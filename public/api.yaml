@@ -1,0 +1,2081 @@
+openapi: 3.0.0
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
+
+info:
+  title: iSync API
+
+paths:
+  /api/login:
+    post:
+      tags:
+        - Auth
+      summary: Login a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                telephone_number:
+                  type: string
+                unit_number:
+                  type: string
+                floor_number:
+                  type: string
+                street:
+                  type: string
+                city:
+                  type: string
+                province:
+                  type: string
+                zip:
+                  type: string
+              required:
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: Returns a list of users.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Users
+      summary: Create a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                pin:
+                  type: integer
+              required:
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get a user by ID
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Users
+      summary: Update a user.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                pin:
+                  type: integer
+              required:
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    delete:
+      tags:
+        - Users
+      summary: Delete a user by ID
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user to delete
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/companies:
+    get:
+      tags:
+        - Companies
+      summary: Returns a list of companies.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Companies
+      summary: Create a company.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: integer
+                company_registered_name:
+                  type: string
+                company_name:
+                  type: string
+                trade_name:
+                  type: string
+                logo:
+                  type: string
+                country:
+                  type: string
+                phone_number:
+                  type: string
+                unit_floor_number:
+                  type: string
+                street:
+                  type: string
+                barangay:
+                  type: string
+                city:
+                  type: string
+                province:
+                  type: string
+                region:
+                  type: string
+              required:
+                - client_id
+                - company_registered_name
+                - company_name
+                - trade_name
+                - logo
+                - country
+                - phone_number
+                - unit_number
+                - floor_number
+                - street
+                - barangay
+                - city
+                - province
+                - region
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/companies/{companyId}:
+    get:
+      tags:
+        - Companies
+      summary: Get a company by ID
+      parameters:
+        - in: path
+          name: companyId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the company to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Companies
+      summary: Update a company.
+      parameters:
+        - in: path
+          name: companyId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the company to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_id:
+                  type: integer
+                company_registered_name:
+                  type: string
+                company_name:
+                  type: string
+                trade_name:
+                  type: string
+                logo:
+                  type: string
+                country:
+                  type: string
+                phone_number:
+                  type: string
+                unit_number:
+                  type: string
+                floor_number:
+                  type: string
+                street:
+                  type: string
+                barangay:
+                  type: string
+                city:
+                  type: string
+                province:
+                  type: string
+                region:
+                  type: string
+              required:
+                - client_id
+                - company_registered_name
+                - company_name
+                - trade_name
+                - logo
+                - country
+                - phone_number
+                - unit_number
+                - floor_number
+                - street
+                - barangay
+                - city
+                - province
+                - region
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    delete:
+      tags:
+        - Companies
+      summary: Delete a company by ID
+      parameters:
+        - in: path
+          name: companyId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the company to delete
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/clusters:
+    get:
+      tags:
+        - Clusters
+      summary: Returns a list of clusters.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Clusters
+      summary: Create a cluster.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_id:
+                  type: integer
+                name:
+                  type: string
+                description:
+                  type: string
+              required:
+                - company_id
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/clusters/{clusterId}:
+    get:
+      tags:
+        - Clusters
+      summary: Get a cluster by ID
+      parameters:
+        - in: path
+          name: clusterId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Clusters
+      summary: Update a cluster.
+      parameters:
+        - in: path
+          name: clusterId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the cluster to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_id:
+                  type: integer
+                name:
+                  type: string
+                description:
+                  type: string
+              required:
+                - company_id
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    delete:
+      tags:
+        - Clusters
+      summary: Delete a cluster by ID
+      parameters:
+        - in: path
+          name: clusterId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the cluster to delete
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/branches:
+    get:
+      tags:
+        - Branches
+      summary: Returns a list of branches.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Branches
+      summary: Create a branch.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_id:
+                  type: integer
+                cluster_id:
+                  type: integer
+                status:
+                  type: string
+                  enum: ['active', 'inactive']
+                  default: 'active'
+                name:
+                  type: string
+                code:
+                  type: string
+                location:
+                  type: string
+                unit_number:
+                  type: string
+                floor_number:
+                  type: string
+                street:
+                  type: string
+                city:
+                  type: string
+                province:
+                  type: string
+                zip:
+                  type: string
+                barangay:
+                  type: string
+                pos_type:
+                  type: string
+                  enum: ['retail', 'restaurant', 'hospitality']
+                  default: 'retail'
+              required:
+                - company_id
+                - cluster_id
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/branches/{branchId}:
+    get:
+      tags:
+        - Branches
+      summary: Get a branch by ID
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Branches
+      summary: Update a branch.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_id:
+                  type: integer
+                cluster_id:
+                  type: integer
+                status:
+                  type: string
+                  enum: ['active', 'inactive']
+                  default: 'active'
+                name:
+                  type: string
+                code:
+                  type: string
+                location:
+                  type: string
+                unit_number:
+                  type: string
+                floor_number:
+                  type: string
+                street:
+                  type: string
+                city:
+                  type: string
+                province:
+                  type: string
+                zip:
+                  type: string
+                barangay:
+                  type: string
+                pos_type:
+                  type: string
+                  enum: ['retail', 'restaurant', 'hospitality']
+                  default: 'retail'
+              required:
+                - company_id
+                - cluster_id
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    delete:
+      tags:
+        - Branches
+      summary: Delete a branch by ID
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to delete
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/regions:
+    get:
+      tags:
+        - Regions
+      summary: Returns a list of regions.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Regions
+      summary: Create a region.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/regions/{regionId}:
+    get:
+      tags:
+        - Regions
+      summary: Get a region by ID
+      parameters:
+        - in: path
+          name: regionId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the region to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Regions
+      summary: Update a region.
+      parameters:
+        - in: path
+          name: regionId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the region to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    delete:
+      tags:
+        - Regions
+      summary: Delete a region by ID
+      parameters:
+        - in: path
+          name: regionId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the region to delete
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/region/{regionId}/provinces:
+    get:
+      tags:
+        - Provinces
+      summary: Returns a list of provinces.
+      parameters:
+        - in: path
+          name: regionId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the region to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/provinces:
+    post:
+      tags:
+        - Provinces
+      summary: Create a province.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region_id:
+                  type: integer
+                name:
+                  type: string
+              required:
+                - name
+                - region_id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/provinces/{provinceId}:
+    get:
+      tags:
+        - Provinces
+      summary: Get a province by ID
+      parameters:
+        - in: path
+          name: provinceId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the province to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Provinces
+      summary: Update a province.
+      parameters:
+        - in: path
+          name: provinceId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the province to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                region_id:
+                  type: integer
+                name:
+                  type: string
+              required:
+                - name
+                - region_id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    delete:
+      tags:
+        - Provinces
+      summary: Delete a region by ID
+      parameters:
+        - in: path
+          name: provinceId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the province to delete
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/province/{provinceId}/cities:
+    get:
+      tags:
+        - Cities
+      summary: Returns a list of cities.
+      parameters:
+        - in: path
+          name: provinceId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the province to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/cities:
+    post:
+      tags:
+        - Cities
+      summary: Create a city.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                province_id:
+                  type: integer
+                name:
+                  type: string
+              required:
+                - name
+                - province_id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/cities/{cityId}:
+    get:
+      tags:
+        - Cities
+      summary: Get a city by ID
+      parameters:
+        - in: path
+          name: cityId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the city to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Cities
+      summary: Update a city.
+      parameters:
+        - in: path
+          name: cityId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the city to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                province_id:
+                  type: integer
+                name:
+                  type: string
+              required:
+                - name
+                - province_id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    delete:
+      tags:
+        - Cities
+      summary: Delete a city by ID
+      parameters:
+        - in: path
+          name: cityId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the city to delete
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/city/{cityId}/barangays:
+    get:
+      tags:
+        - Barangays
+      summary: Returns a list of barangays.
+      parameters:
+        - in: path
+          name: cityId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the city to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/barangays:
+    post:
+      tags:
+        - Barangays
+      summary: Create a barangay.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                city_id:
+                  type: integer
+                name:
+                  type: string
+              required:
+                - name
+                - city_id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/barangays/{barangayId}:
+    get:
+      tags:
+        - Barangays
+      summary: Get a barangay by ID
+      parameters:
+        - in: path
+          name: barangayId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the barangay to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Barangays
+      summary: Update a barangay.
+      parameters:
+        - in: path
+          name: barangayId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the barangay to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                city_id:
+                  type: integer
+                name:
+                  type: string
+              required:
+                - name
+                - city_id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    delete:
+      tags:
+        - Barangays
+      summary: Delete a barangay by ID
+      parameters:
+        - in: path
+          name: barangayId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the barangay to delete
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/activate-machine:
+    post:
+      tags:
+        - POS Machine
+      summary: Activate a machine.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_key:
+                  type: string
+                serial:
+                  type: string
+                model:
+                  type: string
+                android_id:
+                  type: string
+                manufacturer:
+                  type: string
+                board:
+                  type: string
+              required:
+                - product_key
+                - serial
+                - model
+                - android_id
+                - manufacturer
+                - board
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/test-connection:
+    get:
+      tags:
+        - Sync From Server
+      summary: Test connection to the server.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/cash-denominations:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all cash denominations.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/departments/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all departments by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/categories/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all categories by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/sub-categories/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all sub categories by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/branch-users/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all users by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/payment-types/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all payment types by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/discount-types/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all discount types by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/charge-accounts/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all charge accounts by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/branch-transactions:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all transactions by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send transaction to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transaction_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                control_number:
+                  type: string
+                receipt_number:
+                  type: string
+                gross_sales:
+                  type: number
+                net_sales:
+                  type: number
+                vatable_sales:
+                  type: number
+                vat_excempt_sales:
+                  type: number
+                vat_amount:
+                  type: number
+                discount_amount:
+                  type: number
+                tender_amount:
+                  type: number
+                change:
+                  type: number
+                service_charge:
+                  type: number
+                type:
+                  type: string
+                cashier_id:
+                  type: integer
+                cashier_name:
+                  type: string
+                take_order_id:
+                  type: integer
+                  default: null
+                take_order_name:
+                  type: string
+                total_unit_cost:
+                  type: number
+                total_void_amount:
+                  type: number
+                shift_number:
+                  type: integer
+                is_void:
+                  type: boolean
+                void_by_id:
+                  type: integer
+                  default: null
+                void_by:
+                  type: string
+                void_at:
+                  type: string
+                  default: null
+                is_back_out:
+                  type: boolean
+                is_back_out_id:
+                  type: integer
+                  default: null
+                back_out_by:
+                  type: string
+                charge_account_id:
+                  type: integer
+                  default: null
+                charge_account_name:
+                  type: string
+                is_account_receivable:
+                  type: boolean
+                is_sent_to_server:
+                  type: boolean
+                is_complete:
+                  type: boolean
+                completed_at:
+                  type: string
+                  default: null
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_id:
+                  type: integer
+                cut_off_at:
+                  type: string
+                  default: null
+                branch_id:
+                  type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/branch-orders:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all orders by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send transaction to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                product_id:
+                  type: integer
+                code:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                abbreviation:
+                  type: string
+                cost:
+                  type: number
+                qty:
+                  type: number
+                amount:
+                  type: number
+                original_amount:
+                  type: number
+                gross:
+                  type: number
+                total:
+                  type: number
+                total_cost:
+                  type: number
+                is_vatable:
+                  type: boolean
+                vat_amount:
+                  type: number
+                vatable_sales:
+                  type: number
+                vat_exempt_sales:
+                  type: number
+                discount_amount:
+                  type: number
+                department_id:
+                  type: integer
+                department_name:
+                  type: string
+                category_id:
+                  type: integer
+                category_name:
+                  type: string
+                subcategory_id:
+                  type: integer
+                subcategory_name:
+                  type: string
+                unit_id:
+                  type: integer
+                unit_name:
+                  type: string
+                is_void:
+                  type: boolean
+                void_by:
+                  type: string
+                void_at:
+                  type: string
+                  default: null
+                is_back_out:
+                  type: boolean
+                is_back_out_id:
+                  type: integer
+                  default: null
+                back_out_by:
+                  type: string
+                min_amount_sold:
+                  type: number
+                is_paid:
+                  type: boolean
+                is_sent_to_server:
+                  type: boolean
+                is_completed:
+                  type: boolean
+                completed_at:
+                  type: string
+                  default: null
+                branch_id:
+                  type: integer
+                is_cut_off:
+                  type: boolean
+                cut_off_id:
+                  type: integer
+                cut_off_at:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/branch-payments:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all payments by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send payments to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payment_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                payment_type_id:
+                  type: integer
+                payment_type_name:
+                  type: string
+                  default: null
+                amount:
+                  type: number
+                other_information:
+                  type: string
+                  default: null
+                is_advance_payment:
+                  type: boolean
+                is_cut_off:
+                  type: boolean
+                cut_off_id:
+                  type: integer
+                  default: null
+                cut_off_at:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/safekeeping:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all safekeeping data by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send safekeeping to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                safekeeping_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                amount:
+                  type: number
+                cashier_id:
+                  type: integer
+                cashier_name:
+                  type: string
+                  default: null
+                authorize_id:
+                  type: integer
+                authorize_name:
+                  type: string
+                  default: null
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_id:
+                  type: integer
+                  default: null
+                cut_off_at:
+                  type: string
+                  default: null
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/safekeeping-denominations:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all safekeeping denomination data by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send safekeeping denomination to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                branch_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                safekeeping_denomination_id:
+                  type: integer
+                safekeeping_id:
+                  type: integer
+                cash_denomination_id:
+                  type: integer
+                name:
+                  type: string
+                  default: null
+                amount:
+                  type: number
+                qty:
+                  type: number
+                total:
+                  type: number
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/end-of-days:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all end of day data by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send end of day to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                end_of_day_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                beginning_or:
+                  type: string
+                  default: null
+                ending_or:
+                  type: string
+                  default: null
+                beginning_amount:
+                  type: number
+                ending_amount:
+                  type: number
+                total_transactions:
+                  type: integer
+                gross_sales:
+                  type: number
+                net_sales:
+                  type: number
+                vatable_sales:
+                  type: number
+                vat_exempt_sales:
+                  type: number
+                vat_amount:
+                  type: number
+                vat_expense:
+                  type: number
+                void_amount:
+                  type: number
+                total_cash_payments:
+                  type: number
+                total_card_payments:
+                  type: number
+                total_online_payments:
+                  type: number
+                total_ar_payments:
+                  type: number
+                total_mobile_payments:
+                  type: number
+                total_charge:
+                  type: number
+                senior_count:
+                  type: integer
+                senior_amount:
+                  type: number
+                pwd_count:
+                  type: integer
+                pwd_amount:
+                  type: number
+                others_count:
+                  type: integer
+                others_amount:
+                  type: number
+                others_json:
+                  type: string
+                total_payout:
+                  type: number
+                total_service_charge:
+                  type: number
+                total_discount_amount:
+                  type: number
+                total_ar_cash_redeemed_amount:
+                  type: number
+                total_ar_card_redeemed_amount:
+                  type: number
+                total_cost:
+                  type: number
+                total_sk:
+                  type: number
+                cashier_id:
+                  type: integer
+                cashier_name:
+                  type: string
+                  default: null
+                admin_id:
+                  type: integer
+                admin_name:
+                  type: string
+                  default: null
+                shift_number:
+                  type: string
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/cut-offs:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all end of day data by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send cut_off to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cut_off_id:
+                  type: integer
+                end_of_day_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                beginning_or:
+                  type: string
+                  default: null
+                ending_or:
+                  type: string
+                  default: null
+                beginning_amount:
+                  type: number
+                ending_amount:
+                  type: number
+                total_transactions:
+                  type: integer
+                gross_sales:
+                  type: number
+                net_sales:
+                  type: number
+                vatable_sales:
+                  type: number
+                vat_exempt_sales:
+                  type: number
+                vat_amount:
+                  type: number
+                vat_expense:
+                  type: number
+                void_amount:
+                  type: number
+                total_cash_payments:
+                  type: number
+                total_card_payments:
+                  type: number
+                total_online_payments:
+                  type: number
+                total_ar_payments:
+                  type: number
+                total_mobile_payments:
+                  type: number
+                total_charge:
+                  type: number
+                senior_count:
+                  type: integer
+                senior_amount:
+                  type: number
+                pwd_count:
+                  type: integer
+                pwd_amount:
+                  type: number
+                others_count:
+                  type: integer
+                others_amount:
+                  type: number
+                others_json:
+                  type: string
+                total_payout:
+                  type: number
+                total_service_charge:
+                  type: number
+                total_discount_amount:
+                  type: number
+                total_ar_cash_redeemed_amount:
+                  type: number
+                total_ar_card_redeemed_amount:
+                  type: number
+                total_cost:
+                  type: number
+                total_sk:
+                  type: number
+                cashier_id:
+                  type: integer
+                cashier_name:
+                  type: string
+                  default: null
+                admin_id:
+                  type: integer
+                admin_name:
+                  type: string
+                  default: null
+                shift_number:
+                  type: string
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string

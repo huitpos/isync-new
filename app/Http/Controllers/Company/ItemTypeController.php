@@ -1,0 +1,111 @@
+<?php
+
+namespace App\Http\Controllers\Company;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+use App\Repositories\Interfaces\ItemTypeRepositoryInterface;
+
+class ItemTypeController extends Controller
+{
+    protected $itemTypeRepository;
+
+    public function __construct(ItemTypeRepositoryInterface $itemTypeRepository)
+    {
+        $this->itemTypeRepository = $itemTypeRepository;
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $company = $request->attributes->get('company');
+
+        return view('company.itemTypes.index', compact('company'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(Request $request)
+    {
+        $company = $request->attributes->get('company');
+
+        return view('company.itemTypes.create', [
+            'company' => $company,
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'company_id' => 'required',
+            'name' => 'required',
+            'status' => 'required'
+        ]);
+
+        $company = $request->attributes->get('company');
+
+        if ($this->itemTypeRepository->create($request->all())) {
+            return redirect()->route('company.item-types.index', ['companySlug' => $company->slug])->with('success', 'Data has been stored successfully!');
+        }
+
+        return redirect()->back()->with('success', 'Data has been stored successfully!');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Request $request, string $companySlug, string $id)
+    {
+        $company = $request->attributes->get('company');
+
+        $itemType = $this->itemTypeRepository->find($id);
+
+        return view('company.itemTypes.edit', [
+            'company' => $company,
+            'itemType' => $itemType
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $companySlug, string $id)
+    {
+        $request->validate([
+            'company_id' => 'required',
+            'name' => 'required',
+            'status' => 'required'
+        ]);
+
+        $company = $request->attributes->get('company');
+
+        if ($this->itemTypeRepository->update($id, $request->all())) {
+            return redirect()->route('company.item-types.index', ['companySlug' => $company->slug])->with('success', 'Data has been updated successfully!');
+        }
+
+        return redirect()->back()->with('success', 'Data has been updated successfully!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}

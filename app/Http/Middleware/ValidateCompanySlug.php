@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+use App\Models\Company;
+use App\Models\Branch;
+
+
+class ValidateCompanySlug
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $companySlug = $request->route('companySlug');
+
+        if ($companySlug) {
+            // Check if the company with this slug exists
+            $company = Company::where('slug', $companySlug)->first();
+
+            if (!$company) {
+                return abort(404, 'Company not found');
+            }
+
+            // Pass the company data to the request for later use if needed
+            $request->attributes->add(['company' => $company]);
+
+            $branchSlug = $request->route('branchSlug');
+
+            if ($branchSlug) {
+                $branch  = Branch::where([
+                    'slug' => $branchSlug
+                ])->first();
+
+                if (!$branch) {
+                    return abort(404, 'Branch not found');
+                }
+
+                $request->attributes->add(['branch' => $branch]);
+            }
+        }
+
+        return $next($request);
+    }
+}

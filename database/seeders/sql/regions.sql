@@ -1,0 +1,17 @@
+INSERT INTO `regions` (`name`) VALUES ('NCR - National Capital Region');
+INSERT INTO `regions` (`name`) VALUES ('Region I - Ilocos Region');
+INSERT INTO `regions` (`name`) VALUES ('Region II - Cagayan Valley');
+INSERT INTO `regions` (`name`) VALUES ('Region III - Central Luzon');
+INSERT INTO `regions` (`name`) VALUES ('Region IV-A - CALABARZON');
+INSERT INTO `regions` (`name`) VALUES ('Region IV-B - MIMAROPA');
+INSERT INTO `regions` (`name`) VALUES ('Region V - Bicol Region');
+INSERT INTO `regions` (`name`) VALUES ('Region VI - Western Visayas');
+INSERT INTO `regions` (`name`) VALUES ('Region VII - Central Visayas');
+INSERT INTO `regions` (`name`) VALUES ('Region VIII - Eastern Visayas');
+INSERT INTO `regions` (`name`) VALUES ('Region IX - Zamboanga Peninsula');
+INSERT INTO `regions` (`name`) VALUES ('Region X - Northern Mindanao');
+INSERT INTO `regions` (`name`) VALUES ('Region XI - Davao Region');
+INSERT INTO `regions` (`name`) VALUES ('Region XII - SOCCSKSARGEN');
+INSERT INTO `regions` (`name`) VALUES ('Region XIII - Caraga');
+INSERT INTO `regions` (`name`) VALUES ('CAR - Cordillera Administrative Region');
+INSERT INTO `regions` (`name`) VALUES ('BARMM - Bangsamoro Autonomous Region in Muslim Mindanao');
