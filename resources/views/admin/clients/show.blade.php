@@ -106,6 +106,19 @@
                 <div class="fw-bold mt-5">Account Link</div>
                 <div class="text-gray-600">{{ route('company.dashboard', ['companySlug' => $company->slug]) }}</div>
             </div>
+
+            <div class="mb-5 fs-6">
+                <div class="form-check form-switch form-check-custom form-check-solid me-10 mt-5">
+                    <input data-action="{{ route('admin.companies.update', ['company' => $company->id]) }}" data-csrf="{{ csrf_token() }}" class="form-check-input h-30px w-60px status-toggle" type="checkbox" {{ $company->status == 'active' ? 'checked' : '' }}/>
+                    <label class="ms-sm-2">
+                        Status
+                    </label>
+                </div>
+            </div>
+
+            <div class="pb-1 fs-6">
+                <a href="{{ route('admin.clients.edit', ['client' => $company->id]) }}" class="btn btn-secondary">Edit</a>
+            </div>
         </div>
     </div>
 </x-default-layout>

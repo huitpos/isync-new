@@ -179,7 +179,39 @@ class CompanyController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        if ($request->ajax()) {
+            $company = $this->companyRepository->find($id);
+
+            if ($company) {
+                $company->status = $request->status;
+                $company->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Company status updated successfully.'
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Company not found.'
+            ]);
+        }
+
+        $request->validate([
+            'company_id' => 'required',
+            'name' => 'required',
+            'description' => 'required',
+            'status' => 'required',
+        ]);
+
+        $company = $request->attributes->get('company');
+
+        // if ($this->bankRepository->update($id, $request->all())) {
+        //     return redirect()->route('company.banks.index', ['companySlug' => $company->slug])->with('success', 'Bank updated successfully.');
+        // }
+
+        // return redirect()->route('company.banks.index', ['companySlug' => $company->slug])->with('error', 'Bank failed to update.');
     }
 
     /**

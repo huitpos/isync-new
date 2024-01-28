@@ -23,7 +23,19 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return redirect(RouteServiceProvider::HOME);
+                $user = Auth::user();
+                $user->createToken('app')->plainTextToken;
+                session(['_apiToken' => $user->createToken('app')->plainTextToken]);
+
+                if ($user->hasRole('super_admin')) {
+                    return redirect()->route('admin.dashboard');
+                }
+
+                if ($user->client_id) {
+                    $slug = $user->client->companies()->first()->slug;
+
+                    return redirect()->route('company.dashboard', ['companySlug' => $slug]);
+                }
             }
         }
 

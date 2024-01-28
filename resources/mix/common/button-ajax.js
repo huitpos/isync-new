@@ -24,3 +24,40 @@ $(document).on('click', '.button-ajax', function (e) {
             }
         });
 });
+
+$(document).on('change', '.status-toggle', function (e) {
+    e.preventDefault();
+
+    var elem = $(this);
+    var action = elem.data('action');
+    var csrf = $(this).data('csrf');
+
+    axios.request({
+        url: action,
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        data: {
+            _token: csrf,
+            status: elem.is(':checked') ? 'active' : 'inactive'
+        },
+    })
+    .then(function (response) {
+        toastr.success(
+            "", 
+            "Status updated!", 
+            {timeOut: 2000, extendedTimeOut: 0, closeButton: true, closeDuration: 0}
+        );
+    })
+    .catch(function (error) {
+        console.log(error);
+    })
+    .then(function () {
+        if (reload) {
+            window.location.reload();
+        }
+    });
+});
