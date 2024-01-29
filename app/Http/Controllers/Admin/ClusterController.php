@@ -12,6 +12,8 @@ use App\Models\Cluster;
 use App\Repositories\Interfaces\ClusterRepositoryInterface;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 
+use App\DataTables\Admin\ClustersDataTable;
+
 class ClusterController extends Controller
 {
     protected $apiService;
@@ -31,12 +33,10 @@ class ClusterController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(ClustersDataTable $dataTable)
     {
-        $clusters = $this->clusterRepository->all();
-        return view('admin.clusters.index', [
-            'clusters' => $clusters,
-        ]);
+
+        return $dataTable->render('admin.clusters.index');
     }
 
     /**
@@ -72,7 +72,15 @@ class ClusterController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $cluster = $this->clusterRepository->find($id);
+
+        if (!$cluster) {
+            return abort(404, 'Cluster not found');
+        }
+
+        return view('admin.clusters.show', [
+            'cluster' => $cluster,
+        ]);
     }
 
     /**
@@ -98,6 +106,25 @@ class ClusterController extends Controller
      */
     public function update(Request $request, $clusterId)
     {
+        if ($request->ajax()) {
+            $cluster = $this->clusterRepository->find($clusterId);
+
+            if ($cluster) {
+                $cluster->status = $request->status;
+                $cluster->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Cluster status updated successfully.'
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cluster not found.'
+            ]);
+        }
+        
         $request->validate([
             'company_id' => 'required',
             'name' => 'required',

@@ -3524,12 +3524,12 @@ var KTWidgets = function () {
         }, cb);
 
         cb(start, end, '');
-    }    
+    }
 
     // Dark mode toggler
     var initDarkModeToggle = function() {
         var toggle = document.querySelector('#kt_user_menu_dark_mode_toggle');
-        
+
         if (toggle) {
             toggle.addEventListener('click', function() {
                 window.location.href = this.getAttribute('data-kt-url');
@@ -3537,18 +3537,35 @@ var KTWidgets = function () {
         }
     }
 
+    var initFlatpackPicker = function() {
+        var elements = document.querySelectorAll('.flatpack-picker');
+
+        if (elements.length > 0) {
+            [].slice.call(elements).map(function(element) {
+                var enableTime = element.getAttribute('data-enable-time') === 'true' || false;
+                var dateFormat = element.getAttribute('data-date-format') || 'Y-m-d';
+
+                element.flatpickr({
+                    enableTime: enableTime,
+                    dateFormat: dateFormat + (enableTime ? ' H:i' : ''), // Append time format if enableTime is true
+                });
+            });
+        }
+    }
+
     // Public methods
     return {
         init: function () {
+            initFlatpackPicker();
             // Daterangepicker
             initDaterangepicker();
-            
+
             // Dark Mode
             initDarkModeToggle();
 
             // Statistics widgets
             initStatisticsWidget3();
-            initStatisticsWidget4();            
+            initStatisticsWidget4();
 
             // Charts widgets
             initChartsWidget1();

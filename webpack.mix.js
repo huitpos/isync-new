@@ -129,10 +129,10 @@ glob.sync('node_modules/+(@fortawesome|socicon|line-awesome|bootstrap-icons)/**/
     mix.copy(file, `public/assets/plugins/custom/jstree/${path.basename(file)}`);
 });
 
+mix.js('resources/swagger.js', `public/assets/js/swagger.js`);
+
 // Widgets
 mix.scripts((glob.sync(`${dir}/js/widgets/**/*.js`) || []), `public/assets/js/widgets.bundle.js`);
-
-mix.js('resources/swagger.js', `public/assets/js/swagger.js`);
 
 function getDemos() {
     // get possible demo from parameter command

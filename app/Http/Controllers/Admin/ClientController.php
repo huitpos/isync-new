@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 use App\DataTables\Admin\ClientsDataTable;
+use App\DataTables\Admin\CompanyBranchDataTable;
 
 class ClientController extends Controller
 {
@@ -173,7 +174,7 @@ class ClientController extends Controller
             'city_id' => $request['city_id'],
             'barangay_id' => $request['barangay_id'],
             'slug' => Str::slug($request['trade_name']),
-            'street' => Str::slug($request['street']),
+            'street' => $request['street'],
             'company_registered_name' => ''
         ]);
 
@@ -190,11 +191,15 @@ class ClientController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(CompanyBranchDataTable $dataTable, string $id)
     {
         $company = $this->companyRepository->find($id);
 
-        return view('admin.clients.show', [
+        if (!$company) {
+            return abort(404, 'Company not found');
+        }
+
+        return $dataTable->with('company_id', $company->id)->render('admin.clients.show', [
             'company' => $company,
         ]);
     }
@@ -202,9 +207,38 @@ class ClientController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $id)
     {
-        //
+        $company = $this->companyRepository->find($id);
+
+        if (!$company) {
+            return abort(404, 'Company not found');
+        }
+
+        $regions = Region::all();
+        $provinces = Province::where('region_id', $company->region_id)->get();;
+        $cities = City::where('province_id', $company->province_id)->get();
+        $barangays = Barangay::where('city_id', $company->city_id)->get();
+
+        if ($request->old('region_id')) {
+            $provinces = Province::where('region_id', $request->old('region_id'))->get();
+        }
+
+        if ($request->old('province_id')) {
+            $cities = City::where('province_id', $request->old('province_id'))->get();
+        }
+
+        if ($request->old('city_id')) {
+            $barangays = Barangay::where('city_id', $request->old('city_id'))->get();
+        }
+
+        return view('admin.clients.edit', [
+            'company' => $company,
+            'regions' => $regions,
+            'provinces' => $provinces,
+            'cities' => $cities,
+            'barangays' => $barangays,
+        ]);
     }
 
     /**
@@ -212,7 +246,67 @@ class ClientController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        dd($request->all());
+        $company = $this->companyRepository->find($id);
+
+        if (empty($request->password)) {
+            $request->request->remove('password');
+            $request->request->remove('password_confirmation');
+        }
+
+        $validatedData = $request->validate([
+            'owner_name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $company->client->user->id,
+            'password' => 'sometimes|min:6',
+            'password_confirmation' => 'sometimes|same:password',
+            'company_name' => 'required|max:100|unique:companies,company_name,' . $id,
+            'trade_name' => 'required|max:100|unique:companies,trade_name,' . $id,
+            'phone_number' => 'required|max:10',
+            'unit_floor_number' => 'required|max:100',
+            'region_id' => 'required',
+            'province_id' => 'required',
+            'city_id' => 'required',
+            'barangay_id' => 'required',
+            'street' => 'required',
+            'pos_type' => 'required'
+        ]);
+
+        $client = $this->clientRepository->update($company->client->id, [
+            'name' => $validatedData['owner_name'],
+            'telephone_number' => $request['phone_number'],
+            'unit_number' => $request['unit_floor_number'],
+            'floor_number' => $request['unit_floor_number'],
+            'city' => $request['city_id'],
+            'province' => $request['province_id'],
+        ]);
+
+        $this->companyRepository->update($id, [
+            'company_name' => $request['company_name'],
+            'trade_name' => $request['trade_name'],
+            'phone_number' => $request['phone_number'],
+            'unit_floor_number' => $request['unit_floor_number'],
+            'logo' => '',
+            'country' => $request['country'],
+            'region_id' => $request['region_id'],
+            'province_id' => $request['province_id'],
+            'city_id' => $request['city_id'],
+            'barangay_id' => $request['barangay_id'],
+            'slug' => Str::slug($request['trade_name']),
+            'street' => $request['street'],
+            'company_registered_name' => ''
+        ]);
+
+        $userData = [
+            'name' => $validatedData['owner_name'],
+            'email' => $validatedData['email'],
+        ];
+
+        if (!empty($validatedData['password'])) {
+            $userData['password'] = bcrypt($validatedData['password']);
+        }
+
+        $this->userRepository->update($company->client->user->id, $userData);
+
+        return redirect()->route('admin.clients.index')->with('success', 'Data has been updated successfully!');
     }
 
     /**

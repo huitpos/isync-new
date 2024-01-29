@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PosDevice;
 use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\PosMachineRepositoryInterface;
@@ -88,8 +89,12 @@ class MachineController extends BaseController
 
         $machine = $this->posMachineRepository->get(['product_key' => $validatedData['product_key']])->first();
 
-        if (!empty($machine->device)) {
-            return $this->sendError('Device already activated');
+        $devices = PosDevice::where('pos_machine_id', $machine->id)
+            ->where('status', 'active')
+            ->count();
+
+        if ($devices > 0) {
+            return $this->sendError('Device already in use');
         }
 
         $machine->device()->create($postData);

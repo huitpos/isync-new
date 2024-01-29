@@ -17,6 +17,9 @@ use Illuminate\Support\Str;
 use App\Repositories\Interfaces\BranchRepositoryInterface;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 
+use App\DataTables\Admin\BranchesDataTable;
+use App\DataTables\Admin\BranchMachinesDataTable;
+
 class BranchController extends Controller
 {
     protected $branchRepository;
@@ -33,13 +36,9 @@ class BranchController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(BranchesDataTable $dataTable)
     {
-        $branches = $this->branchRepository->all();
-
-        return view('admin.branches.index', [
-            'branches' => $branches
-        ]);
+        return $dataTable->render('admin.branches.index');
     }
 
     /**
@@ -80,7 +79,6 @@ class BranchController extends Controller
             'company_id' => 'required',
             'cluster_id' => 'required',
             'status' => 'required',
-            'pos_type' => 'required',
             'name' => 'required',
             'code' => 'required',
             'unit_floor_number' => 'required',
@@ -104,7 +102,7 @@ class BranchController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(BranchMachinesDataTable $dataTable, string $id)
     {
         $branch = $this->branchRepository->find($id);
 
@@ -112,7 +110,7 @@ class BranchController extends Controller
             return abort(404, 'Branch not found');
         }
 
-        return view('admin.branches.show', [
+        return $dataTable->with('branch_id', $branch->id)->render('admin.branches.show', [
             'branch' => $branch
         ]);
     }
@@ -132,11 +130,10 @@ class BranchController extends Controller
         $provinces = Province::where('region_id', $branch->region_id)->get();
         $cities = City::where('province_id', $branch->province_id)->get();
         $barangays = Barangay::where('city_id', $branch->city_id)->get();
-
+        $companies = $this->companyRepository->all();
         return view('admin.branches.edit', [
+            'companies' => $companies,
             'branch' => $branch,
-            'company' => $company,
-            'clusters' => $company->clusters,
             'regions' => $regions,
             'provinces' => $provinces,
             'cities' => $cities,
@@ -147,22 +144,35 @@ class BranchController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $companyId, $branchId)
+    public function update(Request $request, $branchId)
     {
-        $branch = Branch::find($branchId);
+        if ($request->ajax()) {
+            $branch = Branch::find($branchId);
+
+            if (!$branch) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Branch not found'
+                ]);
+            }
+
+            $branch->status = $request->status;
+            $branch->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Branch status has been updated successfully!'
+            ]);
+        }
 
         $request->validate([
             'company_id' => 'required',
             'cluster_id' => 'required',
             'status' => 'required',
-            'pos_type' => 'required',
             'name' => 'required',
             'code' => 'required',
-            'location' => 'required',
-            'unit_number' => 'required',
-            'floor_number' => 'required',
+            'unit_floor_number' => 'required',
             'street' => 'required',
-            'zip' => 'required',
             'region_id' => 'required',
             'province_id' => 'required',
             'city_id' => 'required',
@@ -173,7 +183,7 @@ class BranchController extends Controller
         $data['slug'] = Str::slug($data['name']);
 
         if ($this->branchRepository->update($branchId, $data)) {
-            return redirect()->route('admin.branches.index', ['companyId' => $companyId])->with('success', 'Data has been updated successfully!');
+            return redirect()->route('admin.branches.index')->with('success', 'Data has been updated successfully!');
         }
 
         return redirect()->back()->with('error', 'Something went wrong. Please try again.');

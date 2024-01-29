@@ -20,7 +20,23 @@
 					</a>
 				</div>
 
-				{{ route('user-management.users.index') }}
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('admin.clusters.*') ? 'active' : '' }}" href="{{ route('admin.clusters.index') }}">
+						<span class="menu-icon">
+							<i class="fa-solid fa-circle-nodes fs-2"></i>
+						</span>
+						<span class="menu-title">Clusters</span>
+					</a>
+				</div>
+
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('admin.branches.*') || request()->routeIs('admin.machines.*') ? 'active' : '' }}" href="{{ route('admin.branches.index') }}">
+						<span class="menu-icon">
+							<i class="fa-solid fa-shop fs-2"></i>
+						</span>
+						<span class="menu-title">Branches</span>
+					</a>
+				</div>
 			@endif
 		</div>
 	</div>

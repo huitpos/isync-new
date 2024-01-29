@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\CreatedUpdatedBy;
+
 class Branch extends Model
 {
     use HasFactory;
+    use CreatedUpdatedBy;
 
     protected $guarded = [];
 
@@ -54,5 +57,10 @@ class Branch extends Model
     public function machines()
     {
         return $this->hasMany(PosMachine::class);
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

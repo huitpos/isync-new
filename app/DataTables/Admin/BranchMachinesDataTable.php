@@ -2,14 +2,14 @@
 
 namespace App\DataTables\Admin;
 
-use App\Models\Company;
+use App\Models\PosMachine;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
-class ClientsDataTable extends DataTable
+class BranchMachinesDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -19,10 +19,18 @@ class ClientsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('actions', function (Company $data) {
+            ->addColumn('status', function (PosMachine $data) {
+                return view('admin.datatables._status-toggle', [
+                    'id' => $data->id,
+                    'route' => 'admin.machines.update',
+                    'param' => ['branchId' => $data->branch_id, 'machine' => $data->id],
+                    'checked' => $data->status == 'active' ? 'checked' : '',
+                ]);
+            })
+            ->addColumn('actions', function (PosMachine $data) {
                 return view('admin.datatables._actions', [
-                    'param' => $data->id,
-                    'route' => 'admin.clients',
+                    'param' => ['branchId' => $data->branch_id, 'machine' => $data->id],
+                    'route' => 'admin.machines',
                 ]);
             });
     }
@@ -31,12 +39,13 @@ class ClientsDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(Company $model): QueryBuilder
+    public function query(PosMachine $model): QueryBuilder
     {
         return $model->newQuery()
+            ->where('pos_machines.branch_id', $this->branch_id)
             ->with([
+                'branch',
                 'createdBy',
-                'client.user',
             ]);
     }
 
@@ -46,7 +55,7 @@ class ClientsDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('clients-table')
+            ->setTableId('branch-machines-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>>",)
@@ -62,14 +71,18 @@ class ClientsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id')->title('ID'),
-            Column::make('company_name')->title('company name'),
-            Column::make('client.name')->title('owner name'),
-            Column::make('phone_number')->title('contact no,'),
-            Column::make('client.user.email')->title('email'),
-            Column::make('pos_type')->title('type of pos'),
+            Column::make('id')->title('Machine No.'),
+            Column::make('name')->title('Device Name'),
+            Column::make('product_key'),
+            Column::make('serial_number'),
+            Column::make('permit_number'),
+            Column::make('valid_from'),
+            Column::make('valid_to')->title('Valid Until'),
+            Column::make('type')->title('Machine Type'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
-            Column::make('status'),
+            Column::computed('status')
+                ->exportable(false)
+                ->printable(false),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

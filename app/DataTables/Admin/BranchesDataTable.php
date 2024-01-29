@@ -2,14 +2,14 @@
 
 namespace App\DataTables\Admin;
 
-use App\Models\Company;
+use App\Models\Branch;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
-class ClientsDataTable extends DataTable
+class BranchesDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -19,10 +19,10 @@ class ClientsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('actions', function (Company $data) {
+            ->addColumn('actions', function (Branch $data) {
                 return view('admin.datatables._actions', [
                     'param' => $data->id,
-                    'route' => 'admin.clients',
+                    'route' => 'admin.branches',
                 ]);
             });
     }
@@ -31,12 +31,14 @@ class ClientsDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(Company $model): QueryBuilder
+    public function query(Branch $model): QueryBuilder
     {
         return $model->newQuery()
             ->with([
                 'createdBy',
-                'client.user',
+                'company.client.user',
+                'cluster',
+
             ]);
     }
 
@@ -46,7 +48,7 @@ class ClientsDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('clients-table')
+            ->setTableId('branches-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>>",)
@@ -62,14 +64,15 @@ class ClientsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id')->title('ID'),
-            Column::make('company_name')->title('company name'),
-            Column::make('client.name')->title('owner name'),
-            Column::make('phone_number')->title('contact no,'),
-            Column::make('client.user.email')->title('email'),
-            Column::make('pos_type')->title('type of pos'),
+            Column::make('id'),
+            Column::make('company.company_name')->title('company name'),
+            Column::make('name')->title('branch name'),
+            Column::make('code')->title('branch code'),
+            Column::make('cluster.name')->title('branch cluster'),
+            Column::make('company.client.name')->title("owner's name"),
+            Column::make('company.client.user.email')->title("email address"),
+            Column::computed('status')->title('status'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
-            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

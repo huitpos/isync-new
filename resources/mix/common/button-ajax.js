@@ -46,11 +46,22 @@ $(document).on('change', '.status-toggle', function (e) {
         },
     })
     .then(function (response) {
-        toastr.success(
-            "", 
-            "Status updated!", 
-            {timeOut: 2000, extendedTimeOut: 0, closeButton: true, closeDuration: 0}
-        );
+
+        if (response.data.status == 'error') {
+            elem.prop('checked', !elem.is(':checked'));
+            toastr.error(
+                "",
+                response.data.message,
+                {timeOut: 2000, extendedTimeOut: 0, closeButton: true, closeDuration: 0}
+            );
+            return;
+        } else {
+            toastr.success(
+                "",
+                response.data.message,
+                {timeOut: 2000, extendedTimeOut: 0, closeButton: true, closeDuration: 0}
+            );
+        }
     })
     .catch(function (error) {
         console.log(error);

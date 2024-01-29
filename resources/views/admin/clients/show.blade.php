@@ -107,7 +107,7 @@
                 <div class="text-gray-600">{{ route('company.dashboard', ['companySlug' => $company->slug]) }}</div>
             </div>
 
-            <div class="mb-5 fs-6">
+            {{-- <div class="mb-5 fs-6">
                 <div class="form-check form-switch form-check-custom form-check-solid me-10 mt-5">
                     <input data-action="{{ route('admin.companies.update', ['company' => $company->id]) }}" data-csrf="{{ csrf_token() }}" class="form-check-input h-30px w-60px status-toggle" type="checkbox" {{ $company->status == 'active' ? 'checked' : '' }}/>
                     <label class="ms-sm-2">
@@ -118,7 +118,39 @@
 
             <div class="pb-1 fs-6">
                 <a href="{{ route('admin.clients.edit', ['client' => $company->id]) }}" class="btn btn-secondary">Edit</a>
+            </div> --}}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header border-0 pt-6">
+            <!--begin::Card title-->
+            <div class="card-title">
+                <h2>Branches</h2>
+            </div>
+            <!--end::Card title-->
+            <!--begin::Card toolbar-->
+            <div class="card-toolbar">
+                <div class="d-flex align-items-center position-relative my-1">
+                    {!! getIcon('magnifier', 'fs-3 position-absolute ms-5') !!}
+                    <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search branch" id="searchBar"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body py-4">
+            <div class="table-responsive">
+                {{ $dataTable->table() }}
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        {{ $dataTable->scripts() }}
+        <script>
+            document.getElementById('searchBar').addEventListener('keyup', function () {
+                window.LaravelDataTables['company-branch-table'].search(this.value).draw();
+            });
+        </script>
+    @endpush
 </x-default-layout>

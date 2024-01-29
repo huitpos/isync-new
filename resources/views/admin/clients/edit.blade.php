@@ -5,19 +5,20 @@
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('admin.clients.create') }}
+        {{ Breadcrumbs::render('admin.clients.edit') }}
     @endsection
 
     <div class="card">
         <div class="card-body py-4">
-            <form class="mt-3" action="{{ route('admin.clients.store') }}" method="POST" novalidate enctype="multipart/form-data">
+            <form class="mt-3" action="{{ route('admin.clients.update', ['client' => $company->id]) }}" method="POST" novalidate enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
 
                 <h3>Company Registered Name</h3>
 
                 <div class="mb-4 mt-5">
                     <label class="form-label">Company Name</label>
-                    <input value="{{ old('company_name') }}" name="company_name" type="text" class="form-control @error('company_name') is-invalid @enderror" required/>
+                    <input value="{{ old('company_name') ?? $company->company_name }}" name="company_name" type="text" class="form-control @error('company_name') is-invalid @enderror" required/>
 
                     @error('company_name')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -26,7 +27,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Trade Name</label>
-                    <input value="{{ old('trade_name') }}" name="trade_name" type="text" class="form-control @error('trade_name') is-invalid @enderror" placeholder="Trade Name" required/>
+                    <input value="{{ old('trade_name') ?? $company->trade_name }}" name="trade_name" type="text" class="form-control @error('trade_name') is-invalid @enderror" placeholder="Trade Name" required/>
 
                     @error('trade_name')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -80,7 +81,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Owner Name</label>
-                    <input value="{{ old('owner_name') }}" name="owner_name" type="text" class="form-control @error('owner_name') is-invalid @enderror" placeholder="Owner Name" required/>
+                    <input value="{{ old('owner_name') ?? $company->client->name }}" name="owner_name" type="text" class="form-control @error('owner_name') is-invalid @enderror" placeholder="Owner Name" required/>
 
                     @error('owner_name')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -94,7 +95,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Contact Number</label>
-                    <input value="{{ old('phone_number') }}" name="phone_number" type="text" class="form-control @error('phone_number') is-invalid @enderror" placeholder="Contact Number" required/>
+                    <input value="{{ old('phone_number') ?? $company->phone_number }}" name="phone_number" type="text" class="form-control @error('phone_number') is-invalid @enderror" placeholder="Contact Number" required/>
 
                     @error('phone_number')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -105,7 +106,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Unit No./Floor Bldg.</label>
-                    <input value="{{ old('unit_floor_number') }}" name="unit_floor_number" type="text" class="form-control @error('unit_floor_number') is-invalid @enderror" placeholder="Unit No./Floor Bldg." required/>
+                    <input value="{{ old('unit_floor_number') ?? $company->unit_floor_number }}" name="unit_floor_number" type="text" class="form-control @error('unit_floor_number') is-invalid @enderror" placeholder="Unit No./Floor Bldg." required/>
 
                     @error('unit_floor_number')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -114,7 +115,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Street</label>
-                    <input value="{{ old('street') }}" name="street" type="text" class="form-control @error('street') is-invalid @enderror" placeholder="Street" required/>
+                    <input value="{{ old('street') ?? $company->street }}" name="street" type="text" class="form-control @error('street') is-invalid @enderror" placeholder="Street" required/>
 
                     @error('street')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -126,7 +127,7 @@
                     <select id="region_id" name="region_id" data-control="select2" data-placeholder="Select a region" class="form-control @error('region_id') is-invalid @enderror" required>
                         <option value=""></option>
                         @foreach ($regions as $region)
-                            <option value="{{ $region->id }}" {{ $region->id == old('region_id') ? 'selected' : '' }}>{{ $region->name }}</option>
+                            <option value="{{ $region->id }}" {{ $region->id == old('region_id') || $region->id == $company->region_id ? 'selected' : '' }}>{{ $region->name }}</option>
                         @endforeach
                     </select>
 
@@ -141,7 +142,7 @@
                         <option value=""></option>
                         @if (!empty($provinces))
                             @foreach ($provinces as $province)
-                                <option value="{{ $province->id }}" {{ $province->id == old('province_id') ? 'selected' : '' }}>{{ $province->name }}</option>
+                                <option value="{{ $province->id }}" {{ $province->id == old('province_id') || $province->id == $company->province_id ? 'selected' : '' }}>{{ $province->name }}</option>
                             @endforeach
                         @endif
                     </select>
@@ -157,7 +158,7 @@
                         <option value=""></option>
                         @if (!empty($cities))
                             @foreach ($cities as $city)
-                                <option value="{{ $city->id }}" {{ $city->id == old('city_id') ? 'selected' : '' }}>{{ $city->name }}</option>
+                                <option value="{{ $city->id }}" {{ $city->id == old('city_id') || $city->id == $company->city_id ? 'selected' : '' }}>{{ $city->name }}</option>
                             @endforeach
                         @endif
                     </select>
@@ -173,7 +174,7 @@
                         <option value=""></option>
                         @if (!empty($barangays))
                             @foreach ($barangays as $barangay)
-                                <option value="{{ $barangay->id }}" {{ $barangay->id == old('barangay_id') ? 'selected' : '' }}>{{ $barangay->name }}</option>
+                                <option value="{{ $barangay->id }}" {{ $barangay->id == old('barangay_id') || $barangay->id == $company->barangay_id ? 'selected' : '' }}>{{ $barangay->name }}</option>
                             @endforeach
                         @endif
                     </select>
@@ -187,9 +188,9 @@
                     <label class="form-label">POS Type</label>
                     <select class="form-select @error('pos_type') is-invalid @enderror" name="pos_type">
                         <option value="">Select a POS Type</option>
-                        <option value="retail" {{ old('pos_type') == 'retail' ? 'selected' : '' }}>Retail</option>
-                        <option value="restaurant" {{ old('pos_type') == 'restaurant' ? 'selected' : '' }}>Restaurant</option>
-                        <option value="hospitality" {{ old('pos_type') == 'hospitality' ? 'selected' : '' }}>Hospitality</option>
+                        <option value="retail" {{ old('pos_type') == 'retail' || $company->pos_type == 'retail' ? 'selected' : '' }}>Retail</option>
+                        <option value="restaurant" {{ old('pos_type') == 'restaurant' || $company->pos_type == 'restaurant' ? 'selected' : '' }}>Restaurant</option>
+                        <option value="hospitality" {{ old('pos_type') == 'hospitality' || $company->pos_type == 'hospitality' ? 'selected' : '' }}>Hospitality</option>
                     </select>
 
                     @error('pos_type')
@@ -201,7 +202,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Email</label>
-                    <input value="{{ old('email') }}" autocomplete="off" name="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email Address" required/>
+                    <input value="{{ old('email') ?? $company->client->user->email }}" autocomplete="off" name="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email Address" required/>
 
                     @error('email')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -250,7 +251,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Update</button>
                 <a href="{{ route('admin.clients.index') }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>
         </div>

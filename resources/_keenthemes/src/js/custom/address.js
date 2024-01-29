@@ -1,4 +1,31 @@
 $(document).ready(function() {
+    $('.company-cluster-selector').on('change', function() {
+        var selectedValue = $(this).val();
+        var newOptionsHTML = '';
+
+        tempOptions('cluster_id');
+
+        $.ajax({
+            url: '/ajax/get-clusters', // Replace with your actual endpoint
+            method: 'GET',
+            data: {
+              company_id: selectedValue
+            },
+            success: function(response) {
+                newOptionsHTML += '<option value="">Select a cluster</option>';
+
+                response.forEach(function(option) {
+                    newOptionsHTML += '<option value="' + option.id + '">' + option.name + '</option>';
+                });
+
+                changeOptionsAndReinitialize('cluster_id', newOptionsHTML);
+            },
+            error: function(xhr, status, error) {
+              console.error('Error:', error);
+            }
+        });
+    });
+
     $('#region_id').on('change', function() {
         var selectedValue = $(this).val();
         var newOptionsHTML = '';

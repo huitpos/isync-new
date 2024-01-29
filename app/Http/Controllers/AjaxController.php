@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Province;
 use App\Models\City;
 use App\Models\Barangay;
+use App\Models\Cluster;
 
 class AjaxController extends Controller
 {
@@ -25,5 +26,11 @@ class AjaxController extends Controller
     {
         $barangays = Barangay::where('city_id', $request->city_id)->get();
         return response()->json($barangays);
+    }
+
+    public function getClusters(Request $request)
+    {
+        $clusters = Cluster::where('company_id', $request->company_id)->get();
+        return response()->json($clusters);
     }
 }

@@ -3,63 +3,15 @@
 use App\Models\User;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
-use Spatie\Permission\Models\Role;
 
-// Home
-Breadcrumbs::for('home', function (BreadcrumbTrail $trail) {
-    $trail->push('Home', '/');
-});
-
-// Home > Dashboard
-Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
-    $trail->parent('home');
-    $trail->push('Dashboard', '/');
-});
-
-// Home > Dashboard > User Management
-Breadcrumbs::for('user-management.index', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard');
-    $trail->push('User Management', route('user-management.users.index'));
-});
-
-// Home > Dashboard > User Management > Users
-Breadcrumbs::for('user-management.users.index', function (BreadcrumbTrail $trail) {
-    $trail->parent('user-management.index');
-    $trail->push('Users', route('user-management.users.index'));
-});
-
-// Home > Dashboard > User Management > Users > [User]
-Breadcrumbs::for('user-management.users.show', function (BreadcrumbTrail $trail, User $user) {
-    $trail->parent('user-management.users.index');
-    $trail->push(ucwords($user->name), route('user-management.users.show', $user));
-});
-
-// Home > Dashboard > User Management > Roles
-Breadcrumbs::for('user-management.roles.index', function (BreadcrumbTrail $trail) {
-    $trail->parent('user-management.index');
-    $trail->push('Roles', route('user-management.roles.index'));
-});
-
-// Home > Dashboard > User Management > Roles > [Role]
-Breadcrumbs::for('user-management.roles.show', function (BreadcrumbTrail $trail, Role $role) {
-    $trail->parent('user-management.roles.index');
-    $trail->push(ucwords($role->name), route('user-management.roles.show', $role));
-});
-
-// Home > Dashboard > User Management > Permission
-Breadcrumbs::for('user-management.permissions.index', function (BreadcrumbTrail $trail) {
-    $trail->parent('user-management.index');
-    $trail->push('Permissions', route('user-management.permissions.index'));
-});
-
-
-
-Breadcrumbs::for('admin', function (BreadcrumbTrail $trail) {
+//admin
+Breadcrumbs::for('admin.dashboard', function (BreadcrumbTrail $trail) {
     $trail->push('Admin', route('admin.dashboard'));
 });
 
+//clients
 Breadcrumbs::for('admin.clients.index', function (BreadcrumbTrail $trail) {
-    $trail->parent('admin');
+    $trail->parent('admin.dashboard');
     $trail->push('Clients', route('admin.clients.index'));
 });
 
@@ -71,4 +23,58 @@ Breadcrumbs::for('admin.clients.create', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('admin.clients.show', function (BreadcrumbTrail $trail, $clientName) {
     $trail->parent('admin.clients.index');
     $trail->push(ucfirst($clientName));
+});
+
+Breadcrumbs::for('admin.clients.edit', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.clients.index');
+    $trail->push('Edit');
+});
+
+//clusters
+Breadcrumbs::for('admin.clusters.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.dashboard');
+    $trail->push('Clusters', route('admin.clusters.index'));
+});
+
+Breadcrumbs::for('admin.clusters.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.clusters.index');
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('admin.clusters.edit', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.clusters.index');
+    $trail->push('Edit');
+});
+
+Breadcrumbs::for('admin.clusters.show', function (BreadcrumbTrail $trail, $clusterName) {
+    $trail->parent('admin.clusters.index');
+    $trail->push(ucfirst($clusterName));
+});
+
+//branch
+Breadcrumbs::for('admin.branches.index', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.dashboard');
+    $trail->push('Branches', route('admin.branches.index'));
+});
+
+Breadcrumbs::for('admin.branches.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.branches.index');
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('admin.branches.edit', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.branches.index');
+    $trail->push('Edit');
+});
+
+Breadcrumbs::for('admin.branches.show', function (BreadcrumbTrail $trail, $branch) {
+    $trail->parent('admin.branches.index');
+    $trail->push(ucfirst($branch->name), route('admin.branches.show', $branch));
+});
+
+//machines
+Breadcrumbs::for('admin.machines.create', function (BreadcrumbTrail $trail, $branchName) {
+    $trail->parent('admin.branches.show', $branchName);
+    $trail->push('Machines');
+    $trail->push('Create');
 });

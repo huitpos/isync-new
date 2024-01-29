@@ -5,7 +5,7 @@
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('dashboard') }}
+        {{ Breadcrumbs::render('admin.dashboard') }}
     @endsection
 
     <!--begin::Row-->

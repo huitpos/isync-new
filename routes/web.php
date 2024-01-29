@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\BranchController as AdminBranchController;
 use App\Http\Controllers\Admin\MachineController as AdminMachineController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
+use App\Http\Controllers\Admin\DeviceController as AdminDeviceController;
 
 use App\Http\Controllers\Branch\PageController as BranchPageController;
 use App\Http\Controllers\Branch\UserController as BranchUserController;
@@ -82,6 +83,7 @@ Route::prefix('ajax')->group(function () {
     Route::get('/get-provinces', [AjaxController::class, 'getProvinces']);
     Route::get('/get-cities', [AjaxController::class, 'getCities']);
     Route::get('/get-barangays', [AjaxController::class, 'getBarangays']);
+    Route::get('/get-clusters', [AjaxController::class, 'getClusters']);
 });
 
 Route::prefix('admin')->group(function () {
@@ -92,8 +94,9 @@ Route::prefix('admin')->group(function () {
         Route::resource('clusters', AdminClusterController::class, ['as' => 'admin']);
         Route::resource('branches', AdminBranchController::class, ['as' => 'admin']);
 
-        Route::prefix('branches/{branchid}')->group(function () {
+        Route::prefix('branches/{branchId}')->group(function () {
             Route::resource('machines', AdminMachineController::class, ['as' => 'admin']);
+            Route::resource('devices', AdminDeviceController::class, ['as' => 'admin']);
         });
     });
 });
