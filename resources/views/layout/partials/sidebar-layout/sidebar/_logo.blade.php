@@ -2,7 +2,7 @@
 <div class="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
 	<!--begin::Logo image-->
 	<a href="#">
-		<img alt="Logo" src="{{ image('logos/logo-light.png') }}" class="h-45px app-sidebar-logo-default theme-light-show" />
+		<img alt="Logo" src="{{ image('logos/logo-dark.png') }}" class="h-45px app-sidebar-logo-default theme-light-show" />
 		<img alt="Logo" src="{{ image('logos/logo-dark.png') }}" class="h-45px app-sidebar-logo-default theme-dark-show" />
 		<img alt="Logo" src="{{ image('logos/iSyncFinalLogo.png') }}" class="h-35px app-sidebar-logo-minimize" />
 	</a>
