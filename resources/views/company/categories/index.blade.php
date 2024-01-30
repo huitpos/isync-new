@@ -1,11 +1,11 @@
 <x-default-layout>
 
     @section('title')
-        Item Types
+        Categories
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.departments.index', $company) }}
+        {{ Breadcrumbs::render('company.categories.index', $company) }}
     @endsection
 
     <div class="card">

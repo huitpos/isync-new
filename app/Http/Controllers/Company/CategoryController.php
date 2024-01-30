@@ -92,14 +92,16 @@ class CategoryController extends Controller
     public function update(Request $request, string $companySlug, string $categoryId)
     {
         $request->validate([
-            'company_id' => 'required',
             'status' => 'required',
             'name' => 'required',
         ]);
 
         $company = $request->attributes->get('company');
 
-        if ($this->categoryRepository->update($categoryId, $request->except('suppliers'))) {
+        $postData = $request->except('suppliers');
+        $postData['company_id'] = $company->id;
+
+        if ($this->categoryRepository->update($categoryId, $postData)) {
             $this->categoryRepository->syncSuppliers($categoryId, $request->suppliers ?? []);
 
             return redirect()->route('company.categories.index', ['companySlug' => $company->slug])->with('success', 'Category updated successfully.');

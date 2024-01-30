@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+use App\Traits\CreatedUpdatedBy;
+
 class Category extends Model
 {
     use HasFactory;
+    use CreatedUpdatedBy;
 
     protected $guarded = [];
 
@@ -21,5 +24,10 @@ class Category extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

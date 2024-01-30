@@ -45,4 +45,19 @@ class Product extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function subcategory()
+    {
+        return $this->belongsTo(Subcategory::class);
+    }
 }

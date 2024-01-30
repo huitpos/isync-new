@@ -91,14 +91,16 @@ class SubcategoryController extends Controller
     public function update(Request $request, string $companySlug, string $subcategoryId)
     {
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'status' => 'required',
         ]);
 
         $company = $request->attributes->get('company');
 
-        if ($this->subcategoryRepository->update($subcategoryId, $request->except('suppliers'))) {
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->subcategoryRepository->update($subcategoryId, $postData)) {
             $this->subcategoryRepository->syncSuppliers($subcategoryId, $request->suppliers ?? []);
 
             return redirect()->route('company.subcategories.index', ['companySlug' => $company->slug])->with('success', 'Subcategory updated successfully.');

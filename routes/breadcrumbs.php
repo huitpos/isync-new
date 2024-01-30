@@ -121,3 +121,40 @@ Breadcrumbs::for('company.products.create', function (BreadcrumbTrail $trail, $c
     $trail->parent('company.products.index', $company);
     $trail->push('Create');
 });
+
+Breadcrumbs::for('admin.products.show', function (BreadcrumbTrail $trail, $company, $product) {
+    $trail->parent('company.products.index', $company);
+    $trail->push($product->name);
+});
+
+//categories
+Breadcrumbs::for('company.categories.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Categories', route('company.categories.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.categories.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.categories.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.categories.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.categories.index', $company);
+    $trail->push('Edit');
+});
+
+//subcategories
+Breadcrumbs::for('company.subcategories.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Subcategories', route('company.subcategories.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.subcategories.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.subcategories.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.subcategories.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.subcategories.index', $company);
+    $trail->push('Edit');
+});

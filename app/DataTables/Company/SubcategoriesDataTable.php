@@ -35,7 +35,8 @@ class SubcategoriesDataTable extends DataTable
     {
         return $model->newQuery()
             ->with([
-                'company'
+                'company',
+                'createdBy',
             ]);
     }
 
@@ -62,7 +63,9 @@ class SubcategoriesDataTable extends DataTable
     {
         return [
             Column::make('id'),
-            Column::make('name'),
+            Column::make('name')->title('Subcategory'),
+            Column::make('description'),
+            Column::make('created_by.name', 'createdBy.name')->title('Created By'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

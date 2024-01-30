@@ -70,9 +70,17 @@ class DepartmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $companySlug, string $id)
     {
-        //
+        $department = $this->departmentRepository->findOrFail($id);
+
+        if (!$department) {
+            return abort(404, 'Department not found.');
+        }
+
+        return view('company.departments.show', [
+            'department' => $department
+        ]);
     }
 
     /**

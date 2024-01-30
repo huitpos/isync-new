@@ -21,8 +21,8 @@ class CategoriesDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('actions', function (Category $data) {
                 return view('company.datatables._actions', [
-                    'param' => ['department' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.departments',
+                    'param' => ['category' => $data->id, 'companySlug' => $data->company->slug],
+                    'route' => 'company.categories',
                 ]);
             });
     }
@@ -35,7 +35,8 @@ class CategoriesDataTable extends DataTable
     {
         return $model->newQuery()
             ->with([
-                'company'
+                'company',
+                'createdBy'
             ]);
     }
 
@@ -63,6 +64,8 @@ class CategoriesDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
+            Column::make('description'),
+            Column::make('created_by.name', 'createdBy.name')->title('Created By'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

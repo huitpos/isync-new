@@ -1,11 +1,11 @@
 <x-default-layout>
 
     @section('title')
-        Subcategories
+        Sub - Categories
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.departments.index', $company) }}
+        {{ Breadcrumbs::render('company.subcategories.index', $company) }}
     @endsection
 
     <div class="card">

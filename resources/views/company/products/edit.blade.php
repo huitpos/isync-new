@@ -246,7 +246,7 @@
                                                 <select class="form-select" name="product_id" data-placeholder="Select a variation">
                                                     <option value="">Product</option>
                                                     @foreach($company->rawProducts as $selectProduct)
-                                                        <option value="{{ $selectProduct->id }}" {{ $selectProduct->id == $productId ? 'selected' : '' }}>{{ $product->name }}</option>
+                                                        <option value="{{ $selectProduct->id }}" {{ $selectProduct->id == $productId ? 'selected' : '' }}>{{ $selectProduct->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>

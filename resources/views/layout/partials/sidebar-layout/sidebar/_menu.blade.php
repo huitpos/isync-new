@@ -87,15 +87,6 @@
 						</div>
 					</div>
 
-					<!--suppliers-->
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.suppliers.*') ? 'active' : '' }}" href="{{ route('company.suppliers.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Suppliers</span>
-							</a>
-						</div>
-					</div>
-
 					<!--categories-->
 					<div class="menu-sub menu-sub-accordion">
 						<div class="menu-item">
@@ -137,6 +128,15 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.discount-types.*') ? 'active' : '' }}" href="{{ route('company.discount-types.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Discount Types</span>
+							</a>
+						</div>
+					</div>
+
+					<!--suppliers-->
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.suppliers.*') ? 'active' : '' }}" href="{{ route('company.suppliers.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Suppliers</span>
 							</a>
 						</div>
 					</div>

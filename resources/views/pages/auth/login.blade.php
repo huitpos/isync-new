@@ -27,20 +27,8 @@
         </div>
         <!--end::Input group--->
 
-        <!--begin::Wrapper-->
-        <div class="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold mb-8">
-            <div></div>
-
-            <!--begin::Link-->
-            <a href="{{ route('password.request') }}" class="link-primary">
-                Forgot Password ?
-            </a>
-            <!--end::Link-->
-        </div>
-        <!--end::Wrapper-->
-
         <!--begin::Submit button-->
-        <div class="d-grid mb-10">
+        <div class="d-grid mb-10 mt-5">
             <button type="submit" id="kt_sign_in_submit" class="btn btn-primary">
                 @include('partials/general/_button-indicator', ['label' => 'Sign In'])
             </button>

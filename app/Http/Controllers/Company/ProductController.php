@@ -143,9 +143,20 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $product = $this->productRepository->find($id);
+
+        if (!$product) {
+            return redirect()->back()->with('error', 'Product not found');
+        }
+
+        $company = $request->attributes->get('company');
+
+        return view('company.products.show', [
+            'product' => $product,
+            'company' => $company,
+        ]);
     }
 
     /**
