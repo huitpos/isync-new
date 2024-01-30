@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\SubcategoryRepositoryInterface;
 
+use App\DataTables\Company\SubcategoriesDataTable;
+
 class SubcategoryController extends Controller
 {
     protected $subcategoryRepository;
@@ -19,11 +21,13 @@ class SubcategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, SubcategoriesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.subcategories.index', compact('company'));
+        return $dataTable->with('company_id', $company->id)->render('company.subcategories.index', [
+            'company' => $company
+        ]);
     }
 
     /**
@@ -42,14 +46,17 @@ class SubcategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'status' => 'required',
+            'category_id' => 'required'
         ]);
 
         $company = $request->attributes->get('company');
 
-        if ($subcategory = $this->subcategoryRepository->create($request->except('suppliers'))) {
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($subcategory = $this->subcategoryRepository->create($postData)) {
             $this->subcategoryRepository->syncSuppliers($subcategory->id, $request->suppliers ?? []);
 
             return redirect()->route('company.subcategories.index', ['companySlug' => $company->slug])->with('success', 'Category created successfully.');

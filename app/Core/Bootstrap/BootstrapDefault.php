@@ -25,7 +25,7 @@ class BootstrapDefault
     public function initAssets()
     {
         # Include global vendors
-        addVendors(['datatables']);
+        addVendors(['datatables', 'formrepeater']);
 
         # Include global javascript files
         addJavascriptFile('assets/js/custom/widgets.js');

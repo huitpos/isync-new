@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 
+use App\DataTables\Company\ProductsDataTable;
+
 class ProductController extends Controller
 {
     protected $productRepository;
@@ -19,11 +21,11 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, ProductsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.products.index', [
+        return $dataTable->with('company_id', $company->id)->render('company.products.index', [
             'company' => $company
         ]);
     }
@@ -45,22 +47,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $bundledItems = $request->input('bundled_items');
-        if (isset($bundledItems[0])) {
-            unset($bundledItems[0]);
-        }
-
-        $request->merge(['bundled_items' => $bundledItems]);
-
-        $rawItems = $request->input('raw_items');
-        if (isset($rawItems[0])) {
-            unset($rawItems[0]);
-        }
-
-        $request->merge(['raw_items' => $rawItems]);
-
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'description' => 'required',
             'abbreviation' => 'required',
@@ -79,12 +66,21 @@ class ProductController extends Controller
             'minimum_stock_level' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'maximum_stock_level' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'stock_on_hand' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'raw_items.*.product_id' => 'nullable',
+            'raw_items.*.quantity' => 'required_with:raw_items.*.product_id',
+            'raw_items.*.uom_id' => 'required_with:raw_items.*.product_id',
+            'bundled_items.*.product_id' => 'nullable',
+            'bundled_items.*.quantity' => 'required_with:bundled_items.*.product_id',
+        ], [
+            'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
+            'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
+            'bundled_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
         ]);
 
         $company = $request->attributes->get('company');
 
         $productData = [
-            'company_id' => $request->input('company_id'),
+            'company_id' => $company->id,
             'name' => $request->input('name'),
             'description' => $request->input('description'),
             'abbreviation' => $request->input('abbreviation'),
@@ -93,13 +89,13 @@ class ProductController extends Controller
             'subcategory_id' => $request->input('subcategory_id'),
             'uom_id' => $request->input('uom_id'),
             'item_type_id' => $request->input('item_type_id'),
-            'image' => $request->input('image') ?? 'asdf',
+            'image' => $request->input('image') ?? '',
             'code' => $request->input('code'),
             'barcode' => $request->input('barcode'),
             'srp' => $request->input('srp'),
             'cost' => $request->input('cost'),
             'markup' => $request->input('markup'),
-            'with_serial' => $request->input('with_serial') ?? false,
+            'serial_number' => $request->input('serial_number'),
             'vatable' => $request->input('vatable') ?? false,
             'discount_exempt' => $request->input('discount_exempt') ?? false,
             'open_price' => $request->input('open_price') ?? false,
@@ -111,6 +107,10 @@ class ProductController extends Controller
 
         $bundledItems = [];
         foreach ($request->input('bundled_items') as $bundle) {
+            if (empty($bundle['product_id'])) {
+                continue;
+            }
+
             $data = [
                 'product_id' => $bundle['product_id'],
                 'quantity' => $bundle['quantity'],
@@ -121,9 +121,14 @@ class ProductController extends Controller
 
         $rawItems = [];
         foreach ($request->input('raw_items') as $raw) {
+            if (empty($raw['product_id'])) {
+                continue;
+            }
+
             $data = [
                 'product_id' => $raw['product_id'],
                 'quantity' => $raw['quantity'],
+                'uom_id' => $raw['uom_id'],
             ];
 
             $rawItems[] = $data;
@@ -163,22 +168,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $companySlug, string $productId)
     {
-        $bundledItems = $request->input('bundled_items');
-        if (isset($bundledItems[0])) {
-            unset($bundledItems[0]);
-        }
-
-        $request->merge(['bundled_items' => $bundledItems]);
-
-        $rawItems = $request->input('raw_items');
-        if (isset($rawItems[0])) {
-            unset($rawItems[0]);
-        }
-
-        $request->merge(['raw_items' => $rawItems]);
-
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'description' => 'required',
             'abbreviation' => 'required',
@@ -197,12 +187,18 @@ class ProductController extends Controller
             'minimum_stock_level' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'maximum_stock_level' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
             'stock_on_hand' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'raw_items.*.product_id' => 'nullable',
+            'raw_items.*.quantity' => 'required_with:raw_items.*.product_id',
+            'raw_items.*.uom_id' => 'required_with:raw_items.*.product_id',
+        ], [
+            'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
+            'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
         ]);
 
         $company = $request->attributes->get('company');
 
         $productData = [
-            'company_id' => $request->input('company_id'),
+            'company_id' => $company->id,
             'name' => $request->input('name'),
             'description' => $request->input('description'),
             'abbreviation' => $request->input('abbreviation'),
@@ -211,13 +207,13 @@ class ProductController extends Controller
             'subcategory_id' => $request->input('subcategory_id'),
             'uom_id' => $request->input('uom_id'),
             'item_type_id' => $request->input('item_type_id'),
-            'image' => $request->input('image') ?? 'asdf',
+            'image' => $request->input('image') ?? '',
             'code' => $request->input('code'),
             'barcode' => $request->input('barcode'),
             'srp' => $request->input('srp'),
             'cost' => $request->input('cost'),
             'markup' => $request->input('markup'),
-            'with_serial' => $request->input('with_serial') ?? false,
+            'serial_number' => $request->input('serial_number'),
             'vatable' => $request->input('vatable') ?? false,
             'discount_exempt' => $request->input('discount_exempt') ?? false,
             'open_price' => $request->input('open_price') ?? false,
@@ -238,13 +234,20 @@ class ProductController extends Controller
         }
 
         $rawItems = [];
-        foreach ($request->input('raw_items') as $raw) {
-            $data = [
-                'product_id' => $raw['product_id'],
-                'quantity' => $raw['quantity'],
-            ];
+        if ($request->has('raw_items')) {
+            foreach ($request->input('raw_items') as $raw) {
+                if (empty($raw['product_id'])) {
+                    continue;
+                }
 
-            $rawItems[] = $data;
+                $data = [
+                    'product_id' => $raw['product_id'],
+                    'quantity' => $raw['quantity'],
+                    'uom_id' => $raw['uom_id'],
+                ];
+
+                $rawItems[] = $data;
+            }
         }
 
         if ($this->productRepository->update($productId, $productData, $bundledItems, $rawItems)) {

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\Supplier;
-
 use App\Repositories\Interfaces\SupplierRepositoryInterface;
+
+use App\DataTables\Company\SuppliersDataTable;
 
 class SupplierController extends Controller
 {
@@ -22,11 +22,13 @@ class SupplierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, SuppliersDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.suppliers.index', compact('company'));
+        return $dataTable->with('company_id', $company->id)->render('company.suppliers.index', [
+            'company' => $company,
+        ]);
     }
 
     /**
@@ -44,8 +46,9 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
+        $company = $request->attributes->get('company');
+
         $request->validate([
-            'company_id' => 'required',
             'status' => 'required',
             'name' => 'required',
             'contact_person' => 'required',
@@ -54,7 +57,10 @@ class SupplierController extends Controller
             'address' => 'required',
         ]);
 
-        if ($this->supplierRepository->create($request->all())) {
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->supplierRepository->create($postData)) {
             return redirect()->route('company.suppliers.index', ['companySlug' => $request->attributes->get('company')->slug])->with('success', 'Supplier created.');
         }
 

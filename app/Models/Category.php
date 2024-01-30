@@ -17,4 +17,9 @@ class Category extends Model
     {
         return $this->belongsToMany(Supplier::class);
     }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

@@ -162,7 +162,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <a href="{{ route('admin.clients.index') }}" class="btn btn-label-secondary waves-effect">Cancel</a>
+                <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>
         </div>
     </div>

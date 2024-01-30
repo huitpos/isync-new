@@ -9,14 +9,6 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="d-flex flex-stack fs-4 py-3">
-                <div class="fw-bold">
-                    {{ $company->company_name }}
-                </div>
-            </div>
-
-            <div class="separator separator-dashed my-3"></div>
-
             <h3>Company Registered Name</h3>
 
             <div class="pb-1 fs-6">

@@ -7,14 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+use App\Traits\CreatedUpdatedBy;
+
 class Department extends Model
 {
     use HasFactory;
+    use CreatedUpdatedBy;
 
     protected $guarded = [];
 
     public function suppliers(): BelongsToMany
     {
         return $this->belongsToMany(Supplier::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

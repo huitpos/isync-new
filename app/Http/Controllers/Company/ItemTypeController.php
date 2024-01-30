@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\ItemTypeRepositoryInterface;
 
+use App\DataTables\Company\ItemTypesDataTable;
+
 class ItemTypeController extends Controller
 {
     protected $itemTypeRepository;
@@ -19,11 +21,13 @@ class ItemTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, ItemTypesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.itemTypes.index', compact('company'));
+        return $dataTable->with('company_id', $company->id)->render('company.itemTypes.index', [
+            'company' => $company
+        ]);
     }
 
     /**
@@ -44,14 +48,16 @@ class ItemTypeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'status' => 'required'
         ]);
 
         $company = $request->attributes->get('company');
 
-        if ($this->itemTypeRepository->create($request->all())) {
+        $postData = $request->all();;
+        $postData['company_id'] = $company->id;
+
+        if ($this->itemTypeRepository->create($postData)) {
             return redirect()->route('company.item-types.index', ['companySlug' => $company->slug])->with('success', 'Data has been stored successfully!');
         }
 

@@ -1,3 +1,28 @@
+$(document).ready(function () {
+    $('.repeater').repeater({
+        initEmpty: false,
+        defaultValues: {
+            'text-input': 'foo'
+        },
+        show: function () {
+            $(this).slideDown();
+            // Init select2 on new repeated items
+            initConditionsSelect2();
+        },
+        hide: function (deleteElement) {
+            // if(confirm('Are you sure you want to delete this element?')) {
+                $(this).slideUp(deleteElement);
+            // }
+        },
+        isFirstItemUndeletable: false,
+        repeaters: [{
+            // (Required)
+            // Specify the jQuery selector for this nested repeater
+            selector: '.inner-repeater'
+        }]
+    });
+});
+
 $(document).on('click', '.button-ajax', function (e) {
     e.preventDefault();
     var action = $(this).data('action');
@@ -72,3 +97,30 @@ $(document).on('change', '.status-toggle', function (e) {
         }
     });
 });
+
+// Init condition select2
+const initConditionsSelect2 = () => {
+    // Tnit new repeating condition types
+    const allConditionTypes = document.querySelectorAll('[data-kt-ecommerce-catalog-add-category="condition_type"]');
+    allConditionTypes.forEach(type => {
+        if ($(type).hasClass("select2-hidden-accessible")) {
+            return;
+        } else {
+            $(type).select2({
+                minimumResultsForSearch: -1
+            });
+        }
+    });
+
+    // Tnit new repeating condition equals
+    const allConditionEquals = document.querySelectorAll('[data-kt-ecommerce-catalog-add-category="condition_equals"]');
+    allConditionEquals.forEach(equal => {
+        if ($(equal).hasClass("select2-hidden-accessible")) {
+            return;
+        } else {
+            $(equal).select2({
+                minimumResultsForSearch: -1
+            });
+        }
+    });
+}

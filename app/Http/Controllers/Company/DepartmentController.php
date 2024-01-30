@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\Department;
-
 use App\Repositories\Interfaces\DepartmentRepositoryInterface;
+
+use App\DataTables\Company\DepartmentsDataTable;
 
 class DepartmentController extends Controller
 {
@@ -21,11 +21,11 @@ class DepartmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, DepartmentsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.departments.index', [
+        return $dataTable->with('company_id', $company->id)->render('company.departments.index', [
             'company' => $company
         ]);
     }

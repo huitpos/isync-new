@@ -71,8 +71,8 @@ class BranchesDataTable extends DataTable
             Column::make('cluster.name')->title('branch cluster'),
             Column::make('company.client.name')->title("owner's name"),
             Column::make('company.client.user.email')->title("email address"),
-            Column::computed('status')->title('status'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::computed('status')->title('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

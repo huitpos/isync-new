@@ -1,15 +1,15 @@
 <?php
 
-namespace App\DataTables;
+namespace App\DataTables\Company;
 
-use App\Models\User;
+use App\Models\Product;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
-class UsersDataTable extends DataTable
+class ProductsDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -19,26 +19,26 @@ class UsersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->rawColumns(['user'])
-            ->editColumn('user', function (User $user) {
-                return view('pages/apps.user-management.users.columns._user', compact('user'));
-            })
-            ->editColumn('role', function (User $user) {
-                return ucwords($user->roles->first()?->name);
-            })
-            ->addColumn('action', function (User $user) {
-                return view('pages/apps.user-management.users.columns._actions', compact('user'));
-            })
-            ->setRowId('id');
+            ->addColumn('actions', function (Product $data) {
+                return view('company.datatables._actions', [
+                    'param' => ['product' => $data->id, 'companySlug' => $data->company->slug],
+                    'route' => 'company.products',
+                ]);
+            });
     }
 
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(User $model): QueryBuilder
+    public function query(Product $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()
+            ->with([
+                'itemType',
+                'uom',
+                'createdBy'
+            ]);
     }
 
     /**
@@ -47,13 +47,13 @@ class UsersDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('users-table')
+            ->setTableId('clusters-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>>",)
-            ->addTableClass('table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer text-gray-600 fw-semibold')
+            ->addTableClass('table align-middle table-striped table-row-bordered fs-6 gy-5 gs-7 dataTable no-footer text-gray-600 fw-semibold')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(2)
+            ->orderBy(0, 'asc')
             ->drawCallback("function() {" . file_get_contents(resource_path('views/pages/apps/user-management/users/columns/_draw-scripts.js')) . "}");
     }
 
@@ -63,13 +63,17 @@ class UsersDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('user')->addClass('d-flex align-items-center')->name('name'),
-            Column::make('role')->searchable(false),
-            Column::computed('action')
-                ->addClass('text-end text-nowrap')
+            Column::make('id'),
+            Column::make('name')->title('Product Name'),
+            Column::make('description'),
+            Column::make('item_type.name', 'itemType.name')->title('Item Type'),
+            Column::make('uom.name')->title('UOM'),
+            Column::make('code')->title('Item Code'),
+            Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('status'),
+            Column::computed('actions')
                 ->exportable(false)
-                ->printable(false)
-                ->width(60)
+                ->printable(false),
         ];
     }
 

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\UnitOfMeasurementRepositoryInterface;
 
+use App\DataTables\Company\UnitOfMeasurementsDataTable;
+
 class UnitOfMeasurementController extends Controller
 {
     protected $uomRepository;
@@ -19,11 +21,13 @@ class UnitOfMeasurementController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, UnitOfMeasurementsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.unitOfMeasurements.index', compact('company'));
+        return $dataTable->with('company_id', $company->id)->render('company.unitOfMeasurements.index', [
+            'company' => $company
+        ]);
     }
 
     /**
@@ -44,14 +48,16 @@ class UnitOfMeasurementController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'status' => 'required',
         ]);
 
         $company = $request->attributes->get('company');
 
-        if ($this->uomRepository->create($request->all())) {
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->uomRepository->create($postData)) {
             return redirect()->route('company.unit-of-measurements.index', ['companySlug' => $company->slug])->with('success', 'Data has been stored successfully!');
         }
 

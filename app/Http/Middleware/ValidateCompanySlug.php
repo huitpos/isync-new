@@ -8,8 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 use App\Models\Company;
 use App\Models\Branch;
-
-
 class ValidateCompanySlug
 {
     /**

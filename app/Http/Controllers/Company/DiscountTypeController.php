@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\DiscountTypeRepositoryInterface;
 
+use App\DataTables\Company\DiscountTypesDataTable;
+
 class DiscountTypeController extends Controller
 {
     protected $discountTypeRepository;
@@ -19,12 +21,12 @@ class DiscountTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, DiscountTypesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.discountTypes.index', [
-            'company' => $company,
+        return $dataTable->with('company_id', $company->id)->render('company.discountTypes.index', [
+            'company' => $company
         ]);
     }
 

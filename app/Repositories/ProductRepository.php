@@ -21,7 +21,10 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function find(String $id): ?Product
     {
-        return Product::with('bundledItems')->find($id);
+        return Product::with([
+            'bundledItems',
+            'rawItems',
+        ])->find($id);
     }
 
     public function create(array $productData, array $bundledData, array $rawData): Product
@@ -36,7 +39,10 @@ class ProductRepository implements ProductRepositoryInterface
 
         if (!empty($rawData)) {
             foreach ($rawData as $rawItem) {
-                $product->rawItems()->attach($rawItem['product_id'], ['quantity' => $rawItem['quantity']]);
+                $product->rawItems()->attach($rawItem['product_id'], [
+                    'quantity' => $rawItem['quantity'],
+                    'uom_id' => $rawItem['uom_id'],
+                ]);
             }
         }
 
@@ -56,11 +62,13 @@ class ProductRepository implements ProductRepositoryInterface
             }
         }
 
+        $product->rawItems()->detach();
         if (!empty($rawData)) {
-            $product->rawItems()->detach();
-
             foreach ($rawData as $rawItem) {
-                $product->rawItems()->attach($rawItem['product_id'], ['quantity' => $rawItem['quantity']]);
+                $product->rawItems()->attach($rawItem['product_id'], [
+                    'quantity' => $rawItem['quantity'],
+                    'uom_id' => $rawItem['uom_id'],
+                ]);
             }
         }
 

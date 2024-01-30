@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 
+use App\DataTables\Company\CategoriesDataTable;
+
 class CategoryController extends Controller
 {
     protected $categoryRepository;
@@ -19,11 +21,13 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, CategoriesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.categories.index', compact('company'));
+        return $dataTable->with('company_id', $company->id)->render('company.categories.index', [
+            'company' => $company,
+        ]);
     }
 
     /**
@@ -41,15 +45,19 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'company_id' => 'required',
-            'status' => 'required',
-            'name' => 'required',
-        ]);
-
         $company = $request->attributes->get('company');
 
-        if ($category = $this->categoryRepository->create($request->except('suppliers'))) {
+        $request->validate([
+            'status' => 'required',
+            'name' => 'required',
+            'department_id' => 'required',
+        ]);
+
+        $postData = $request->except('suppliers');
+
+        $postData['company_id'] = $company->id;
+
+        if ($category = $this->categoryRepository->create($postData)) {
             $this->categoryRepository->syncSuppliers($category->id, $request->suppliers ?? []);
 
             return redirect()->route('company.categories.index', ['companySlug' => $company->slug])->with('success', 'Category created successfully.');
