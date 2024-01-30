@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CitySeeder::class,
             BarangaySeeder::class,
             CashDenonimationsSeeder::class,
+            PaymentTypeSeeder::class
         ]);
     }
 }

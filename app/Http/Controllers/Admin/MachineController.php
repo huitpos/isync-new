@@ -113,7 +113,7 @@ class MachineController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MachineDevicesDataTable $datatable, string $id)
+    public function show(MachineDevicesDataTable $datatable, string $branchId, string $id)
     {
         $machine = $this->posMachineRepository->find($id);
 
