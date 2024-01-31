@@ -40,6 +40,42 @@
 			@endif
 
 			@if (request()->attributes->get('company'))
+				<div class="mb-5">
+					<button type="button" class="btn btn-primary rotate w-100 btn-trim-end" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start" data-kt-menu-offset="10px, 10px">
+						{{ request()->attributes->get('company')->company_name }}
+						<i class="ki-duotone ki-down fs-3 rotate-180 ms-3 me-0"></i>
+					</button>
+
+					<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-primary fw-semibold w-auto min-w-300px mw-300px" data-kt-menu="true">
+						<div class="menu-item mt-2">
+							<a href="{{ route('company.dashboard', ['companySlug' => request()->attributes->get('company')->slug]) }}" class="menu-link p-2">
+								{{ request()->attributes->get('company')->company_name }}
+							</a>
+						</div>
+
+						<div class="separator mb-3 opacity-75"></div>
+
+						<label class="form-label fw-semibold p-2">Branch:</label>
+
+						@foreach(request()->attributes->get('company')->branches as $branch)
+							<div class="menu-item p-0">
+								<a href="{{ route('branch.dashboard', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => $branch->slug]) }}" class="menu-link p-2 mb-1">
+									{{ $branch->name }}
+								</a>
+							</div>
+						@endforeach
+					</div>
+				</div>
+
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('company.dashboard') ? 'active' : '' }}" href="{{ route('company.dashboard', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+						<span class="menu-icon">
+							<i class="fa-solid fa-chart-line fs-2"></i>
+						</span>
+						<span class="menu-title">Dashboard</span>
+					</a>
+				</div>
+
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(
 						'company.products.*',

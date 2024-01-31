@@ -72,4 +72,6 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 2. docker-compose up -d
 3. docker exec -it isync_app_1 bash
 4. composer install
-4. npm install
+5. npm install
+6. php artisan migrate
+7. php artisan migrate --database=transactional_db --path=database/migrations/transactional_db
