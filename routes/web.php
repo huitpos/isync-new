@@ -6,7 +6,6 @@ use App\Http\Middleware\ValidateCompanySlug;
 use App\Http\Middleware\SuperAdminMiddleware;
 
 use App\Http\Controllers\AjaxController;
-use App\Http\Controllers\DashboardController;
 
 use App\Http\Controllers\Company\PageController as CompanyPageController;
 use App\Http\Controllers\Company\BranchController as CompanyBranchController;
@@ -52,21 +51,6 @@ use App\Http\Controllers\Apps\PermissionManagementController;
 |
 */
 
-// Route::middleware(['auth'])->group(function () {
-
-//     Route::get('/', [DashboardController::class, 'index']);
-
-//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-// });
-
-
-Route::name('user-management.')->group(function () {
-    Route::resource('/user-management/users', UserManagementController::class);
-    Route::resource('/user-management/roles', RoleManagementController::class);
-    Route::resource('/user-management/permissions', PermissionManagementController::class);
-});
-
 Route::get('/error', function () {
     abort(500);
 });
@@ -77,7 +61,6 @@ require __DIR__ . '/auth.php';
 Route::view('/swagger', 'swagger');
 
 Route::view('/', 'comingSoon');
-// Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::prefix('ajax')->group(function () {
     Route::get('/get-provinces', [AjaxController::class, 'getProvinces']);
