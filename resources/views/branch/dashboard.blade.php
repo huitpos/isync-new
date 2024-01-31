@@ -5,7 +5,7 @@
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.dashboard', $company) }}
+        {{ Breadcrumbs::render('branch.dashboard', $company, $branch) }}
     @endsection
 
     <div class="row g-1 g-xl-5 mb-1 mb-xl-5">
@@ -15,7 +15,7 @@
                 'subText' => 'Transaction Count',
             ])
         </div>
-        
+
         <div class="col-3">
             @include('partials/widgets/small_card', [
                 'text' => number_format($transactionAmount, 2),

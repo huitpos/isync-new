@@ -158,3 +158,9 @@ Breadcrumbs::for('company.subcategories.edit', function (BreadcrumbTrail $trail,
     $trail->parent('company.subcategories.index', $company);
     $trail->push('Edit');
 });
+
+//company dashboard
+Breadcrumbs::for('branch.dashboard', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});

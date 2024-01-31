@@ -13,4 +13,8 @@ interface BranchRepositoryInterface
     function create(array $attributes): Branch;
     function update(String $id, array $attributes): Bool;
     function delete(String $id): Bool;
+    function getTransactionAmount(String $id): float;
+    function getTransactionCostAmount(String $id): float;
+    function getTransactionCount(String $id): int;
+    function getCompletedTransaction(String $id): ?Collection;
 }

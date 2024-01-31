@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Company;
+use App\Models\Transaction;
 use Illuminate\Support\Collection;
 
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
@@ -41,4 +42,43 @@ class CompanyRepository implements CompanyRepositoryInterface
         $company = Company::findOrFail($id);
         return $company->delete();
     }
+
+    public function getTransactionAmount(String $id): Float
+    {
+        $company = Company::findOrFail($id);
+
+        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())->sum('net_sales');
+
+        return $amount;
+    }
+
+    public function getTransactionCostAmount(String $id): Float
+    {
+        $company = Company::findOrFail($id);
+
+        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())->sum('total_unit_cost');
+
+        return $amount;
+    }
+
+    public function getTransactionCount(String $id): Int
+    {
+        $company = Company::findOrFail($id);
+
+        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())->count();
+
+        return $amount;
+    }
+
+    public function getCompletedTransaction(String $id): ?Collection
+    {
+        $company = Company::findOrFail($id);
+
+        $transactions = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+            ->where('is_complete', true)
+            ->get();
+
+        return $transactions;
+    }
+
 }

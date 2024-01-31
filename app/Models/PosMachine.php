@@ -9,6 +9,8 @@ use App\Traits\CreatedUpdatedBy;
 
 class PosMachine extends Model
 {
+    protected $connection = 'mysql';
+
     use HasFactory;
     use CreatedUpdatedBy;
 
