@@ -99,8 +99,8 @@ class MachineController extends Controller
                 },
             ],
             'tin' => 'required',
-            'limit_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'vat' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'limit_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
         ]);
 
         if ($this->posMachineRepository->create($request->all())) {
@@ -185,8 +185,8 @@ class MachineController extends Controller
                 },
             ],
             'tin' => 'required',
-            'limit_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
-            'vat' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'limit_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
         ]);
 
         if ($this->posMachineRepository->update($machineId, $request->all())) {
