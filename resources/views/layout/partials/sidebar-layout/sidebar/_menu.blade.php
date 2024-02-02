@@ -57,7 +57,7 @@
 
 					<label class="form-label fw-semibold p-2">Branch:</label>
 
-					@foreach(request()->attributes->get('company')->branches as $branch)
+					@foreach(request()->attributes->get('company')->activeBranches as $branch)
 						<div class="menu-item p-0">
 							<a href="{{ route('branch.dashboard', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => $branch->slug]) }}" class="menu-link p-2 mb-1">
 								{{ $branch->name }}

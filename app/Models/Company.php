@@ -24,6 +24,11 @@ class Company extends Model
         return $this->hasMany(Branch::class);
     }
 
+    public function activeBranches()
+    {
+        return $this->hasMany(Branch::class)->where('status', 'active');
+    }
+
     public function departments()
     {
         return $this->hasMany(Department::class);

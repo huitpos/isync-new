@@ -12,6 +12,8 @@ class Branch extends Model
     use HasFactory;
     use CreatedUpdatedBy;
 
+    protected $connection = 'mysql';
+
     protected $guarded = [];
 
     public function cluster()

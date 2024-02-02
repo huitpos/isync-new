@@ -17,4 +17,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(PosMachine::class, 'pos_machine_id');
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }

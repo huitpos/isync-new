@@ -42,6 +42,9 @@
 						<thead>
 							<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
 								<th class="p-0 pb-3 text-start">Date</th>
+								@if (isset($addBranch) && $addBranch)
+									<th class="p-0 pb-3 text-start">Branch</th>
+								@endif
 								<th class="p-0 pb-3 text-start">Machine No.</th>
 								<th class="p-0 pb-3 text-start">OR No.</th>
 								<th class="p-0 pb-3 text-start">Cashier</th>
@@ -64,6 +67,12 @@
 								<td class="text-start pe-13">
 									<span class="text-gray-600">{{ $completedTransaction->completed_at }}</span>
 								</td>
+
+								@if (isset($addBranch) && $addBranch)
+									<td class="text-start pe-13">
+										<span class="text-gray-600">{{ $completedTransaction->branch->name }}</span>
+									</td>
+								@endif
 
 								<td class="text-start pe-13">
 									<span class="text-gray-600">{{ $completedTransaction->pos_machine_id }}</span>

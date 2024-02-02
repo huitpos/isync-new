@@ -41,6 +41,7 @@
             @include('partials/widgets/transactions_table', [
                 'completedTransactions' => $completedTransactions,
                 'pendingTransactions' => $pendingTransactions ?? [],
+                'addBranch' => true
             ])
         </div>
     </div>
