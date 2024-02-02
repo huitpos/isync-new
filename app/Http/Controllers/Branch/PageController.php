@@ -23,7 +23,8 @@ class PageController extends Controller
         $transactionAmount = $this->branchRepository->getTransactionAmount($branch->id);
         $costAmount = $this->branchRepository->getTransactionCostAmount($branch->id);
         $transactionCount = $this->branchRepository->getTransactionCount($branch->id);
-        $completedTransactions = $this->branchRepository->getCompletedTransaction($branch->id);
+        $completedTransactions = $this->branchRepository->getCompletedTransactions($branch->id);
+        $pendingTransactions = $this->branchRepository->getPendingTransactions($branch->id);
 
         return view('branch.dashboard', compact([
             'company',
@@ -31,7 +32,8 @@ class PageController extends Controller
             'transactionAmount',
             'costAmount',
             'transactionCount',
-            'completedTransactions'
+            'completedTransactions',
+            'pendingTransactions'
         ]));
     }
 }

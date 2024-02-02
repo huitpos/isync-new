@@ -22,14 +22,16 @@ class PageController extends Controller
         $transactionAmount = $this->companyRepository->getTransactionAmount($company->id);
         $costAmount = $this->companyRepository->getTransactionCostAmount($company->id);
         $transactionCount = $this->companyRepository->getTransactionCount($company->id);
-        $completedTransactions = $this->companyRepository->getCompletedTransaction($company->id);
+        $completedTransactions = $this->companyRepository->getCompletedTransactions($company->id);
+        $pendingTransactions = $this->companyRepository->getPendingTransactions($company->id);
 
         return view('company.dashboard', [
             'company' => $company,
             'transactionAmount' => $transactionAmount,
             'costAmount' => $costAmount,
             'transactionCount' => $transactionCount,
-            'completedTransactions' => $completedTransactions
+            'completedTransactions' => $completedTransactions,
+            'pendingTransactions' => $pendingTransactions,
         ]);
     }
 }

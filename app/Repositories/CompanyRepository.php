@@ -47,7 +47,9 @@ class CompanyRepository implements CompanyRepositoryInterface
     {
         $company = Company::findOrFail($id);
 
-        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())->sum('net_sales');
+        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+            ->where('is_complete', true)
+            ->sum('net_sales');
 
         return $amount;
     }
@@ -56,7 +58,9 @@ class CompanyRepository implements CompanyRepositoryInterface
     {
         $company = Company::findOrFail($id);
 
-        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())->sum('total_unit_cost');
+        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+            ->where('is_complete', true)
+            ->sum('total_unit_cost');
 
         return $amount;
     }
@@ -65,17 +69,32 @@ class CompanyRepository implements CompanyRepositoryInterface
     {
         $company = Company::findOrFail($id);
 
-        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())->count();
+        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+            ->where('is_complete', true)
+            ->count();
 
         return $amount;
     }
 
-    public function getCompletedTransaction(String $id): ?Collection
+    public function getCompletedTransactions(String $id): ?Collection
     {
         $company = Company::findOrFail($id);
 
         $transactions = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
             ->where('is_complete', true)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return $transactions;
+    }
+
+    public function getPendingTransactions(String $id): ?Collection
+    {
+        $company = Company::findOrFail($id);
+
+        $transactions = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+            ->where('is_complete', false)
+            ->orderBy('id', 'desc')
             ->get();
 
         return $transactions;

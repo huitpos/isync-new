@@ -40,6 +40,7 @@
         <div class="col-12">
             @include('partials/widgets/transactions_table', [
                 'completedTransactions' => $completedTransactions,
+                'pendingTransactions' => $pendingTransactions ?? [],
             ])
         </div>
     </div>

@@ -15,7 +15,7 @@
                 'subText' => 'Transaction Count',
             ])
         </div>
-        
+
         <div class="col-3">
             @include('partials/widgets/small_card', [
                 'text' => number_format($transactionAmount, 2),
@@ -40,6 +40,7 @@
         <div class="col-12">
             @include('partials/widgets/transactions_table', [
                 'completedTransactions' => $completedTransactions,
+                'pendingTransactions' => $pendingTransactions ?? [],
             ])
         </div>
     </div>

@@ -16,5 +16,6 @@ interface CompanyRepositoryInterface
     function getTransactionAmount(String $id): float;
     function getTransactionCostAmount(String $id): float;
     function getTransactionCount(String $id): int;
-    function getCompletedTransaction(String $id): ?Collection;
+    function getCompletedTransactions(String $id): ?Collection;
+    function getPendingTransactions(String $id): ?Collection;
 }

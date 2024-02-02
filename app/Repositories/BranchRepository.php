@@ -52,22 +52,37 @@ class BranchRepository implements BranchRepositoryInterface
 
     public function getTransactionCostAmount(String $id): Float
     {
-        $amount = Transaction::where('branch_id', $id)->sum('total_unit_cost');
+        $amount = Transaction::where('branch_id', $id)
+            ->where('is_complete', true)
+            ->sum('total_unit_cost');
 
         return $amount;
     }
 
     public function getTransactionCount(String $id): Int
     {
-        $amount = Transaction::where('branch_id', $id)->count();
+        $amount = Transaction::where('branch_id', $id)
+            ->where('is_complete', true)
+            ->count();
 
         return $amount;
     }
 
-    public function getCompletedTransaction(String $id): ?Collection
+    public function getCompletedTransactions(String $id): ?Collection
     {
         $transactions = Transaction::where('branch_id', $id)
             ->where('is_complete', true)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return $transactions;
+    }
+
+    public function getPendingTransactions(String $id): ?Collection
+    {
+        $transactions = Transaction::where('branch_id', $id)
+            ->where('is_complete', false)
+            ->orderBy('id', 'desc')
             ->get();
 
         return $transactions;
