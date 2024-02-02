@@ -161,6 +161,15 @@
                     @enderror
                 </div>
 
+                <div class="mb-4 mt-4">
+                    <label class="form-label">Phone Number</label>
+                    <input value="{{ old('name') }}" name="phone_number" type="text" class="form-control @error('phone_number') is-invalid @enderror" placeholder="Phone Number" required/>
+
+                    @error('phone_number')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
                 <button type="submit" class="btn btn-primary">Submit</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>

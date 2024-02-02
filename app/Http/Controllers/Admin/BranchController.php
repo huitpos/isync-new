@@ -87,6 +87,7 @@ class BranchController extends Controller
             'province_id' => 'required',
             'city_id' => 'required',
             'barangay_id' => 'required',
+            'phone_number' => 'required',
         ]);
 
         $data = $request->all();
@@ -177,6 +178,7 @@ class BranchController extends Controller
             'province_id' => 'required',
             'city_id' => 'required',
             'barangay_id' => 'required',
+            'phone_number' => 'required',
         ]);
 
         $data = $request->all();
