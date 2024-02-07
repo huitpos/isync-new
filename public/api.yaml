@@ -41,1098 +41,7 @@ paths:
                 type: array
                 items:
                   type: string
-  /api/register:
-    post:
-      tags:
-        - Auth
-      summary: Register a user.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                first_name:
-                  type: string
-                last_name:
-                  type: string
-                email:
-                  type: string
-                password:
-                  type: string
-                telephone_number:
-                  type: string
-                unit_number:
-                  type: string
-                floor_number:
-                  type: string
-                street:
-                  type: string
-                city:
-                  type: string
-                province:
-                  type: string
-                zip:
-                  type: string
-              required:
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/users:
-    get:
-      tags:
-        - Users
-      summary: Returns a list of users.
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    post:
-      tags:
-        - Users
-      summary: Create a user.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                password:
-                  type: string
-                pin:
-                  type: integer
-              required:
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/users/{userId}:
-    get:
-      tags:
-        - Users
-      summary: Get a user by ID
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the user to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    put:
-      tags:
-        - Users
-      summary: Update a user.
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the user to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-                password:
-                  type: string
-                pin:
-                  type: integer
-              required:
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    delete:
-      tags:
-        - Users
-      summary: Delete a user by ID
-      parameters:
-        - in: path
-          name: userId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the user to delete
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/companies:
-    get:
-      tags:
-        - Companies
-      summary: Returns a list of companies.
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    post:
-      tags:
-        - Companies
-      summary: Create a company.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                client_id:
-                  type: integer
-                company_registered_name:
-                  type: string
-                company_name:
-                  type: string
-                trade_name:
-                  type: string
-                logo:
-                  type: string
-                country:
-                  type: string
-                phone_number:
-                  type: string
-                unit_floor_number:
-                  type: string
-                street:
-                  type: string
-                barangay:
-                  type: string
-                city:
-                  type: string
-                province:
-                  type: string
-                region:
-                  type: string
-              required:
-                - client_id
-                - company_registered_name
-                - company_name
-                - trade_name
-                - logo
-                - country
-                - phone_number
-                - unit_number
-                - floor_number
-                - street
-                - barangay
-                - city
-                - province
-                - region
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/companies/{companyId}:
-    get:
-      tags:
-        - Companies
-      summary: Get a company by ID
-      parameters:
-        - in: path
-          name: companyId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the company to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    put:
-      tags:
-        - Companies
-      summary: Update a company.
-      parameters:
-        - in: path
-          name: companyId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the company to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                client_id:
-                  type: integer
-                company_registered_name:
-                  type: string
-                company_name:
-                  type: string
-                trade_name:
-                  type: string
-                logo:
-                  type: string
-                country:
-                  type: string
-                phone_number:
-                  type: string
-                unit_number:
-                  type: string
-                floor_number:
-                  type: string
-                street:
-                  type: string
-                barangay:
-                  type: string
-                city:
-                  type: string
-                province:
-                  type: string
-                region:
-                  type: string
-              required:
-                - client_id
-                - company_registered_name
-                - company_name
-                - trade_name
-                - logo
-                - country
-                - phone_number
-                - unit_number
-                - floor_number
-                - street
-                - barangay
-                - city
-                - province
-                - region
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    delete:
-      tags:
-        - Companies
-      summary: Delete a company by ID
-      parameters:
-        - in: path
-          name: companyId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the company to delete
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
 
-  /api/clusters:
-    get:
-      tags:
-        - Clusters
-      summary: Returns a list of clusters.
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    post:
-      tags:
-        - Clusters
-      summary: Create a cluster.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                company_id:
-                  type: integer
-                name:
-                  type: string
-                description:
-                  type: string
-              required:
-                - company_id
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/clusters/{clusterId}:
-    get:
-      tags:
-        - Clusters
-      summary: Get a cluster by ID
-      parameters:
-        - in: path
-          name: clusterId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the user to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    put:
-      tags:
-        - Clusters
-      summary: Update a cluster.
-      parameters:
-        - in: path
-          name: clusterId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the cluster to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                company_id:
-                  type: integer
-                name:
-                  type: string
-                description:
-                  type: string
-              required:
-                - company_id
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    delete:
-      tags:
-        - Clusters
-      summary: Delete a cluster by ID
-      parameters:
-        - in: path
-          name: clusterId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the cluster to delete
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-
-  /api/branches:
-    get:
-      tags:
-        - Branches
-      summary: Returns a list of branches.
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    post:
-      tags:
-        - Branches
-      summary: Create a branch.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                company_id:
-                  type: integer
-                cluster_id:
-                  type: integer
-                status:
-                  type: string
-                  enum: ['active', 'inactive']
-                  default: 'active'
-                name:
-                  type: string
-                code:
-                  type: string
-                location:
-                  type: string
-                unit_number:
-                  type: string
-                floor_number:
-                  type: string
-                street:
-                  type: string
-                city:
-                  type: string
-                province:
-                  type: string
-                zip:
-                  type: string
-                barangay:
-                  type: string
-                pos_type:
-                  type: string
-                  enum: ['retail', 'restaurant', 'hospitality']
-                  default: 'retail'
-              required:
-                - company_id
-                - cluster_id
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/branches/{branchId}:
-    get:
-      tags:
-        - Branches
-      summary: Get a branch by ID
-      parameters:
-        - in: path
-          name: branchId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the branch to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    put:
-      tags:
-        - Branches
-      summary: Update a branch.
-      parameters:
-        - in: path
-          name: branchId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the branch to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                company_id:
-                  type: integer
-                cluster_id:
-                  type: integer
-                status:
-                  type: string
-                  enum: ['active', 'inactive']
-                  default: 'active'
-                name:
-                  type: string
-                code:
-                  type: string
-                location:
-                  type: string
-                unit_number:
-                  type: string
-                floor_number:
-                  type: string
-                street:
-                  type: string
-                city:
-                  type: string
-                province:
-                  type: string
-                zip:
-                  type: string
-                barangay:
-                  type: string
-                pos_type:
-                  type: string
-                  enum: ['retail', 'restaurant', 'hospitality']
-                  default: 'retail'
-              required:
-                - company_id
-                - cluster_id
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    delete:
-      tags:
-        - Branches
-      summary: Delete a branch by ID
-      parameters:
-        - in: path
-          name: branchId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the branch to delete
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/regions:
-    get:
-      tags:
-        - Regions
-      summary: Returns a list of regions.
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    post:
-      tags:
-        - Regions
-      summary: Create a region.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-              required:
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/regions/{regionId}:
-    get:
-      tags:
-        - Regions
-      summary: Get a region by ID
-      parameters:
-        - in: path
-          name: regionId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the region to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    put:
-      tags:
-        - Regions
-      summary: Update a region.
-      parameters:
-        - in: path
-          name: regionId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the region to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-              required:
-                - name
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    delete:
-      tags:
-        - Regions
-      summary: Delete a region by ID
-      parameters:
-        - in: path
-          name: regionId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the region to delete
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/region/{regionId}/provinces:
-    get:
-      tags:
-        - Provinces
-      summary: Returns a list of provinces.
-      parameters:
-        - in: path
-          name: regionId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the region to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/provinces:
-    post:
-      tags:
-        - Provinces
-      summary: Create a province.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                region_id:
-                  type: integer
-                name:
-                  type: string
-              required:
-                - name
-                - region_id
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/provinces/{provinceId}:
-    get:
-      tags:
-        - Provinces
-      summary: Get a province by ID
-      parameters:
-        - in: path
-          name: provinceId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the province to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    put:
-      tags:
-        - Provinces
-      summary: Update a province.
-      parameters:
-        - in: path
-          name: provinceId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the province to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                region_id:
-                  type: integer
-                name:
-                  type: string
-              required:
-                - name
-                - region_id
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    delete:
-      tags:
-        - Provinces
-      summary: Delete a region by ID
-      parameters:
-        - in: path
-          name: provinceId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the province to delete
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-
-  /api/province/{provinceId}/cities:
-    get:
-      tags:
-        - Cities
-      summary: Returns a list of cities.
-      parameters:
-        - in: path
-          name: provinceId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the province to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/cities:
-    post:
-      tags:
-        - Cities
-      summary: Create a city.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                province_id:
-                  type: integer
-                name:
-                  type: string
-              required:
-                - name
-                - province_id
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/cities/{cityId}:
-    get:
-      tags:
-        - Cities
-      summary: Get a city by ID
-      parameters:
-        - in: path
-          name: cityId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the city to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    put:
-      tags:
-        - Cities
-      summary: Update a city.
-      parameters:
-        - in: path
-          name: cityId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the city to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                province_id:
-                  type: integer
-                name:
-                  type: string
-              required:
-                - name
-                - province_id
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    delete:
-      tags:
-        - Cities
-      summary: Delete a city by ID
-      parameters:
-        - in: path
-          name: cityId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the city to delete
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-
-  /api/city/{cityId}/barangays:
-    get:
-      tags:
-        - Barangays
-      summary: Returns a list of barangays.
-      parameters:
-        - in: path
-          name: cityId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the city to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/barangays:
-    post:
-      tags:
-        - Barangays
-      summary: Create a barangay.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                city_id:
-                  type: integer
-                name:
-                  type: string
-              required:
-                - name
-                - city_id
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  /api/barangays/{barangayId}:
-    get:
-      tags:
-        - Barangays
-      summary: Get a barangay by ID
-      parameters:
-        - in: path
-          name: barangayId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the barangay to get
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    put:
-      tags:
-        - Barangays
-      summary: Update a barangay.
-      parameters:
-        - in: path
-          name: barangayId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the barangay to update
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                city_id:
-                  type: integer
-                name:
-                  type: string
-              required:
-                - name
-                - city_id
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    delete:
-      tags:
-        - Barangays
-      summary: Delete a barangay by ID
-      parameters:
-        - in: path
-          name: barangayId
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the barangay to delete
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
   /api/activate-machine:
     post:
       tags:
@@ -1172,6 +81,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/test-connection:
     get:
       tags:
@@ -1185,11 +95,19 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/cash-denominations:
     get:
       tags:
         - Sync From Server
       summary: Get all cash denominations.
+      parameters:
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1198,6 +116,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/departments/{branchId}:
     get:
       tags:
@@ -1210,6 +129,12 @@ paths:
             type: integer
           required: true
           description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1218,6 +143,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/categories/{branchId}:
     get:
       tags:
@@ -1230,6 +156,12 @@ paths:
             type: integer
           required: true
           description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1238,6 +170,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/sub-categories/{branchId}:
     get:
       tags:
@@ -1250,6 +183,12 @@ paths:
             type: integer
           required: true
           description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1258,6 +197,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/branch-users/{branchId}:
     get:
       tags:
@@ -1270,6 +210,12 @@ paths:
             type: integer
           required: true
           description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1278,6 +224,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/payment-types/{branchId}:
     get:
       tags:
@@ -1290,6 +237,12 @@ paths:
             type: integer
           required: true
           description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1298,6 +251,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/discount-types/{branchId}:
     get:
       tags:
@@ -1310,6 +264,12 @@ paths:
             type: integer
           required: true
           description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1318,6 +278,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/charge-accounts/{branchId}:
     get:
       tags:
@@ -1330,6 +291,12 @@ paths:
             type: integer
           required: true
           description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1338,6 +305,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/branch-transactions:
     get:
       tags:
@@ -1356,6 +324,12 @@ paths:
             type: integer
           required: true
           description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1374,6 +348,8 @@ paths:
             schema:
               type: object
               properties:
+                device_id:
+                  type: integer
                 transaction_id:
                   type: integer
                 pos_machine_id:
@@ -1466,6 +442,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/branch-orders:
     get:
       tags:
@@ -1484,6 +461,12 @@ paths:
             type: integer
           required: true
           description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1502,6 +485,8 @@ paths:
             schema:
               type: object
               properties:
+                device_id:
+                  type: integer
                 order_id:
                   type: integer
                 pos_machine_id:
@@ -1600,6 +585,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/branch-payments:
     get:
       tags:
@@ -1618,6 +604,12 @@ paths:
             type: integer
           required: true
           description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1636,6 +628,8 @@ paths:
             schema:
               type: object
               properties:
+                device_id:
+                  type: integer
                 payment_id:
                   type: integer
                 pos_machine_id:
@@ -1672,6 +666,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/safekeeping:
     get:
       tags:
@@ -1690,6 +685,12 @@ paths:
             type: integer
           required: true
           description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1708,6 +709,8 @@ paths:
             schema:
               type: object
               properties:
+                device_id:
+                  type: integer
                 safekeeping_id:
                   type: integer
                 pos_machine_id:
@@ -1746,6 +749,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/safekeeping-denominations:
     get:
       tags:
@@ -1764,6 +768,12 @@ paths:
             type: integer
           required: true
           description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1782,6 +792,8 @@ paths:
             schema:
               type: object
               properties:
+                device_id:
+                  type: integer
                 branch_id:
                   type: integer
                 pos_machine_id:
@@ -1809,6 +821,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   /api/end-of-days:
     get:
       tags:
@@ -1827,6 +840,12 @@ paths:
             type: integer
           required: true
           description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1845,6 +864,8 @@ paths:
             schema:
               type: object
               properties:
+                device_id:
+                  type: integer
                 end_of_day_id:
                   type: integer
                 pos_machine_id:
@@ -1961,6 +982,12 @@ paths:
             type: integer
           required: true
           description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
       responses:
         '200':
           content:
@@ -1979,6 +1006,8 @@ paths:
             schema:
               type: object
               properties:
+                device_id:
+                  type: integer
                 cut_off_id:
                   type: integer
                 end_of_day_id:

@@ -66,7 +66,7 @@ class MachineController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $machineId)
     {
         $request->validate([
             'branch_id' => 'required',
@@ -154,6 +154,25 @@ class MachineController extends Controller
      */
     public function update(Request $request, $branchId, $machineId)
     {
+        if ($request->ajax()) {
+            $machine = $this->posMachineRepository->find($machineId);
+
+            if ($machine) {
+                $machine->status = $request->status;
+                $machine->save();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Machine status updated successfully.'
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Machine not found.'
+            ]);
+        }
+
         $request->validate([
             'branch_id' => 'required',
             'status' => 'required',
@@ -201,6 +220,6 @@ class MachineController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        dd("here");
     }
 }

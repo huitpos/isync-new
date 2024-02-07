@@ -85,19 +85,34 @@ class MachineController extends BaseController
         ]);
 
         $postData = $request->all();
-        unset($postData['product_key']);
 
-        $machine = $this->posMachineRepository->get(['product_key' => $validatedData['product_key']])->first();
+        $machine = $this->posMachineRepository->get([
+            'product_key' => $validatedData['product_key'],
+            'status' => 'active'
+        ])->first();
+
+        if (!$machine) {
+            return $this->sendError('Invalid product key');
+        }
 
         $devices = PosDevice::where('pos_machine_id', $machine->id)
-            ->where('status', 'active')
-            ->count();
+            ->where('status', 'active');
 
-        if ($devices > 0) {
+        if ($request->has('device_id')) {
+            $devices->where('id', '!=', $request->input('device_id'));
+        }
+
+        if ($devices->count() > 0) {
             return $this->sendError('Device already in use');
         }
 
-        $machine->device()->create($postData);
+        if (!$request->has('device_id')) {
+            unset($postData['product_key']);
+            unset($postData['device_id']);
+            $machine->device()->create($postData);
+        }
+
+        $machine = $this->posMachineRepository->getWithActivationData(['product_key' => $validatedData['product_key']])->first();
 
         return $this->sendResponse($machine, 'Device activated successfully');
     }

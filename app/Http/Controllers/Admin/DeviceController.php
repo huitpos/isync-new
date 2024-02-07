@@ -91,8 +91,15 @@ class DeviceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $machineId, string $deviceId)
     {
-        //
+        $device = PosDevice::findOrFail($deviceId);
+
+        if ($device->delete()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Device deleted successfully.'
+            ]);
+        }
     }
 }

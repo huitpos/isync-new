@@ -21,13 +21,13 @@ class BranchMachinesDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('name', function (PosMachine $data) {
                 return view('admin.datatables._link', [
-                    'url' => route('admin.branches.show', $data->branch_id),
+                    'url' => route('admin.machines.show', ['machine' => $data->id, 'branchId' => $data->branch_id]),
                     'text' => $data->name,
                 ]);
             })
             ->addColumn('product_key', function (PosMachine $data) {
                 return view('admin.datatables._link', [
-                    'url' => route('admin.branches.show', $data->branch_id),
+                    'url' => route('admin.machines.show', ['machine' => $data->id, 'branchId' => $data->branch_id]),
                     'text' => $data->product_key,
                 ]);
             })

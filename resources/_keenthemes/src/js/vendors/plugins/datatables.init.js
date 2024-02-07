@@ -7,7 +7,7 @@
 // Set Defaults
 
 var defaults = {
-	"language": {		
+	"language": {
 		"info": "Showing _START_ to _END_ of _TOTAL_ records",
     	"infoEmpty": "Showing no records",
 		"lengthMenu": "_MENU_",

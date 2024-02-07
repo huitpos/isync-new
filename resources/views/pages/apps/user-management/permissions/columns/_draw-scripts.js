@@ -2,7 +2,7 @@
 document.querySelectorAll('[data-kt-action="delete_row"]').forEach(function (element) {
     element.addEventListener('click', function (e) {
         Swal.fire({
-            text: 'Are you sure you want to remove?',
+            text: 'Are you sure you want to remove?222',
             icon: 'warning',
             buttonsStyling: false,
             showCancelButton: true,

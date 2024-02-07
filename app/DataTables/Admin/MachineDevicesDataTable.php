@@ -19,12 +19,16 @@ class MachineDevicesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('status', function (PosDevice $data) {
-                return view('admin.datatables._status-toggle', [
-                    'id' => $data->id,
-                    'route' => 'admin.devices.update',
-                    'param' => ['branchId' => $data->machine->branch_id, 'device' => $data->id],
-                    'checked' => $data->status == 'active' ? 'checked' : '',
+            ->addColumn('actions', function (PosDevice $data) {
+                return view('admin.datatables._actions', [
+                    'param' => $data->id,
+                    'hideEdit' => true,
+                    'showDelete' => true,
+                    'route' => 'admin.devices',
+                    'deleteParam' => [
+                        'device' => $data->id,
+                        'branchId' => $data->machine->branch_id,
+                    ]
                 ]);
             });
     }
@@ -53,7 +57,7 @@ class MachineDevicesDataTable extends DataTable
             ->addTableClass('table align-middle table-striped table-row-bordered fs-6 gy-5 gs-7 dataTable no-footer text-gray-600 fw-semibold')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
             ->orderBy(0, 'asc')
-            ->drawCallback("function() {" . file_get_contents(resource_path('views/pages/apps/user-management/users/columns/_draw-scripts.js')) . "}");
+            ->drawCallback("function() {" . file_get_contents(resource_path('views/admin/datatables/_draw-scripts.js')) . "}");
     }
 
     /**
@@ -68,7 +72,7 @@ class MachineDevicesDataTable extends DataTable
             Column::make('android_id'),
             Column::make('manufacturer'),
             Column::make('board'),
-            Column::computed('status')
+            Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),
         ];

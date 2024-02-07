@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\BarangayController;
 use App\Http\Controllers\Api\MachineController;
 use App\Http\Controllers\Api\MiscController;
 
+use App\Http\Middleware\MachineValidationMiddleware;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -33,7 +35,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UsersController::class);
     Route::apiResource('companies', CompaniesController::class);
     Route::apiResource('clusters', ClustersController::class);
@@ -46,39 +48,43 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('city/{cityId}/barangays', BarangayController::class);
     Route::apiResource('barangays', BarangayController::class);
 
+    //sync
     Route::post('/activate-machine', [MachineController::class, 'activate']);
-    Route::get('/departments/{branchId}', [MiscController::class, 'departments']);
-    Route::get('/cash-denominations', [MiscController::class, 'cashDenominations']);
-    Route::get('/categories/{branchId}', [MiscController::class, 'categories']);
-    Route::get('/sub-categories/{branchId}', [MiscController::class, 'subCategories']);
-    Route::get('/branch-users/{branchId}', [MiscController::class, 'branchUsers']);
-    Route::get('/payment-types/{branchId}', [MiscController::class, 'paymentTypes']);
-    Route::get('/discount-types/{branchId}', [MiscController::class, 'discountTypes']);
-    Route::get('/charge-accounts/{branchId}', [MiscController::class, 'chargeAccounts']);
-    Route::get('/branch-products/{branchId}', [MiscController::class, 'products']);
 
-    Route::get('/branch-transactions', [MiscController::class, 'getTransactions']);
-    Route::post('/branch-transactions', [MiscController::class, 'saveTransactions']);
+    Route::middleware([MachineValidationMiddleware::class])->group(function () {
+        Route::get('/cash-denominations', [MiscController::class, 'cashDenominations']);
+        Route::get('/departments/{branchId}', [MiscController::class, 'departments']);
+        Route::get('/categories/{branchId}', [MiscController::class, 'categories']);
+        Route::get('/sub-categories/{branchId}', [MiscController::class, 'subCategories']);
+        Route::get('/branch-users/{branchId}', [MiscController::class, 'branchUsers']);
+        Route::get('/payment-types/{branchId}', [MiscController::class, 'paymentTypes']);
+        Route::get('/discount-types/{branchId}', [MiscController::class, 'discountTypes']);
+        Route::get('/charge-accounts/{branchId}', [MiscController::class, 'chargeAccounts']);
+        Route::get('/branch-products/{branchId}', [MiscController::class, 'products']);
 
-    Route::get('/branch-orders', [MiscController::class, 'getOrders']);
-    Route::post('/branch-orders', [MiscController::class, 'saveOrders']);
+        Route::get('/branch-transactions', [MiscController::class, 'getTransactions']);
+        Route::post('/branch-transactions', [MiscController::class, 'saveTransactions']);
 
-    Route::post('/branch-payments', [MiscController::class, 'savePayments']);
-    Route::get('/branch-payments', [MiscController::class, 'getPayments']);
+        Route::get('/branch-orders', [MiscController::class, 'getOrders']);
+        Route::post('/branch-orders', [MiscController::class, 'saveOrders']);
 
-    Route::get('/safekeeping', [MiscController::class, 'getSafekeepings']);
-    Route::post('/safekeeping', [MiscController::class, 'saveSafekeepings']);
+        Route::post('/branch-payments', [MiscController::class, 'savePayments']);
+        Route::get('/branch-payments', [MiscController::class, 'getPayments']);
 
-    Route::get('/safekeeping-denominations', [MiscController::class, 'getSafekeepingDenominations']);
-    Route::post('/safekeeping-denominations', [MiscController::class, 'saveSafekeepingsDenominations']);
+        Route::get('/safekeeping', [MiscController::class, 'getSafekeepings']);
+        Route::post('/safekeeping', [MiscController::class, 'saveSafekeepings']);
 
-    Route::get('/test-connection', [MiscController::class, 'testConnection']);
+        Route::get('/safekeeping-denominations', [MiscController::class, 'getSafekeepingDenominations']);
+        Route::post('/safekeeping-denominations', [MiscController::class, 'saveSafekeepingsDenominations']);
 
-    Route::post('/end-of-days', [MiscController::class, 'saveEndOfDays']);
-    Route::get('/end-of-days', [MiscController::class, 'getEndOfDays']);
+        Route::get('/test-connection', [MiscController::class, 'testConnection']);
 
-    Route::post('/cut-offs', [MiscController::class, 'saveCutOffs']);
-    Route::get('/cut-offs', [MiscController::class, 'getCutOffs']);
+        Route::post('/end-of-days', [MiscController::class, 'saveEndOfDays']);
+        Route::get('/end-of-days', [MiscController::class, 'getEndOfDays']);
+
+        Route::post('/cut-offs', [MiscController::class, 'saveCutOffs']);
+        Route::get('/cut-offs', [MiscController::class, 'getCutOffs']);
+    });
 
     Route::get('/logout', [AuthController::class, 'logout']);
-});
+// });

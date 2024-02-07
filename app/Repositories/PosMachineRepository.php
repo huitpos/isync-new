@@ -20,6 +20,11 @@ class PosMachineRepository implements PosMachineRepositoryInterface
 
     public function get($parameters = []): ?Collection
     {
+        return PosMachine::where($parameters)->get();
+    }
+
+    public function getWithActivationData($parameters = []): ?Collection
+    {
         return PosMachine::with([
             'branch' => [
                 'cluster',
@@ -33,7 +38,8 @@ class PosMachineRepository implements PosMachineRepositoryInterface
                     'city',
                     'barangay',
                 ]
-            ]
+            ],
+            'device'
         ])->where($parameters)->get();
     }
 
