@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UsersController::class);
 
     Route::apiResource('clusters', ClustersController::class);
@@ -49,6 +49,7 @@ Route::post('/login', [AuthController::class, 'login']);
 
     //sync
     Route::post('/activate-machine', [MachineController::class, 'activate']);
+    Route::get('/test-connection', [MiscController::class, 'testConnection']);
 
     Route::middleware([MachineValidationMiddleware::class])->group(function () {
         Route::apiResource('companies', CompaniesController::class);
@@ -78,8 +79,6 @@ Route::post('/login', [AuthController::class, 'login']);
         Route::get('/safekeeping-denominations', [MiscController::class, 'getSafekeepingDenominations']);
         Route::post('/safekeeping-denominations', [MiscController::class, 'saveSafekeepingsDenominations']);
 
-        Route::get('/test-connection', [MiscController::class, 'testConnection']);
-
         Route::post('/end-of-days', [MiscController::class, 'saveEndOfDays']);
         Route::get('/end-of-days', [MiscController::class, 'getEndOfDays']);
 
@@ -88,4 +87,4 @@ Route::post('/login', [AuthController::class, 'login']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
-// });
+});
