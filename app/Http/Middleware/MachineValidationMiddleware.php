@@ -24,7 +24,7 @@ class MachineValidationMiddleware
         if (!$device || $device->machine->status !== 'active') {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid machine'
+                'message' => 'Invalid device'
             ], 422);
         }
 

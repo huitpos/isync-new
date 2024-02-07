@@ -37,9 +37,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UsersController::class);
-    Route::apiResource('companies', CompaniesController::class);
+
     Route::apiResource('clusters', ClustersController::class);
-    Route::apiResource('branches', BranchesController::class);
     Route::apiResource('regions', RegionController::class);
     Route::apiResource('region/{regionId}/provinces', ProvinceController::class);
     Route::apiResource('provinces', ProvinceController::class);
@@ -52,6 +51,8 @@ Route::post('/login', [AuthController::class, 'login']);
     Route::post('/activate-machine', [MachineController::class, 'activate']);
 
     Route::middleware([MachineValidationMiddleware::class])->group(function () {
+        Route::apiResource('companies', CompaniesController::class);
+        Route::apiResource('branches', BranchesController::class);
         Route::get('/cash-denominations', [MiscController::class, 'cashDenominations']);
         Route::get('/departments/{branchId}', [MiscController::class, 'departments']);
         Route::get('/categories/{branchId}', [MiscController::class, 'categories']);

@@ -9,7 +9,7 @@ use App\Models\Branch;
 
 use Illuminate\Support\Str;
 
-class BranchesController extends Controller
+class BranchesController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -41,7 +41,13 @@ class BranchesController extends Controller
      */
     public function show($id)
     {
-        return Branch::find($id);
+        $branch = Branch::find($id);
+
+        if (is_null($branch)) {
+            return $this->sendError('Branch not found.');
+        }
+
+        return $this->sendResponse($branch, 'Branch retrieved successfully.');
     }
 
     /**

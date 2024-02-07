@@ -82,6 +82,60 @@ paths:
                 items:
                   type: string
 
+  /api/companies/{companyId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get company data by company ID.
+      parameters:
+        - in: path
+          name: companyId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the company to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/branches/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get branch data by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
   /api/test-connection:
     get:
       tags:

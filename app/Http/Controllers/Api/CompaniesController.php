@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Company;
-
+use Faker\Provider\Base;
 use Illuminate\Support\Str;
 
 
-class CompaniesController extends Controller
+class CompaniesController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -49,7 +49,13 @@ class CompaniesController extends Controller
      */
     public function show(string $id)
     {
-        return Company::find($id);
+        $company =  Company::find($id);
+
+        if (is_null($company)) {
+            return $this->sendError('Company not found.');
+        }
+
+        return $this->sendResponse($company, 'Categories retrieved successfully.');
     }
 
     /**
