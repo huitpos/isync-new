@@ -39,7 +39,7 @@ class PosMachineRepository implements PosMachineRepositoryInterface
                     'barangay',
                 ]
             ],
-            'device'
+            'deviceInfo'
         ])->where($parameters)->get();
     }
 

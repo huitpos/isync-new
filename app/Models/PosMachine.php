@@ -21,6 +21,11 @@ class PosMachine extends Model
         return $this->hasOne(PosDevice::class);
     }
 
+    public function deviceInfo()
+    {
+        return $this->hasOne(PosDevice::class);
+    }
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);
