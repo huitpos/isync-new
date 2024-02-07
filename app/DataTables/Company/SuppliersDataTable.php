@@ -19,6 +19,12 @@ class SuppliersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (Supplier $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.suppliers.show', ['companySlug' => $data->company->slug, 'supplier' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('actions', function (Supplier $data) {
                 return view('company.datatables._actions', [
                     'param' => ['supplier' => $data->id, 'companySlug' => $data->company->slug],
@@ -34,7 +40,11 @@ class SuppliersDataTable extends DataTable
     public function query(Supplier $model): QueryBuilder
     {
         return $model->newQuery()
-            ->with('company');
+            ->where('company_id', $this->company_id)
+            ->with([
+                'company',
+                'createdBy',
+            ]);
     }
 
     /**
@@ -60,8 +70,12 @@ class SuppliersDataTable extends DataTable
     {
         return [
             Column::make('id'),
-            Column::make('name'),
-            Column::make('status')->title('status'),
+            Column::make('name')->title('supplier name'),
+            Column::make('contact_person'),
+            Column::make('contact_number'),
+            Column::make('email'),
+            Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

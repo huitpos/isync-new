@@ -19,6 +19,12 @@ class ItemTypesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (ItemType $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.item-types.show', ['companySlug' => $data->company->slug, 'item_type' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('actions', function (ItemType $data) {
                 return view('company.datatables._actions', [
                     'param' => ['item_type' => $data->id, 'companySlug' => $data->company->slug],
@@ -34,8 +40,10 @@ class ItemTypesDataTable extends DataTable
     public function query(ItemType $model): QueryBuilder
     {
         return $model->newQuery()
+            ->where('company_id', $this->company_id)
             ->with([
-                'company'
+                'company',
+                'createdBy'
             ]);
     }
 
@@ -63,6 +71,8 @@ class ItemTypesDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
+            Column::make('created_by.name', 'createdBy.name')->title('Created By'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

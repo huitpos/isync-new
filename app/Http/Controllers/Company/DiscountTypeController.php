@@ -50,7 +50,6 @@ class DiscountTypeController extends Controller
         $company = $request->attributes->get('company');
 
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'description' => 'required',
             'type' => 'required',
@@ -58,7 +57,10 @@ class DiscountTypeController extends Controller
             'status' => 'required',
         ]);
 
-        if ($this->discountTypeRepository->create($request->all())) {
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->discountTypeRepository->create($postData)) {
             return redirect()->route('company.discount-types.index', ['companySlug' => $company->slug])->with('success', 'Discount type created successfully.');
         }
 
@@ -68,9 +70,20 @@ class DiscountTypeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+
+        $discountType = $this->discountTypeRepository->find($id);
+
+        if (!$discountType) {
+            return abort(404, 'Discount type not found.');
+        }
+
+        return view('company.discountTypes.show', [
+            'company' => $company,
+            'discountType' => $discountType,
+        ]);
     }
 
     /**
@@ -96,7 +109,6 @@ class DiscountTypeController extends Controller
         $company = $request->attributes->get('company');
 
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'description' => 'required',
             'type' => 'required',
@@ -104,7 +116,10 @@ class DiscountTypeController extends Controller
             'status' => 'required',
         ]);
 
-        if ($this->discountTypeRepository->update($id, $request->all())) {
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->discountTypeRepository->update($id, $postData)) {
             return redirect()->route('company.discount-types.index', ['companySlug' => $company->slug])->with('success', 'Discount type updated successfully.');
         }
 

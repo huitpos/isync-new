@@ -19,6 +19,12 @@ class CategoriesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (Category $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.categories.show', ['companySlug' => $data->company->slug, 'category' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('actions', function (Category $data) {
                 return view('company.datatables._actions', [
                     'param' => ['category' => $data->id, 'companySlug' => $data->company->slug],
@@ -34,6 +40,7 @@ class CategoriesDataTable extends DataTable
     public function query(Category $model): QueryBuilder
     {
         return $model->newQuery()
+            ->where('company_id', $this->company_id)
             ->with([
                 'company',
                 'createdBy'

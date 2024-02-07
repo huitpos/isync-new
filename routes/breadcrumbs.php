@@ -111,6 +111,11 @@ Breadcrumbs::for('company.suppliers.create', function (BreadcrumbTrail $trail, $
     $trail->push('Create');
 });
 
+Breadcrumbs::for('company.suppliers.show', function (BreadcrumbTrail $trail, $company, $supplier) {
+    $trail->parent('company.suppliers.index', $company);
+    $trail->push(ucfirst($supplier->name));
+});
+
 //products
 Breadcrumbs::for('company.products.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
@@ -143,6 +148,11 @@ Breadcrumbs::for('company.categories.edit', function (BreadcrumbTrail $trail, $c
     $trail->push('Edit');
 });
 
+Breadcrumbs::for('company.categories.show', function (BreadcrumbTrail $trail, $company, $category) {
+    $trail->parent('company.categories.index', $company);
+    $trail->push(ucfirst($category->name));
+});
+
 //subcategories
 Breadcrumbs::for('company.subcategories.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
@@ -159,7 +169,72 @@ Breadcrumbs::for('company.subcategories.edit', function (BreadcrumbTrail $trail,
     $trail->push('Edit');
 });
 
-//company dashboard
+Breadcrumbs::for('company.subcategories.show', function (BreadcrumbTrail $trail, $company, $subcategory) {
+    $trail->parent('company.subcategories.index', $company);
+    $trail->push(ucfirst($subcategory->name));
+});
+
+//discount types
+Breadcrumbs::for('company.discountTypes.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Discount Types', route('company.discount-types.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.discountTypes.show', function (BreadcrumbTrail $trail, $company, $discountType) {
+    $trail->parent('company.discountTypes.index', $company);
+    $trail->push(ucfirst($discountType->company_name));
+});
+
+//charge accounts
+Breadcrumbs::for('company.chargeAccounts.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Charge Accounts', route('company.charge-accounts.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.chargeAccounts.show', function (BreadcrumbTrail $trail, $company, $chargeAccount) {
+    $trail->parent('company.chargeAccounts.index', $company);
+    $trail->push(ucfirst($chargeAccount->name));
+});
+
+//payment types
+Breadcrumbs::for('company.paymentTypes.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Payment Types', route('company.payment-types.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.paymentTypes.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.paymentTypes.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.paymentTypes.show', function (BreadcrumbTrail $trail, $company, $paymentType) {
+    $trail->parent('company.paymentTypes.index', $company);
+    $trail->push(ucfirst($paymentType->name));
+});
+
+//uom
+Breadcrumbs::for('company.uom.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Unit Of Measurements', route('company.unit-of-measurements.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.uom.show', function (BreadcrumbTrail $trail, $company, $uom) {
+    $trail->parent('company.uom.index', $company);
+    $trail->push(ucfirst($uom->name));
+});
+
+//item types
+Breadcrumbs::for('company.itemTypes.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Item Types', route('company.item-types.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.itemTypes.show', function (BreadcrumbTrail $trail, $company, $itemType) {
+    $trail->parent('company.itemTypes.index', $company);
+    $trail->push(ucfirst($itemType->name));
+});
+
+//branch dashboard
 Breadcrumbs::for('branch.dashboard', function (BreadcrumbTrail $trail, $company, $branch) {
     $trail->parent('company.dashboard', $company);
     $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));

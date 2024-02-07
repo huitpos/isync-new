@@ -69,9 +69,17 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+
+        $category = $this->categoryRepository->findOrFail($id);
+
+        if ($category->company_id != $company->id) {
+            abort(404);
+        }
+
+        return view('company.categories.show', compact('company', 'category'));
     }
 
     /**

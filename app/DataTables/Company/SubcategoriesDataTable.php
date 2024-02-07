@@ -19,6 +19,12 @@ class SubcategoriesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (Subcategory $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.subcategories.show', ['companySlug' => $data->company->slug, 'subcategory' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('actions', function (Subcategory $data) {
                 return view('company.datatables._actions', [
                     'param' => ['subcategory' => $data->id, 'companySlug' => $data->company->slug],
@@ -34,6 +40,7 @@ class SubcategoriesDataTable extends DataTable
     public function query(Subcategory $model): QueryBuilder
     {
         return $model->newQuery()
+            ->where('company_id', $this->company_id)
             ->with([
                 'company',
                 'createdBy',

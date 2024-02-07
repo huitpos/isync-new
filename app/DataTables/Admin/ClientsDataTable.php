@@ -19,6 +19,12 @@ class ClientsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('company_name', function (Company $data) {
+                return view('admin.datatables._link', [
+                    'url' => route('admin.clients.show', $data->id),
+                    'text' => $data->company_name,
+                ]);
+            })
             ->addColumn('actions', function (Company $data) {
                 return view('admin.datatables._actions', [
                     'param' => $data->id,

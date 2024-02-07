@@ -19,6 +19,12 @@ class DepartmentsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (Department $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.departments.show', ['companySlug' => $data->company->slug, 'department' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('actions', function (Department $data) {
                 return view('company.datatables._actions', [
                     'param' => ['department' => $data->id, 'companySlug' => $data->company->slug],
@@ -34,6 +40,7 @@ class DepartmentsDataTable extends DataTable
     public function query(Department $model): QueryBuilder
     {
         return $model->newQuery()
+            ->where('company_id', $this->company_id)
             ->with([
                 'createdBy'
             ]);

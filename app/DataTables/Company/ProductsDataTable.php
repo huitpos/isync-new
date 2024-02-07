@@ -19,6 +19,12 @@ class ProductsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (Product $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.products.show', ['companySlug' => $data->company->slug, 'product' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('actions', function (Product $data) {
                 return view('company.datatables._actions', [
                     'param' => ['product' => $data->id, 'companySlug' => $data->company->slug],
@@ -34,6 +40,7 @@ class ProductsDataTable extends DataTable
     public function query(Product $model): QueryBuilder
     {
         return $model->newQuery()
+            ->where('company_id', $this->company_id)
             ->with([
                 'itemType',
                 'uom',

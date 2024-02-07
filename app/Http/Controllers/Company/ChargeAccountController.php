@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\ChargeAccountRepositoryInterface;
 
+use App\DataTables\Company\ChargeAccountsDataTable;
+
 class ChargeAccountController extends Controller
 {
     protected $chargeAccountRepository;
@@ -19,11 +21,12 @@ class ChargeAccountController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, ChargeAccountsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.chargeAccounts.index', compact('company'));
+        return $dataTable->with('company_id', $company->id)
+            ->render('company.chargeAccounts.index', compact('company'));
     }
 
     /**
@@ -44,7 +47,6 @@ class ChargeAccountController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'credit_limit' => 'required|numeric',
             'address' => 'required',
@@ -55,7 +57,10 @@ class ChargeAccountController extends Controller
 
         $company = $request->attributes->get('company');
 
-        if ($this->chargeAccountRepository->create($request->all())) {
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->chargeAccountRepository->create($postData)) {
             return redirect()->route('company.charge-accounts.index', ['companySlug' => $company->slug])->with('success', 'Data has been stored successfully!');
         }
 
@@ -65,9 +70,15 @@ class ChargeAccountController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+        $chargeAccount = $this->chargeAccountRepository->find($id);
+
+        return view('company.chargeAccounts.show', [
+            'company' => $company,
+            'chargeAccount' => $chargeAccount,
+        ]);
     }
 
     /**
@@ -101,7 +112,10 @@ class ChargeAccountController extends Controller
 
         $company = $request->attributes->get('company');
 
-        if ($this->chargeAccountRepository->update($id, $request->all())) {
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->chargeAccountRepository->update($id, $postData)) {
             return redirect()->route('company.charge-accounts.index', ['companySlug' => $company->slug])->with('success', 'Data has been updated successfully!');
         }
 

@@ -68,9 +68,17 @@ class SubcategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+
+        $subcategory = $this->subcategoryRepository->findOrFail($id);
+
+        if ($subcategory->company_id != $company->id) {
+            abort(404);
+        }
+
+        return view('company.subcategories.show', compact('company', 'subcategory'));
     }
 
     /**

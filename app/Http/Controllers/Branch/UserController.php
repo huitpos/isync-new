@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\UserRepositoryInterface;
 
+use App\DataTables\Branch\UsersDataTable;
+
 class UserController extends Controller
 {
     protected $userRepository;
@@ -19,12 +21,12 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, UsersDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        return view('branch.users.index', [
+        return $dataTable->with(['branch_id' => $branch->id])->render('branch.users.index', [
             'company' => $company,
             'branch' => $branch,
         ]);
@@ -49,8 +51,10 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
         $request->validate([
-            'branch_id' => 'required',
             'username' => 'required|unique:users,username',
             'password' => 'required',
             'first_name' => 'required',
@@ -60,6 +64,7 @@ class UserController extends Controller
 
         $data = $request->all();
         $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
+        $data['branch_id'] = $branch->id;
 
         if ($this->userRepository->create($data)) {
             return redirect()->route('branch.users.index', ['companySlug' => $request->attributes->get('company')->slug, 'branchSlug' => $request->attributes->get('branch')->slug])->with('success', 'User created successfully.');

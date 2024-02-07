@@ -47,7 +47,7 @@
                         data-kt-image-input-action="change"
                         data-bs-toggle="tooltip"
                         data-bs-dismiss="click"
-                        title="Change avatar">
+                        title="Change logo">
                             <i class="ki-duotone ki-pencil fs-6"><span class="path1"></span><span class="path2"></span></i>
 
                             <!--begin::Inputs-->
@@ -62,7 +62,7 @@
                         data-kt-image-input-action="cancel"
                         data-bs-toggle="tooltip"
                         data-bs-dismiss="click"
-                        title="Cancel avatar">
+                        title="Cancel logo">
                             <i class="ki-outline ki-cross fs-3"></i>
                         </span>
                         <!--end::Cancel button-->

@@ -67,9 +67,19 @@ class UnitOfMeasurementController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+        $uom = $this->uomRepository->find($id);
+
+        if (empty($uom)) {
+            return abort(404);
+        }
+
+        return view('company.unitOfMeasurements.show', [
+            'company' => $company,
+            'uom' => $uom,
+        ]);
     }
 
     /**

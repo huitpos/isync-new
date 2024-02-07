@@ -19,6 +19,12 @@ class ClustersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (Cluster $data) {
+                return view('admin.datatables._link', [
+                    'url' => route('admin.clusters.show', $data->id),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('status', function (Cluster $data) {
                 return view('admin.datatables._status-toggle', [
                     'id' => $data->id,

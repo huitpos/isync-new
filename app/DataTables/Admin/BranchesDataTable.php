@@ -19,6 +19,12 @@ class BranchesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (Branch $data) {
+                return view('admin.datatables._link', [
+                    'url' => route('admin.branches.show', $data->id),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('actions', function (Branch $data) {
                 return view('admin.datatables._actions', [
                     'param' => $data->id,

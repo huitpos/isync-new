@@ -78,6 +78,15 @@
 					</a>
 				</div>
 
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('branch.users.*') ? 'active' : '' }}" href="{{ route('branch.users.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+						<span class="menu-icon">
+							<i class="fa-solid fa-users fs-2"></i>
+						</span>
+						<span class="menu-title">Users</span>
+					</a>
+				</div>
+
 			@elseif (request()->attributes->get('company'))
 				<div class="menu-item">
 					<a class="menu-link {{ request()->routeIs('company.dashboard') ? 'active' : '' }}" href="{{ route('company.dashboard', ['companySlug' => request()->attributes->get('company')->slug]) }}">
@@ -117,7 +126,9 @@
 						'company.subcategories.*',
 						'company.item-types.*',
 						'company.unit-of-measurements.*',
-						'company.discount-types.*'
+						'company.discount-types.*',
+						'company.charge-accounts.*',
+						'company.payment-types.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -125,6 +136,15 @@
 						<span class="menu-title">Settings</span>
 						<span class="menu-arrow"></span>
 					</span>
+
+					<!--departments-->
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.payment-types.*') ? 'active' : '' }}" href="{{ route('company.payment-types.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Payment Types</span>
+							</a>
+						</div>
+					</div>
 
 					<!--departments-->
 					<div class="menu-sub menu-sub-accordion">
@@ -185,6 +205,15 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.suppliers.*') ? 'active' : '' }}" href="{{ route('company.suppliers.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Suppliers</span>
+							</a>
+						</div>
+					</div>
+
+					<!--charge accounts-->
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.charge-accounts.*') ? 'active' : '' }}" href="{{ route('company.charge-accounts.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Charge Accounts</span>
 							</a>
 						</div>
 					</div>

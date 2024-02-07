@@ -19,10 +19,16 @@ class UnitOfMeasurementsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (UnitOfMeasurement $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.unit-of-measurements.show', ['companySlug' => $data->company->slug, 'unit_of_measurement' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('actions', function (UnitOfMeasurement $data) {
                 return view('company.datatables._actions', [
-                    'param' => ['item_type' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.item-types',
+                    'param' => ['unit_of_measurement' => $data->id, 'companySlug' => $data->company->slug],
+                    'route' => 'company.unit-of-measurements',
                 ]);
             });
     }
@@ -34,8 +40,10 @@ class UnitOfMeasurementsDataTable extends DataTable
     public function query(UnitOfMeasurement $model): QueryBuilder
     {
         return $model->newQuery()
+            ->where('company_id', $this->company_id)
             ->with([
-                'company'
+                'company',
+                'createdBy',
             ]);
     }
 
@@ -63,6 +71,8 @@ class UnitOfMeasurementsDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
+            Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

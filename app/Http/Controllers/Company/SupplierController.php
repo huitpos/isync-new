@@ -70,9 +70,13 @@ class SupplierController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+
+        $supplier = $this->supplierRepository->findOrFail($id);
+
+        return view('company.suppliers.show', compact('company', 'supplier'));
     }
 
     /**

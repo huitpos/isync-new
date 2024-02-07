@@ -67,9 +67,20 @@ class ItemTypeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+
+        $itemType = $this->itemTypeRepository->find($id);
+
+        if (!$itemType || $itemType->company_id != $company->id) {
+            return abort(404, 'Item Type not found!');
+        }
+
+        return view('company.itemTypes.show', [
+            'company' => $company,
+            'itemType' => $itemType
+        ]);
     }
 
     /**

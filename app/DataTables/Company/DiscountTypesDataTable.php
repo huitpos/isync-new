@@ -2,7 +2,7 @@
 
 namespace App\DataTables\Company;
 
-use App\Models\UnitOfMeasurement;
+use App\Models\DiscountType;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Services\DataTable;
@@ -19,10 +19,16 @@ class DiscountTypesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('actions', function (UnitOfMeasurement $data) {
+            ->addColumn('name', function (DiscountType $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.discount-types.show', ['companySlug' => $data->company->slug, 'discount_type' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
+            ->addColumn('actions', function (DiscountType $data) {
                 return view('company.datatables._actions', [
-                    'param' => ['item_type' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.item-types',
+                    'param' => ['discount_type' => $data->id, 'companySlug' => $data->company->slug],
+                    'route' => 'company.discount-types',
                 ]);
             });
     }
@@ -31,11 +37,14 @@ class DiscountTypesDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(UnitOfMeasurement $model): QueryBuilder
+    public function query(DiscountType $model): QueryBuilder
     {
         return $model->newQuery()
+            ->where('company_id', $this->company_id)
             ->with([
-                'company'
+                'company',
+                'createdBy',
+                'department'
             ]);
     }
 
@@ -62,7 +71,13 @@ class DiscountTypesDataTable extends DataTable
     {
         return [
             Column::make('id'),
-            Column::make('name'),
+            Column::make('name')->title('Discount Type'),
+            Column::make('description'),
+            Column::make('department.name'),
+            Column::make('type'),
+            Column::make('discount'),
+            Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\PaymentTypeRepositoryInterface;
 
+use App\DataTables\Company\PaymentTypesDataTable;
+
 class PaymentTypeController extends Controller
 {
     protected $paymentTypeRepository;
@@ -19,13 +21,12 @@ class PaymentTypeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, PaymentTypesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        return view('company.paymentTypes.index', [
-            'company' => $company
-        ]);
+        return $dataTable->with('company_id', $company->id)
+            ->render('company.paymentTypes.index', compact('company'));
     }
 
     /**
@@ -45,49 +46,38 @@ class PaymentTypeController extends Controller
      */
     public function store(Request $request)
     {
-        $paymentTypeFields = $request->input('payment_type_fields');
-
-        if (isset($paymentTypeFields[0])) {
-            unset($paymentTypeFields[0]);
-        }
-
-        $request->merge(['payment_type_fields' => $paymentTypeFields]);
-
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             // 'logo' => 'required',
             'status' => 'required',
-            'payment_type_fields.*.name' => ['required'],
-            'payment_type_fields.*.field_type' => ['required'],
-            'payment_type_fields.*.option_list' => [
-                function ($attribute, $value, $fail) use ($request) {
+            'payment_type_fields.*.name' => 'nullable',
+            'payment_type_fields.*.field_type' => 'required_with:payment_type_fields.*.name',
+            'payment_type_fields.*.options' => [
+                'nullable',
+                'required_with:payment_type_fields.*.name',
+                function ($attribute, $value, $fail) use($request) {
                     $index = explode('.', $attribute)[1];
                     $fieldType = $request->input("payment_type_fields.$index.field_type");
 
-                    // Check if options are required based on field type
-                    if ($fieldType !== 'textbox' && empty($value)) {
-                        $fail("Option for field #:index is required");
-                    }
+                    if (!empty($value) && !empty($fieldType) && $fieldType !== 'textbox') {
+                        $nonBlankOptions = array_filter($value, function ($option) {
+                            return !empty($option['option']);
+                        });
 
-                    if ($fieldType !== 'textbox') {
-                        foreach ($value as $option) {
-                            if (empty($option['option'])) {
-                                $fail("Option name for field #:index is required");
-                            }
+                        if (empty($nonBlankOptions)) {
+                            $fail('At least one non-blank option is required if field_type is not textbox.');
                         }
                     }
                 },
             ],
         ], [
-            'payment_type_fields.*.name.required' => 'Field name for field #:index is required',
-            'payment_type_fields.*.field_type.required' => 'Field type for field #:index is required',
+            'payment_type_fields.*.field_type' => 'The field type is required',
         ]);
 
         $company = $request->attributes->get('company');
 
         $paymentTypeData = [
-            'company_id' => $request->input('company_id'),
+            'company_id' => $company->id,
             'status' => $request->input('status'),
             'name' => $request->input('name'),
             'description' => $request->input('description'),
@@ -101,8 +91,8 @@ class PaymentTypeController extends Controller
                 'field_type' => $field['field_type'],
             ];
 
-            if (!empty($field['option_list'])) {
-                foreach ($field['option_list'] as $option) {
+            if (!empty($field['options'])) {
+                foreach ($field['options'] as $option) {
                     $data['options'][] = $option['option'];
                 }
             }
@@ -120,9 +110,20 @@ class PaymentTypeController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+
+        $paymentType = $this->paymentTypeRepository->find($id);
+
+        if (!$paymentType || $paymentType->company_id != $company->id) {
+            return abort(404, 'Payment Type not found');
+        }
+
+        return view('company.paymentTypes.show', [
+            'paymentType' => $paymentType,
+            'company' => $company
+        ]);
     }
 
     /**
@@ -145,49 +146,38 @@ class PaymentTypeController extends Controller
      */
     public function update(Request $request, string $companySlug, string $paymentTypeId)
     {
-        $paymentTypeFields = $request->input('payment_type_fields');
-
-        if (isset($paymentTypeFields[0])) {
-            unset($paymentTypeFields[0]);
-        }
-
-        $request->merge(['payment_type_fields' => $paymentTypeFields]);
-
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
-            'status' => 'required',
             // 'logo' => 'required',
-            'payment_type_fields.*.name' => ['required'],
-            'payment_type_fields.*.field_type' => ['required'],
-            'payment_type_fields.*.option_list' => [
-                function ($attribute, $value, $fail) use ($request) {
+            'status' => 'required',
+            'payment_type_fields.*.name' => 'nullable',
+            'payment_type_fields.*.field_type' => 'required_with:payment_type_fields.*.name',
+            'payment_type_fields.*.options' => [
+                'nullable',
+                'required_with:payment_type_fields.*.name',
+                function ($attribute, $value, $fail) use($request) {
                     $index = explode('.', $attribute)[1];
                     $fieldType = $request->input("payment_type_fields.$index.field_type");
 
-                    // Check if options are required based on field type
-                    if ($fieldType !== 'textbox' && empty($value)) {
-                        $fail("Option for field #:index is required");
-                    }
+                    if (!empty($value) && !empty($fieldType) && $fieldType !== 'textbox') {
+                        $nonBlankOptions = array_filter($value, function ($option) {
+                            return !empty($option['option']);
+                        });
 
-                    if ($fieldType !== 'textbox') {
-                        foreach ($value as $option) {
-                            if (empty($option['option'])) {
-                                $fail("Option name for field #:index is required");
-                            }
+                        if (empty($nonBlankOptions)) {
+                            $fail('At least one non-blank option is required if field_type is not textbox.');
                         }
                     }
                 },
             ],
         ], [
-            'payment_type_fields.*.name.required' => 'Field name for field #:index is required',
-            'payment_type_fields.*.field_type.required' => 'Field type for field #:index is required',
+            'payment_type_fields.*.field_type' => 'The field type is required',
         ]);
 
         $company = $request->attributes->get('company');
 
         $paymentTypeData = [
-            'company_id' => $request->input('company_id'),
+            'company_id' => $company->id,
             'name' => $request->input('name'),
             'description' => $request->input('description'),
             'status' => $request->input('status'),
@@ -201,8 +191,8 @@ class PaymentTypeController extends Controller
                 'field_type' => $field['field_type'],
             ];
 
-            if (!empty($field['option_list'])) {
-                foreach ($field['option_list'] as $option) {
+            if (!empty($field['options'])) {
+                foreach ($field['options'] as $option) {
                     $data['options'][] = $option['option'];
                 }
             }

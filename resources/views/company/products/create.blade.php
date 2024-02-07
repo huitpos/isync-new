@@ -269,7 +269,7 @@
 
                         <div class="form-group mt-5">
                             <button type="button" data-repeater-create="" class="btn btn-sm btn-light-primary">
-                            <i class="fa-solid fa-plus fs-2"></i>Add another raw material</button>
+                            <i class="fa-solid fa-plus fs-2"></i>Add raw material</button>
                         </div>
                     </div>
                 </div>
@@ -352,7 +352,7 @@
 
                         <div class="form-group mt-5">
                             <button type="button" data-repeater-create="" class="btn btn-sm btn-light-primary">
-                            <i class="fa-solid fa-plus fs-2"></i>Add another budle item</button>
+                            <i class="fa-solid fa-plus fs-2"></i>Add budle item</button>
                         </div>
                     </div>
                 </div>
