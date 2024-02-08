@@ -45,7 +45,8 @@ class BranchesController extends BaseController
                 'region',
                 'province',
                 'city',
-                'barangay'
+                'barangay',
+                'cluster'
             ])
             ->find($id);
 
