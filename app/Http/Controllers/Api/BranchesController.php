@@ -41,7 +41,13 @@ class BranchesController extends BaseController
      */
     public function show($id)
     {
-        $branch = Branch::find($id);
+        $branch = Branch::with([
+                'region',
+                'province',
+                'city',
+                'barangay'
+            ])
+            ->find($id);
 
         if (is_null($branch)) {
             return $this->sendError('Branch not found.');

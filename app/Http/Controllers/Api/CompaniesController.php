@@ -49,7 +49,13 @@ class CompaniesController extends BaseController
      */
     public function show(string $id)
     {
-        $company =  Company::find($id);
+        $company =  Company::with([
+                'region',
+                'province',
+                'city',
+                'barangay'
+            ])
+            ->find($id);
 
         if (is_null($company)) {
             return $this->sendError('Company not found.');
