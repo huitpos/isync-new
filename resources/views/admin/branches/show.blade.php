@@ -80,6 +80,16 @@
                 <div class="fw-bold mt-5">Branch Link</div>
                 <div class="text-gray-600">{{ route('branch.dashboard', ['companySlug' => $branch->company->slug, 'branchSlug' => $branch->slug]) }}</div>
             </div>
+
+            <div class="pb-1 fs-6">
+                <div class="fw-bold mt-5">Receipt Header</div>
+                <div class="text-gray-600">{{ $branch->receipt_header }}</div>
+            </div>
+
+            <div class="pb-1 fs-6">
+                <div class="fw-bold mt-5">Receipt Bottom Text</div>
+                <div class="text-gray-600">{{ $branch->receipt_bottom_text }}</div>
+            </div>
         </div>
     </div>
 
