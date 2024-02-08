@@ -99,6 +99,12 @@ class MachineController extends BaseController
             ->where('status', 'active');
 
         if ($request->has('device_id')) {
+            $device = PosDevice::with('machine.branch')->where('id', $request->has('device_id'))->first();
+
+            if (!$device) {
+                return $this->sendError('Invalid device');
+            }
+
             $devices->where('id', '!=', $request->input('device_id'));
         }
 

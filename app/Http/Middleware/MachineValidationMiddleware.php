@@ -19,12 +19,26 @@ class MachineValidationMiddleware
     {
         $machineId = $request->input('device_id');
 
-        $device = PosDevice::with('machine')->where('id', $machineId)->first();
+        $device = PosDevice::with('machine.branch')->where('id', $machineId)->first();
 
-        if (!$device || $device->machine->status !== 'active') {
+        if (!$device) {
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid device'
+            ], 422);
+        }
+
+        if ($device->machine->status !== 'active') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product Key is not active'
+            ], 422);
+        }
+
+        if ($device->machine->branch->status !== 'active') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Branch is not active'
             ], 422);
         }
 
