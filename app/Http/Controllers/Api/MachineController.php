@@ -91,8 +91,13 @@ class MachineController extends BaseController
             'status' => 'active'
         ])->first();
 
+
         if (!$machine) {
             return $this->sendError('Invalid product key');
+        }
+
+        if ($machine->branch->status != "active") {
+            return $this->sendError('Inactive Branch');
         }
 
         $devices = PosDevice::where('pos_machine_id', $machine->id)
