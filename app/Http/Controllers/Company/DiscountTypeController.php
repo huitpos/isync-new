@@ -118,6 +118,7 @@ class DiscountTypeController extends Controller
 
         $postData = $request->all();
         $postData['company_id'] = $company->id;
+        $postData['is_vat_exempt'] = $company->is_vat_exempt ?? false;
 
         if ($this->discountTypeRepository->update($id, $postData)) {
             return redirect()->route('company.discount-types.index', ['companySlug' => $company->slug])->with('success', 'Discount type updated successfully.');
