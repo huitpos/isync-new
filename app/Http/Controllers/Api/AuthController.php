@@ -11,6 +11,7 @@ use App\Models\Client;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 
 class AuthController extends BaseController
@@ -61,7 +62,12 @@ class AuthController extends BaseController
 
             return $this->sendResponse($success, 'User login successfully.');
         } else {
-            return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
+            return $this->sendError(
+                'Unauthorised.', 
+                ['error' => 'Unauthorised'],
+                401,
+                Config::get('app.status_codes')['unauthorised']
+            );
         }
     }
 

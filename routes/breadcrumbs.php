@@ -81,7 +81,7 @@ Breadcrumbs::for('admin.machines.create', function (BreadcrumbTrail $trail, $bra
 
 //company dashboard
 Breadcrumbs::for('company.dashboard', function (BreadcrumbTrail $trail, $company) {
-    $trail->push(ucfirst($company->company_name), route('company.dashboard', ['companySlug' => $company->slug]));
+    $trail->push(ucfirst($company->trade_name), route('company.dashboard', ['companySlug' => $company->slug]));
 });
 
 //departments
@@ -234,8 +234,32 @@ Breadcrumbs::for('company.itemTypes.show', function (BreadcrumbTrail $trail, $co
     $trail->push(ucfirst($itemType->name));
 });
 
+//company reports
+Breadcrumbs::for('company.reports.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Reports');
+});
+
+Breadcrumbs::for('company.reports.viewTransaction', function (BreadcrumbTrail $trail, $company, $transaction) {
+    $trail->parent('company.reports.index', $company);
+    $trail->push('Transaction');
+    $trail->push($transaction->id);
+});
+
 //branch dashboard
 Breadcrumbs::for('branch.dashboard', function (BreadcrumbTrail $trail, $company, $branch) {
     $trail->parent('company.dashboard', $company);
     $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+//branch reports
+Breadcrumbs::for('branch.reports.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.reports.viewTransaction', function (BreadcrumbTrail $trail, $company, $branch, $transaction) {
+    $trail->parent('branch.reports.index', $company, $branch);
+    $trail->push('Transaction');
+    $trail->push($transaction->id);
 });

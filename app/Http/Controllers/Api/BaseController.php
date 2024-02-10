@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use App\Http\Controllers\Controller as Controller;
 
 
@@ -21,6 +22,7 @@ class BaseController extends Controller
             'success' => true,
             'data'    => $result,
             'message' => $message,
+            'code' => Config::get('app.status_codes')['success']
         ];
 
 
@@ -33,11 +35,12 @@ class BaseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function sendError($error, $errorMessages = [], $code = 404)
+    public function sendError($error, $errorMessages = [], $code = 404, $errorCode = null)
     {
         $response = [
             'success' => false,
             'message' => $error,
+            'code' => $errorCode ?? Config::get('app.status_codes')['failed']
         ];
 
 

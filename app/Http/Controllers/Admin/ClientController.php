@@ -280,6 +280,7 @@ class ClientController extends Controller
         ]);
 
         $this->companyRepository->update($id, [
+            'status' => $request['status'],
             'company_name' => $request['company_name'],
             'trade_name' => $request['trade_name'],
             'phone_number' => $request['phone_number'],

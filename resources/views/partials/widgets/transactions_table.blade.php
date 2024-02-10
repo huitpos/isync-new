@@ -41,89 +41,98 @@
 					<table class="table table-bordered align-middle gs-0 gy-3 my-0">
 						<thead>
 							<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
-								<th class="p-0 pb-3 text-start">Date</th>
+								<th class="text-start">Date</th>
 								@if (isset($addBranch) && $addBranch)
-									<th class="p-0 pb-3 text-start">Branch</th>
+									<th class="text-start">Branch</th>
 								@endif
-								<th class="p-0 pb-3 text-start">Machine No.</th>
-								<th class="p-0 pb-3 text-start">OR No.</th>
-								<th class="p-0 pb-3 text-start">Cashier</th>
-								<th class="p-0 pb-3 text-start">Shift</th>
-								<th class="p-0 pb-3 text-start">Gross Sales</th>
-								<th class="p-0 pb-3 text-start">Net Sales</th>
-								<th class="p-0 pb-3 text-start">Vat Sales</th>
-								<th class="p-0 pb-3 text-start">Vat Amount</th>
-								<th class="p-0 pb-3 text-start">Vat Exempt</th>
-								<th class="p-0 pb-3 text-start">Discount</th>
-								<th class="p-0 pb-3 text-start">Type of Payment</th>
-								<th class="p-0 pb-3 text-start">Paid Amount</th>
-								<th class="p-0 pb-3 text-start">Change</th>
+								<th class="text-start">Machine No.</th>
+								<th class="text-start">OR No.</th>
+								<th class="text-start">Cashier</th>
+								<th class="text-start">Shift</th>
+								<th class="text-end">Gross Sales</th>
+								<th class="text-end">Net Sales</th>
+								<th class="text-end">Vat Sales</th>
+								<th class="text-end">Vat Amount</th>
+								<th class="text-end">Vat Exempt</th>
+								<th class="text-end">Discount</th>
+								<th class="text-start">Type of Payment</th>
+								<th class="text-end">Paid Amount</th>
+								<th class="text-end">Change</th>
 							</tr>
 						</thead>
 
 						<tbody>
 							@foreach ($completedTransactions as $completedTransaction)
 							<tr>
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->completed_at }}</span>
+								<td class="text-start">
+									<span class="text-gray-600">{{ $completedTransaction->created_at }}</span>
 								</td>
 
 								@if (isset($addBranch) && $addBranch)
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $completedTransaction->branch->name }}</span>
 									</td>
 								@endif
 
-								<td class="text-start pe-13">
+								<td class="text-start">
 									<span class="text-gray-600">{{ $completedTransaction->pos_machine_id }}</span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->receipt_number }} </span>
+								<td class="text-start">
+									<span class="text-gray-600">
+										<a target="_blank" href="{{ !empty($transactionRoute) ? route($transactionRoute, [
+												'companySlug' => $completedTransaction->branch->company->slug,
+												'transactionId' => $completedTransaction->id,
+												'branchSlug' => $completedTransaction->branch->slug,
+											]) : '#' }}"
+										>
+											{{ $completedTransaction->receipt_number }}
+										</a>
+									</span>
 								</td>
 
-								<td class="text-start pe-13">
+								<td class="text-start">
 									<span class="text-gray-600">{{ $completedTransaction->cashier_name }} </span>
 								</td>
 
-								<td class="text-start pe-13">
+								<td class="text-start">
 									<span class="text-gray-600">{{ $completedTransaction->shift_number }} </span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->gross_sales }} </span>
+								<td class="text-end">
+									<span class="text-gray-600">{{ number_format($completedTransaction->gross_sales, 4) }} </span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->net_sales }} </span>
+								<td class="text-end">
+									<span class="text-gray-600">{{ number_format($completedTransaction->net_sales, 4) }} </span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->vat_amount }} </span>
+								<td class="text-end">
+									<span class="text-gray-600">{{ number_format($completedTransaction->vat_amount, 4) }} </span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->vatable_sales }} </span>
+								<td class="text-end">
+									<span class="text-gray-600">{{ number_format($completedTransaction->vatable_sales, 4) }} </span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->vat_excempt_sales }} </span>
+								<td class="text-end">
+									<span class="text-gray-600">{{ number_format($completedTransaction->vat_excempt_sales, 4) }} </span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->discount_amount ?? 0 }} </span>
+								<td class="text-end">
+									<span class="text-gray-600">{{ number_format($completedTransaction->discount_amount ?? 0, 4) }} </span>
 								</td>
 
-								<td class="text-start pe-13">
+								<td class="text-start">
 									<span class="text-gray-600">Cash</span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->tender_amount ?? 0 }} </span>
+								<td class="text-end">
+									<span class="text-gray-600">{{ number_format($completedTransaction->tender_amount ?? 0, 4) }} </span>
 								</td>
 
-								<td class="text-start pe-13">
-									<span class="text-gray-600">{{ $completedTransaction->change ?? 0 }} </span>
+								<td class="text-end">
+									<span class="text-gray-600">{{ number_format($completedTransaction->change ?? 0, 4) }} </span>
 								</td>
 							</tr>
 							@endforeach
@@ -138,79 +147,79 @@
 						<table class="table table-bordered align-middle gs-0 gy-3 my-0">
 							<thead>
 								<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
-									<th class="p-0 pb-3 text-start">Date</th>
-									<th class="p-0 pb-3 text-start">Machine No.</th>
-									<th class="p-0 pb-3 text-start">OR No.</th>
-									<th class="p-0 pb-3 text-start">Cashier</th>
-									<th class="p-0 pb-3 text-start">Shift</th>
-									<th class="p-0 pb-3 text-start">Gross Sales</th>
-									<th class="p-0 pb-3 text-start">Net Sales</th>
-									<th class="p-0 pb-3 text-start">Vat Sales</th>
-									<th class="p-0 pb-3 text-start">Vat Amount</th>
-									<th class="p-0 pb-3 text-start">Vat Exempt</th>
-									<th class="p-0 pb-3 text-start">Discount</th>
-									<th class="p-0 pb-3 text-start">Type of Payment</th>
-									<th class="p-0 pb-3 text-start">Paid Amount</th>
-									<th class="p-0 pb-3 text-start">Change</th>
+									<th class="text-start">Date</th>
+									<th class="text-start">Machine No.</th>
+									<th class="text-start">OR No.</th>
+									<th class="text-start">Cashier</th>
+									<th class="text-start">Shift</th>
+									<th class="text-start">Gross Sales</th>
+									<th class="text-start">Net Sales</th>
+									<th class="text-start">Vat Sales</th>
+									<th class="text-start">Vat Amount</th>
+									<th class="text-start">Vat Exempt</th>
+									<th class="text-start">Discount</th>
+									<th class="text-start">Type of Payment</th>
+									<th class="text-start">Paid Amount</th>
+									<th class="text-start">Change</th>
 								</tr>
 							</thead>
 
 							<tbody>
 								@foreach ($pendingTransactions as $pendingTransaction)
 								<tr>
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->completed_at }}</span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->pos_machine_id }}</span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->receipt_number }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->cashier_name }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->shift_number }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->gross_sales }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->net_sales }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->vat_amount }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->vatable_sales }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->vat_excempt_sales }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->discount_amount ?? 0 }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">Cash</span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->tender_amount ?? 0 }} </span>
 									</td>
 
-									<td class="text-start pe-13">
+									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->change ?? 0 }} </span>
 									</td>
 								</tr>

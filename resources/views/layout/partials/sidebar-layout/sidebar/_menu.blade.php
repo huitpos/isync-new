@@ -218,6 +218,26 @@
 						</div>
 					</div>
 				</div>
+
+				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
+					{{ request()->routeIs(
+						'company.reports.*',
+					) ? 'here show' : '' }}"
+				>
+					<span class="menu-link">
+						<span class="menu-icon"><i class="fa-solid fa-chart-simple fs-2"></i></span>
+						<span class="menu-title">Sales Reports</span>
+						<span class="menu-arrow"></span>
+					</span>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.transactions') || request()->routeIs('company.reports.view-transaction') ? 'active' : '' }}" href="{{ route('company.reports.transactions', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Sales Transaction Report</span>
+							</a>
+						</div>
+					</div>
+				</div>
 			@endif
 		</div>
 	</div>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\PosDevice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 use App\Repositories\Interfaces\PosMachineRepositoryInterface;
 
@@ -93,11 +94,15 @@ class MachineController extends BaseController
 
 
         if (!$machine) {
-            return $this->sendError('Invalid product key');
+            return $this->sendError('Invalid product key', [], 404, Config::get('app.status_codes')['invalid_product_key']);
         }
 
         if ($machine->branch->status != "active") {
-            return $this->sendError('Inactive Branch');
+            return $this->sendError('Inactive Branch', [], 404, Config::get('app.status_codes')['branch_not_active']);
+        }
+
+        if ($machine->branch->company->status != "active") {
+            return $this->sendError('Inactive Company', [], 404, Config::get('app.status_codes')['company_not_active']);
         }
 
         $devices = PosDevice::where('pos_machine_id', $machine->id)
@@ -107,14 +112,14 @@ class MachineController extends BaseController
             $device = PosDevice::with('machine.branch')->where('id', $request->has('device_id'))->first();
 
             if (!$device) {
-                return $this->sendError('Invalid device');
+                return $this->sendError('Invalid device', [], 404, Config::get('app.status_codes')['invalid_device']);
             }
 
             $devices->where('id', '!=', $request->input('device_id'));
         }
 
         if ($devices->count() > 0) {
-            return $this->sendError('Device already in use');
+            return $this->sendError('Device already in use', [], 404, Config::get('app.status_codes')['device_already_in_use']);
         }
 
         if (!$request->has('device_id')) {

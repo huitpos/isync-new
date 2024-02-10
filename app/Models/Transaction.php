@@ -22,4 +22,21 @@ class Transaction extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function items()
+    {
+        return $this->hasMany(Order::class, 'transaction_id', 'transaction_id')->where(function ($query) {
+            $query->where('branch_id', $this->branch_id)
+                  ->where('pos_machine_id', $this->pos_machine_id);
+        });
+
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'transaction_id', 'transaction_id')->where(function ($query) {
+            $query->where('branch_id', $this->branch_id)
+                  ->where('pos_machine_id', $this->pos_machine_id);
+        });
+    }
 }

@@ -12,4 +12,9 @@ class Order extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function uom()
+    {
+        return $this->belongsTo(UnitOfMeasurement::class, 'unit_id');
+    }
 }

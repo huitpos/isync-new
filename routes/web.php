@@ -21,6 +21,7 @@ use App\Http\Controllers\Company\BankController as CompanyBankController;
 use App\Http\Controllers\Company\DiscountTypeController as CompanyDiscountTypeController;
 use App\Http\Controllers\Company\ItemTypeController as CompanyItemTypeController;
 use App\Http\Controllers\Company\ProductController as CompanyProductController;
+use App\Http\Controllers\Company\ReportController as CompanyReportController;
 
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\ClusterController as AdminClusterController;
@@ -33,12 +34,7 @@ use App\Http\Controllers\Admin\DeviceController as AdminDeviceController;
 use App\Http\Controllers\Branch\PageController as BranchPageController;
 use App\Http\Controllers\Branch\UserController as BranchUserController;
 use App\Http\Controllers\Branch\TransactionController as BranchTransactionController;
-
-
-
-use App\Http\Controllers\Apps\RoleManagementController;
-use App\Http\Controllers\Apps\UserManagementController;
-use App\Http\Controllers\Apps\PermissionManagementController;
+use App\Http\Controllers\Branch\ReportController as BranchReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,8 +80,6 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-Route::view('/test', 'content.pages.pages-account-settings-account');
-
 //company
 Route::middleware([ValidateCompanySlug::class])->prefix('{companySlug}')->group(function () {
     Route::get('/', [CompanyPageController::class, 'dashboard'])->name('company.dashboard');
@@ -103,10 +97,20 @@ Route::middleware([ValidateCompanySlug::class])->prefix('{companySlug}')->group(
     Route::resource('item-types', CompanyItemTypeController::class, ['as' => 'company']);
     Route::resource('products', CompanyProductController::class, ['as' => 'company']);
 
+    Route::prefix('reports')->group(function () {
+        Route::get('/transactions', [CompanyReportController::class, 'transactions'])->name('company.reports.transactions');
+        Route::get('/transaction/{transactionId}', [CompanyReportController::class, 'viewTransaction'])->name('company.reports.view-transaction');
+    });
+
     //branch
     Route::middleware([ValidateCompanySlug::class])->prefix('{branchSlug}')->group(function () {
         Route::get('/', [BranchPageController::class, 'dashboard'])->name('branch.dashboard');
         Route::resource('users', BranchUserController::class, ['as' => 'branch']);
         Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');
+
+        Route::prefix('reports')->group(function () {
+            Route::get('/transactions', [BranchReportController::class, 'transactions'])->name('branch.reports.transactions');
+            Route::get('/transaction/{transactionId}', [BranchReportController::class, 'viewTransaction'])->name('branch.reports.view-transaction');
+        });
     });
 });

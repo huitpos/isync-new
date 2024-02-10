@@ -41,7 +41,8 @@
             @include('partials/widgets/transactions_table', [
                 'completedTransactions' => $completedTransactions,
                 'pendingTransactions' => $pendingTransactions ?? [],
-                'addBranch' => true
+                'addBranch' => true,
+                'transactionRoute' => 'company.reports.view-transaction'
             ])
         </div>
     </div>

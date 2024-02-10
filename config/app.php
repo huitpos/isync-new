@@ -213,4 +213,15 @@ return [
         // 'ExampleClass' => App\Example\ExampleClass::class,
     ])->toArray(),
 
+    'status_codes' => [
+        'success' => 'ISYNC001',
+        'failed' => 'ISYNC002',
+        'invalid_device' => 'ISYNC003',
+        'product_key_not_active' => 'ISYNC004',
+        'branch_not_active' => 'ISYNC005',
+        'company_not_active' => 'ISYNC006',
+        'unauthorised' => 'ISYNC007',
+        'invalid_product_key' => 'ISYNC008',
+        'device_already_in_use' => 'ISYNC009',
+    ]
 ];

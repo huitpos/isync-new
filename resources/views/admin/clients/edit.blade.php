@@ -14,6 +14,18 @@
                 @csrf
                 @method('PUT')
 
+                <div class="mb-4">
+                    <label class="form-label">Status</label>
+                    <select id="status" name="status" class="form-control @error('status') is-invalid @enderror" required>
+                        <option value="active" {{ old('status') == 'active' || $company->status == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status') == 'inactive' || $company->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
                 <h3>Company Registered Name</h3>
 
                 <div class="mb-4 mt-5">
