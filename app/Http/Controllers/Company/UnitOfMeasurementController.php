@@ -106,7 +106,6 @@ class UnitOfMeasurementController extends Controller
     public function update(Request $request, string $companySlug, $uomId)
     {
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'status'
         ]);
@@ -118,7 +117,12 @@ class UnitOfMeasurementController extends Controller
             return redirect()->route('company.unit-of-measurements.index', ['companySlug' => $company->slug])->with('error', 'Data not found!');
         }
 
-        if ($this->uomRepository->update($uomId, $request->all())) {
+        $company = $request->attributes->get('company');
+
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->uomRepository->update($uomId, $postData)) {
             return redirect()->route('company.unit-of-measurements.index', ['companySlug' => $company->slug])->with('success', 'Data has been updated successfully!');
         }
 

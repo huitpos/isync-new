@@ -104,14 +104,17 @@ class ItemTypeController extends Controller
     public function update(Request $request, string $companySlug, string $id)
     {
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'status' => 'required'
         ]);
 
         $company = $request->attributes->get('company');
 
-        if ($this->itemTypeRepository->update($id, $request->all())) {
+        $postData = $request->all();;
+        $postData['company_id'] = $company->id;
+        $postData['show_in_cashier'] = $request->show_in_cashier ?? false;
+
+        if ($this->itemTypeRepository->update($id, $postData)) {
             return redirect()->route('company.item-types.index', ['companySlug' => $company->slug])->with('success', 'Data has been updated successfully!');
         }
 

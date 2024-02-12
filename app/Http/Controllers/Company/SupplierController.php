@@ -97,7 +97,6 @@ class SupplierController extends Controller
     public function update(Request $request, string $companySlug, string $supplierId)
     {
         $request->validate([
-            'company_id' => 'required',
             'status' => 'required',
             'name' => 'required',
             'contact_person' => 'required',
@@ -106,7 +105,12 @@ class SupplierController extends Controller
             'address' => 'required',
         ]);
 
-        if ($this->supplierRepository->update($supplierId, $request->all())) {
+        $company = $request->attributes->get('company');
+
+        $postData = $request->all();
+        $postData['company_id'] = $company->id;
+
+        if ($this->supplierRepository->update($supplierId, $postData)) {
             return redirect()->route('company.suppliers.index', ['companySlug' => $request->attributes->get('company')->slug])->with('success', 'Supplier successfully updated.');
         }
 

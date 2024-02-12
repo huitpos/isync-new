@@ -111,6 +111,11 @@ Breadcrumbs::for('company.suppliers.create', function (BreadcrumbTrail $trail, $
     $trail->push('Create');
 });
 
+Breadcrumbs::for('company.suppliers.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.suppliers.index', $company);
+    $trail->push('Edit');
+});
+
 Breadcrumbs::for('company.suppliers.show', function (BreadcrumbTrail $trail, $company, $supplier) {
     $trail->parent('company.suppliers.index', $company);
     $trail->push(ucfirst($supplier->name));
@@ -196,6 +201,16 @@ Breadcrumbs::for('company.chargeAccounts.show', function (BreadcrumbTrail $trail
     $trail->push(ucfirst($chargeAccount->name));
 });
 
+Breadcrumbs::for('company.chargeAccounts.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.chargeAccounts.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.chargeAccounts.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.chargeAccounts.index', $company);
+    $trail->push('Edit');
+});
+
 //payment types
 Breadcrumbs::for('company.paymentTypes.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
@@ -223,6 +238,16 @@ Breadcrumbs::for('company.uom.show', function (BreadcrumbTrail $trail, $company,
     $trail->push(ucfirst($uom->name));
 });
 
+Breadcrumbs::for('company.uom.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.uom.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.uom.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.uom.index', $company);
+    $trail->push('Edit');
+});
+
 //item types
 Breadcrumbs::for('company.itemTypes.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
@@ -232,6 +257,16 @@ Breadcrumbs::for('company.itemTypes.index', function (BreadcrumbTrail $trail, $c
 Breadcrumbs::for('company.itemTypes.show', function (BreadcrumbTrail $trail, $company, $itemType) {
     $trail->parent('company.itemTypes.index', $company);
     $trail->push(ucfirst($itemType->name));
+});
+
+Breadcrumbs::for('company.itemTypes.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.itemTypes.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.itemTypes.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.itemTypes.index', $company);
+    $trail->push('Edit');
 });
 
 //company reports

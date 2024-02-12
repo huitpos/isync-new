@@ -101,7 +101,6 @@ class ChargeAccountController extends Controller
     public function update(Request $request, string $companySlug, string $id)
     {
         $request->validate([
-            'company_id' => 'required',
             'name' => 'required',
             'credit_limit' => 'required|numeric',
             'address' => 'required',
