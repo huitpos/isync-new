@@ -45,7 +45,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Department</label>
-                    <select class="form-select" name="department_id" data-control="select2" data-close-on-select="true" data-placeholder="Select department">
+                    <select class="form-select @error('department_id') is-invalid @enderror" name="department_id" data-control="select2" data-close-on-select="true" data-placeholder="Select department">
                         <option></option>
                         @foreach ($company->departments as $department)
                             <option value="{{ $department->id }}">{{ $department->name }}</option>
