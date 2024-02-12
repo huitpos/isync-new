@@ -106,32 +106,36 @@ class ProductController extends Controller
         ];
 
         $bundledItems = [];
-        foreach ($request->input('bundled_items') as $bundle) {
-            if (empty($bundle['product_id'])) {
-                continue;
+        if (!empty($request->input('bundled_items'))) {
+            foreach ($request->input('bundled_items') as $bundle) {
+                if (empty($bundle['product_id'])) {
+                    continue;
+                }
+
+                $data = [
+                    'product_id' => $bundle['product_id'],
+                    'quantity' => $bundle['quantity'],
+                ];
+
+                $bundledItems[] = $data;
             }
-
-            $data = [
-                'product_id' => $bundle['product_id'],
-                'quantity' => $bundle['quantity'],
-            ];
-
-            $bundledItems[] = $data;
         }
 
         $rawItems = [];
-        foreach ($request->input('raw_items') as $raw) {
-            if (empty($raw['product_id'])) {
-                continue;
+        if (!empty($request->input('raw_items'))) {
+            foreach ($request->input('raw_items') as $raw) {
+                if (empty($raw['product_id'])) {
+                    continue;
+                }
+
+                $data = [
+                    'product_id' => $raw['product_id'],
+                    'quantity' => $raw['quantity'],
+                    'uom_id' => $raw['uom_id'],
+                ];
+
+                $rawItems[] = $data;
             }
-
-            $data = [
-                'product_id' => $raw['product_id'],
-                'quantity' => $raw['quantity'],
-                'uom_id' => $raw['uom_id'],
-            ];
-
-            $rawItems[] = $data;
         }
 
         if ($this->productRepository->create($productData, $bundledItems, $rawItems)) {
@@ -235,17 +239,23 @@ class ProductController extends Controller
         ];
 
         $bundledItems = [];
-        foreach ($request->input('bundled_items') as $bundle) {
-            $data = [
-                'product_id' => $bundle['product_id'],
-                'quantity' => $bundle['quantity'],
-            ];
+        if (!empty($request->input('bundled_items'))) {
+            foreach ($request->input('bundled_items') as $bundle) {
+                if (empty($bundle['product_id'])) {
+                    continue;
+                }
 
-            $bundledItems[] = $data;
+                $data = [
+                    'product_id' => $bundle['product_id'],
+                    'quantity' => $bundle['quantity'],
+                ];
+
+                $bundledItems[] = $data;
+            }
         }
 
         $rawItems = [];
-        if ($request->has('raw_items')) {
+        if (!empty($request->input('raw_items'))) {
             foreach ($request->input('raw_items') as $raw) {
                 if (empty($raw['product_id'])) {
                     continue;
