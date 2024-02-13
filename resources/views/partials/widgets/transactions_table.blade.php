@@ -116,7 +116,7 @@
 								</td>
 
 								<td class="text-end">
-									<span class="text-gray-600">{{ number_format($completedTransaction->vat_excempt_sales, 4) }} </span>
+									<span class="text-gray-600">{{ number_format($completedTransaction->vat_exempt_sales, 4) }} </span>
 								</td>
 
 								<td class="text-end">
@@ -204,7 +204,7 @@
 									</td>
 
 									<td class="text-start">
-										<span class="text-gray-600">{{ $pendingTransaction->vat_excempt_sales }} </span>
+										<span class="text-gray-600">{{ $pendingTransaction->vat_exempt_sales }} </span>
 									</td>
 
 									<td class="text-start">

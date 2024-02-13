@@ -68,7 +68,7 @@ class TransactionsDataTable extends DataTable
             Column::make('net_sales')->title('Net Sales'),
             Column::make('vatable_sales')->title('VAT Sales'),
             Column::make('vat_amount')->title('VAT Amount'),
-            Column::make('vat_excempt_sales')->title('VAT Exempt'),
+            Column::make('vat_exempt_sales')->title('VAT Exempt'),
             Column::make('discount_amount')->title('Discount'),
             Column::make('payment_types')->title('Type Of Payment'),
             Column::make('is_void')->title('Void'),

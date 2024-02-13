@@ -26,7 +26,7 @@ return new class extends Migration
             $table->double('gross_sales', 15, 4);
             $table->double('net_sales', 15, 4);
             $table->double('vatable_sales', 15, 4);
-            $table->double('vat_excempt_sales', 15, 4);
+            $table->double('vat_exempt_sales', 15, 4);
             $table->double('vat_amount', 15, 4);
             $table->double('discount_amount', 15, 4);
             $table->double('tender_amount', 15, 4);

@@ -18,6 +18,9 @@ use App\Models\SafekeepingDenomination;
 use App\Models\EndOfDay;
 use App\Models\CutOff;
 use App\Models\PaymentType;
+use App\Models\Discount;
+use App\Models\DiscountDetail;
+
 use Illuminate\Support\Facades\Redis;
 
 class MiscController extends BaseController
@@ -118,7 +121,7 @@ class MiscController extends BaseController
             'gross_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'net_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'vatable_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'vat_excempt_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat_exempt_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'vat_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'tender_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
@@ -148,7 +151,7 @@ class MiscController extends BaseController
             'gross_sales' => $request->gross_sales,
             'net_sales' => $request->net_sales,
             'vatable_sales' => $request->vatable_sales,
-            'vat_excempt_sales' => $request->vat_excempt_sales,
+            'vat_exempt_sales' => $request->vat_exempt_sales,
             'vat_amount' => $request->vat_amount,
             'discount_amount' => $request->discount_amount,
             'tender_amount' => $request->tender_amount,
@@ -563,7 +566,7 @@ class MiscController extends BaseController
             'total_online_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_ar_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_mobile_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_charge' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total_change' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'senior_count' => 'required|numeric',
             'senior_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'pwd_count' => 'required|numeric',
@@ -608,7 +611,7 @@ class MiscController extends BaseController
             'total_online_payments' => $request->total_online_payments,
             'total_ar_payments' => $request->total_ar_payments,
             'total_mobile_payments' => $request->total_mobile_payments,
-            'total_charge' => $request->total_charge,
+            'total_change' => $request->total_change,
             'senior_count' => $request->senior_count,
             'senior_amount' => $request->senior_amount,
             'pwd_count' => $request->pwd_count,
@@ -689,7 +692,7 @@ class MiscController extends BaseController
             'total_online_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_ar_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_mobile_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_charge' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total_change' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'senior_count' => 'required|numeric',
             'senior_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'pwd_count' => 'required|numeric',
@@ -735,7 +738,7 @@ class MiscController extends BaseController
             'total_online_payments' => $request->total_online_payments,
             'total_ar_payments' => $request->total_ar_payments,
             'total_mobile_payments' => $request->total_mobile_payments,
-            'total_charge' => $request->total_charge,
+            'total_change' => $request->total_change,
             'senior_count' => $request->senior_count,
             'senior_amount' => $request->senior_amount,
             'pwd_count' => $request->pwd_count,
@@ -792,5 +795,177 @@ class MiscController extends BaseController
         ])->get();
 
         return $this->sendResponse($cutOffs, 'Cut Offs retrieved successfully.');
+    }
+
+    public function saveDiscounts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'discount_id' => 'required|numeric|min:1',
+            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required|exists:branches,id',
+            'transaction_id' => 'required|exists:transactional_db.transactions,transaction_id',
+            'custom_discount_id' => 'required|numeric',
+            'discount_type_id' => 'required|exists:discount_types,id',
+            'value' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat_exempt_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'cashier_id' => 'required|exists:users,id',
+            'authorize_id' => 'required|exists:users,id',
+            'is_void' => 'required|boolean',
+            'is_sent_to_server' => 'required|boolean',
+            'is_cut_off' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'discount_id' => $request->discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'transaction_id' => $request->transaction_id,
+            'custom_discount_id' => $request->custom_discount_id,
+            'discount_type_id' => $request->discount_type_id,
+            'discount_name' => $request->discount_name,
+            'value' => $request->value,
+            'discount_amount' => $request->discount_amount,
+            'vat_exempt_amount' => $request->vat_exempt_amount,
+            'type' => $request->type,
+            'cashier_id' => $request->cashier_id,
+            'cashier_name' => $request->cashier_name,
+            'authorize_id' => $request->authorize_id,
+            'authorize_name' => $request->authorize_name,
+            'customer_identification_number' => $request->customer_identification_number,
+            'customer_name' => $request->customer_name,
+            'customer_address' => $request->customer_address,
+            'is_void' => $request->is_void,
+            'void_by_id' => $request->void_by_id,
+            'void_by' => $request->void_by,
+            'void_at' => $request->void_at,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'shift_number' => $request->shift_number,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'Discount created successfully.';
+        $discount = Discount::where([
+            'discount_id' => $request->discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($discount) {
+            $message = 'Discount updated successfully.';
+            $discount->update($postData);
+            return $this->sendResponse($discount, $message);
+        }
+
+        return $this->sendResponse(Discount::create($postData), $message);
+    }
+
+    public function getDiscounts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required|exists:branches,id',
+            'pos_machine_id' => 'required|exists:pos_machines,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $discounts = Discount::where([
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
+        ])->get();
+
+        return $this->sendResponse($discounts, 'Discounts retrieved successfully.');
+    }
+
+    public function saveDiscountDetails(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'discount_details_id' => 'required|numeric|min:1',
+            'discount_id' => 'required|numeric',
+            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required|exists:branches,id',
+            'custom_discount_id' => 'required|numeric',
+            'transaction_id' => 'required|numeric',
+            'order_id' => 'required|numeric',
+            'discount_type_id' => 'required|numeric',
+            'value' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat_exempt_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'is_void' => 'required|boolean',
+            'is_sent_to_server' => 'required|boolean',
+            'is_cut_off' => 'required|boolean',
+            'is_vat_exempt' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'discount_details_id' => $request->discount_details_id,
+            'discount_id' => $request->discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'custom_discount_id' => $request->custom_discount_id,
+            'transaction_id' => $request->transaction_id,
+            'order_id' => $request->order_id,
+            'discount_type_id' => $request->discount_type_id,
+            'value' => $request->value,
+            'discount_amount' => $request->discount_amount,
+            'vat_exempt_amount' => $request->vat_exempt_amount,
+            'type' => $request->type,
+            'is_void' => $request->is_void,
+            'void_by_id' => $request->void_by_id,
+            'void_by' => $request->void_by,
+            'void_at' => $request->void_at,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'is_vat_exempt' => $request->is_vat_exempt,
+            'shift_number' => $request->shift_number,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'Discount Details created successfully.';
+        $discountDetails = DiscountDetail::where([
+            'discount_details_id' => $request->discount_details_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($discountDetails) {
+            $message = 'Discount Details updated successfully.';
+            $discountDetails->update($postData);
+            return $this->sendResponse($discountDetails, $message);
+        }
+
+        return $this->sendResponse(DiscountDetail::create($postData), $message);
+    }
+    
+    public function getDiscountDetails(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required|exists:branches,id',
+            'pos_machine_id' => 'required|exists:pos_machines,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $discounts = DiscountDetail::where([
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
+        ])->get();
+
+        return $this->sendResponse($discounts, 'Discount details retrieved successfully.');
     }
 }

@@ -104,7 +104,7 @@
                     { data: 'net_sales' },
                     { data: 'vatable_sales' },
                     { data: 'vat_amount' },
-                    { data: 'vat_excempt_sales' },
+                    { data: 'vat_exempt_sales' },
                     { data: 'discount_amount' },
                     { data: 'payment_types' },
                     { data: 'is_void' },

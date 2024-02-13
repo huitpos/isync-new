@@ -84,6 +84,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/cut-offs', [MiscController::class, 'saveCutOffs']);
         Route::get('/cut-offs', [MiscController::class, 'getCutOffs']);
+
+        Route::post('/discounts', [MiscController::class, 'saveDiscounts']);
+        Route::get('/discounts', [MiscController::class, 'getDiscounts']);
+
+        Route::post('/discount-details', [MiscController::class, 'saveDiscountDetails']);
+        Route::get('/discount-details', [MiscController::class, 'getDiscountDetails']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
