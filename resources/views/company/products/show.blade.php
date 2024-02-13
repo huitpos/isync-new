@@ -11,6 +11,13 @@
         <div class="card-body">
             <h2>{{ $product->name }}</h2>
 
+            <div class="pb-1 fs-6">
+                <div class="fw-bold mt-5">Image</div>
+                <div class="text-gray-600">
+                    <div class="image-input-wrapper w-125px h-125px" style="border: 1px dashed #92A0B3; background-size:contain; background-repeat: no-repeat; background-image: url('{{ Storage::disk('s3')->url($product->image) }}');"></div>
+                </div>
+            </div>
+
             <div class="pb-1 fs-6 mt-7">
                 <div class="fw-bold">Description</div>
                 <div class="text-gray-600">{{ $product->description }}</div>

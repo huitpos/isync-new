@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
-
 use App\DataTables\Company\ProductsDataTable;
 
 class ProductController extends Controller
@@ -138,7 +139,15 @@ class ProductController extends Controller
             }
         }
 
-        if ($this->productRepository->create($productData, $bundledItems, $rawItems)) {
+        if ($product = $this->productRepository->create($productData, $bundledItems, $rawItems)) {
+            $path = '';
+            if ($file = $request->file('image')) {
+                $customFileName = 'product_' . $product->id . '.' . $file->extension();
+                $path = Storage::disk('s3')->putFileAs('product_images', $file, $customFileName, 'public');
+
+                $product->image = $path;
+                $product->save();
+            }
             return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Product created successfully');
         }
@@ -192,7 +201,6 @@ class ProductController extends Controller
             'subcategory_id' => 'required',
             'uom_id' => 'required',
             'item_type_id' => 'required',
-            // 'image' => 'required',
             'code' => 'required',
             'barcode' => 'required',
             'srp' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
@@ -212,6 +220,12 @@ class ProductController extends Controller
 
         $company = $request->attributes->get('company');
 
+        $path = '';
+        if ($file = $request->file('image')) {
+            $customFileName = 'product_' . $productId . '.' . $file->extension();
+            $path = Storage::disk('s3')->putFileAs('product_images', $file, $customFileName, 'public');
+        }
+
         $productData = [
             'company_id' => $company->id,
             'name' => $request->input('name'),
@@ -222,7 +236,7 @@ class ProductController extends Controller
             'subcategory_id' => $request->input('subcategory_id'),
             'uom_id' => $request->input('uom_id'),
             'item_type_id' => $request->input('item_type_id'),
-            'image' => $request->input('image') ?? '',
+            'image' => $path,
             'code' => $request->input('code'),
             'barcode' => $request->input('barcode'),
             'srp' => $request->input('srp'),

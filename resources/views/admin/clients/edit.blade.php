@@ -50,9 +50,13 @@
                     <label class="form-label">Company Logo</label><br>
 
                     <!--begin::Image input-->
-                    <div class="image-input image-input-placeholder image-input-empty" data-kt-image-input="true">
+                    <div class="image-input image-input-placeholder {{ empty($company->logo) ? 'image-input-empty' : '' }}" data-kt-image-input="true">
                         <!--begin::Image preview wrapper-->
-                        <div class="image-input-wrapper w-125px h-125px" style="background-size:contain"></div>
+                        @if (!empty($company->logo))
+                        <div class="image-input-wrapper w-125px h-125px" style="background-size:contain; background-image: url('{{ Storage::disk('s3')->url($company->logo) }}');"></div>
+                        @else
+                            <div class="image-input-wrapper w-125px h-125px" style="background-size:contain"></div>
+                        @endif
                         <!--end::Image preview wrapper-->
 
                         <!--begin::Edit button-->
@@ -60,12 +64,12 @@
                         data-kt-image-input-action="change"
                         data-bs-toggle="tooltip"
                         data-bs-dismiss="click"
-                        title="Change avatar">
+                        title="Change logo">
                             <i class="ki-duotone ki-pencil fs-6"><span class="path1"></span><span class="path2"></span></i>
 
                             <!--begin::Inputs-->
-                            <input type="file" name="avatar" accept=".png, .jpg, .jpeg" />
-                            <input type="hidden" name="avatar_remove" />
+                            <input type="file" name="logo" accept=".png, .jpg, .jpeg" />
+                            <input type="hidden" name="logo_remove" />
                             <!--end::Inputs-->
                         </label>
                         <!--end::Edit button-->
@@ -75,7 +79,7 @@
                         data-kt-image-input-action="cancel"
                         data-bs-toggle="tooltip"
                         data-bs-dismiss="click"
-                        title="Cancel avatar">
+                        title="Cancel logo">
                             <i class="ki-outline ki-cross fs-3"></i>
                         </span>
                         <!--end::Cancel button-->
@@ -85,7 +89,7 @@
                         data-kt-image-input-action="remove"
                         data-bs-toggle="tooltip"
                         data-bs-dismiss="click"
-                        title="Remove avatar">
+                        title="Remove logo">
                             <i class="ki-outline ki-cross fs-3"></i>
                         </span>
                     </div>
@@ -263,7 +267,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary disable-on-click">Update</button>
+                <button type="submit" class="btn btn-primary">Update</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>
         </div>
@@ -273,7 +277,8 @@
 <style>
     .image-input-placeholder {
         background-image: url('/assets/media/avatars/blank.png');
-        background-size: contain
+        background-size: contain;
+        border: 1px dashed #92A0B3;
     }
 
     [data-bs-theme="dark"] .image-input-placeholder {

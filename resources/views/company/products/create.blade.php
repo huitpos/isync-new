@@ -371,12 +371,12 @@
                         data-kt-image-input-action="change"
                         data-bs-toggle="tooltip"
                         data-bs-dismiss="click"
-                        title="Change avatar">
+                        title="Change image">
                             <i class="ki-duotone ki-pencil fs-6"><span class="path1"></span><span class="path2"></span></i>
 
                             <!--begin::Inputs-->
-                            <input type="file" name="avatar" accept=".png, .jpg, .jpeg" />
-                            <input type="hidden" name="avatar_remove" />
+                            <input type="file" name="image" accept=".png, .jpg, .jpeg" />
+                            <input type="hidden" name="image_remove" />
                             <!--end::Inputs-->
                         </label>
                         <!--end::Edit button-->
@@ -386,7 +386,7 @@
                         data-kt-image-input-action="cancel"
                         data-bs-toggle="tooltip"
                         data-bs-dismiss="click"
-                        title="Cancel avatar">
+                        title="Cancel image">
                             <i class="ki-outline ki-cross fs-3"></i>
                         </span>
                         <!--end::Cancel button-->
@@ -396,7 +396,7 @@
                         data-kt-image-input-action="remove"
                         data-bs-toggle="tooltip"
                         data-bs-dismiss="click"
-                        title="Remove avatar">
+                        title="Remove image">
                             <i class="ki-outline ki-cross fs-3"></i>
                         </span>
                     </div>
@@ -436,7 +436,8 @@
 <style>
     .image-input-placeholder {
         background-image: url('/assets/media/avatars/blank.png');
-        background-size: contain
+        background-size: contain;
+        border: 1px dashed #92A0B3;
     }
 
     [data-bs-theme="dark"] .image-input-placeholder {

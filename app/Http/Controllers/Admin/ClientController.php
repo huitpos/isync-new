@@ -81,33 +81,6 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        // $file = $request->file('avatar');
-
-
-        // $path = Storage::disk('s3')->put('avatars', $file, 'public');
-
-        // dd($path);
-
-        // $url = Storage::disk('s3')->url($path);
-
-
-        // dd($url);
-
-
-        // $path = $request->file('avatar')->store(
-        //     'companies/logos/'.uniqid(), 's3'
-        // );
-
-        // dd($path);
-
-        // dd($request->file());
-        // $path = $request->file('avatar')->store('avatars');
-
-        // // $filePath = 'avatars/' . $path;
-
-        // $fileUrl = Storage::url($path);
-
-        // dd(asset($fileUrl));
         $validatedData = $request->validate([
             'owner_name' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -137,37 +110,13 @@ class ClientController extends Controller
             ]
         );
 
-        $shortFilePath = '';
-
-        if ($request->input('logo')) {
-            $base64Image = $request->input('logo');
-            $image = json_decode($base64Image);
-            $imageData = base64_decode($image->data);
-            $companyName = Str::slug($request['trade_name']);
-
-            // Define the directory path based on the company name
-            $directoryPath = public_path('images/' . $companyName);
-
-            $fileName = uniqid() . '.' . $image->name;
-
-            $filePath = $directoryPath . '/' . $fileName;
-            $shortFilePath = '/images/' . $companyName . '/' . $fileName;
-
-            // Check if the directory exists, if not, create it recursively
-            if (!File::exists($directoryPath)) {
-                File::makeDirectory($directoryPath, 0777, true); // Recursive directory creation
-            }
-
-            file_put_contents($filePath, $imageData);
-        }
-
-        $this->companyRepository->create([
+        $company = $this->companyRepository->create([
             'client_id' => $client->id,
             'company_name' => $request['company_name'],
             'trade_name' => $request['trade_name'],
             'phone_number' => $request['phone_number'],
             'unit_floor_number' => $request['unit_floor_number'],
-            'logo' => $shortFilePath,
+            'logo' => '',
             'country' => $request['country'],
             'region_id' => $request['region_id'],
             'province_id' => $request['province_id'],
@@ -178,14 +127,24 @@ class ClientController extends Controller
             'company_registered_name' => ''
         ]);
 
+        $path = '';
+
+        if ($file = $request->file('logo')) {
+            $customFileName = 'company_logo_' . $company->id . '.' . $file->extension();
+            $path = Storage::disk('s3')->putFileAs('company_logos', $file, $customFileName, 'public');
+
+            $this->companyRepository->update($company->id, [
+                'logo' => $path,
+            ]);
+        }
+
         $user = $this->userRepository->create([
             'name' => $validatedData['owner_name'],
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
             'client_id' => $client->id,
+            'role' => 'company_admin'
         ]);
-
-        $user->assignRole('company_admin');
 
         return redirect()->route('admin.clients.index')->with('success', 'Data has been stored successfully!');
     }
@@ -272,7 +231,7 @@ class ClientController extends Controller
             'pos_type' => 'required'
         ]);
 
-        $client = $this->clientRepository->update($company->client->id, [
+        $this->clientRepository->update($company->client->id, [
             'name' => $validatedData['owner_name'],
             'telephone_number' => $request['phone_number'],
             'unit_number' => $request['unit_floor_number'],
@@ -281,13 +240,19 @@ class ClientController extends Controller
             'province' => $request['province_id'],
         ]);
 
+        $path = '';
+        if ($file = $request->file('logo')) {
+            $customFileName = 'company_logo_' . $id . '.' . $file->extension();
+            $path = Storage::disk('s3')->putFileAs('company_logos', $file, $customFileName, 'public');
+        }
+
         $this->companyRepository->update($id, [
             'status' => $request['status'],
             'company_name' => $request['company_name'],
             'trade_name' => $request['trade_name'],
             'phone_number' => $request['phone_number'],
             'unit_floor_number' => $request['unit_floor_number'],
-            'logo' => '',
+            'logo' => $path,
             'country' => $request['country'],
             'region_id' => $request['region_id'],
             'province_id' => $request['province_id'],
@@ -307,7 +272,7 @@ class ClientController extends Controller
             $userData['password'] = bcrypt($validatedData['password']);
         }
 
-        $this->userRepository->update($company->client->user->id, $userData);
+        $this->userRepository->update($company->client->user->id, $userData, false, false);
 
         return redirect()->route('admin.clients.index')->with('success', 'Data has been updated successfully!');
     }

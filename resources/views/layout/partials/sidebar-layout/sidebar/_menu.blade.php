@@ -132,7 +132,7 @@
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
-						<span class="menu-icon"><i class="fa-solid fa-chart-simple fs-2"></i></span>
+						<span class="menu-icon"><i class="fa-solid fa-id-card fs-2"></i></span>
 						<span class="menu-title">Access Level</span>
 						<span class="menu-arrow"></span>
 					</span>

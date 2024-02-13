@@ -11,6 +11,6 @@ interface UserRepositoryInterface
     function get(array $parameter): ?Collection;
     function find(String $id): ?User;
     function create(array $attributes): User;
-    function update(String $id, array $attributes, $syncRoles, $syncBranches): Bool;
+    function update(String $id, array $attributes, $syncRoles = true, $syncBranches = true): Bool;
     function delete(String $id): Bool;
 }
