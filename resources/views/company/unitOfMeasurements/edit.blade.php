@@ -44,7 +44,7 @@
                     @enderror
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-5">Submit</button>
+                <button type="submit" class="btn btn-primary mt-5 disable-on-click">Submit</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>
         </div>

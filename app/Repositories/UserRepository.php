@@ -32,8 +32,6 @@ class UserRepository implements UserRepositoryInterface
         unset($data['role']);
         unset($data['branches']);
 
-        $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
-
         $user = User::create($data);
 
         $user->assignRole($role);
@@ -52,8 +50,6 @@ class UserRepository implements UserRepositoryInterface
 
         unset($data['role']);
         unset($data['branches']);
-
-        $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
 
         if ($syncRoles) {
             $user->syncRoles([]);

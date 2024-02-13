@@ -50,6 +50,8 @@ $(document).on('click', '.button-ajax', function (e) {
         });
 });
 
+
+
 $(document).on('change', '.status-toggle', function (e) {
     e.preventDefault();
 
@@ -124,3 +126,10 @@ const initConditionsSelect2 = () => {
         }
     });
 }
+
+$(document).on('click', '.disable-on-click', function (e) {
+    $(this).prop('disabled', true);
+    $(this).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Please wait...');
+
+    $(this).closest('form').submit();
+});
