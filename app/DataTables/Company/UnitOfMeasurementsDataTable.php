@@ -71,6 +71,7 @@ class UnitOfMeasurementsDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
+            Column::make('description'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::computed('actions')
