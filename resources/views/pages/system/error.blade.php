@@ -1,5 +1,5 @@
 <!--begin::Card-->
-<div class="card card-flush w-lg-650px py-5">
+<div class="card card-flush">
     <!--begin::Card body-->
     <div class="card-body py-15 py-lg-20">
 

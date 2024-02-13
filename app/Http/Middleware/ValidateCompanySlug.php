@@ -31,6 +31,10 @@ class ValidateCompanySlug
                 return abort(404, 'Company not found');
             }
 
+            if ($company->status !== 'active') {
+                return abort(403, 'Access denied! You no longer have access to your account. For further assistance, please contact iSync support.');
+            }
+
             // Pass the company data to the request for later use if needed
             $request->attributes->add(['company' => $company]);
 

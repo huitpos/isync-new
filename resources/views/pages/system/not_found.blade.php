@@ -1,5 +1,5 @@
 <!--begin::Card-->
-<div class="card card-flush w-lg-650px py-5">
+<div class="card card-flush">
     <!--begin::Card body-->
     <div class="card-body py-15 py-lg-20">
 
@@ -23,7 +23,11 @@
 
         <!--begin::Text-->
         <div class="fw-semibold fs-6 text-gray-500 mb-7">
-            We can't find that page.
+            @if($exception->getMessage())
+                {{ $exception->getMessage() }}
+            @else
+                We can't find that page.
+            @endif
         </div>
         <!--end::Text-->
 
