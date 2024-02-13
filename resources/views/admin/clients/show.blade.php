@@ -21,12 +21,14 @@
                 <div class="text-gray-600">{{ $company->trade_name }}</div>
             </div>
 
+            @if($company->logo)
             <div class="pb-1 fs-6">
                 <div class="fw-bold mt-5">Company Logo</div>
                 <div class="text-gray-600">
                     <div class="image-input-wrapper w-125px h-125px" style="border: 1px dashed #92A0B3; background-size:contain; background-image: url('{{ Storage::disk('s3')->url($company->logo) }}');"></div>
                 </div>
             </div>
+            @endif
 
             <div class="pb-1 fs-6">
                 <div class="fw-bold mt-5">Owner Name</div>
