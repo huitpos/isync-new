@@ -182,6 +182,9 @@ class MiscController extends BaseController
             'cut_off_id' => $request->cut_off_id,
             'cut_off_at' => $request->cut_off_at,
             'branch_id' => $request->branch_id,
+            'guest_name' => $request->guest_name,
+            'is_resume_printed' => $request->is_resume_printed,
+            'treg' => $request->treg,
         ];
 
         //check if existing. update if yes
@@ -299,9 +302,12 @@ class MiscController extends BaseController
             'is_completed' => $request->is_completed,
             'completed_at' => $request->completed_at,
             'branch_id' => $request->branch_id,
+            'shift_number' => $request->shift_number,
             'is_cut_off' => $request->is_cut_off,
             'cut_off_id' => $request->cut_off_id,
             'cut_off_at' => $request->cut_off_at,
+            'discount_details_id' => $request->discount_details_id,
+            'treg' => $request->treg,
         ];
 
         $order = Order::where([
@@ -367,9 +373,12 @@ class MiscController extends BaseController
             'amount' => $request->amount,
             'other_informations' => $request->other_informations,
             'is_advance_payment' => $request->is_advance_payment,
+            'shift_number' => $request->shift_number,
+            'is_sent_to_server' => $request->is_sent_to_server,
             'is_cut_off' => $request->is_cut_off,
             'cut_off_id' => $request->cut_off_id,
             'cut_off_at' => $request->cut_off_at,
+            'treg' => $request->treg,
         ];
 
         $payment = Payment::where([
@@ -438,6 +447,8 @@ class MiscController extends BaseController
             'cut_off_id' => $request->cut_off_id,
             'cut_off_at' => $request->cut_off_at,
             'is_sent_to_server' => $request->is_sent_to_server,
+            'shift_number' => $request->shift_number,
+            'treg' => $request->treg,
         ];
 
         $safekeeping = Safekeeping::where([
@@ -494,6 +505,8 @@ class MiscController extends BaseController
         }
 
         $postData = [
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
             'safekeeping_denomination_id' => $request->safekeeping_denomination_id,
             'safekeeping_id' => $request->safekeeping_id,
             'cash_denomination_id' => $request->cash_denomination_id,
@@ -501,8 +514,9 @@ class MiscController extends BaseController
             'amount' => $request->amount,
             'qty' => $request->qty,
             'total' => $request->total,
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
+            'shift_number' => $request->shift_number,
+            'cut_off_id' => $request->cut_off_id,
+            'treg' => $request->treg,
         ];
 
         $safekeepingDenomination = SafekeepingDenomination::where([

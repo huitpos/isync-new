@@ -488,6 +488,12 @@ paths:
                   default: null
                 branch_id:
                   type: integer
+                guest_name:
+                  type: string
+                is_resume_printed:
+                  type: boolean
+                treg:
+                  type: string
       responses:
         '200':
           content:
@@ -532,7 +538,7 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send transaction to the server.
+      summary: Send orders to the server.
       requestBody:
         content:
           application/json:
@@ -622,6 +628,8 @@ paths:
                 completed_at:
                   type: string
                   default: null
+                shift_number:
+                  type: integer
                 branch_id:
                   type: integer
                 is_cut_off:
@@ -631,6 +639,10 @@ paths:
                 cut_off_at:
                   type: string
                   default: null
+                discount_details_id:
+                  type: integer
+                treg:
+                  type: string
       responses:
         '200':
           content:
@@ -704,6 +716,10 @@ paths:
                   default: null
                 is_advance_payment:
                   type: boolean
+                shift_number:
+                  type: integer
+                is_sent_to_server:
+                  type: boolean
                 is_cut_off:
                   type: boolean
                 cut_off_id:
@@ -712,6 +728,8 @@ paths:
                 cut_off_at:
                   type: string
                   default: null
+                treg:
+                  type: string
       responses:
         '200':
           content:
@@ -795,6 +813,10 @@ paths:
                 is_sent_to_server:
                   type: boolean
                   default: false
+                shift_number:
+                  type: integer
+                treg:
+                  type: string
       responses:
         '200':
           content:
@@ -867,6 +889,12 @@ paths:
                   type: number
                 total:
                   type: number
+                shift_number:
+                  type: integer
+                cut_off_id:
+                  type: integer
+                treg:
+                  type: string
       responses:
         '200':
           content:
