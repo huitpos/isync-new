@@ -178,12 +178,14 @@ class ClientController extends Controller
             'company_registered_name' => ''
         ]);
 
-        $this->userRepository->create([
+        $user = $this->userRepository->create([
             'name' => $validatedData['owner_name'],
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
             'client_id' => $client->id,
         ]);
+
+        $user->assignRole('company_admin');
 
         return redirect()->route('admin.clients.index')->with('success', 'Data has been stored successfully!');
     }

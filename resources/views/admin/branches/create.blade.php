@@ -65,8 +65,8 @@
                     <label class="form-label">Branch Cluster</label>
                     <select id="cluster_id" name="cluster_id" data-control="select2" data-placeholder="Select a cluster" class="form-control @error('cluster_id') is-invalid @enderror" required>
                         <option value=""></option>
-                        @if (!empty($clusters))
-                            @foreach ($clusters as $cluster)`
+                        @if (!empty($company->clusters))
+                            @foreach ($company->clusters as $cluster)`
                                 <option value="{{ $cluster->id }}" {{ $cluster->id == old('cluster_id') ? 'selected' : '' }}>{{ $cluster->name }}</option>
                             @endforeach
                         @endif

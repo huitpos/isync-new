@@ -26,13 +26,45 @@ class UserRepository implements UserRepositoryInterface
 
     public function create(array $data): User
     {
+        $role = $data['role'];
+        $branches = $data['branches'];
+
+        unset($data['role']);
+        unset($data['branches']);
+
+        $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
+
         $user = User::create($data);
+
+        $user->assignRole($role);
+
+        $user->branches()->attach($branches);
+
         return $user;
     }
 
-    public function update(String $id, array $data): Bool
+    public function update(String $id, array $data, $syncRoles = true, $syncBranches = true): Bool
     {
         $user = User::findOrFail($id);
+
+        $role = $data['role'] ?? null;
+        $branches = $data['branches'] ?? null;
+
+        unset($data['role']);
+        unset($data['branches']);
+
+        $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
+
+        if ($syncRoles) {
+            $user->syncRoles([]);
+            $user->assignRole($role);
+        }
+
+        if ($syncBranches) {
+            $user->branches()->detach();
+            $user->branches()->attach($branches);
+        }
+
         return $user->update($data);
     }
 

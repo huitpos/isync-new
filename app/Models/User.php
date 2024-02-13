@@ -38,4 +38,24 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Client::class);
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function branches()
+    {
+        return $this->belongsToMany(Branch::class);
+    }
+
+    public function activeBranches()
+    {
+        return $this->belongsToMany(Branch::class)->where('status', 'active');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

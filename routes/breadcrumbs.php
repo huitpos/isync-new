@@ -269,6 +269,22 @@ Breadcrumbs::for('company.itemTypes.edit', function (BreadcrumbTrail $trail, $co
     $trail->push('Edit');
 });
 
+//users
+Breadcrumbs::for('company.users.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Users', route('company.users.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.users.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.users.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.users.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.users.index', $company);
+    $trail->push('Edit');
+});
+
 //company reports
 Breadcrumbs::for('company.reports.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
@@ -280,6 +296,12 @@ Breadcrumbs::for('company.reports.viewTransaction', function (BreadcrumbTrail $t
     $trail->push('Transaction');
     $trail->push($transaction->id);
 });
+
+
+
+
+
+
 
 //branch dashboard
 Breadcrumbs::for('branch.dashboard', function (BreadcrumbTrail $trail, $company, $branch) {
@@ -297,4 +319,21 @@ Breadcrumbs::for('branch.reports.viewTransaction', function (BreadcrumbTrail $tr
     $trail->parent('branch.reports.index', $company, $branch);
     $trail->push('Transaction');
     $trail->push($transaction->id);
+});
+
+// branch users
+Breadcrumbs::for('branch.users.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Users', route('branch.users.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.users.create', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('branch.users.index', $company, $branch);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('branch.users.edit', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('branch.users.index', $company, $branch);
+    $trail->push('Edit');
 });

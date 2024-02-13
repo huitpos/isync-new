@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataTables\Branch;
+namespace App\DataTables\Company;
 
 use App\Models\User as Model;
 use Yajra\DataTables\Html\Column;
@@ -18,17 +18,14 @@ class UsersDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        $branchSlug = $this->branch_slug;
-        $companySlug = $this->company_slug;
-
         return (new EloquentDataTable($query))
             ->addColumn('roles', function (Model $data) {
                 return str_replace('_', ' ', $data->getRoleNames()->implode(', '));
             })
-            ->addColumn('actions', function (Model $data) use ($branchSlug, $companySlug) {
-                return view('branch.datatables._actions', [
-                    'param' => ['user' => $data->id, 'companySlug' => $companySlug, 'branchSlug' => $branchSlug],
-                    'route' => 'branch.users',
+            ->addColumn('actions', function (Model $data) {
+                return view('company.datatables._actions', [
+                    'param' => ['user' => $data->id, 'companySlug' => $data->company->slug],
+                    'route' => 'company.users',
                 ]);
             });
     }
@@ -39,11 +36,8 @@ class UsersDataTable extends DataTable
      */
     public function query(Model $model): QueryBuilder
     {
-        $branchId = $this->branch_id;
         return $model->newQuery()
-            ->whereHas('branches', function ($query) use ($branchId) {
-                $query->where('branch_id', $branchId);
-            });
+            ->where('company_id', $this->company_id);
     }
 
     /**

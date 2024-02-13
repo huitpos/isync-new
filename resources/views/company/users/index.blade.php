@@ -5,7 +5,7 @@
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('branch.users.index', $company, $branch) }}
+        {{ Breadcrumbs::render('company.users.index', $company) }}
     @endsection
 
     <div class="card">
@@ -19,9 +19,9 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                    <a href="{{ route('branch.users.create', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">
+                    <a href="{{ route('company.users.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
-                        Add user
+                        Add User
                     </a>
                 </div>
             </div>
@@ -42,5 +42,4 @@
             });
         </script>
     @endpush
-
 </x-default-layout>

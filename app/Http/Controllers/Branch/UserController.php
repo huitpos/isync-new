@@ -26,7 +26,11 @@ class UserController extends Controller
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        return $dataTable->with(['branch_id' => $branch->id])->render('branch.users.index', [
+        return $dataTable->with([
+            'branch_id' => $branch->id,
+            'branch_slug' => $branch->slug,
+            'company_slug' => $company->slug,
+        ])->render('branch.users.index', [
             'company' => $company,
             'branch' => $branch,
         ]);
@@ -64,7 +68,9 @@ class UserController extends Controller
 
         $data = $request->all();
         $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
-        $data['branch_id'] = $branch->id;
+        $data['company_id'] = $company->id;
+        $data['branches'][] = $branch->id;
+        $data['role'] = 'branch_user';
 
         if ($this->userRepository->create($data)) {
             return redirect()->route('branch.users.index', ['companySlug' => $request->attributes->get('company')->slug, 'branchSlug' => $request->attributes->get('branch')->slug])->with('success', 'User created successfully.');
@@ -84,17 +90,48 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $companySlug, string $branchSlug, string $id)
     {
-        //
+        $user = $this->userRepository->find($id);
+
+        if (!$user) {
+            return redirect()->route('branch.users.index', ['companySlug' => $companySlug, 'branchSlug' => $branchSlug])->with('error', 'User not found.');
+        }
+
+        return view('branch.users.edit', [
+            'user' => $user,
+            'company' => $request->attributes->get('company'),
+            'branch' => $request->attributes->get('branch'),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $companySlug, string $branchSlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
+        $request->validate([
+            'username' => 'required|unique:users,username,' . $id,
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $id,
+        ]);
+
+        $postData = $request->all();
+        $postData['name'] = $postData['first_name'] . ' ' . $postData['last_name'];
+
+        if (empty($postData['password'])) {
+            unset($postData['password']);
+        }
+
+        if ($this->userRepository->update($id, $postData, false, false)) {
+            return redirect()->route('branch.users.index', ['companySlug' => $companySlug, 'branchSlug' => $branchSlug])->with('success', 'User updated successfully.');
+        }
+
+        return redirect()->route('branch.users.index', ['companySlug' => $companySlug, 'branchSlug' => $branchSlug])->with('error', 'User failed to update.');
     }
 
     /**

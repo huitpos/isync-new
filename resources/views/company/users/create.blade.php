@@ -5,12 +5,12 @@
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('branch.users.create', $company, $branch) }}
+        {{ Breadcrumbs::render('company.users.create', $company) }}
     @endsection
 
     <div class="card">
         <div class="card-body py-4">
-            <form class="mt-3" action="{{ route('branch.users.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
+            <form class="mt-3" action="{{ route('company.users.store', ['companySlug' => $company->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-5">
@@ -18,6 +18,31 @@
                     <label class="form-check-label" for="is_active">
                         Active
                     </label>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Role</label>
+                    <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
+                        <option value="company_admin" {{ old('role') == 'company_admin' ? 'selected' : '' }}>Company Admin</option>
+                        <option value="branch_user" {{ old('role') == 'branch_user' ? 'selected' : '' }}>Branch User</option>
+                    </select>
+
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Branches</label>
+                    <select class="form-select @error('branches') is-invalid @enderror" name="branches[]" data-control="select2" data-close-on-select="false" data-placeholder="Select branch" data-allow-clear="true" multiple="multiple">
+                        @foreach ($company->activeBranches as $branch)
+                            <option {{ in_array($branch->id, old('branches') ?? []) ? 'selected' : '' }} value="{{ $branch->id }}">{{ $branch->name }}</option>
+                        @endforeach
+                    </select>
+
+                    @error('branches')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-4">

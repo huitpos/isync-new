@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Company;
+
 class AuthenticatedSessionController extends Controller
 {
     /**
@@ -44,10 +46,14 @@ class AuthenticatedSessionController extends Controller
             return route('admin.dashboard');
         }
 
-        if ($user->client_id) {
-            $slug = $user->client->companies()->first()->slug;
+        if ($user->hasRole('company_admin')) {
+            $company =  Company::find($user->company_id);
+            return route('company.dashboard', ['companySlug' => $company->slug]);
+        }
 
-            return route('company.dashboard', ['companySlug' => $slug]);
+        if ($user->hasRole('branch_user')) {
+            $branch = $user->activeBranches->first();
+            return route('branch.dashboard', ['companySlug' => $branch->company->slug, 'branchSlug' => $branch->slug]);
         }
     }
 

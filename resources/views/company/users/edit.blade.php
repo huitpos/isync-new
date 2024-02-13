@@ -1,28 +1,58 @@
 <x-default-layout>
 
     @section('title')
-        Create a new user
+        Edit user
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('branch.users.create', $company, $branch) }}
+        {{ Breadcrumbs::render('company.users.edit', $company) }}
     @endsection
 
     <div class="card">
         <div class="card-body py-4">
-            <form class="mt-3" action="{{ route('branch.users.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
+            <form class="mt-3" action="{{ route('company.users.update', ['companySlug' => $company->slug, 'user' => $user->id]) }}" method="POST" novalidate enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
 
                 <div class="mb-5">
-                    <input value="1" checked name="is_active" class="form-check-input" type="checkbox" id="is_active">
+                    <input value="1" {{ $user->is_active ? 'checked' : '' }} name="is_active" class="form-check-input" type="checkbox" id="is_active">
                     <label class="form-check-label" for="is_active">
                         Active
                     </label>
                 </div>
 
                 <div class="mb-4">
+                    @php
+                        $roles = $user->getRoleNames()->toArray();
+                    @endphp
+
+                    <label class="form-label">Role</label>
+                    <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
+                        <option value="company_admin" {{ old('role') == 'company_admin' || in_array('company_admin', $roles ?? []) ? 'selected' : '' }}>Company Admin</option>
+                        <option value="branch_user" {{ old('role') == 'branch_user' || in_array('branch_user', $roles ?? []) ? 'selected' : '' }}>Branch User</option>
+                    </select>
+
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Branches</label>
+                    <select class="form-select @error('branches') is-invalid @enderror" name="branches[]" data-control="select2" data-close-on-select="false" data-placeholder="Select branch" data-allow-clear="true" multiple="multiple">
+                        @foreach ($company->activeBranches as $branch)
+                            <option {{ in_array($branch->id, old('branches') ?? $user->activeBranches->pluck('id')->toArray() ?? []) ? 'selected' : '' }} value="{{ $branch->id }}">{{ $branch->name }}</option>
+                        @endforeach
+                    </select>
+
+                    @error('branches')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
                     <label class="form-label">Email</label>
-                    <input value="{{ old('email') }}" autocomplete="off" name="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email" required/>
+                    <input value="{{ old('email') ?? $user->email }}" autocomplete="off" name="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email" required/>
 
                     @error('email')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -31,7 +61,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Username</label>
-                    <input value="{{ old('username') }}" name="username" type="text" class="form-control @error('username') is-invalid @enderror" placeholder="Username" required/>
+                    <input value="{{ old('username') ?? $user->username }}" name="username" type="text" class="form-control @error('username') is-invalid @enderror" placeholder="Username" required/>
 
                     @error('username')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -61,7 +91,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">First Name</label>
-                    <input value="{{ old('first_name') }}" name="first_name" type="text" class="form-control @error('first_name') is-invalid @enderror" placeholder="First Name" required/>
+                    <input value="{{ old('first_name') ?? $user->first_name }}" name="first_name" type="text" class="form-control @error('first_name') is-invalid @enderror" placeholder="First Name" required/>
 
                     @error('first_name')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -70,7 +100,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Last Name</label>
-                    <input value="{{ old('last_name') }}" name="last_name" type="text" class="form-control @error('last_name') is-invalid @enderror" placeholder="Last Name" required/>
+                    <input value="{{ old('last_name') ?? $user->last_name }}" name="last_name" type="text" class="form-control @error('last_name') is-invalid @enderror" placeholder="Last Name" required/>
 
                     @error('last_name')
                         <div class="invalid-feedback"> {{ $message }}</div>

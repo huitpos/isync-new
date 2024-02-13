@@ -19,6 +19,10 @@ class ValidateCompanySlug
     {
         $companySlug = $request->route('companySlug');
 
+        $user = auth()->user();
+
+        $branches = $user->activeBranches->pluck('id')->toArray();
+
         if ($companySlug) {
             // Check if the company with this slug exists
             $company = Company::where('slug', $companySlug)->first();
@@ -34,7 +38,8 @@ class ValidateCompanySlug
 
             if ($branchSlug) {
                 $branch  = Branch::where([
-                    'slug' => $branchSlug
+                    'slug' => $branchSlug,
+                    'id' => $branches
                 ])->first();
 
                 if (!$branch) {
@@ -42,6 +47,12 @@ class ValidateCompanySlug
                 }
 
                 $request->attributes->add(['branch' => $branch]);
+
+                return $next($request);
+            }
+
+            if (!$user->hasRole('company_admin')) {
+                abort(403, 'Unauthorized action.');
             }
         }
 
