@@ -19,12 +19,6 @@ class BranchMachinesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('name', function (PosMachine $data) {
-                return view('admin.datatables._link', [
-                    'url' => route('admin.machines.show', ['machine' => $data->id, 'branchId' => $data->branch_id]),
-                    'text' => $data->name,
-                ]);
-            })
             ->addColumn('product_key', function (PosMachine $data) {
                 return view('admin.datatables._link', [
                     'url' => route('admin.machines.show', ['machine' => $data->id, 'branchId' => $data->branch_id]),

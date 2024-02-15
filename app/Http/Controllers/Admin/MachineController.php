@@ -74,8 +74,8 @@ class MachineController extends Controller
             'name' => 'required',
             'serial_number' => 'required',
             'min' => 'required',
-            // 'receipt_header' => 'required',
-            // 'receipt_bottom_text' => 'required',
+            'receipt_header' => 'required',
+            'receipt_bottom_text' => 'required',
             'permit_number' => 'required',
             'accreditation_number' => 'required',
             'valid_from' => [
@@ -179,8 +179,8 @@ class MachineController extends Controller
             // 'machine_number' => 'required',
             'serial_number' => 'required',
             'min' => 'required',
-            // 'receipt_header' => 'required',
-            // 'receipt_bottom_text' => 'required',
+            'receipt_header' => 'required',
+            'receipt_bottom_text' => 'required',
             'permit_number' => 'required',
             'accreditation_number' => 'required',
             'valid_from' => [

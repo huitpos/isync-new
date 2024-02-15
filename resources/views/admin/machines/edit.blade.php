@@ -56,6 +56,24 @@
                 </div>
 
                 <div class="mb-4">
+                    <label class="form-label">Receipt Header</label>
+                    <input value="{{ old('receipt_header') ?? $branch->receipt_header }}" name="receipt_header" type="text" class="form-control @error('receipt_header') is-invalid @enderror" placeholder="Receipt Header" required/>
+
+                    @error('receipt_header')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Receipt Buttom Text</label>
+                    <input value="{{ old('receipt_bottom_text') ?? $branch->receipt_bottom_text }}" name="receipt_bottom_text" type="text" class="form-control @error('receipt_bottom_text') is-invalid @enderror" placeholder="Receipt Buttom Text" required/>
+
+                    @error('receipt_bottom_text')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
                     <label class="form-label">Permit Number</label>
                     <input value="{{ old('permit_number') ?? $machine->permit_number }}" name="permit_number" type="text" class="form-control @error('permit_number') is-invalid @enderror" placeholder="Permit Number" required/>
 
