@@ -96,9 +96,9 @@
 
                 <div class="mb-4">
                     <label class="form-label">Department</label>
-                    <select id="department_id" name="department_id" data-control="select2" data-placeholder="Select Department" class="form-select @error('department_id') is-invalid @enderror" required>
+                    <select id="department_id" name="department_id" data-control="select2" data-placeholder="Select Department" class="form-select @error('department_id') is-invalid @enderror department-category-selector" required>
                         <option value=""></option>
-                        @foreach ($company->departments as $department)
+                        @foreach ($departments as $department)
                             <option value="{{ $department->id }}" {{ $department->id == old('department_id') || $department->id == $product->department_id ? 'selected' : '' }}>{{ $department->name }}</option>
                         @endforeach
                     </select>
@@ -110,9 +110,9 @@
 
                 <div class="mb-4">
                     <label class="form-label">Category</label>
-                    <select id="category_id" name="category_id" data-control="select2" data-placeholder="Select Category" class="form-select @error('category_id') is-invalid @enderror" required>
+                    <select id="category_id" name="category_id" data-control="select2" data-placeholder="Select Category" class="form-select @error('category_id') is-invalid @enderror category-subcategory-selector" required>
                         <option value="">Select a category</option>
-                        @foreach ($company->categories as $category)
+                        @foreach ($categories as $category)
                             <option value="{{ $category->id }}" {{ $category->id == old('category_id') || $category->id == $product->category_id ? 'selected' : '' }}>{{ $category->name }}</option>
                         @endforeach
                     </select>
@@ -126,7 +126,7 @@
                     <label class="form-label">Sub-category</label>
                     <select id="subcategory_id" name="subcategory_id" data-control="select2" data-placeholder="Select Subcategory" class="form-select @error('subcategory_id') is-invalid @enderror" required>
                         <option value="">Select a category</option>
-                        @foreach ($company->subcategories as $subcategory)
+                        @foreach ($subcategories as $subcategory)
                             <option value="{{ $subcategory->id }}" {{ $subcategory->id == old('subcategory_id') || $subcategory->id == $product->subcategory_id ? 'selected' : '' }}>{{ $subcategory->name }}</option>
                         @endforeach
                     </select>

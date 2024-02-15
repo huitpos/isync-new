@@ -68,6 +68,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/get-cities', [AjaxController::class, 'getCities']);
         Route::get('/get-barangays', [AjaxController::class, 'getBarangays']);
         Route::get('/get-clusters', [AjaxController::class, 'getClusters']);
+        Route::get('/get-department-categories', [AjaxController::class, 'getDepartmentCategories']);
+        Route::get('/get-category-subcategories', [AjaxController::class, 'getCategorySubcategories']);
     });
 
     Route::prefix('admin')->group(function () {

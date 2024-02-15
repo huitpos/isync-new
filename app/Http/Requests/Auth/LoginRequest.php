@@ -58,6 +58,21 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user(); // Get the authenticated user
+        $company = $user->company; // Assuming there's a relationship between User and Company
+
+        if (!$user->hasRole('super_admin')) {
+            if (!$company || $company->status !== 'active') {
+                RateLimiter::clear($this->throttleKey());
+
+                Auth::logout();
+
+                throw ValidationException::withMessages([
+                    'message' => trans('Access denied! You no longer have access to your account. For further assistance, please contact iSync support.'),
+                ]);
+            }
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

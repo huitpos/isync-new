@@ -8,15 +8,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Repositories\Interfaces\CategoryRepositoryInterface;
+use App\Repositories\Interfaces\SubcategoryRepositoryInterface;
 use App\DataTables\Company\ProductsDataTable;
 
 class ProductController extends Controller
 {
     protected $productRepository;
+    protected $categoryRepository;
+    protected $subcategoryRepository;
 
-    public function __construct(ProductRepositoryInterface $productRepository)
-    {
+    public function __construct(
+        ProductRepositoryInterface $productRepository,
+        CategoryRepositoryInterface $categoryRepository,
+        SubcategoryRepositoryInterface $subcategoryRepository
+    ) {
         $this->productRepository = $productRepository;
+        $this->categoryRepository = $categoryRepository;
+        $this->subcategoryRepository = $subcategoryRepository;
     }
 
     /**
@@ -37,9 +46,30 @@ class ProductController extends Controller
     public function create(Request $request)
     {
         $company = $request->attributes->get('company');
+        $categories = [];
+        $subcategories = [];
+
+        if (!empty(old('department_id'))) {
+            $categories = $this->categoryRepository->get([
+                'department_id' => old('department_id'),
+                'status' => 'active'
+            ]);
+        }
+
+        if (!empty(old('category_id'))) {
+            $subcategories = $this->subcategoryRepository->get([
+                'category_id' => old('category_id'),
+                'status' => 'active'
+            ]);
+        }
+
+        $departments = $company->departments()->where('status', 'active')->get();
 
         return view('company.products.create', [
-            'company' => $company
+            'company' => $company,
+            'categories' => $categories,
+            'subcategories' => $subcategories,
+            'departments' => $departments
         ]);
     }
 
@@ -181,9 +211,27 @@ class ProductController extends Controller
 
         $product = $this->productRepository->find($productId);
 
+        if (!$product) {
+            return abort(404, 'Product not found');
+        }
+
+        $departments = $company->departments()->where('status', 'active')->get();
+        $categories = $company->categories()->where([
+            'status' => 'active',
+            'department_id' => $product->department_id
+        ])->get();
+
+        $subcategories = $company->subcategories()->where([
+            'status' => 'active',
+            'category_id' => $product->category_id
+        ])->get();
+
         return view('company.products.edit', [
             'company' => $company,
             'product' => $product,
+            'departments' => $departments,
+            'categories' => $categories,
+            'subcategories' => $subcategories,
         ]);
     }
 

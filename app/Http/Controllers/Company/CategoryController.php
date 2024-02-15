@@ -36,8 +36,10 @@ class CategoryController extends Controller
     public function create(Request $request)
     {
         $company = $request->attributes->get('company');
+        $departments = $company->departments()->where('status', 'active')->get();
+        $suppliers = $company->suppliers()->where('status', 'active')->get();
 
-        return view('company.categories.create', compact('company'));
+        return view('company.categories.create', compact('company', 'departments', 'suppliers'));
     }
 
     /**
@@ -91,7 +93,10 @@ class CategoryController extends Controller
 
         $category = $this->categoryRepository->findOrFail($categoryId);
 
-        return view('company.categories.edit', compact('company', 'category'));
+        $departments = $company->departments()->where('status', 'active')->get();
+        $suppliers = $company->suppliers()->where('status', 'active')->get();
+
+        return view('company.categories.edit', compact('company', 'category', 'departments', 'suppliers'));
     }
 
     /**

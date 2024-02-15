@@ -73,6 +73,7 @@ class SubcategoriesDataTable extends DataTable
             Column::make('name')->title('Subcategory'),
             Column::make('description'),
             Column::make('created_by.name', 'createdBy.name')->title('Created By'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

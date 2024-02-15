@@ -48,7 +48,7 @@
                     <label class="form-label">Category</label>
                     <select class="form-select" name="category_id" data-control="select2" data-close-on-select="true" data-placeholder="Select category">
                         <option></option>
-                        @foreach ($company->categories as $category)
+                        @foreach ($categories as $category)
                             <option value="{{ $category->id }}" {{ $category->id == $subcategory->category_id ? 'selected' : '' }}>{{ $category->name }}</option>
                         @endforeach
                     </select>

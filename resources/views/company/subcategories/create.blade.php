@@ -47,7 +47,7 @@
                     <label class="form-label">Category</label>
                     <select class="form-select @error('category_id') is-invalid @enderror" name="category_id" data-control="select2" data-close-on-select="true" data-placeholder="Select category">
                         <option></option>
-                        @foreach ($company->categories as $category)
+                        @foreach ($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
                     </select>

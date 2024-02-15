@@ -48,7 +48,7 @@
                     <label class="form-label">Department</label>
                     <select class="form-select" name="department_id" data-control="select2" data-close-on-select="true" data-placeholder="Select department">
                         <option></option>
-                        @foreach ($company->departments as $department)
+                        @foreach ($departments as $department)
                             <option value=" {{ $department->id }}" {{ $department->id ==  old('department_id') || $department->id == $category->department_id ? 'selected' : '' }}>{{ $department->name }}</option>
                         @endforeach
                     </select>
@@ -60,14 +60,14 @@
 
                 @php
                     $selectedSuppliers = [];
-                    foreach ($department->suppliers as $supplier) {
+                    foreach ($category->suppliers as $supplier) {
                         $selectedSuppliers[] = $supplier->id;
                     }
                 @endphp
                 <div class="mb-4">
                     <label class="form-label">Suppliers</label>
                     <select class="form-select" name="suppliers[]" data-control="select2" data-close-on-select="false" data-placeholder="Select supplier" data-allow-clear="true" multiple="multiple">
-                        @foreach ($company->suppliers as $supplier)
+                        @foreach ($suppliers as $supplier)
                             <option value="{{ $supplier->id }}" {{ in_array($supplier->id, $selectedSuppliers) ? 'selected' : '' }}>{{ $supplier->name }}</option>
                         @endforeach
                     </select>

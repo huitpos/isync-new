@@ -1,4 +1,62 @@
 $(document).ready(function() {
+    $('.department-category-selector').on('change', function() {
+        var selectedValue = $(this).val();
+        var newOptionsHTML = '';
+
+        tempOptions('category_id');
+
+        if ($('.category-subcategory-selector').length) {
+            tempOptions('subcategory_id');
+        }
+
+        $.ajax({
+            url: '/ajax/get-department-categories', // Replace with your actual endpoint
+            method: 'GET',
+            data: {
+              department_id: selectedValue
+            },
+            success: function(response) {
+                newOptionsHTML += '<option value="">Select a category</option>';
+
+                response.forEach(function(option) {
+                    newOptionsHTML += '<option value="' + option.id + '">' + option.name + '</option>';
+                });
+
+                changeOptionsAndReinitialize('category_id', newOptionsHTML);
+            },
+            error: function(xhr, status, error) {
+              console.error('Error:', error);
+            }
+        });
+    });
+
+    $('.category-subcategory-selector').on('change', function() {
+        var selectedValue = $(this).val();
+        var newOptionsHTML = '';
+
+        tempOptions('subcategory_id');
+
+        $.ajax({
+            url: '/ajax/get-category-subcategories', // Replace with your actual endpoint
+            method: 'GET',
+            data: {
+              category_id: selectedValue
+            },
+            success: function(response) {
+                newOptionsHTML += '<option value="">Select a subcategory</option>';
+
+                response.forEach(function(option) {
+                    newOptionsHTML += '<option value="' + option.id + '">' + option.name + '</option>';
+                });
+
+                changeOptionsAndReinitialize('subcategory_id', newOptionsHTML);
+            },
+            error: function(xhr, status, error) {
+              console.error('Error:', error);
+            }
+        });
+    });
+
     $('.company-cluster-selector').on('change', function() {
         var selectedValue = $(this).val();
         var newOptionsHTML = '';

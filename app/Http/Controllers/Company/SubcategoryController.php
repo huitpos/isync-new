@@ -37,7 +37,9 @@ class SubcategoryController extends Controller
     {
         $company = $request->attributes->get('company');
 
-        return view('company.subcategories.create', compact('company'));
+        $categories = $company->categories()->where('status', 'active')->get();
+
+        return view('company.subcategories.create', compact('company', 'categories'));
     }
 
     /**
@@ -90,7 +92,9 @@ class SubcategoryController extends Controller
 
         $subcategory = $this->subcategoryRepository->findOrFail($subcategoryId);
 
-        return view('company.subcategories.edit', compact('company', 'subcategory'));
+        $categories = $company->categories()->where('status', 'active')->get();
+
+        return view('company.subcategories.edit', compact('company', 'subcategory', 'categories'));
     }
 
     /**
