@@ -61,11 +61,11 @@ CREATE TABLE `cut_offs` (
   KEY `cut_offs_branch_id_foreign` (`branch_id`),
   KEY `cut_offs_cashier_id_foreign` (`cashier_id`),
   KEY `cut_offs_admin_id_foreign` (`admin_id`),
-  CONSTRAINT `cut_offs_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `laravel_db`.`users` (`id`),
-  CONSTRAINT `cut_offs_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `laravel_db`.`branches` (`id`),
-  CONSTRAINT `cut_offs_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `laravel_db`.`users` (`id`),
+  CONSTRAINT `cut_offs_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `isync`.`users` (`id`),
+  CONSTRAINT `cut_offs_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
+  CONSTRAINT `cut_offs_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `isync`.`users` (`id`),
   CONSTRAINT `cut_offs_end_of_day_id_foreign` FOREIGN KEY (`end_of_day_id`) REFERENCES `end_of_days` (`end_of_day_id`),
-  CONSTRAINT `cut_offs_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `laravel_db`.`pos_machines` (`id`)
+  CONSTRAINT `cut_offs_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `end_of_days`;
@@ -123,10 +123,10 @@ CREATE TABLE `end_of_days` (
   KEY `end_of_days_branch_id_foreign` (`branch_id`),
   KEY `end_of_days_cashier_id_foreign` (`cashier_id`),
   KEY `end_of_days_admin_id_foreign` (`admin_id`),
-  CONSTRAINT `end_of_days_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `laravel_db`.`users` (`id`),
-  CONSTRAINT `end_of_days_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `laravel_db`.`branches` (`id`),
-  CONSTRAINT `end_of_days_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `laravel_db`.`users` (`id`),
-  CONSTRAINT `end_of_days_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `laravel_db`.`pos_machines` (`id`)
+  CONSTRAINT `end_of_days_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `isync`.`users` (`id`),
+  CONSTRAINT `end_of_days_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
+  CONSTRAINT `end_of_days_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `isync`.`users` (`id`),
+  CONSTRAINT `end_of_days_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `migrations`;
@@ -199,13 +199,13 @@ CREATE TABLE `orders` (
   KEY `orders_subcategory_id_foreign` (`subcategory_id`),
   KEY `orders_is_back_out_id_foreign` (`is_back_out_id`),
   KEY `orders_branch_id_foreign` (`branch_id`),
-  CONSTRAINT `orders_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `laravel_db`.`branches` (`id`),
-  CONSTRAINT `orders_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `laravel_db`.`categories` (`id`),
-  CONSTRAINT `orders_department_id_foreign` FOREIGN KEY (`department_id`) REFERENCES `laravel_db`.`departments` (`id`),
-  CONSTRAINT `orders_is_back_out_id_foreign` FOREIGN KEY (`is_back_out_id`) REFERENCES `laravel_db`.`users` (`id`),
-  CONSTRAINT `orders_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `laravel_db`.`pos_machines` (`id`),
-  CONSTRAINT `orders_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `laravel_db`.`products` (`id`),
-  CONSTRAINT `orders_subcategory_id_foreign` FOREIGN KEY (`subcategory_id`) REFERENCES `laravel_db`.`subcategories` (`id`),
+  CONSTRAINT `orders_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
+  CONSTRAINT `orders_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `isync`.`categories` (`id`),
+  CONSTRAINT `orders_department_id_foreign` FOREIGN KEY (`department_id`) REFERENCES `isync`.`departments` (`id`),
+  CONSTRAINT `orders_is_back_out_id_foreign` FOREIGN KEY (`is_back_out_id`) REFERENCES `isync`.`users` (`id`),
+  CONSTRAINT `orders_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`),
+  CONSTRAINT `orders_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `isync`.`products` (`id`),
+  CONSTRAINT `orders_subcategory_id_foreign` FOREIGN KEY (`subcategory_id`) REFERENCES `isync`.`subcategories` (`id`),
   CONSTRAINT `orders_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -233,9 +233,9 @@ CREATE TABLE `payments` (
   KEY `payments_branch_id_foreign` (`branch_id`),
   KEY `payments_transaction_id_foreign` (`transaction_id`),
   KEY `payments_payment_type_id_foreign` (`payment_type_id`),
-  CONSTRAINT `payments_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `laravel_db`.`branches` (`id`),
-  CONSTRAINT `payments_payment_type_id_foreign` FOREIGN KEY (`payment_type_id`) REFERENCES `laravel_db`.`payment_types` (`id`),
-  CONSTRAINT `payments_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `laravel_db`.`pos_machines` (`id`),
+  CONSTRAINT `payments_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
+  CONSTRAINT `payments_payment_type_id_foreign` FOREIGN KEY (`payment_type_id`) REFERENCES `isync`.`payment_types` (`id`),
+  CONSTRAINT `payments_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`),
   CONSTRAINT `payments_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -260,9 +260,9 @@ CREATE TABLE `safekeeping_denominations` (
   KEY `safekeeping_denominations_pos_machine_id_foreign` (`pos_machine_id`),
   KEY `safekeeping_denominations_safekeeping_id_foreign` (`safekeeping_id`),
   KEY `safekeeping_denominations_cash_denomination_id_foreign` (`cash_denomination_id`),
-  CONSTRAINT `safekeeping_denominations_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `laravel_db`.`branches` (`id`),
-  CONSTRAINT `safekeeping_denominations_cash_denomination_id_foreign` FOREIGN KEY (`cash_denomination_id`) REFERENCES `laravel_db`.`cash_denominations` (`id`),
-  CONSTRAINT `safekeeping_denominations_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `laravel_db`.`pos_machines` (`id`),
+  CONSTRAINT `safekeeping_denominations_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
+  CONSTRAINT `safekeeping_denominations_cash_denomination_id_foreign` FOREIGN KEY (`cash_denomination_id`) REFERENCES `isync`.`cash_denominations` (`id`),
+  CONSTRAINT `safekeeping_denominations_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`),
   CONSTRAINT `safekeeping_denominations_safekeeping_id_foreign` FOREIGN KEY (`safekeeping_id`) REFERENCES `safekeepings` (`safekeeping_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -291,10 +291,10 @@ CREATE TABLE `safekeepings` (
   KEY `safekeepings_branch_id_foreign` (`branch_id`),
   KEY `safekeepings_cashier_id_foreign` (`cashier_id`),
   KEY `safekeepings_authorize_id_foreign` (`authorize_id`),
-  CONSTRAINT `safekeepings_authorize_id_foreign` FOREIGN KEY (`authorize_id`) REFERENCES `laravel_db`.`users` (`id`),
-  CONSTRAINT `safekeepings_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `laravel_db`.`branches` (`id`),
-  CONSTRAINT `safekeepings_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `laravel_db`.`users` (`id`),
-  CONSTRAINT `safekeepings_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `laravel_db`.`pos_machines` (`id`)
+  CONSTRAINT `safekeepings_authorize_id_foreign` FOREIGN KEY (`authorize_id`) REFERENCES `isync`.`users` (`id`),
+  CONSTRAINT `safekeepings_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
+  CONSTRAINT `safekeepings_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `isync`.`users` (`id`),
+  CONSTRAINT `safekeepings_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `transactions`;
@@ -353,13 +353,13 @@ CREATE TABLE `transactions` (
   KEY `transactions_is_back_out_id_foreign` (`is_back_out_id`),
   KEY `transactions_charge_account_id_foreign` (`charge_account_id`),
   KEY `transactions_branch_id_foreign` (`branch_id`),
-  CONSTRAINT `transactions_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `laravel_db`.`branches` (`id`),
-  CONSTRAINT `transactions_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `laravel_db`.`users` (`id`),
-  CONSTRAINT `transactions_charge_account_id_foreign` FOREIGN KEY (`charge_account_id`) REFERENCES `laravel_db`.`charge_accounts` (`id`),
-  CONSTRAINT `transactions_is_back_out_id_foreign` FOREIGN KEY (`is_back_out_id`) REFERENCES `laravel_db`.`users` (`id`),
-  CONSTRAINT `transactions_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `laravel_db`.`pos_machines` (`id`),
-  CONSTRAINT `transactions_take_order_id_foreign` FOREIGN KEY (`take_order_id`) REFERENCES `laravel_db`.`pos_machines` (`id`),
-  CONSTRAINT `transactions_void_by_id_foreign` FOREIGN KEY (`void_by_id`) REFERENCES `laravel_db`.`users` (`id`)
+  CONSTRAINT `transactions_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
+  CONSTRAINT `transactions_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `isync`.`users` (`id`),
+  CONSTRAINT `transactions_charge_account_id_foreign` FOREIGN KEY (`charge_account_id`) REFERENCES `isync`.`charge_accounts` (`id`),
+  CONSTRAINT `transactions_is_back_out_id_foreign` FOREIGN KEY (`is_back_out_id`) REFERENCES `isync`.`users` (`id`),
+  CONSTRAINT `transactions_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`),
+  CONSTRAINT `transactions_take_order_id_foreign` FOREIGN KEY (`take_order_id`) REFERENCES `isync`.`pos_machines` (`id`),
+  CONSTRAINT `transactions_void_by_id_foreign` FOREIGN KEY (`void_by_id`) REFERENCES `isync`.`users` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
