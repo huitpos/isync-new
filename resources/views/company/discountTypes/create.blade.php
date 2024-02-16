@@ -1,11 +1,11 @@
 <x-default-layout>
 
     @section('title')
-        Create a new supplier
+        Create a new discount type
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.suppliers.create', $company) }}
+        {{ Breadcrumbs::render('company.discountTypes.create', $company) }}
     @endsection
 
     <div class="card">

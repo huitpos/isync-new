@@ -190,6 +190,16 @@ Breadcrumbs::for('company.discountTypes.show', function (BreadcrumbTrail $trail,
     $trail->push(ucfirst($discountType->company_name));
 });
 
+Breadcrumbs::for('company.discountTypes.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.discountTypes.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.discountTypes.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.discountTypes.index', $company);
+    $trail->push('Edit');
+});
+
 //charge accounts
 Breadcrumbs::for('company.chargeAccounts.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
