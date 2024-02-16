@@ -88,7 +88,7 @@ class ClientController extends Controller
             'password_confirmation' => 'required|same:password',
             'company_name' => 'required|unique:companies,company_name|max:100',
             'trade_name' => 'required|unique:companies,trade_name|max:100',
-            'phone_number' => 'required|max:10',
+            'phone_number' => 'required',
             'unit_floor_number' => 'required|max:100',
             'region_id' => 'required',
             'province_id' => 'required',
