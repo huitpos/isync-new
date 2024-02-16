@@ -50,7 +50,9 @@ class PosMachineRepository implements PosMachineRepositoryInterface
 
     public function create(array $data): PosMachine
     {
+        $lastMachineNumber = PosMachine::where('branch_id', $data['branch_id'])->max('machine_number');
         $data['product_key'] = strtoupper(str::random(5) . "-" . str::random(5) . "-" . str::random(5) . "-" . str::random(5) . "-" . str::random(5));
+        $data['machine_number'] = $lastMachineNumber + 1;
 
         $posMachine = PosMachine::create($data);
         return $posMachine;

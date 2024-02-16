@@ -77,7 +77,7 @@ class BranchMachinesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id')->title('Machine No.'),
+            Column::make('machine_number')->title('Machine No.'),
             Column::make('name')->title('Device Name'),
             Column::make('product_key'),
             Column::make('serial_number'),

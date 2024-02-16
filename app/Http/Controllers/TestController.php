@@ -3,27 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Branch;
 
 class TestController extends Controller
 {
-    public function mapCompanyUsers(Request $request)
+    public function mapMachineNumber(Request $request)
     {
-        $companyUsers = User::where('client_id', '!=', null)->get();
-        $branchUsers = User::where('branch_id', '!=', null)->get();
+        $branches = Branch::all();
 
-        foreach ($companyUsers as $user) {
-            $user->company_id = $user->client->companies()->first()->id;
-            $user->save();
+        foreach ($branches as $branch) {
+            $machineNumber = 1;
 
-            $user->assignRole('company_admin');
+            foreach ($branch->machines as $machine) {
+                $machine->update([
+                    'machine_number' => $machineNumber
+                ]);
+
+                $machineNumber++;
+            }
         }
 
-        foreach ($branchUsers as $user) {
-            $user->company_id = $user->branch->company->id;
-            $user->save();
-
-            $user->assignRole('branch_user');
-        }
+        dd("here");
     }
 }
