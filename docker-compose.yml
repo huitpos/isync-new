@@ -26,7 +26,7 @@ services:
   db:
     image: mysql:latest
     environment:
-      MYSQL_DATABASE: laravel_db
+      MYSQL_DATABASE: isync
       MYSQL_USER: laravel_user
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: root

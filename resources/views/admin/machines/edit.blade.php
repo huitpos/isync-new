@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Create a new machine
+        Edit machine
     @endsection
 
     @section('breadcrumbs')
@@ -57,7 +57,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Receipt Header</label>
-                    <input value="{{ old('receipt_header') ?? $branch->receipt_header }}" name="receipt_header" type="text" class="form-control @error('receipt_header') is-invalid @enderror" placeholder="Receipt Header" required/>
+                    <input value="{{ old('receipt_header') ?? $machine->receipt_header }}" name="receipt_header" type="text" class="form-control @error('receipt_header') is-invalid @enderror" placeholder="Receipt Header" required/>
 
                     @error('receipt_header')
                         <div class="invalid-feedback"> {{ $message }}</div>
@@ -66,7 +66,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Receipt Buttom Text</label>
-                    <input value="{{ old('receipt_bottom_text') ?? $branch->receipt_bottom_text }}" name="receipt_bottom_text" type="text" class="form-control @error('receipt_bottom_text') is-invalid @enderror" placeholder="Receipt Buttom Text" required/>
+                    <input value="{{ old('receipt_bottom_text') ?? $machine->receipt_bottom_text }}" name="receipt_bottom_text" type="text" class="form-control @error('receipt_bottom_text') is-invalid @enderror" placeholder="Receipt Buttom Text" required/>
 
                     @error('receipt_bottom_text')
                         <div class="invalid-feedback"> {{ $message }}</div>
