@@ -20,6 +20,7 @@ use App\Models\CutOff;
 use App\Models\PaymentType;
 use App\Models\Discount;
 use App\Models\DiscountDetail;
+use App\Models\ApiRequestLog;
 
 use Illuminate\Support\Facades\Redis;
 
@@ -115,6 +116,7 @@ class MiscController extends BaseController
 
     public function saveTransactions(Request $request)
     {
+        $requestData = $request->all();
         $validator = validator($request->all(), [
             'transaction_id' => 'required|numeric|min:1',
             'pos_machine_id' => 'required|exists:pos_machines,id',
@@ -140,6 +142,14 @@ class MiscController extends BaseController
         ]);
 
         if ($validator->fails()) {
+            //log request
+            $log = new ApiRequestLog();
+            $log->type = 'saveTransactions';
+            $log->method = $request->method();
+            $log->request = json_encode($requestData);
+            $log->response = json_encode($validator->errors());
+            $log->save();
+
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
@@ -183,7 +193,7 @@ class MiscController extends BaseController
             'cut_off_at' => $request->cut_off_at,
             'branch_id' => $request->branch_id,
             'guest_name' => $request->guest_name,
-            'is_resume_printed' => $request->is_resume_printed,
+            'is_resume_printed' => $request->is_resume_printed ?? false,
             'treg' => $request->treg,
         ];
 
@@ -198,8 +208,26 @@ class MiscController extends BaseController
         if ($transaction) {
             $message = 'Transaction updated successfully.';
             $transaction->update($postData);
+
+            //log request
+            $log = new ApiRequestLog();
+            $log->type = 'saveTransactions';
+            $log->method = $request->method();
+            $log->request = json_encode($requestData);
+            $log->response = json_encode($transaction);
+            $log->save();
+
             return $this->sendResponse($transaction, $message);
         }
+
+        //log request
+        $log = new ApiRequestLog();
+        $log->type = 'saveTransactions';
+        $log->method = $request->method();
+        $log->request = json_encode($requestData);
+        $log->response = json_encode(Transaction::create($postData));
+        $log->save();
+
 
         return $this->sendResponse(Transaction::create($postData), $message);
     }
