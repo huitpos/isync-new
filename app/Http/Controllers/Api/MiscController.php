@@ -209,24 +209,8 @@ class MiscController extends BaseController
             $message = 'Transaction updated successfully.';
             $transaction->update($postData);
 
-            //log request
-            $log = new ApiRequestLog();
-            $log->type = 'saveTransactions';
-            $log->method = $request->method();
-            $log->request = json_encode($requestData);
-            $log->response = json_encode($transaction);
-            $log->save();
-
             return $this->sendResponse($transaction, $message);
         }
-
-        //log request
-        $log = new ApiRequestLog();
-        $log->type = 'saveTransactions';
-        $log->method = $request->method();
-        $log->request = json_encode($requestData);
-        $log->response = json_encode(Transaction::create($postData));
-        $log->save();
 
 
         return $this->sendResponse(Transaction::create($postData), $message);
