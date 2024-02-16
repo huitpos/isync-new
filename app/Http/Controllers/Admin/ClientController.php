@@ -221,7 +221,7 @@ class ClientController extends Controller
             'password_confirmation' => 'sometimes|same:password',
             'company_name' => 'required|max:100|unique:companies,company_name,' . $id,
             'trade_name' => 'required|max:100|unique:companies,trade_name,' . $id,
-            'phone_number' => 'required|max:10',
+            'phone_number' => 'required',
             'unit_floor_number' => 'required|max:100',
             'region_id' => 'required',
             'province_id' => 'required',
