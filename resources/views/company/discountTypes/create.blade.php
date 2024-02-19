@@ -85,6 +85,141 @@
                     </label>
                 </div>
 
+                <div class="mt-7">
+                    <label class="form-label">Fields</label>
+                    <!--begin::Repeater-->
+                    <div class="repeater">
+                        <!--begin::Form group-->
+                        <div class="form-group">
+                            <div data-repeater-list="discount_type_fields">
+                                @if (empty(old('discount_type_fields')))
+                                    <div data-repeater-item>
+                                        <div class="form-group row mb-5">
+                                            <div class="col-md-3">
+                                                <label class="form-label">Field Name:</label>
+                                                <input name="name" class="form-control mb-2 mb-md-0" placeholder="Field Name"/>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <label class="form-label">Field Type:</label>
+                                                <select name="field_type" class="form-control">
+                                                    <option value=""></option>
+                                                    <option value="textbox">Textbox</option>
+                                                    <option value="select">Select</option>
+                                                    <option value="radio">Radio</option>
+                                                    <option value="checkbox">Checkbox</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <div class="inner-repeater">
+                                                    <div data-repeater-list="options" class="mb-5">
+                                                        <div data-repeater-item>
+                                                            <label class="form-label">Option:</label>
+                                                            <div class="input-group">
+                                                                <input type="option" name="option" class="form-control" placeholder="Option">
+                                                                <button class="border btn btn-icon btn-light-danger" data-repeater-delete="" type="button">
+                                                                    <i class="ki-duotone ki-trash fs-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>                                                    </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-sm btn-flex btn-light-primary" data-repeater-create type="button">
+                                                        <i class="ki-duotone ki-plus fs-5"></i>
+                                                        Add Option
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3">
+                                                <a href="javascript:;" data-repeater-delete class="btn btn-sm btn-flex btn-light-danger mt-3 mt-md-9">
+                                                    <i class="ki-duotone ki-trash fs-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                                    Delete Field
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    @foreach (old('discount_type_fields') as $key => $field)
+                                        <div data-repeater-item>
+                                            <div class="form-group row mb-5">
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Field Name:</label>
+                                                    <input value="{{ $field['name'] }}" name="name" class="form-control mb-2 mb-md-0" placeholder="Field Name"/>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Field Type:</label>
+                                                    <select name="field_type" class="form-control @error('discount_type_fields.' . $key . '.field_type') is-invalid @enderror">
+                                                        <option value=""></option>
+                                                        <option value="textbox" {{ $field['field_type'] == 'textbox' ? 'selected' : '' }}>Textbox</option>
+                                                        <option value="select" {{ $field['field_type'] == 'select' ? 'selected' : '' }}>Select</option>
+                                                        <option value="radio" {{ $field['field_type'] == 'radio' ? 'selected' : '' }}>Radio</option>
+                                                        <option value="checkbox" {{ $field['field_type'] == 'checkbox' ? 'selected' : '' }}>Checkbox</option>
+                                                    </select>
+
+                                                    @error('discount_type_fields.' . $key . '.field_type')
+                                                        <div class="invalid-feedback"> {{ $message }}</div>
+                                                    @enderror
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <div class="inner-repeater">
+                                                        <div data-repeater-list="options" class="mb-5">
+                                                            @if (empty($field['options']))
+                                                            <div data-repeater-item>
+                                                                <label class="form-label">Option:</label>
+                                                                <input name="option" class="form-control mb-2 mb-md-0 @error('discount_type_fields.' . $key . '.options') is-invalid @enderror" placeholder="Option"/>
+
+                                                                @error('discount_type_fields.' . $key . '.options')
+                                                                    <div class="invalid-feedback"> {{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+                                                            @else
+                                                                @foreach ($field['options'] as $option)
+                                                                    <div data-repeater-item>
+                                                                        <label class="form-label">Option:</label>
+                                                                        <input value="{{ $option['option'] }}" name="option" class="form-control mb-2 mb-md-0 @error('discount_type_fields.' . $key . '.options') is-invalid @enderror" placeholder="Option"/>
+
+                                                                        @error('discount_type_fields.' . $key . '.options')
+                                                                            <div class="invalid-feedback"> {{ $message }}</div>
+                                                                        @enderror
+                                                                    </div>
+                                                                @endforeach
+                                                            @endif
+                                                        </div>
+                                                        <button class="btn btn-sm btn-flex btn-light-primary" data-repeater-create type="button">
+                                                            <i class="ki-duotone ki-plus fs-5"></i>
+                                                            Add Option
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-3">
+                                                    <a href="javascript:;" data-repeater-delete class="btn btn-sm btn-flex btn-light-danger mt-3 mt-md-9">
+                                                        <i class="ki-duotone ki-trash fs-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                                        Delete Row
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                        <!--end::Form group-->
+
+                        <!--begin::Form group-->
+                        <div class="form-group">
+                            <a href="javascript:;" data-repeater-create class="btn btn-flex btn-light-primary">
+                                <i class="ki-duotone ki-plus fs-3"></i>
+                                Add Field
+                            </a>
+                        </div>
+                        <!--end::Form group-->
+                    </div>
+                    <!--end::Repeater-->
+                </div>
+
 
                 <button type="submit" class="btn btn-primary mt-5 disable-on-click">Submit</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>

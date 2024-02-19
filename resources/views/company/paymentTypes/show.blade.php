@@ -41,7 +41,7 @@
                                     <td>{{ $field->name }}</td>
                                     <td>{{ $field->field_type }}</td>
                                     <td>
-                                        @foreach($field->options as $option)
+                                        @foreach($field->options ?? [] as $option)
                                             <span class="badge badge-light">{{ $option }}</span>
                                         @endforeach
                                     </td>

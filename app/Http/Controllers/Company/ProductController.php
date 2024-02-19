@@ -96,7 +96,6 @@ class ProductController extends Controller
             'status' => 'required',
             'minimum_stock_level' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'maximum_stock_level' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'stock_on_hand' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'raw_items.*.product_id' => 'nullable',
             'raw_items.*.quantity' => 'required_with:raw_items.*.product_id',
             'raw_items.*.uom_id' => 'required_with:raw_items.*.product_id',
@@ -126,14 +125,13 @@ class ProductController extends Controller
             'srp' => $request->input('srp'),
             'cost' => $request->input('cost'),
             'markup' => $request->input('markup'),
-            'serial_number' => $request->input('serial_number'),
-            'vatable' => $request->input('vatable') ?? false,
+            'with_serial' => $request->input('with_serial') ?? false,
+            'vat_exempt' => $request->input('vat_exempt') ?? false,
             'discount_exempt' => $request->input('discount_exempt') ?? false,
             'open_price' => $request->input('open_price') ?? false,
             'status' => $request->input('status'),
             'minimum_stock_level' => $request->input('minimum_stock_level'),
             'maximum_stock_level' => $request->input('maximum_stock_level'),
-            'stock_on_hand' => $request->input('stock_on_hand'),
         ];
 
         $bundledItems = [];
@@ -257,7 +255,6 @@ class ProductController extends Controller
             'status' => 'required',
             'minimum_stock_level' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'maximum_stock_level' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'stock_on_hand' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'raw_items.*.product_id' => 'nullable',
             'raw_items.*.quantity' => 'required_with:raw_items.*.product_id',
             'raw_items.*.uom_id' => 'required_with:raw_items.*.product_id',
@@ -290,14 +287,13 @@ class ProductController extends Controller
             'srp' => $request->input('srp'),
             'cost' => $request->input('cost'),
             'markup' => $request->input('markup'),
-            'serial_number' => $request->input('serial_number'),
-            'vatable' => $request->input('vatable') ?? false,
+            'with_serial' => $request->input('with_serial') ?? false,
+            'vat_exempt' => $request->input('vat_exempt') ?? false,
             'discount_exempt' => $request->input('discount_exempt') ?? false,
             'open_price' => $request->input('open_price') ?? false,
             'status' => $request->input('status'),
             'minimum_stock_level' => $request->input('minimum_stock_level'),
             'maximum_stock_level' => $request->input('maximum_stock_level'),
-            'stock_on_hand' => $request->input('stock_on_hand'),
         ];
 
         $bundledItems = [];

@@ -1,4 +1,31 @@
 $(document).ready(function() {
+    $('#markup_type').on('change', function() {
+        computeSrp();
+    });
+
+    $('.compute-srp').on('keyup', function() {
+        computeSrp();
+    });
+
+    function computeSrp()
+    {
+        var cost  = parseFloat($('#cost').val());
+        var markUpType = $('#markup_type').val();
+        var markUpValue = parseFloat($('#markup').val());
+
+        if (isNaN(cost) || isNaN(markUpValue)) {
+            $('#srp').val(0);
+            return false;
+        }
+
+        var srp = cost + markUpValue;
+        if (markUpType == 'percentage') {
+            srp = cost + (cost * (markUpValue / 100));
+        }
+
+        $('#srp').val(srp);
+    }
+
     $('.department-category-selector').on('change', function() {
         var selectedValue = $(this).val();
         var newOptionsHTML = '';

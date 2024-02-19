@@ -123,7 +123,7 @@
 
                                             <div class="col-md-3">
                                                 <div class="inner-repeater">
-                                                    <div data-repeater-list="option_list" class="mb-5">
+                                                    <div data-repeater-list="options" class="mb-5">
                                                         <div data-repeater-item>
                                                             <label class="form-label">Option:</label>
                                                             <input name="option" class="form-control mb-2 mb-md-0" placeholder="Option"/>

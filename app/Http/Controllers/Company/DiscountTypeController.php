@@ -54,13 +54,60 @@ class DiscountTypeController extends Controller
             'description' => 'required',
             'type' => 'required',
             'discount' => 'required',
+            'department_id' => 'required',
             'status' => 'required',
+            'discount_type_fields.*.name' => 'nullable',
+            'discount_type_fields.*.field_type' => 'required_with:discount_type_fields.*.name',
+            'discount_type_fields.*.options' => [
+                'nullable',
+                function ($attribute, $value, $fail) use($request) {
+                    $index = explode('.', $attribute)[1];
+                    $fieldType = $request->input("discount_type_fields.$index.field_type");
+
+                    if (!empty($value) && !empty($fieldType) && $fieldType !== 'textbox') {
+                        $nonBlankOptions = array_filter($value, function ($option) {
+                            return !empty($option['option']);
+                        });
+
+                        if (empty($nonBlankOptions)) {
+                            $fail('At least one non-blank option is required if field_type is not textbox.');
+                        }
+                    }
+                },
+            ],
+        ], [
+            'discount_type_fields.*.field_type' => 'The field type is required',
         ]);
 
         $postData = $request->all();
         $postData['company_id'] = $company->id;
 
-        if ($this->discountTypeRepository->create($postData)) {
+        $discountTypeFields = [];
+        foreach ($request->input('discount_type_fields') as $field) {
+            if (empty($field['name'])) {
+                continue;
+            }
+
+            $data = [
+                'name' => $field['name'],
+                'field_type' => $field['field_type'],
+            ];
+
+            if (!empty($field['options'])) {
+                foreach ($field['options'] as $option) {
+                    if (empty($option['option'])) {
+                        continue;
+                    }
+
+                    $data['options'][] = $option['option'];
+                }
+            }
+
+            $discountTypeFields[] = $data;
+        }
+
+        unset($postData['discount_type_fields']);
+        if ($this->discountTypeRepository->create($postData, $discountTypeFields)) {
             return redirect()->route('company.discount-types.index', ['companySlug' => $company->slug])->with('success', 'Discount type created successfully.');
         }
 
@@ -120,7 +167,33 @@ class DiscountTypeController extends Controller
         $postData['company_id'] = $company->id;
         $postData['is_vat_exempt'] = $company->is_vat_exempt ?? false;
 
-        if ($this->discountTypeRepository->update($id, $postData)) {
+        $discountTypeFields = [];
+        foreach ($request->input('discount_type_fields') as $field) {
+            if (empty($field['name'])) {
+                continue;
+            }
+
+            $data = [
+                'name' => $field['name'],
+                'field_type' => $field['field_type'],
+            ];
+
+            if (!empty($field['options'])) {
+                foreach ($field['options'] as $option) {
+                    if (empty($option['option'])) {
+                        continue;
+                    }
+
+                    $data['options'][] = $option['option'];
+                }
+            }
+
+            $discountTypeFields[] = $data;
+        }
+
+        unset($postData['discount_type_fields']);
+
+        if ($this->discountTypeRepository->update($id, $postData, $discountTypeFields)) {
             return redirect()->route('company.discount-types.index', ['companySlug' => $company->slug])->with('success', 'Discount type updated successfully.');
         }
 

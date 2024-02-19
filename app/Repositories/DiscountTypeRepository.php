@@ -26,16 +26,28 @@ class DiscountTypeRepository implements DiscountTypeRepositoryInterface
         return DiscountType::find($id);
     }
 
-    public function create(array $data): DiscountType
+    public function create(array $data, array $fieldsData): DiscountType
     {
         $discountType = DiscountType::create($data);
+
+        if (!empty($fieldsData)) {
+            $discountType->fields()->createMany($fieldsData);
+        }
+
         return $discountType;
     }
 
-    public function update(String $id, array $data): Bool
+    public function update(String $id, array $data, array $fieldsData): DiscountType
     {
         $discountType = DiscountType::findOrFail($id);
-        return $discountType->update($data);
+        $discountType->update($data);
+
+        if (!empty($fieldsData)) {
+            $discountType->fields()->delete();
+            $discountType->fields()->createMany($fieldsData);
+        }
+
+        return $discountType;
     }
 
     public function delete(String $id): Bool

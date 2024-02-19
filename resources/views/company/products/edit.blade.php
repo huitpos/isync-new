@@ -86,15 +86,6 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Serial No.</label>
-                    <input value="{{ old('serial_number') ?? $product->serial_number }}" name="serial_number" type="text" class="form-control @error('serial_number') is-invalid @enderror" placeholder="Serial No." required/>
-
-                    @error('serial_number')
-                        <div class="invalid-feedback"> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-4">
                     <label class="form-label">Department</label>
                     <select id="department_id" name="department_id" data-control="select2" data-placeholder="Select Department" class="form-select @error('department_id') is-invalid @enderror department-category-selector" required>
                         <option value=""></option>
@@ -156,13 +147,13 @@
 
                 <div class="mb-4 mt-6">
                     <div class="form-check">
-                        <input {{ $product->vatable ? 'checked' : '' }} class="form-check-input" name="vatable" type="checkbox" value="1"/>
+                        <input {{ $product->vat_exempt ? 'checked' : '' }} class="form-check-input" name="vat_exempt" type="checkbox" value="1"/>
                         <label>
-                            Vatable
+                            Vat exempt
                         </label>
                     </div>
 
-                    @error('vatable')
+                    @error('vat_exempt')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
@@ -189,6 +180,19 @@
                     </div>
 
                     @error('open_price')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4 mt-6">
+                    <div class="form-check">
+                        <input {{ $product->with_serial ? 'checked' : '' }} class="form-check-input" name="with_serial" type="checkbox" value="1"/>
+                        <label>
+                            With Serial
+                        </label>
+                    </div>
+
+                    @error('with_serial')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
@@ -302,15 +306,6 @@
                     <input value="{{ old('maximum_stock_level') ?? $product->maximum_stock_level }}" name="maximum_stock_level" type="text" class="form-control @error('maximum_stock_level') is-invalid @enderror" placeholder="Max. Stock Level" required/>
 
                     @error('maximum_stock_level')
-                        <div class="invalid-feedback"> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-4 mt-7">
-                    <label class="form-label">Running Stock Level</label>
-                    <input value="{{ old('stock_on_hand') ?? $product->stock_on_hand }}" name="stock_on_hand" type="text" class="form-control @error('stock_on_hand') is-invalid @enderror" placeholder="Running Stock Level" required/>
-
-                    @error('stock_on_hand')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>

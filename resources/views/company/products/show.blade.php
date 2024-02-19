@@ -46,11 +46,6 @@
             </div>
 
             <div class="pb-1 fs-6 mt-2">
-                <div class="fw-bold">Serial No.</div>
-                <div class="text-gray-600">{{ $product->serial_number }}</div>
-            </div>
-
-            <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">Deparment.</div>
                 <div class="text-gray-600">{{ $product->department->name }}</div>
             </div>
@@ -78,18 +73,23 @@
             </div>
 
             <div class="pb-1 fs-6 mt-2">
-                <div class="fw-bold">Vatable</div>
-                <div class="text-gray-600">{{ $product->vatable ? 'Yes' : '' }}</div>
+                <div class="fw-bold">Vat Exempt</div>
+                <div class="text-gray-600">{{ $product->vat_exempt ? 'Yes' : 'No' }}</div>
             </div>
 
             <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">Discount Exempt</div>
-                <div class="text-gray-600">{{ $product->discount_exempt ? 'Yes' : '' }}</div>
+                <div class="text-gray-600">{{ $product->discount_exempt ? 'Yes' : 'No' }}</div>
             </div>
 
             <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">Open Price</div>
-                <div class="text-gray-600">{{ $product->open_price ? 'Yes' : '' }}</div>
+                <div class="text-gray-600">{{ $product->open_price ? 'Yes' : 'No' }}</div>
+            </div>
+
+            <div class="pb-1 fs-6 mt-2">
+                <div class="fw-bold">With Serial</div>
+                <div class="text-gray-600">{{ $product->with_serial ? 'Yes' : 'No' }}</div>
             </div>
 
             <h3 class="mt-5 mb-2">Raw Materials</h3>

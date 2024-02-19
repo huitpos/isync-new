@@ -72,6 +72,11 @@
                 <div class="text-gray-600">{{ $branch->barangay->name }}</div>
             </div>
 
+            <div class="pb-1 fs-6">
+                <div class="fw-bold mt-5">Phone Number</div>
+                <div class="text-gray-600">{{ $branch->phone_number }}</div>
+            </div>
+
             <div class="separator separator-dashed my-3"></div>
 
             <h3>Account Registration</h3>

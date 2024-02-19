@@ -28,4 +28,9 @@ class DiscountType extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function fields()
+    {
+        return $this->hasMany(DiscountTypeFields::class);
+    }
 }

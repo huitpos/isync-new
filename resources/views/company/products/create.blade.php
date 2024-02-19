@@ -85,15 +85,6 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Serial No.</label>
-                    <input value="{{ old('serial_number') }}" name="serial_number" type="text" class="form-control @error('serial_number') is-invalid @enderror" placeholder="Serial No." required/>
-
-                    @error('serial_number')
-                        <div class="invalid-feedback"> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-4">
                     <label class="form-label">Department</label>
                     <select id="department_id" name="department_id" data-control="select2" data-placeholder="Select Department" class="form-select @error('department_id') is-invalid @enderror department-category-selector" required>
                         <option value=""></option>
@@ -136,32 +127,53 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">SRP</label>
-                    <input value="{{ old('srp') }}" name="srp" type="text" class="form-control @error('srp') is-invalid @enderror" placeholder="SRP" required/>
-
-                    @error('srp')
-                        <div class="invalid-feedback"> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-4">
                     <label class="form-label">Cost</label>
-                    <input value="{{ old('cost') }}" name="cost" type="text" class="form-control @error('cost') is-invalid @enderror" placeholder="Cost" required/>
+                    <input id="cost" value="{{ old('cost') }}" name="cost" type="number" class="form-control @error('cost') is-invalid @enderror compute-srp" placeholder="Cost" required/>
 
                     @error('cost')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
 
+                <div class="mb-4">
+                    <label class="form-label">Markup Type</label>
+                    <select id="markup_type" name="markup_type" class="form-control @error('status') is-invalid @enderror compute-srp" required>
+                        <option value="fixed" {{ old('status') == 'fixed' ? 'selected' : '' }}>Fixed Amount</option>
+                        <option value="percentage" {{ old('status') == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                    </select>
+
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4 mt-7">
+                    <label class="form-label">Mark Up</label>
+                    <input id="markup" value="{{ old('markup') }}" name="markup" type="number" class="form-control @error('markup') is-invalid @enderror compute-srp" placeholder="Markup" required/>
+
+                    @error('markup')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">SRP</label>
+                    <input id="srp" value="{{ old('srp') ?? 0 }}" name="srp" readonly type="text" class="form-control @error('srp') is-invalid @enderror" placeholder="SRP" required/>
+
+                    @error('srp')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="mb-4 mt-6">
                     <div class="form-check">
-                        <input class="form-check-input" name="vatable" type="checkbox" value="1"/>
+                        <input class="form-check-input" name="vat_exempt" type="checkbox" value="1"/>
                         <label>
-                            Vatable
+                            Vat Exempt
                         </label>
                     </div>
 
-                    @error('vatable')
+                    @error('vat_exempt')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
@@ -188,6 +200,19 @@
                     </div>
 
                     @error('open_price')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4 mt-6">
+                    <div class="form-check">
+                        <input class="form-check-input" name="with_serial" type="checkbox" value="1"/>
+                        <label>
+                            With Serial
+                        </label>
+                    </div>
+
+                    @error('with_serial')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
@@ -292,15 +317,6 @@
                     @enderror
                 </div>
 
-                <div class="mb-4 mt-7">
-                    <label class="form-label">Running Stock Level</label>
-                    <input value="{{ old('stock_on_hand') }}" name="stock_on_hand" type="text" class="form-control @error('stock_on_hand') is-invalid @enderror" placeholder="Running Stock Level" required/>
-
-                    @error('stock_on_hand')
-                        <div class="invalid-feedback"> {{ $message }}</div>
-                    @enderror
-                </div>
-
                 <div class="mt-7">
                     <label class="form-label">Bundled Items</label>
                     <div class="repeater">
@@ -400,15 +416,6 @@
                             <i class="ki-outline ki-cross fs-3"></i>
                         </span>
                     </div>
-                </div>
-
-                <div class="mb-4 mt-7">
-                    <label class="form-label">Mark Up</label>
-                    <input value="{{ old('markup') }}" name="markup" type="text" class="form-control @error('markup') is-invalid @enderror" placeholder="markup" required/>
-
-                    @error('markup')
-                        <div class="invalid-feedback"> {{ $message }}</div>
-                    @enderror
                 </div>
 
                 <div class="mb-4">

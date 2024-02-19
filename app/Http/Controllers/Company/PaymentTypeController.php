@@ -86,6 +86,10 @@ class PaymentTypeController extends Controller
 
         $paymentTypeFields = [];
         foreach ($request->input('payment_type_fields') as $field) {
+            if (empty($field['name'])) {
+                continue;
+            }
+
             $data = [
                 'name' => $field['name'],
                 'field_type' => $field['field_type'],
@@ -186,6 +190,10 @@ class PaymentTypeController extends Controller
 
         $paymentTypeFields = [];
         foreach ($request->input('payment_type_fields') as $field) {
+            if (empty($field['name'])) {
+                continue;
+            }
+
             $data = [
                 'name' => $field['name'],
                 'field_type' => $field['field_type'],
