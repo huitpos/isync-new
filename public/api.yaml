@@ -1403,7 +1403,7 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get company data by company ID.
+      summary: Get machine data by machine ID.
       parameters:
         - in: path
           name: machineId
