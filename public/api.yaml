@@ -1398,3 +1398,64 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /api/machines/{machineId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get company data by company ID.
+      parameters:
+        - in: path
+          name: machineId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    put:
+      tags:
+        - Sync To Server
+      summary: Send machine details to the server.
+      parameters:
+        - in: path
+          name: machineId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the machine
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                or_counter:
+                  type: integer
+                x_reading_counter:
+                  type: integer
+                z_reading_counter:
+                  type: integer
+
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
