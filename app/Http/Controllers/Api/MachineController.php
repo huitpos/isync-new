@@ -47,7 +47,13 @@ class MachineController extends BaseController
      */
     public function show(string $id)
     {
-        //
+        $machine = $this->posMachineRepository->find($id);
+
+        if (!$machine) {
+            return $this->sendError('Machine not found', [], 404, Config::get('app.status_codes')['machine_not_found']);
+        }
+
+        return $this->sendResponse($machine, 'Machine retrieved successfully');
     }
 
     /**
@@ -63,7 +69,30 @@ class MachineController extends BaseController
      */
     public function update(Request $request, string $id)
     {
-        //
+        $machine = $this->posMachineRepository->find($id);
+
+        if (!$machine) {
+            return $this->sendError('Machine not found', [], 404, Config::get('app.status_codes')['machine_not_found']);
+        }
+
+        $validator = validator($request->all(), [
+            'or_counter' => 'required',
+            'x_reading_counter' => 'required',
+            'z_reading_counter' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        // update validator data
+        $machine->update([
+            'or_counter' => $request->or_counter,
+            'x_reading_counter' => $request->x_reading_counter,
+            'z_reading_counter' => $request->z_reading_counter,
+        ]);
+
+        return $this->sendResponse($machine, 'Machine updated successfully');
     }
 
     /**

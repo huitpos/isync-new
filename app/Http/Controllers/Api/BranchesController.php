@@ -24,16 +24,16 @@ class BranchesController extends BaseController
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'company_id' => 'required',
-            'cluster_id' => 'required',
-            'name' => 'required',
-        ]);
+        // $validatedData = $request->validate([
+        //     'company_id' => 'required',
+        //     'cluster_id' => 'required',
+        //     'name' => 'required',
+        // ]);
 
-        $data = $request->all();
-        $data['slug'] = Str::slug($data['name']);
+        // $data = $request->all();
+        // $data['slug'] = Str::slug($data['name']);
 
-        return Branch::create($data);
+        // return Branch::create($data);
     }
 
     /**
@@ -62,18 +62,18 @@ class BranchesController extends BaseController
      */
     public function update(Request $request, string $id)
     {
-        $branch = Branch::find($id);
-        $validatedData = $request->validate([
-            'company_id' => 'required',
-            'cluster_id' => 'required',
-            'name' => 'required',
-        ]);
+        // $branch = Branch::find($id);
+        // $validatedData = $request->validate([
+        //     'company_id' => 'required',
+        //     'cluster_id' => 'required',
+        //     'name' => 'required',
+        // ]);
 
-        $data = $request->all();
-        $data['slug'] = Str::slug($data['name']);
+        // $data = $request->all();
+        // $data['slug'] = Str::slug($data['name']);
 
-        $branch->update($data);
-        return $branch;
+        // $branch->update($data);
+        // return $branch;
     }
 
     /**
@@ -81,6 +81,6 @@ class BranchesController extends BaseController
      */
     public function destroy(string $id)
     {
-        return Branch::destroy($id);
+        // return Branch::destroy($id);
     }
 }

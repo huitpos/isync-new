@@ -223,5 +223,6 @@ return [
         'unauthorised' => 'ISYNC007',
         'invalid_product_key' => 'ISYNC008',
         'device_already_in_use' => 'ISYNC009',
+        'machine_not_found' => 'ISYNC010',
     ]
 ];

@@ -17,7 +17,7 @@ class CompaniesController extends BaseController
      */
     public function index()
     {
-        return Company::all();
+        // return Company::all();
     }
 
     /**
@@ -25,23 +25,23 @@ class CompaniesController extends BaseController
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'company_registered_name' => 'required|unique:companies,company_registered_name|max:100',
-            'company_name' => 'required',
-            'trade_name' => 'required|max:100',
-            'phone_number' => 'max:10',
-            'unit_floor_number' => 'max:100',
-            'street_name' => 'max:100',
-        ], [
-            'client_id.exists' => 'The selected client ID does not exist.',
-        ]);
+        // $validatedData = $request->validate([
+        //     'client_id' => 'required|exists:clients,id',
+        //     'company_registered_name' => 'required|unique:companies,company_registered_name|max:100',
+        //     'company_name' => 'required',
+        //     'trade_name' => 'required|max:100',
+        //     'phone_number' => 'max:10',
+        //     'unit_floor_number' => 'max:100',
+        //     'street_name' => 'max:100',
+        // ], [
+        //     'client_id.exists' => 'The selected client ID does not exist.',
+        // ]);
 
-        $data = $request->all();
+        // $data = $request->all();
 
-        $data['slug'] = Str::slug($data['trade_name']);
+        // $data['slug'] = Str::slug($data['trade_name']);
 
-        return Company::create($data);
+        // return Company::create($data);
     }
 
     /**
@@ -69,20 +69,20 @@ class CompaniesController extends BaseController
      */
     public function update(Request $request, string $id)
     {
-        $company = Company::find($id);
-        $validatedData = $request->validate([
-            'client_id' => 'required',
-            'company_registered_name' => 'required|unique:companies,company_registered_name,' . $company->id,
-            'company_name' => 'required',
-            'trade_name' => 'required',
-        ]);
+        // $company = Company::find($id);
+        // $validatedData = $request->validate([
+        //     'client_id' => 'required',
+        //     'company_registered_name' => 'required|unique:companies,company_registered_name,' . $company->id,
+        //     'company_name' => 'required',
+        //     'trade_name' => 'required',
+        // ]);
 
-        $data = $request->all();
+        // $data = $request->all();
 
-        $data['slug'] = Str::slug($data['trade_name']);
+        // $data['slug'] = Str::slug($data['trade_name']);
 
-        $company->update($data);
-        return $company;
+        // $company->update($data);
+        // return $company;
     }
 
     /**
@@ -90,6 +90,6 @@ class CompaniesController extends BaseController
      */
     public function destroy(string $id)
     {
-        return Company::destroy($id);
+        // return Company::destroy($id);
     }
 }

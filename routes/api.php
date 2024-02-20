@@ -36,16 +36,16 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('users', UsersController::class);
+    // Route::apiResource('users', UsersController::class);
 
-    Route::apiResource('clusters', ClustersController::class);
-    Route::apiResource('regions', RegionController::class);
-    Route::apiResource('region/{regionId}/provinces', ProvinceController::class);
-    Route::apiResource('provinces', ProvinceController::class);
-    Route::apiResource('province/{provinceId}/cities', CityController::class);
-    Route::apiResource('cities', CityController::class);
-    Route::apiResource('city/{cityId}/barangays', BarangayController::class);
-    Route::apiResource('barangays', BarangayController::class);
+    // Route::apiResource('clusters', ClustersController::class);
+    // Route::apiResource('regions', RegionController::class);
+    // Route::apiResource('region/{regionId}/provinces', ProvinceController::class);
+    // Route::apiResource('provinces', ProvinceController::class);
+    // Route::apiResource('province/{provinceId}/cities', CityController::class);
+    // Route::apiResource('cities', CityController::class);
+    // Route::apiResource('city/{cityId}/barangays', BarangayController::class);
+    // Route::apiResource('barangays', BarangayController::class);
 
     //sync
     Route::post('/activate-machine', [MachineController::class, 'activate']);
@@ -54,6 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware([MachineValidationMiddleware::class])->group(function () {
         Route::apiResource('companies', CompaniesController::class);
         Route::apiResource('branches', BranchesController::class);
+        Route::apiResource('machines', MachineController::class);
+
         Route::get('/cash-denominations', [MiscController::class, 'cashDenominations']);
         Route::get('/departments/{branchId}', [MiscController::class, 'departments']);
         Route::get('/categories/{branchId}', [MiscController::class, 'categories']);
@@ -90,6 +92,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/discount-details', [MiscController::class, 'saveDiscountDetails']);
         Route::get('/discount-details', [MiscController::class, 'getDiscountDetails']);
+
+        Route::apiResource('branches', BranchesController::class);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
