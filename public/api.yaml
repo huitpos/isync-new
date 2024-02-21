@@ -359,6 +359,33 @@ paths:
                 type: array
                 items:
                   type: string
+  
+  /api/branch-products/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all charge accounts by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
 
   /api/branch-transactions:
     get:
