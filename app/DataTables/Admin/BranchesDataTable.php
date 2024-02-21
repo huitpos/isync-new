@@ -70,7 +70,6 @@ class BranchesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
             Column::make('company.company_name')->title('company name'),
             Column::make('name')->title('branch name'),
             Column::make('code')->title('branch code'),

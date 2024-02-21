@@ -75,7 +75,7 @@
 								@endif
 
 								<td class="text-start">
-									<span class="text-gray-600">{{ $completedTransaction->pos_machine_id }}</span>
+									<span class="text-gray-600">{{ $completedTransaction->machine?->machine_number }}</span>
 								</td>
 
 								<td class="text-start">
@@ -172,7 +172,7 @@
 									</td>
 
 									<td class="text-start">
-										<span class="text-gray-600">{{ $pendingTransaction->pos_machine_id }}</span>
+										<span class="text-gray-600">{{ $pendingTransaction->machine?->machine_number }}</span>
 									</td>
 
 									<td class="text-start">

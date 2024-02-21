@@ -46,9 +46,18 @@
 
                 <div class="mb-4">
                     <label class="form-label">Item Code</label>
-                    <input value="{{ old('code') ?? $product->code }}" name="code" type="text" class="form-control @error('code') is-invalid @enderror" placeholder="Item Code" required/>
+                    <input value="{{ old('code') ?? $product->code }}" type="text" class="form-control @error('code') is-invalid @enderror" placeholder="Item Code" readonly/>
 
                     @error('code')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">SKU</label>
+                    <input value="{{ old('sku') ?? $product->sku }}" name="sku" type="text" class="form-control @error('sku') is-invalid @enderror" placeholder="SKU"/>
+
+                    @error('sku')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>

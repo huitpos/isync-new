@@ -69,7 +69,6 @@ class ItemTypesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
             Column::make('name'),
             Column::make('created_by.name', 'createdBy.name')->title('Created By'),
             Column::make('status'),

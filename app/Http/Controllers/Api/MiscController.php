@@ -21,6 +21,7 @@ use App\Models\PaymentType;
 use App\Models\Discount;
 use App\Models\DiscountDetail;
 use App\Models\ApiRequestLog;
+use App\Models\DiscountType;
 
 use Illuminate\Support\Facades\Redis;
 
@@ -84,7 +85,9 @@ class MiscController extends BaseController
     {
         $branch = Branch::with('company')->find($branchId);
 
-        $discountTypes = $branch->company->discountTypes;
+        $discountTypes = DiscountType::with('departments')->where('company_id', $branch->company->id)
+            ->orWhereNull('company_id')
+            ->get();
 
         return $this->sendResponse($discountTypes, 'Discount Types retrieved successfully.');
     }

@@ -75,7 +75,6 @@ class ClustersDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
             Column::make('company.company_name')->title('company name'),
             Column::make('name')->title('cluster name'),
             Column::make('status')->title('status'),

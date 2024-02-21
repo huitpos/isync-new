@@ -69,7 +69,6 @@ class UnitOfMeasurementsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
             Column::make('name'),
             Column::make('description'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),

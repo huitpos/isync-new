@@ -70,7 +70,6 @@ class ProductsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
             Column::make('name')->title('Product Name'),
             Column::make('description'),
             Column::make('item_type.name', 'itemType.name')->title('Item Type'),

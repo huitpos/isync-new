@@ -3,23 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Branch;
+use App\Models\Company;
 
 class TestController extends Controller
 {
-    public function mapMachineNumber(Request $request)
+    public function mapData(Request $request)
     {
-        $branches = Branch::all();
+        $companies = Company::all();
 
-        foreach ($branches as $branch) {
-            $machineNumber = 1;
+        foreach ($companies as $company) {
+            $number = 1;
 
-            foreach ($branch->machines as $machine) {
-                $machine->update([
-                    'machine_number' => $machineNumber
+            foreach ($company->products as $data) {
+                $data->update([
+                    'code' => $number
                 ]);
 
-                $machineNumber++;
+                $number++;
             }
         }
 

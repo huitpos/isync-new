@@ -29,6 +29,9 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function create(array $productData, array $bundledData, array $rawData): Product
     {
+        $lastNumber = Product::where('company_id', $productData['company_id'])->max('code');
+        $productData['code'] = $lastNumber + 1;
+
         $product = Product::create($productData);
 
         if (!empty($bundledData)) {

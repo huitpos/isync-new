@@ -45,15 +45,21 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Department</label>
-                    <select class="form-select" name="department_id" data-control="select2" data-close-on-select="true" data-placeholder="Select department">
-                        <option></option>
-                        @foreach ($company->departments as $department)
-                            <option {{ $department->id == $discountType->department_id ? 'selected' : '' }} value="{{ $department->id }}">{{ $department->name }}</option>
+                    @php
+                        $selectedDepartments = [];
+                        foreach ($discountType->departments as $department) {
+                            $selectedDepartments[] = $department->id;
+                        }
+                    @endphp
+
+                    <label class="form-label">Departments</label>
+                    <select class="form-select" name="departments[]" data-control="select2" data-close-on-select="false" data-placeholder="Select department" data-allow-clear="true" multiple="multiple">
+                        @foreach ($departments as $department)
+                            <option value="{{ $department->id }}" {{ in_array($department->id, $selectedDepartments) ? 'selected' : '' }}>{{ $department->name }}</option>
                         @endforeach
                     </select>
 
-                    @error('department_id')
+                    @error('departments')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>

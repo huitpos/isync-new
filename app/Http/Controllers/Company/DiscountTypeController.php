@@ -36,9 +36,11 @@ class DiscountTypeController extends Controller
     public function create(Request $request)
     {
         $company = $request->attributes->get('company');
+        $departments = $company->departments()->where('status', 'active')->get();
 
         return view('company.discountTypes.create', [
-            'company' => $company
+            'company' => $company,
+            'departments' => $departments
         ]);
     }
 
@@ -54,7 +56,6 @@ class DiscountTypeController extends Controller
             'description' => 'required',
             'type' => 'required',
             'discount' => 'required',
-            'department_id' => 'required',
             'status' => 'required',
             'discount_type_fields.*.name' => 'nullable',
             'discount_type_fields.*.field_type' => 'required_with:discount_type_fields.*.name',
@@ -107,7 +108,9 @@ class DiscountTypeController extends Controller
         }
 
         unset($postData['discount_type_fields']);
-        if ($this->discountTypeRepository->create($postData, $discountTypeFields)) {
+        unset($postData['departments']);
+        if ($discountType = $this->discountTypeRepository->create($postData, $discountTypeFields)) {
+            $this->discountTypeRepository->syncDepartments($discountType->id, $request->departments ?? []);
             return redirect()->route('company.discount-types.index', ['companySlug' => $company->slug])->with('success', 'Discount type created successfully.');
         }
 
@@ -139,12 +142,14 @@ class DiscountTypeController extends Controller
     public function edit(Request $request, string $companySlug, int $id)
     {
         $company = $request->attributes->get('company');
+        $departments = $company->departments()->where('status', 'active')->get();
 
         $discountType = $this->discountTypeRepository->find($id);
 
         return view('company.discountTypes.edit', [
             'company' => $company,
             'discountType' => $discountType,
+            'departments' => $departments
         ]);
     }
 
@@ -192,8 +197,10 @@ class DiscountTypeController extends Controller
         }
 
         unset($postData['discount_type_fields']);
+        unset($postData['departments']);
 
         if ($this->discountTypeRepository->update($id, $postData, $discountTypeFields)) {
+            $this->discountTypeRepository->syncDepartments($id, $request->departments ?? []);
             return redirect()->route('company.discount-types.index', ['companySlug' => $company->slug])->with('success', 'Discount type updated successfully.');
         }
 

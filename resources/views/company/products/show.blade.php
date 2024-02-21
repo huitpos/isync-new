@@ -31,6 +31,11 @@
             </div>
 
             <div class="pb-1 fs-6 mt-2">
+                <div class="fw-bold">SKU</div>
+                <div class="text-gray-600">{{ $product->sku }}</div>
+            </div>
+
+            <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">Item Abbreviation</div>
                 <div class="text-gray-600">{{ $product->abbreviation }}</div>
             </div>

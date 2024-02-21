@@ -53,7 +53,7 @@ Route::get('/error', function () {
     abort(500);
 });
 
-Route::get('/map-machine', [TestController::class, 'mapMachineNumber']);
+Route::get('/map-data', [TestController::class, 'mapData']);
 
 require __DIR__ . '/auth.php';
 

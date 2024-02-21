@@ -43,8 +43,7 @@ class DiscountTypesDataTable extends DataTable
             ->where('company_id', $this->company_id)
             ->with([
                 'company',
-                'createdBy',
-                'department'
+                'createdBy'
             ]);
     }
 
@@ -70,10 +69,8 @@ class DiscountTypesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
             Column::make('name')->title('Discount Type'),
             Column::make('description'),
-            Column::make('department.name'),
             Column::make('type'),
             Column::make('discount'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),

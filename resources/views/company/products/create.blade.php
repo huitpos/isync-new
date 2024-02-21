@@ -44,10 +44,10 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Item Code</label>
-                    <input value="{{ old('code') }}" name="code" type="text" class="form-control @error('code') is-invalid @enderror" placeholder="Item Code" required/>
+                    <label class="form-label">SKU</label>
+                    <input value="{{ old('sku') }}" name="sku" type="text" class="form-control @error('sku') is-invalid @enderror" placeholder="SKU" required/>
 
-                    @error('code')
+                    @error('sku')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>

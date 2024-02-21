@@ -55,4 +55,10 @@ class DiscountTypeRepository implements DiscountTypeRepositoryInterface
         $discountType = DiscountType::findOrFail($id);
         return $discountType->delete();
     }
+
+    public function syncDepartments(String $id, array $data): array
+    {
+        $discountType = DiscountType::findOrFail($id);
+        return $discountType->departments()->sync($data);
+    }
 }

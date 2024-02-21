@@ -69,7 +69,6 @@ class SuppliersDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
             Column::make('name')->title('supplier name'),
             Column::make('contact_person'),
             Column::make('contact_number'),

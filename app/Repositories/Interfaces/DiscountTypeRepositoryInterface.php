@@ -13,4 +13,5 @@ interface DiscountTypeRepositoryInterface
     function create(array $attributes, array $fieldsData): DiscountType;
     function update(String $id, array $attributes, array $fieldsData): DiscountType;
     function delete(String $id): Bool;
+    function syncDepartments(String $id, array $attributes): array;
 }

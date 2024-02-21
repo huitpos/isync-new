@@ -78,8 +78,9 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $company = $request->attributes->get('company');
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:products,name,NULL,id,company_id,' . $company->id,
             'description' => 'required',
             'abbreviation' => 'required',
             'department_id' => 'required',
@@ -87,8 +88,7 @@ class ProductController extends Controller
             'subcategory_id' => 'required',
             'uom_id' => 'required',
             'item_type_id' => 'required',
-            // 'image' => 'required',
-            'code' => 'required',
+            'sku' => 'required|unique:products,sku,NULL,id,company_id,' . $company->id,
             'barcode' => 'required',
             'srp' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
@@ -107,8 +107,6 @@ class ProductController extends Controller
             'bundled_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
         ]);
 
-        $company = $request->attributes->get('company');
-
         $productData = [
             'company_id' => $company->id,
             'name' => $request->input('name'),
@@ -120,7 +118,7 @@ class ProductController extends Controller
             'uom_id' => $request->input('uom_id'),
             'item_type_id' => $request->input('item_type_id'),
             'image' => $request->input('image') ?? '',
-            'code' => $request->input('code'),
+            'sku' => $request->input('sku'),
             'barcode' => $request->input('barcode'),
             'srp' => $request->input('srp'),
             'cost' => $request->input('cost'),
@@ -238,8 +236,9 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $companySlug, string $productId)
     {
+        $company = $request->attributes->get('company');
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|unique:products,name,' . $productId . ',id,company_id,' . $company->id,
             'description' => 'required',
             'abbreviation' => 'required',
             'department_id' => 'required',
@@ -247,7 +246,7 @@ class ProductController extends Controller
             'subcategory_id' => 'required',
             'uom_id' => 'required',
             'item_type_id' => 'required',
-            'code' => 'required',
+            'sku' => 'required|unique:products,sku,' . $productId . ',id,company_id,' . $company->id,
             'barcode' => 'required',
             'srp' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
@@ -262,8 +261,6 @@ class ProductController extends Controller
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
         ]);
-
-        $company = $request->attributes->get('company');
 
         $path = '';
         if ($file = $request->file('image')) {
@@ -282,7 +279,7 @@ class ProductController extends Controller
             'uom_id' => $request->input('uom_id'),
             'item_type_id' => $request->input('item_type_id'),
             'image' => $path,
-            'code' => $request->input('code'),
+            'sku' => $request->input('sku'),
             'barcode' => $request->input('barcode'),
             'srp' => $request->input('srp'),
             'cost' => $request->input('cost'),

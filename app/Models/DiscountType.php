@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 use App\Traits\CreatedUpdatedBy;
 
 class DiscountType extends Model
@@ -24,9 +26,9 @@ class DiscountType extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function department()
+    public function departments(): BelongsToMany
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsToMany(Department::class);
     }
 
     public function fields()
