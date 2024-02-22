@@ -68,6 +68,7 @@ class ClientsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('id')->visible(false),
             Column::make('company_name')->title('company name'),
             Column::make('client.name')->title('owner name'),
             Column::make('phone_number')->title('contact no,'),
