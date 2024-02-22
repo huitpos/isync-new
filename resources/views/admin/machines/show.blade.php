@@ -21,7 +21,7 @@
 
             <div class="pb-1 fs-6">
                 <div class="fw-bold mt-5">Machine No.</div>
-                <div class="text-gray-600">{{ $machine->id }}</div>
+                <div class="text-gray-600">{{ $machine->machine_number }}</div>
             </div>
 
             <div class="pb-1 fs-6">

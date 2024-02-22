@@ -69,6 +69,7 @@ class SubcategoriesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('id')->visible(false),
             Column::make('name')->title('Subcategory'),
             Column::make('description'),
             Column::make('created_by.name', 'createdBy.name')->title('Created By'),

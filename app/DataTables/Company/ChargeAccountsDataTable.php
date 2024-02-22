@@ -69,6 +69,7 @@ class ChargeAccountsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('id')->visible(false),
             Column::make('name'),
             Column::make('credit_limit'),
             Column::make('contact_number'),
