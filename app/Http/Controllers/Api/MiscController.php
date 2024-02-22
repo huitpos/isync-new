@@ -839,7 +839,6 @@ class MiscController extends BaseController
             'discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'vat_exempt_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cashier_id' => 'required|exists:users,id',
-            'authorize_id' => 'required|exists:users,id',
             'is_void' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
