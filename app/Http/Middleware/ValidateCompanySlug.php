@@ -42,9 +42,10 @@ class ValidateCompanySlug
 
             if ($branchSlug) {
                 $branch  = Branch::where([
-                    'slug' => $branchSlug,
-                    'id' => $branches
-                ])->first();
+                    'slug' => $branchSlug
+                ])
+                ->whereIn('id', $branches)
+                ->first();
 
                 if (!$branch) {
                     return abort(404, 'Branch not found');
