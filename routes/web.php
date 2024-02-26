@@ -104,6 +104,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('discount-types', CompanyDiscountTypeController::class, ['as' => 'company']);
         Route::resource('item-types', CompanyItemTypeController::class, ['as' => 'company']);
         Route::resource('products', CompanyProductController::class, ['as' => 'company']);
+        Route::get('/import-product', [CompanyProductController::class, 'showForm']);
+        Route::post('/import-product', [CompanyProductController::class, 'import'])->name('company.products.import');
         Route::resource('users', CompanyUserController::class, ['as' => 'company']);
 
         Route::prefix('reports')->group(function () {

@@ -12,6 +12,11 @@ use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\Interfaces\SubcategoryRepositoryInterface;
 use App\DataTables\Company\ProductsDataTable;
 
+use App\Imports\ProductsImport;
+use Maatwebsite\Excel\Facades\Excel;
+
+use App\Models\Product;
+
 class ProductController extends Controller
 {
     protected $productRepository;
@@ -89,7 +94,7 @@ class ProductController extends Controller
             'uom_id' => 'required',
             'item_type_id' => 'required',
             'sku' => 'required|unique:products,sku,NULL,id,company_id,' . $company->id,
-            'barcode' => 'required',
+            'barcode' => 'required|unique:products,barcode,NULL,id,company_id,' . $company->id,
             'srp' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'markup' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
@@ -247,7 +252,7 @@ class ProductController extends Controller
             'uom_id' => 'required',
             'item_type_id' => 'required',
             'sku' => 'required|unique:products,sku,' . $productId . ',id,company_id,' . $company->id,
-            'barcode' => 'required',
+            'barcode' => 'required|unique:products,barcode,' . $productId . ',id,company_id,' . $company->id,
             'srp' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'markup' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
@@ -338,5 +343,43 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function import(Request $request)
+    {
+        $company = $request->attributes->get('company');
+
+        $request->validate([
+            'file' => 'required|mimes:xlsx',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->store('uploads');
+
+        $import = new ProductsImport($request->attributes->get('company')->id);
+
+        Excel::import($import, $path);
+
+        foreach ($import->getData() as $product) {
+            Product::updateOrCreate(
+                [
+                    'name' => $product['name'],
+                    'company_id' => $product['company_id']
+                ],
+                $product
+            );
+        }
+
+        return redirect()->route('company.products.index', ['companySlug' => $company->slug])
+                ->with('success', 'Products imported successfully');
+    }
+
+    public function showForm(Request $request)
+    {
+        $company = $request->attributes->get('company');
+
+        return view('company.products.import', [
+            'company' => $company
+        ]);
     }
 }
