@@ -25,4 +25,14 @@ class UnitOfMeasurement extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function conversions()
+    {
+        return $this->hasMany(UnitConversion::class, 'from_unit_id');
+    }
+
+    public function conversionsTo()
+    {
+        return $this->hasMany(UnitConversion::class, 'to_unit_id');
+    }
 }

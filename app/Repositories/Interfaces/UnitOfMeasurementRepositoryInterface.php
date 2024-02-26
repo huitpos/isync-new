@@ -13,4 +13,5 @@ interface UnitOfMeasurementRepositoryInterface
     function create(array $attributes): UnitOfMeasurement;
     function update(String $id, array $attributes): Bool;
     function delete(String $id): Bool;
+    function syncConversion(String $id, array $attributes): Collection;
 }

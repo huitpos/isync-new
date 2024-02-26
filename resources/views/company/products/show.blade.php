@@ -105,7 +105,7 @@
                         <thead>
                             <tr class="fw-bold fs-6 text-gray-800">
                                 <th>Product</th>
-                                <th>Quanity</th>
+                                <th>Quantity</th>
                                 <th>Unit of Measurement</th>
                             </tr>
                         </thead>
@@ -147,7 +147,7 @@
                         <thead>
                             <tr class="fw-bold fs-6 text-gray-800">
                                 <th>Product</th>
-                                <th>Quanity</th>
+                                <th>Quantity</th>
                             </tr>
                         </thead>
                         <tbody>

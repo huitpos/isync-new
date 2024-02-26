@@ -41,4 +41,23 @@ class UnitOfMeasurementRepository implements UnitOfMeasurementRepositoryInterfac
         $uom = UnitOfMeasurement::findOrFail($id);
         return $uom->delete();
     }
+
+    public function syncConversion(String $id, array $data): Collection
+    {
+        $unitOfMeasurement = UnitOfMeasurement::find($id);
+
+        $previousConversions = $unitOfMeasurement->conversions()->pluck('id')->toArray();
+
+        $unitOfMeasurement->conversions()
+            ->whereIn('id', $previousConversions)
+            ->where('company_id', $unitOfMeasurement->company_id)
+            ->where('from_unit_id', $unitOfMeasurement->id)
+            ->delete();
+
+        if (empty($data)) {
+            return collect([]);
+        }
+
+        return $unitOfMeasurement->conversions()->createMany($data);
+    }
 }

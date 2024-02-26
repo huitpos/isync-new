@@ -9,6 +9,8 @@ use App\Repositories\Interfaces\UnitOfMeasurementRepositoryInterface;
 
 use App\DataTables\Company\UnitOfMeasurementsDataTable;
 
+use App\Models\UnitConversion;
+
 class UnitOfMeasurementController extends Controller
 {
     protected $uomRepository;
@@ -61,7 +63,7 @@ class UnitOfMeasurementController extends Controller
             return redirect()->route('company.unit-of-measurements.index', ['companySlug' => $company->slug])->with('success', 'Data has been stored successfully!');
         }
 
-        return redirect()->back()->with('success', 'Data has been stored successfully!');
+        return redirect()->back()->with('error', 'Error occurred while saving data!');
     }
 
     /**
@@ -76,10 +78,15 @@ class UnitOfMeasurementController extends Controller
             return abort(404);
         }
 
-        return view('company.unitOfMeasurements.show', [
-            'company' => $company,
-            'uom' => $uom,
+        $otherUoms = $this->uomRepository->get([
+            ['company_id', '=',  $company->id],
+            ['id', '!=', $id]
         ]);
+
+        $conversions = $uom->conversions;
+        $toConversions = $uom->conversionsTo;
+
+        return view('company.unitOfMeasurements.show', compact('company', 'uom', 'otherUoms', 'conversions', 'toConversions'));
     }
 
     /**
@@ -126,7 +133,7 @@ class UnitOfMeasurementController extends Controller
             return redirect()->route('company.unit-of-measurements.index', ['companySlug' => $company->slug])->with('success', 'Data has been updated successfully!');
         }
 
-        return redirect()->back()->with('success', 'Data has been updated successfully!');
+        return redirect()->back()->with('error', 'Error occurred while updating data!');
     }
 
     /**
@@ -135,5 +142,51 @@ class UnitOfMeasurementController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function saveConversion(Request $request)
+    {
+        $allConversions = UnitConversion::where('to_unit_id', $request->input('uom_id'))->get();
+        $allFromConversions = $allConversions->pluck('from_unit_id')->toArray();
+
+        $request->validate([
+            'unit_conversions.*.to_unit_id' => [
+                'required_with:unit_conversions.*.value',
+                'distinct',
+                function ($attribute, $value, $fail) use ($request, $allFromConversions) {
+                    if (in_array($value, $allFromConversions)) {
+                        $fail('Conversion already exists!');
+                    }
+                },
+            ],
+            'unit_conversions.*.value' => 'required_with:unit_conversions.*.to_unit_id',
+        ], [
+            'unit_conversions.*.to_unit_id' => 'This field is required or has duplicate value', 
+            'unit_conversions.*.value' => 'The field is required',
+        ]);
+
+        $company = $request->attributes->get('company');
+
+        $postData = $request->all();
+        $conversionData = [];
+        if (!empty($postData['unit_conversions'])) {
+            foreach ($postData['unit_conversions'] as $conversion) {
+                if (empty($conversion['value']) && empty($conversion['to_unit_id'])) {
+                    continue;
+                }
+
+                $conversionData[] = [
+                    'to_unit_id' => $conversion['to_unit_id'],
+                    'value' => $conversion['value'],
+                    'company_id' => $company->id,
+                ];
+            }
+        }
+
+        if ($this->uomRepository->syncConversion($postData['uom_id'], $conversionData)) {
+            return redirect()->back()->with('success', 'Data has been updated successfully!');
+        }
+
+        return redirect()->back()->with('error', 'Error occurred while updating data!');
     }
 }

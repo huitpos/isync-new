@@ -150,8 +150,6 @@
                                         if (!$fromOld) {
                                             $fields = $discountType->fields->toArray();
                                         }
-
-                                        // dd($fields);
                                     @endphp
 
                                     @foreach ($fields as $key => $field)

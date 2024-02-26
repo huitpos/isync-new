@@ -97,6 +97,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('categories', CompanyCategoryController::class, ['as' => 'company']);
         Route::resource('subcategories', CompanySubcategoryController::class, ['as' => 'company']);
         Route::resource('unit-of-measurements', CompanyUnitOfMeasurementController::class, ['as' => 'company']);
+        Route::post('/unit-of-measurements/save-conversion', [CompanyUnitOfMeasurementController::class, 'saveConversion'])->name('company.unit-of-measurements.save-conversion');
         Route::resource('payment-types', CompanyPaymentTypeController::class, ['as' => 'company']);
         Route::resource('charge-accounts', CompanyChargeAccountController::class, ['as' => 'company']);
         Route::resource('banks', CompanyBankController::class, ['as' => 'company']);

@@ -1,6 +1,6 @@
 $(document).ready(function () {
     $('.repeater').repeater({
-        initEmpty: false,
+        initEmpty: $('.repeater').data('init-empty') || false,
         defaultValues: {
             'text-input': 'foo'
         },
