@@ -65,4 +65,9 @@ class Branch extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function deliveryLocations()
+    {
+        return $this->hasMany(DeliveryLocation::class);
+    }
 }

@@ -168,7 +168,7 @@ var KTApp = function () {
         var elements = [].slice.call(document.querySelectorAll('[data-kt-daterangepicker="true"]'));
         var start = moment().subtract(29, 'days');
         var end = moment();
-        
+
         elements.map(function (element) {
             if (element.getAttribute("data-kt-initialized") === "1") {
                 return;
@@ -186,7 +186,7 @@ var KTApp = function () {
                         display.innerHTML = start.format('D MMM YYYY');
                     } else {
                         display.innerHTML = start.format('D MMM YYYY') + ' - ' + end.format('D MMM YYYY');
-                    }                    
+                    }
                 }
             }
 
@@ -239,6 +239,31 @@ var KTApp = function () {
 
             if (element.getAttribute('data-hide-search') == 'true') {
                 options.minimumResultsForSearch = Infinity;
+            }
+
+            if (element.hasAttribute('data-ajax-url')) {
+                var query = {};
+
+                if (element.getAttribute('data-param-link')) {
+                    var paramLink = element.getAttribute('data-param-link');
+                    var paramName = element.getAttribute('data-param-name');
+                    var paramValueElement = document.querySelector(paramLink);
+
+                    var query = {};
+
+                    query[paramName] = paramValueElement.value;
+                }
+
+                options.ajax = {
+                    url: element.getAttribute('data-ajax-url'),
+                    dataType: 'json',
+                    delay: 250,
+                    cache: true,
+                    data: function (params) {
+                        var mergedData = Object.assign({}, params, query);
+                        return mergedData;
+                    }
+                };
             }
 
             $(element).select2(options);

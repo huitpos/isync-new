@@ -19,6 +19,7 @@ class ValidateCompanySlug
     {
         $companySlug = $request->route('companySlug');
 
+        /** @var \App\Models\User */
         $user = auth()->user();
 
         $branches = $user->activeBranches->pluck('id')->toArray();

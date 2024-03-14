@@ -128,7 +128,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Vat</label>
-                    <input value="{{ old('vat') }}" name="vat" type="text" class="form-control @error('vat') is-invalid @enderror" placeholder="Cash Amount Limit" required/>
+                    <input value="{{ old('vat') }}" name="vat" type="text" class="form-control @error('vat') is-invalid @enderror" placeholder="Vat" required/>
 
                     @error('vat')
                         <div class="invalid-feedback"> {{ $message }}</div>
