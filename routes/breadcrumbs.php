@@ -342,9 +342,19 @@ Breadcrumbs::for('company.paymentTerms.index', function (BreadcrumbTrail $trail,
     $trail->push('Payment Terms', route('company.payment-terms.index', ['companySlug' => $company->slug]));
 });
 
+Breadcrumbs::for('company.paymentTerms.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.paymentTerms.index', $company);
+    $trail->push('Create');
+});
+
 Breadcrumbs::for('company.supplierTerms.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
     $trail->push('Supplier Terms', route('company.supplier-terms.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.supplierTerms.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.supplierTerms.index', $company);
+    $trail->push('Create');
 });
 
 

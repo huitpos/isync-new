@@ -5,7 +5,7 @@
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.chargeAccounts.create', $company) }}
+        {{ Breadcrumbs::render('company.supplierTerms.create', $company) }}
     @endsection
 
     <div class="card">
