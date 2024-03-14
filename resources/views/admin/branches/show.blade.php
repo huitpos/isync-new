@@ -109,7 +109,7 @@
             <div class="card-toolbar">
                 <div class="d-flex align-items-center position-relative my-1">
                     {!! getIcon('magnifier', 'fs-3 position-absolute ms-5') !!}
-                    <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search machine" id="searchBar"/>
+                    <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search" id="searchBar"/>
                 </div>
 
                 <div class="d-flex justify-content-end m-3" data-kt-user-table-toolbar="base">

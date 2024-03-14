@@ -7,6 +7,8 @@ use App\Models\Province;
 use App\Models\City;
 use App\Models\Barangay;
 use App\Models\Cluster;
+use App\Models\Product;
+use App\Models\Department;
 
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\Interfaces\SubcategoryRepositoryInterface;
@@ -56,6 +58,13 @@ class AjaxController extends Controller
         return response()->json($categories);
     }
 
+    public function getDepartmentSuppliers(Request $request)
+    {
+        $department = Department::with('suppliers')->find($request->department_id);
+
+        return response()->json($department->suppliers);
+    }
+
     public function getCategorySubcategories(Request $request)
     {
         $subcategories = $this->subcategoryRepository->get([
@@ -64,5 +73,52 @@ class AjaxController extends Controller
         ]);
 
         return response()->json($subcategories);
+    }
+
+    public function getProducts(Request $request)
+    {
+        $productsQuery = Product::query();
+
+        if ($request->has('department_id')) {
+            $productsQuery->where('department_id', $request->department_id);
+        }
+
+        if ($request->has('term')) {
+            $term = '%' . $request->term . '%'; // Add wildcard % before and after the search term
+            $productsQuery->where('name', 'like', $term);
+        }
+
+        $products = $productsQuery->get();
+
+        $responseData = [];
+        foreach ($products as $product) {
+            $responseData[] = [
+                'id' => $product->id,
+                'text' => $product->name
+            ];
+        }
+
+        return response()->json(['results' => $responseData]);
+    }
+
+    public function getProductUoms(Request $request)
+    {
+        $product = Product::find($request->product_id);
+
+        $uom = $product->uom;
+
+        $responseData[] = [
+            'id' => $uom->id,
+            'text' => $uom->name
+        ];
+
+        return response()->json($responseData);
+    }
+
+    public function getProductDetails()
+    {
+        $product = Product::find(request()->product_id);
+
+        return response()->json($product);
     }
 }

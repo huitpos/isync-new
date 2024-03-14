@@ -127,4 +127,15 @@ class Company extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function supplierTerms()
+    {
+        return $this->hasMany(SupplierTerm::class);
+    }
+
+    // payment terms
+    public function paymentTerms()
+    {
+        return $this->hasMany(PaymentTerm::class);
+    }
 }

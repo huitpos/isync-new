@@ -148,7 +148,7 @@ class MachineController extends BaseController
         }
 
         if ($devices->count() > 0) {
-            return $this->sendError('Device already in use', [], 404, Config::get('app.status_codes')['device_already_in_use']);
+            return $this->sendError('Product key already in use', [], 404, Config::get('app.status_codes')['device_already_in_use']);
         }
 
         if (!$request->has('device_id')) {

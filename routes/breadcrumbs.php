@@ -307,8 +307,45 @@ Breadcrumbs::for('company.reports.viewTransaction', function (BreadcrumbTrail $t
     $trail->push($transaction->id);
 });
 
+Breadcrumbs::for('company.purchaseRequests.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Purchase Requests', route('company.purchase-requests.index', ['companySlug' => $company->slug]));
+});
 
+Breadcrumbs::for('company.purchaseRequests.show', function (BreadcrumbTrail $trail, $company, $pr) {
+    $trail->parent('company.purchaseRequests.index', $company);
+    $trail->push($pr->pr_number);
+});
 
+Breadcrumbs::for('company.purchaseOrders.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Purchase Orders', route('company.purchase-orders.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.purchaseOrders.show', function (BreadcrumbTrail $trail, $company, $po) {
+    $trail->parent('company.purchaseOrders.index', $company);
+    $trail->push($po->po_number);
+});
+
+Breadcrumbs::for('company.purchaseDeliveries.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Purchase Deliveries', route('company.purchase-orders.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.purchaseDeliveries.show', function (BreadcrumbTrail $trail, $company, $pd) {
+    $trail->parent('company.purchaseDeliveries.index', $company);
+    $trail->push($pd->pd_number);
+});
+
+Breadcrumbs::for('company.paymentTerms.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Payment Terms', route('company.payment-terms.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.supplierTerms.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Supplier Terms', route('company.supplier-terms.index', ['companySlug' => $company->slug]));
+});
 
 
 
@@ -346,4 +383,42 @@ Breadcrumbs::for('branch.users.create', function (BreadcrumbTrail $trail, $compa
 Breadcrumbs::for('branch.users.edit', function (BreadcrumbTrail $trail, $company, $branch) {
     $trail->parent('branch.users.index', $company, $branch);
     $trail->push('Edit');
+});
+
+Breadcrumbs::for('branch.purchaseRequests.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Purchase Requests', route('branch.purchase-requests.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.purchaseRequests.create', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('branch.purchaseRequests.index', $company, $branch);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('branch.purchaseRequests.show', function (BreadcrumbTrail $trail, $company, $branch, $pr) {
+    $trail->parent('branch.purchaseRequests.index', $company, $branch);
+    $trail->push($pr->pr_number);
+});
+
+Breadcrumbs::for('branch.purchaseOrders.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Purchase Orders', route('branch.purchase-orders.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.purchaseOrders.show', function (BreadcrumbTrail $trail, $company, $branch, $po) {
+    $trail->parent('branch.purchaseOrders.index', $company, $branch);
+    $trail->push($po->po_number);
+});
+
+Breadcrumbs::for('branch.deliveryLocations.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Delivery Locations', route('branch.delivery-locations.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.deliveryLocations.create', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('branch.deliveryLocations.index', $company, $branch);
+    $trail->push('Create');
 });

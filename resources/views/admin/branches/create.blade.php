@@ -15,7 +15,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Status</label>
-                    <select id="status" name="status" class="form-control @error('status') is-invalid @enderror" required>
+                    <select id="status" name="status" class="form-select @error('status') is-invalid @enderror" required>
                         <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
@@ -27,7 +27,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Company Name</label>
-                    <select id="company_id" name="company_id" data-control="select2" data-placeholder="Select a company" class="form-control @error('company_id') is-invalid @enderror company-cluster-selector" required>
+                    <select id="company_id" name="company_id" data-control="select2" data-placeholder="Select a company" class="form-select @error('company_id') is-invalid @enderror company-cluster-selector" required>
                         <option value=""></option>
                         @foreach ($companies as $company)`
                             <option value="{{ $company->id }}" {{ $company->id == old('company_id') ? 'selected' : '' }}>{{ $company->company_name }}</option>
@@ -63,7 +63,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Branch Cluster</label>
-                    <select id="cluster_id" name="cluster_id" data-control="select2" data-placeholder="Select a cluster" class="form-control @error('cluster_id') is-invalid @enderror" required>
+                    <select id="cluster_id" name="cluster_id" data-control="select2" data-placeholder="Select a cluster" class="form-select @error('cluster_id') is-invalid @enderror" required>
                         <option value=""></option>
                         @if (!empty($company->clusters))
                             @foreach ($company->clusters as $cluster)`
