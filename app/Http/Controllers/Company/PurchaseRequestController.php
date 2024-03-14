@@ -126,6 +126,7 @@ class PurchaseRequestController extends Controller
                     'uom_id' => $item->uom_id,
                     'unit_price' => $item->unit_price,
                     'quantity' => $item->quantity,
+                    'balance' => $item->quantity,
                     'total' => $item->total,
                     'pr_remarks' => $item->remarks,
                 ];
