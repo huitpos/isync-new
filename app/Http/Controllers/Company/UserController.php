@@ -61,6 +61,7 @@ class UserController extends Controller
 
         $postData = $request->all();
         $postData['company_id'] = $company->id;
+        $postData['name'] = $postData['first_name'] . ' ' . $postData['last_name'];
         if ($this->userRepository->create($postData)) {
             return redirect()->route('company.users.index', ['companySlug' => $company->slug])->with('success', 'User created successfully.');
         }
