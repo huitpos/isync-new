@@ -87,52 +87,54 @@ class PurchaseRequestController extends Controller
         $data['action_by'] = auth()->user()->id;
 
         if ($pr->update($data)) {
-            $pr = PurchaseRequest::findOrFail($id);
-            $branch = $pr->branch;
+            if ($request->status === 'approved') {
+                $pr = PurchaseRequest::findOrFail($id);
+                $branch = $pr->branch;
 
-            $poCount = PurchaseOrder::where([
-                'branch_id' => $branch->id
-            ])->count();
+                $poCount = PurchaseOrder::where([
+                    'branch_id' => $branch->id
+                ])->count();
 
-            $branchCode = strtoupper($branch->branch_code);
-            $date = date('Ymd');
-            $counter = str_pad($poCount+1, 4, '0', STR_PAD_LEFT);
-            $poNumber = "PO$branchCode$date$counter";
+                $branchCode = strtoupper($branch->branch_code);
+                $date = date('Ymd');
+                $counter = str_pad($poCount+1, 4, '0', STR_PAD_LEFT);
+                $poNumber = "PO$branchCode$date$counter";
 
-            $poData = [
-                'branch_id' => $pr->branch_id,
-                'department_id' => $pr->department_id,
-                'delivery_location_id' => $pr->delivery_location_id,
-                'supplier_id' => $pr->supplier_id,
-                'payment_term_id' => $pr->payment_term_id,
-                'supplier_term_id' => $pr->supplier_term_id,
-                'purchase_request_id' => $pr->id,
-                'po_number' => $poNumber,
-                'date_needed' => $pr->date_needed,
-                'pr_remarks' => $pr->remarks,
-                'total' => $pr->total,
-                'status' => 'approved',
-                'action_by' => auth()->user()->id,
-            ];
-
-            $purchaseOrder = new PurchaseOrder();
-            $purchaseOrder->fill($poData);
-            $purchaseOrder->save();
-
-            $poItems = [];
-            foreach ($pr->items as $item) {
-                $poItems[] = [
-                    'product_id' => $item->product_id,
-                    'uom_id' => $item->uom_id,
-                    'unit_price' => $item->unit_price,
-                    'quantity' => $item->quantity,
-                    'balance' => $item->quantity,
-                    'total' => $item->total,
-                    'pr_remarks' => $item->remarks,
+                $poData = [
+                    'branch_id' => $pr->branch_id,
+                    'department_id' => $pr->department_id,
+                    'delivery_location_id' => $pr->delivery_location_id,
+                    'supplier_id' => $pr->supplier_id,
+                    'payment_term_id' => $pr->payment_term_id,
+                    'supplier_term_id' => $pr->supplier_term_id,
+                    'purchase_request_id' => $pr->id,
+                    'po_number' => $poNumber,
+                    'date_needed' => $pr->date_needed,
+                    'pr_remarks' => $pr->remarks,
+                    'total' => $pr->total,
+                    'status' => 'approved',
+                    'action_by' => auth()->user()->id,
                 ];
-            }
 
-            $purchaseOrder->items()->createMany($poItems);
+                $purchaseOrder = new PurchaseOrder();
+                $purchaseOrder->fill($poData);
+                $purchaseOrder->save();
+
+                $poItems = [];
+                foreach ($pr->items as $item) {
+                    $poItems[] = [
+                        'product_id' => $item->product_id,
+                        'uom_id' => $item->uom_id,
+                        'unit_price' => $item->unit_price,
+                        'quantity' => $item->quantity,
+                        'balance' => $item->quantity,
+                        'total' => $item->total,
+                        'pr_remarks' => $item->remarks,
+                    ];
+                }
+
+                $purchaseOrder->items()->createMany($poItems);
+            }
 
             return redirect()->route('company.purchase-requests.show', [
                 'companySlug' => $companySlug,
