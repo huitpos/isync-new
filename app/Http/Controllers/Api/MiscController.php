@@ -142,6 +142,10 @@ class MiscController extends BaseController
             'is_complete' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
             'branch_id' => 'required|exists:branches,id',
+
+            'total_quantity' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total_void_qty' => 'required|numeric',
+            'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
         ]);
 
         if ($validator->fails()) {
@@ -198,6 +202,10 @@ class MiscController extends BaseController
             'guest_name' => $request->guest_name,
             'is_resume_printed' => $request->is_resume_printed ?? false,
             'treg' => $request->treg,
+            'backout_at' => $request->backout_at,
+            'total_quantity' => $request->total_quantity,
+            'total_void_qty' => $request->total_void_qty,
+            'vat_expense' => $request->vat_expense,
         ];
 
         //check if existing. update if yes
@@ -270,6 +278,10 @@ class MiscController extends BaseController
             'is_completed' => 'required|boolean',
             'branch_id' => 'required|exists:branches,id',
             'is_cut_off' => 'required|boolean',
+            'is_discount_exempt' => 'required|boolean',
+            'is_open_price' => 'required|boolean',
+            'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'with_serial' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -323,6 +335,11 @@ class MiscController extends BaseController
             'cut_off_at' => $request->cut_off_at,
             'discount_details_id' => $request->discount_details_id,
             'treg' => $request->treg,
+            'is_discount_exempt' => $request->is_discount_exempt,
+            'is_open_price' => $request->is_open_price,
+            'remarks' => $request->remarks,
+            'vat_expense' => $request->vat_expense,
+            'with_serial' => $request->with_serial,
         ];
 
         $order = Order::where([
@@ -372,6 +389,7 @@ class MiscController extends BaseController
             'amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'is_advance_payment' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
+            'is_void' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -394,6 +412,10 @@ class MiscController extends BaseController
             'cut_off_id' => $request->cut_off_id,
             'cut_off_at' => $request->cut_off_at,
             'treg' => $request->treg,
+            'is_void' => $request->is_void,
+            'void_at' => $request->void_at ?? null,
+            'void_by' => $request->void_by ?? null,
+            'void_by_id' => $request->void_by_id ?? null,
         ];
 
         $payment = Payment::where([
@@ -443,6 +465,10 @@ class MiscController extends BaseController
             'authorize_id' => 'required|exists:users,id',
             'is_cut_off' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
+
+            'end_of_day_id' => 'required|exists:transactional_db.end_of_days,end_of_day_id',
+            'is_auto' => 'required|boolean',
+            'short_over' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
         ]);
 
         if ($validator->fails()) {
@@ -460,10 +486,12 @@ class MiscController extends BaseController
             'authorize_name' => $request->authorize_name,
             'is_cut_off' => $request->is_cut_off,
             'cut_off_id' => $request->cut_off_id,
-            'cut_off_at' => $request->cut_off_at,
             'is_sent_to_server' => $request->is_sent_to_server,
             'shift_number' => $request->shift_number,
             'treg' => $request->treg,
+            'end_of_day_id' => $request->end_of_day_id,
+            'is_auto' => $request->is_auto,
+            'short_over' => $request->short_over,
         ];
 
         $safekeeping = Safekeeping::where([
@@ -513,6 +541,9 @@ class MiscController extends BaseController
             'total' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'branch_id' => 'required|exists:branches,id',
             'pos_machine_id' => 'required|exists:pos_machines,id',
+            'end_of_day_id' => 'required|exists:transactional_db.end_of_days,end_of_day_id',
+            'is_cut_off' => 'required|boolean',
+            'is_sent_to_server' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -532,6 +563,9 @@ class MiscController extends BaseController
             'shift_number' => $request->shift_number,
             'cut_off_id' => $request->cut_off_id,
             'treg' => $request->treg,
+            'end_of_day_id' => $request->end_of_day_id,
+            'is_cut_off' => $request->is_cut_off,
+            'is_sent_to_server' => $request->is_sent_to_server,
         ];
 
         $safekeepingDenomination = SafekeepingDenomination::where([
@@ -590,29 +624,19 @@ class MiscController extends BaseController
             'vat_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'void_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_cash_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_card_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_online_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_ar_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_mobile_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_change' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'senior_count' => 'required|numeric',
-            'senior_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'pwd_count' => 'required|numeric',
-            'pwd_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'others_count' => 'required|numeric',
-            'others_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_payout' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_service_charge' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_ar_cash_redeemed_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_ar_card_redeemed_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_sk' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cashier_id' => 'required|exists:users,id',
             'admin_id' => 'required|exists:users,id',
             'shift_number' => 'required',
             'is_sent_to_server' => 'required|boolean',
+            'reading_number' => 'required|numeric',
+            'void_qty' => 'required|numeric',
+            'total_short_over' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
         ]);
 
         if ($validator->fails()) {
@@ -635,24 +659,10 @@ class MiscController extends BaseController
             'vat_amount' => $request->vat_amount,
             'vat_expense' => $request->vat_expense,
             'void_amount' => $request->void_amount,
-            'total_cash_payments' => $request->total_cash_payments,
-            'total_card_payments' => $request->total_card_payments,
-            'total_online_payments' => $request->total_online_payments,
-            'total_ar_payments' => $request->total_ar_payments,
-            'total_mobile_payments' => $request->total_mobile_payments,
             'total_change' => $request->total_change,
-            'senior_count' => $request->senior_count,
-            'senior_amount' => $request->senior_amount,
-            'pwd_count' => $request->pwd_count,
-            'pwd_amount' => $request->pwd_amount,
-            'others_count' => $request->others_count,
-            'others_amount' => $request->others_amount,
-            'others_json' => $request->others_json,
             'total_payout' => $request->total_payout,
             'total_service_charge' => $request->total_service_charge,
             'total_discount_amount' => $request->total_discount_amount,
-            'total_ar_cash_redeemed_amount' => $request->total_ar_cash_redeemed_amount,
-            'total_ar_card_redeemed_amount' => $request->total_ar_card_redeemed_amount,
             'total_cost' => $request->total_cost,
             'total_sk' => $request->total_sk,
             'cashier_id' => $request->cashier_id,
@@ -662,6 +672,9 @@ class MiscController extends BaseController
             'shift_number' => $request->shift_number,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'reading_number' => $request->reading_number,
+            'void_qty' => $request->void_qty,
+            'total_short_over' => $request->total_short_over,
         ];
 
         $endOfDay = EndOfDay::where([
@@ -716,29 +729,19 @@ class MiscController extends BaseController
             'vat_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'void_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_cash_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_card_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_online_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_ar_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_mobile_payments' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_change' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'senior_count' => 'required|numeric',
-            'senior_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'pwd_count' => 'required|numeric',
-            'pwd_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'others_count' => 'required|numeric',
-            'others_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_payout' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_service_charge' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_ar_cash_redeemed_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
-            'total_ar_card_redeemed_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_sk' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cashier_id' => 'required|exists:users,id',
             'admin_id' => 'required|exists:users,id',
             'shift_number' => 'required',
             'is_sent_to_server' => 'required|boolean',
+            'reading_number' => 'required|numeric',
+            'void_qty' => 'required|numeric',
+            'total_short_over' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
         ]);
 
         if ($validator->fails()) {
@@ -762,24 +765,10 @@ class MiscController extends BaseController
             'vat_amount' => $request->vat_amount,
             'vat_expense' => $request->vat_expense,
             'void_amount' => $request->void_amount,
-            'total_cash_payments' => $request->total_cash_payments,
-            'total_card_payments' => $request->total_card_payments,
-            'total_online_payments' => $request->total_online_payments,
-            'total_ar_payments' => $request->total_ar_payments,
-            'total_mobile_payments' => $request->total_mobile_payments,
             'total_change' => $request->total_change,
-            'senior_count' => $request->senior_count,
-            'senior_amount' => $request->senior_amount,
-            'pwd_count' => $request->pwd_count,
-            'pwd_amount' => $request->pwd_amount,
-            'others_count' => $request->others_count,
-            'others_amount' => $request->others_amount,
-            'others_json' => $request->others_json,
             'total_payout' => $request->total_payout,
             'total_service_charge' => $request->total_service_charge,
             'total_discount_amount' => $request->total_discount_amount,
-            'total_ar_cash_redeemed_amount' => $request->total_ar_cash_redeemed_amount,
-            'total_ar_card_redeemed_amount' => $request->total_ar_card_redeemed_amount,
             'total_cost' => $request->total_cost,
             'total_sk' => $request->total_sk,
             'cashier_id' => $request->cashier_id,
@@ -789,6 +778,9 @@ class MiscController extends BaseController
             'shift_number' => $request->shift_number,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'reading_number' => $request->reading_number,
+            'void_qty' => $request->void_qty,
+            'total_short_over' => $request->total_short_over,
         ];
 
         $cutOff = CutOff::where([
@@ -838,6 +830,7 @@ class MiscController extends BaseController
             'value' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'vat_exempt_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cashier_id' => 'required|exists:users,id',
             'is_void' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
@@ -876,6 +869,7 @@ class MiscController extends BaseController
             'cut_off_id' => $request->cut_off_id,
             'shift_number' => $request->shift_number,
             'treg' => $request->treg,
+            'vat_expense' => $request->vat_expense,
         ];
 
         $message = 'Discount created successfully.';
@@ -927,6 +921,7 @@ class MiscController extends BaseController
             'value' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'vat_exempt_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'is_void' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
@@ -960,6 +955,7 @@ class MiscController extends BaseController
             'is_vat_exempt' => $request->is_vat_exempt,
             'shift_number' => $request->shift_number,
             'treg' => $request->treg,
+            'vat_expense' => $request->vat_expense,
         ];
 
         $message = 'Discount Details created successfully.';

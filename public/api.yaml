@@ -521,6 +521,15 @@ paths:
                   type: boolean
                 treg:
                   type: string
+                backout_at:
+                  type: string
+                  default: null
+                total_quantity:
+                  type: number
+                total_void_qty:
+                  type: number
+                vat_expense:
+                  type: number
       responses:
         '200':
           content:
@@ -670,6 +679,16 @@ paths:
                   type: integer
                 treg:
                   type: string
+                is_discount_exempt:
+                  type: boolean
+                is_open_price:
+                  type: boolean
+                remarks:
+                  type: string
+                vat_expense:
+                  type: number
+                with_serial:
+                  type: boolean
       responses:
         '200':
           content:
@@ -757,6 +776,17 @@ paths:
                   default: null
                 treg:
                   type: string
+                is_void:
+                  type: boolean
+                void_at:
+                  type: string
+                  default: null
+                void_by:
+                  type: string
+                  default: null
+                void_by_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -834,9 +864,6 @@ paths:
                 cut_off_id:
                   type: integer
                   default: null
-                cut_off_at:
-                  type: string
-                  default: null
                 is_sent_to_server:
                   type: boolean
                   default: false
@@ -844,6 +871,13 @@ paths:
                   type: integer
                 treg:
                   type: string
+                end_of_day_id:
+                  type: integer
+                is_auto:
+                  type: boolean
+                  default: false
+                short_over:
+                  type: number
       responses:
         '200':
           content:
@@ -922,6 +956,14 @@ paths:
                   type: integer
                 treg:
                   type: string
+                end_of_day_id:
+                  type: integer
+                is_cut_off:
+                  type: boolean
+                  default: false
+                is_sent_to_server:
+                  type: boolean
+                  default: false
       responses:
         '200':
           content:
@@ -1007,41 +1049,13 @@ paths:
                   type: number
                 void_amount:
                   type: number
-                total_cash_payments:
-                  type: number
-                total_card_payments:
-                  type: number
-                total_online_payments:
-                  type: number
-                total_ar_payments:
-                  type: number
-                total_mobile_payments:
-                  type: number
                 total_change:
                   type: number
-                senior_count:
-                  type: integer
-                senior_amount:
-                  type: number
-                pwd_count:
-                  type: integer
-                pwd_amount:
-                  type: number
-                others_count:
-                  type: integer
-                others_amount:
-                  type: number
-                others_json:
-                  type: string
                 total_payout:
                   type: number
                 total_service_charge:
                   type: number
                 total_discount_amount:
-                  type: number
-                total_ar_cash_redeemed_amount:
-                  type: number
-                total_ar_card_redeemed_amount:
                   type: number
                 total_cost:
                   type: number
@@ -1065,6 +1079,12 @@ paths:
                 treg:
                   type: string
                   default: null
+                reading_number:
+                  type: number
+                void_qty:
+                  type: number
+                total_short_over:
+                  type: number
       responses:
         '200':
           content:
@@ -1151,41 +1171,13 @@ paths:
                   type: number
                 void_amount:
                   type: number
-                total_cash_payments:
-                  type: number
-                total_card_payments:
-                  type: number
-                total_online_payments:
-                  type: number
-                total_ar_payments:
-                  type: number
-                total_mobile_payments:
-                  type: number
                 total_change:
                   type: number
-                senior_count:
-                  type: integer
-                senior_amount:
-                  type: number
-                pwd_count:
-                  type: integer
-                pwd_amount:
-                  type: number
-                others_count:
-                  type: integer
-                others_amount:
-                  type: number
-                others_json:
-                  type: string
                 total_payout:
                   type: number
                 total_service_charge:
                   type: number
                 total_discount_amount:
-                  type: number
-                total_ar_cash_redeemed_amount:
-                  type: number
-                total_ar_card_redeemed_amount:
                   type: number
                 total_cost:
                   type: number
@@ -1209,6 +1201,12 @@ paths:
                 treg:
                   type: string
                   default: null
+                reading_number:
+                  type: number
+                void_qty:
+                  type: number
+                total_short_over:
+                  type: number
       responses:
         '200':
           content:
@@ -1287,6 +1285,8 @@ paths:
                   type: integer
                 treg:
                   type: string
+                vat_expense:
+                  type: number
       responses:
         '200':
           content:
@@ -1385,6 +1385,8 @@ paths:
                   type: string
                 treg:
                   type: string
+                vat_expense:
+                  type: number
 
       responses:
         '200':
