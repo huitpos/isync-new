@@ -76,6 +76,7 @@ class MiscController extends BaseController
 
         $paymentTypes = PaymentType::where('company_id', $branch->company->id)
             ->orWhereNull('company_id')
+            ->with('fields')
             ->get();
 
         return $this->sendResponse($paymentTypes, 'Payment Types retrieved successfully.');
@@ -87,6 +88,7 @@ class MiscController extends BaseController
 
         $discountTypes = DiscountType::with('departments')->where('company_id', $branch->company->id)
             ->orWhereNull('company_id')
+            ->with('fields')
             ->get();
 
         return $this->sendResponse($discountTypes, 'Discount Types retrieved successfully.');
