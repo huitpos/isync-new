@@ -13,22 +13,21 @@ class TestController extends Controller
         $branches = Branch::all();
 
         foreach ($branches as $branch) {
-            $locationData = [
-                'branch_id' => $branch->id,
-                'name' => $branch->name,
-                'unit_floor_number' => $branch->unit_floor_number,
-                'street' => $branch->street,
-                'region_id' => $branch->region_id,
-                'province_id' => $branch->province_id,
-                'city_id' => $branch->city_id,
-                'barangay_id' => $branch->barangay_id,
-                'is_default' => true,
-            ];
-
-            //create DeliveryLocation
-            DeliveryLocation::create($locationData);
+            foreach ($branch->company->products as $product) {
+                if ($branch->products()->where('product_id', $product->id)->exists()) {
+                    // Product already exists in the branch, update the existing pivot record
+                    $branch->products()->updateExistingPivot($product->id, [
+                        'price' => $product->srp,
+                        'stock' => 0
+                    ]);
+                } else {
+                    // Product doesn't exist in the branch, create a new pivot record
+                    $branch->products()->attach($product->id, [
+                        'price' => $product->srp,
+                        'stock' => 0
+                    ]);
+                }
+            }
         }
-
-        dd("here");
     }
 }

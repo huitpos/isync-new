@@ -70,4 +70,9 @@ class Branch extends Model
     {
         return $this->hasMany(DeliveryLocation::class);
     }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class)->withPivot('price', 'stock');
+    }
 }

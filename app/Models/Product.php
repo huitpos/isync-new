@@ -60,4 +60,9 @@ class Product extends Model
     {
         return $this->belongsTo(Subcategory::class);
     }
+
+    public function branches()
+    {
+        return $this->belongsToMany(Branch::class)->withPivot('price', 'stock');
+    }
 }

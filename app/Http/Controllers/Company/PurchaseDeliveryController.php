@@ -72,6 +72,8 @@ class PurchaseDeliveryController extends Controller
     {
         $pd = PurchaseDelivery::findOrFail($id);
 
+        $branch = $pd->branch;
+
         $status = $request->input('status');
         $pd->status = $status;
         $pd->action_by = auth()->user()->id;
@@ -92,6 +94,24 @@ class PurchaseDeliveryController extends Controller
 
                 $product->srp = $srp;
                 $product->save();
+
+                $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
+
+                $newStock = $pivotData->stock + $item->qty;
+
+                if ($branch->products()->where('product_id', $id)->exists()) {
+                    // Product already exists in the branch, update the existing pivot record
+                    $branch->products()->updateExistingPivot($id, [
+                        'price' => $srp,
+                        'stock' => $newStock
+                    ]);
+                } else {
+                    // Product doesn't exist in the branch, create a new pivot record
+                    $branch->products()->attach($id, [
+                        'price' => $srp,
+                        'stock' => $newStock
+                    ]);
+                }
             }
         }
 
