@@ -22,6 +22,7 @@ use App\Models\Discount;
 use App\Models\DiscountDetail;
 use App\Models\ApiRequestLog;
 use App\Models\DiscountType;
+use App\Models\Product;
 
 use Illuminate\Support\Facades\Redis;
 
@@ -645,6 +646,8 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $branch = Branch::findOrFail($request->branch_id);
+
         $postData = [
             'end_of_day_id' => $request->end_of_day_id,
             'pos_machine_id' => $request->pos_machine_id,
@@ -687,6 +690,35 @@ class MiscController extends BaseController
 
         $message = 'End of Day created successfully.';
         if ($endOfDay) {
+            if ($request['products']) {
+                foreach ($request['products'] as $reqProduct) {
+                    $product = Product::find($reqProduct['id']);
+
+                    if ($product) {
+                        $pivotData = $product->branches->where('id', $request->branch_id)->first()->pivot;
+
+                        $oldStock = 0;
+                        if ($pivotData) {
+                            $oldStock = $pivotData->stock;
+                        }
+
+                        $newStock = $oldStock - $reqProduct['quantity'];
+
+                        if ($branch->products()->where('product_id', $product['id'])->exists()) {
+                            // Product already exists in the branch, update the existing pivot record
+                            $branch->products()->updateExistingPivot($product['id'], [
+                                'stock' => $newStock
+                            ]);
+                        } else {
+                            // Product doesn't exist in the branch, create a new pivot record
+                            $branch->products()->attach($product['id'], [
+                                'stock' => $newStock
+                            ]);
+                        }
+                    }
+                }
+            }
+
             $message = 'End of Day updated successfully.';
             $endOfDay->update($postData);
             return $this->sendResponse($endOfDay, $message);

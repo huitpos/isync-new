@@ -46,6 +46,7 @@ use App\Http\Controllers\Branch\DeliveryLocationController as BranchDeliveryLoca
 use App\Http\Controllers\Branch\PurchaseRequestController as BranchPurchaseRequestController;
 use App\Http\Controllers\Branch\PurchaseOrderController as BranchPurchaseOrderController;
 use App\Http\Controllers\Branch\PurchaseDeliveryController as BranchPurchaseDeliveryController;
+use App\Http\Controllers\Branch\ProductController as BranchProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -138,6 +139,7 @@ Route::middleware('auth')->group(function () {
             Route::resource('delivery-locations', BranchDeliveryLocationController::class, ['as' => 'branch']);
             Route::resource('purchase-requests', BranchPurchaseRequestController::class, ['as' => 'branch']);
             Route::resource('purchase-orders', BranchPurchaseOrderController::class, ['as' => 'branch']);
+            Route::resource('products', BranchProductController::class, ['as' => 'branch']);
             Route::get('/purchase-orders/{purchaseOrderId}/create-delivery', [BranchPurchaseDeliveryController::class, 'create'])->name('branch.purchase-delivery.create');
             Route::resource('purchase-deliveries', BranchPurchaseDeliveryController::class, ['as' => 'branch']);
 

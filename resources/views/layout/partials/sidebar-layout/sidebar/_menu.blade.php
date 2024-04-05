@@ -139,6 +139,15 @@
 					</div>
 				</div>
 
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('branch.products.*') ? 'active' : '' }}" href="{{ route('branch.products.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+						<span class="menu-icon">
+							<i class="fa-solid fa-table-list fs-2"></i>
+						</span>
+						<span class="menu-title">Products</span>
+					</a>
+				</div>
+
 			@elseif (request()->attributes->get('company'))
 				<div class="menu-item">
 					<a class="menu-link {{ request()->routeIs('company.dashboard') ? 'active' : '' }}" href="{{ route('company.dashboard', ['companySlug' => request()->attributes->get('company')->slug]) }}">
