@@ -137,19 +137,40 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">SRP</label>
-                    <input value="{{ old('srp') ?? $product->srp }}" name="srp" type="text" class="form-control @error('srp') is-invalid @enderror" placeholder="SRP" required/>
+                    <label class="form-label">Cost</label>
+                    <input id="cost" value="{{ old('cost') ?? $product->cost }}" name="cost" type="text" class="form-control @error('cost') is-invalid @enderror compute-srp" placeholder="Cost" required/>
 
-                    @error('srp')
+                    @error('cost')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Cost</label>
-                    <input value="{{ old('cost') ?? $product->cost }}" name="cost" type="text" class="form-control @error('cost') is-invalid @enderror" placeholder="Cost" required/>
+                    <label class="form-label">Markup Type</label>
+                    <select id="markup_type" name="markup_type" class="form-control @error('status') is-invalid @enderror compute-srp" required>
+                        <option value="fixed" {{ old('status') == 'fixed' || $product->markup_type == 'fixed' ? 'selected' : '' }}>Fixed Amount</option>
+                        <option value="percentage" {{ old('status') == 'percentage' || $product->markup_type == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                    </select>
 
-                    @error('cost')
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4 mt-7">
+                    <label class="form-label">Mark Up</label>
+                    <input id="markup" value="{{ old('markup') ?? $product->markup }}" name="markup" type="text" class="form-control @error('markup') is-invalid @enderror compute-srp" placeholder="markup" required/>
+
+                    @error('markup')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">SRP</label>
+                    <input id="srp" value="{{ old('srp') ?? $product->srp }}" name="srp" type="text" class="form-control @error('srp') is-invalid @enderror" placeholder="SRP" required/>
+
+                    @error('srp')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
@@ -438,15 +459,6 @@
                             <i class="ki-outline ki-cross fs-3"></i>
                         </span>
                     </div>
-                </div>
-
-                <div class="mb-4 mt-7">
-                    <label class="form-label">Mark Up</label>
-                    <input value="{{ old('markup') ?? $product->markup }}" name="markup" type="text" class="form-control @error('markup') is-invalid @enderror" placeholder="markup" required/>
-
-                    @error('markup')
-                        <div class="invalid-feedback"> {{ $message }}</div>
-                    @enderror
                 </div>
 
                 <div class="mb-4">
