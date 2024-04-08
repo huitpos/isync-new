@@ -8,6 +8,10 @@
         {{ Breadcrumbs::render('branch.purchaseRequests.create', $company, $branch) }}
     @endsection
 
+    @error('pr_items')
+        <div class="alert alert-danger">Select at least 1 item</div>
+    @enderror
+
     <div class="card">
         <div class="card-body py-4">
             <form class="mt-3" action="{{ route('branch.purchase-requests.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
@@ -188,7 +192,7 @@
                                                         data-param-link="#department_id"
                                                         required
                                                     >
-                                                        <option value="{{ $item['product_id'] }}" selected="selected">{{ $item['pr_selected_product_text'] }}</option>
+                                                        <option value="{{ $item['product_id'] ?? '' }}" selected="selected">{{ $item['pr_selected_product_text'] ?? '' }}</option>
                                                     </select>
 
                                                     <input name="pr_selected_product_text" value="{{ $item['pr_selected_product_text'] }}" type="hidden" class="pr_selected_product_text">
@@ -215,7 +219,13 @@
 
                                                 <div class="col-md-2">
                                                     <label class="form-label">Quantity:</label>
-                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="text" class="form-control pr_quantity"/>
+                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="text" class="form-control pr_quantity @error('pr_items.' . $key . '.quantity') is-invalid @enderror"/>
+
+                                                    <div class="invalid-feedback">
+                                                        @error('pr_items.' . $key . '.quantity')
+                                                            <p>{{ $message }}</p>
+                                                        @enderror
+                                                    </div>
                                                 </div>
 
                                                 <div class="col-md-2">

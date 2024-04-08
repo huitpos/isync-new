@@ -84,6 +84,13 @@ class PurchaseRequestController extends Controller
             ],
             'delivery_location_id' => 'required',
             'supplier_id' => 'required',
+            'pr_items' => 'required',
+            'pr_items.*.product_id' => 'required',
+            'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
+        ],
+        [
+            'pr_items' => 'Product is required',
+            'pr_items.*.quantity' => 'Quantity field required',
         ]);
 
         $branch = $request->attributes->get('branch');
