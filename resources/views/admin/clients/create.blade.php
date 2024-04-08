@@ -234,7 +234,7 @@
                     <div data-kt-password-meter="true">
                         <div>
                             <div class="position-relative mb-3">
-                                <input class="form-control form-control @error('password_confirmation') is-invalid @enderror"" type="password" placeholder="" required name="password_confirmation" autocomplete="off" />
+                                <input class="form-control form-control @error('password_confirmation') is-invalid @enderror" type="password" placeholder="" required name="password_confirmation" autocomplete="off" />
 
                                 @error('password_confirmation')
                                     <div class="invalid-feedback"> {{ $message }}</div>
