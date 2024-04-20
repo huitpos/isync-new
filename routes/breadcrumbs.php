@@ -329,7 +329,7 @@ Breadcrumbs::for('company.purchaseOrders.show', function (BreadcrumbTrail $trail
 
 Breadcrumbs::for('company.purchaseDeliveries.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
-    $trail->push('Purchase Deliveries', route('company.purchase-orders.index', ['companySlug' => $company->slug]));
+    $trail->push('Purchase Deliveries', route('company.purchase-deliveries.index', ['companySlug' => $company->slug]));
 });
 
 Breadcrumbs::for('company.purchaseDeliveries.show', function (BreadcrumbTrail $trail, $company, $pd) {
