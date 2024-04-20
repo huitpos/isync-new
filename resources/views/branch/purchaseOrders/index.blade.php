@@ -69,6 +69,7 @@
                         }
                     },
                     { data: 'purchase_request.pr_number' },
+                    { data: 'branch.name' },
                     { data: 'created_by.name' },
                     {
                         data: 'created_at',

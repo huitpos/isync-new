@@ -81,6 +81,7 @@
                         }
                     },
                     { data: 'purchase_order.po_number' },
+                    { data: 'branch.name' },
                     { data: 'created_by.name' },
                     { data: 'status' },
                     {

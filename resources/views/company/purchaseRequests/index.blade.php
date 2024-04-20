@@ -80,6 +80,7 @@
                             return '<a href="' + row.view_url + '">' + row.pr_number + '</a>';
                         }
                     },
+                    { data: 'branch.name' },
                     {
                         data: 'date_needed',
                         render: function(data, type, row) {
