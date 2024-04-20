@@ -357,6 +357,11 @@ Breadcrumbs::for('company.supplierTerms.create', function (BreadcrumbTrail $trai
     $trail->push('Create');
 });
 
+Breadcrumbs::for('company.supplierTerms.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.supplierTerms.index', $company);
+    $trail->push('Edit');
+});
+
 
 
 

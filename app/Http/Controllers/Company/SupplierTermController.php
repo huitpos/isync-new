@@ -66,17 +66,37 @@ class SupplierTermController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+        $supplierTerm = SupplierTerm::findOrFail($id);
+
+        return view('company.supplierTerms.edit', [
+            'company' => $company,
+            'supplierTerm' => $supplierTerm,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $companySlug, int $id)
     {
-        //
+        $company = $request->attributes->get('company');
+
+        $request->validate([
+            'name' => 'required',
+            'days' => 'required',
+        ]);
+
+        $supplierTerm = SupplierTerm::findOrFail($id);
+
+        if ($supplierTerm->update($request->all())) {
+            return redirect()->route('company.supplier-terms.index', ['companySlug' => $company->slug])->with('success', 'Supplier term updated successfully.');
+        }
+
+        return redirect()->route('company.supplier-terms.index', ['companySlug' => $company->slug])->with('error', 'Supplier term update failed.');
+
     }
 
     /**
