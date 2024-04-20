@@ -115,17 +115,62 @@ class DeliveryLocationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $companybranchSlug, string $branchSlug, string $id)
     {
-        //
+        $location = DeliveryLocation::findOrFail($id);
+
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
+        $regions = Region::all();
+        $provinces = Province::where('region_id', $location->region_id)->get();
+        $cities = City::where('province_id', $location->province_id)->get();
+        $barangays = Barangay::where('city_id', $location->city_id)->get();
+
+        return view('branch.deliveryLocations.edit', compact('company', 'branch', 'regions', 'provinces', 'cities', 'barangays', 'location'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $companybranchSlug, string $branchSlug, string $id)
     {
-        //
+        $location = DeliveryLocation::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required',
+            'unit_floor_number' => 'required',
+            'street' => 'required',
+            'region_id' => 'required',
+            'province_id' => 'required',
+            'city_id' => 'required',
+            'barangay_id' => 'required',
+        ]);
+
+        $locationData = $request->only([
+            'name',
+            'unit_floor_number',
+            'street',
+            'region_id',
+            'province_id',
+            'city_id',
+            'barangay_id',
+            'phone_number',
+        ]);
+
+        $locationData['is_default'] = $request->is_default ?? false;
+
+        if ($location->update($locationData)) {
+            return redirect()->route('branch.delivery-locations.index', [
+                    'companySlug' => $request->attributes->get('company')->slug,
+                    'branchSlug' => $request->attributes->get('branch')->slug
+                ])->with('success', 'Delivery location created successfully.');
+        }
+
+        return redirect()->route('branch.delivery-locations.index', [
+                'companySlug' => $request->attributes->get('company')->slug,
+                'branchSlug' => $request->attributes->get('branch')->slug
+            ])->with('error', 'Delivery location failed to create.');
     }
 
     /**

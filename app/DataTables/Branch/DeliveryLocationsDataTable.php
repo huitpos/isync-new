@@ -24,8 +24,8 @@ class DeliveryLocationsDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('actions', function (Model $data) use ($branchSlug, $companySlug) {
                 return view('branch.datatables._actions', [
-                    'param' => ['user' => $data->id, 'companySlug' => $companySlug, 'branchSlug' => $branchSlug],
-                    'route' => 'branch.users',
+                    'param' => ['delivery_location' => $data->id, 'companySlug' => $companySlug, 'branchSlug' => $branchSlug],
+                    'route' => 'branch.delivery-locations',
                 ]);
             });
     }
