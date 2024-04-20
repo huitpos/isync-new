@@ -432,3 +432,14 @@ Breadcrumbs::for('branch.deliveryLocations.create', function (BreadcrumbTrail $t
     $trail->parent('branch.deliveryLocations.index', $company, $branch);
     $trail->push('Create');
 });
+
+Breadcrumbs::for('branch.purchaseDeliveries.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Purchase Deliveries', route('branch.purchase-deliveries.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.purchaseDeliveries.show', function (BreadcrumbTrail $trail, $company, $branch, $pd) {
+    $trail->parent('branch.purchaseDeliveries.index', $company, $branch);
+    $trail->push($pd->pd_number);
+});

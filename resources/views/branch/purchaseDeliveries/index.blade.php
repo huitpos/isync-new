@@ -5,7 +5,7 @@
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('branch.purchaseRequests.index', $company, $branch) }}
+        {{ Breadcrumbs::render('branch.purchaseDeliveries.index', $company, $branch) }}
     @endsection
 
     <div class="card">
