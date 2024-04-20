@@ -116,6 +116,7 @@ class UserController extends Controller
 
         $postData = $request->all();
         $postData['company_id'] = $company->id;
+        $postData['is_active'] = $request->is_active ?? false;
 
         if (empty($postData['password'])) {
             unset($postData['password']);
