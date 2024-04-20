@@ -67,6 +67,7 @@ class SupplierTermsDataTable extends DataTable
             Column::make('name'),
             Column::make('days'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),
