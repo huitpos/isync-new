@@ -23,10 +23,9 @@ class PaymentTermsDataTable extends DataTable
                 return $data->is_default ? 'Yes' : 'No';
             })
             ->addColumn('actions', function (Model $data) {
-                return '';
                 return view('company.datatables._actions', [
-                    'param' => ['charge_account' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.charge-accounts',
+                    'param' => ['payment_term' => $data->id, 'companySlug' => $data->company->slug],
+                    'route' => 'company.payment-terms',
                 ]);
             });
     }
@@ -70,6 +69,7 @@ class PaymentTermsDataTable extends DataTable
             Column::make('id')->visible(false),
             Column::make('name'),
             Column::make('is_default'),
+            Column::make('status'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::computed('actions')
                 ->exportable(false)

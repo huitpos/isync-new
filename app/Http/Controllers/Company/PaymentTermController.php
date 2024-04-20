@@ -69,17 +69,38 @@ class PaymentTermController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+        $paymentTerm = PaymentTerm::findOrFail($id);
+
+        return view('company.paymentTerms.edit', [
+            'company' => $company,
+            'paymentTerm' => $paymentTerm,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $companySlug, string $id)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+        ]);
+
+        $company = $request->attributes->get('company');
+
+        $postData = $request->all();
+        $postData['is_default'] = $request->is_default ?? false;
+
+        $paymentTerm = PaymentTerm::findOrFail($id);
+
+        if ($paymentTerm->update($postData)) {
+            return redirect()->route('company.payment-terms.index', ['companySlug' => $company->slug])->with('success', 'Payment term updated successfully.');
+        }
+
+        return redirect()->route('company.payment-terms.index', ['companySlug' => $company->slug])->with('error', 'Payment term update failed.');
     }
 
     /**
