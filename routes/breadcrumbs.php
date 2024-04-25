@@ -491,3 +491,14 @@ Breadcrumbs::for('branch.stockTransferDeliveries.show', function (BreadcrumbTrai
     $trail->parent('branch.stockTransferDeliveries.index', $company, $branch);
     $trail->push($std->std_number);
 });
+
+Breadcrumbs::for('branch.productPhysicalCount.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Product Physical Count', route('branch.product-physical-counts.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.productPhysicalCount.create', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('branch.productPhysicalCount.index', $company, $branch);
+    $trail->push('Create');
+});

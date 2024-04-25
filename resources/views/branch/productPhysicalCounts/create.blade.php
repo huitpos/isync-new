@@ -1,11 +1,11 @@
 <x-default-layout>
 
     @section('title')
-        Create a new stock transfer request
+        Create a new product physical count
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('branch.stockTransferRequests.create', $company, $branch) }}
+        {{ Breadcrumbs::render('branch.productPhysicalCount.create', $company, $branch) }}
     @endsection
 
     @error('pr_items')
@@ -14,7 +14,7 @@
 
     <div class="card">
         <div class="card-body py-4">
-            <form class="mt-3" action="{{ route('branch.stock-transfer-requests.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
+            <form class="mt-3" action="{{ route('branch.product-physical-counts.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
                 @csrf
 
                 <div class="row mb-5">
@@ -35,46 +35,6 @@
                         @error('department_id')
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
-                    </div>
-                </div>
-
-                <div class="row mb-5">
-                    <div class="col-md-6 mb-5">
-                        <label class="form-label">Delivery Location</label>
-                        <select id="delivery_location_id" name="delivery_location_id" class="form-select @error('delivery_location_id') is-invalid @enderror" required>
-                            <option value="">Select Location</option>
-                            @foreach($deliveryLocations as $deliveryLocation)
-                                @php
-                                    $address = $deliveryLocation->unit_floor_number . ' ' . $deliveryLocation->street . ', ' . $deliveryLocation->barangay->name . ', ' . $deliveryLocation->city->name . ', ' . $deliveryLocation->province->name . ', ' . $deliveryLocation->region->name;
-                                @endphp
-
-                                <option data-address="{{ $address }}" value="{{ $deliveryLocation->id }}">{{ $deliveryLocation->name }}</option>
-                            @endforeach
-                        </select>
-
-                        @error('delivery_location_id')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Supplier</label>
-                        <select id="source_branch_id" name="source_branch_id" class="form-select @error('source_branch_id') is-invalid @enderror" required>
-                            <option value="">Source Branch</option>
-
-                            @foreach($branches as $branch)
-                                <option value="{{ $branch->id }}" {{ $branch->id == old('source_branch_id') ? 'selected' : '' }}>{{ $branch->name }}</option>
-                            @endforeach
-                        </select>
-
-                        @error('source_branch_id')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-12">
-                        <label class="form-label">Delivery Address</label>
-                        <input id="delivery_address" type="text" disabled class="form-control"/>
                     </div>
                 </div>
 
@@ -109,7 +69,7 @@
                                                     required
                                                 ></select>
 
-                                                <input name="pr_selected_product_text" type="hidden" class="pr_selected_product_text">
+                                                <input type="hidden" class="pr_selected_product_text">
                                             </div>
 
                                             <div class="col-md-3">
@@ -117,12 +77,12 @@
                                                 <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control @error('company_id') is-invalid @enderror select2-ajax pr_uom_id" required>
                                                 </select>
 
-                                                <input name="pr_selected_uom_text" type="hidden" class="pr_selected_uom_text">
+                                                <input type="hidden" class="pr_selected_uom_text">
                                             </div>
 
                                             <div class="col-md-3">
                                                 <label class="form-label">Barcode:</label>
-                                                <input readonly name="barcode" type="text" class="form-control barcode"/>
+                                                <input readonly type="text" class="form-control barcode"/>
                                             </div>
 
                                             <div class="col-md-2">

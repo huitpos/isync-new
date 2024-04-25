@@ -51,6 +51,7 @@ use App\Http\Controllers\Branch\ProductController as BranchProductController;
 use App\Http\Controllers\Branch\StockTransferRequestController as BranchStockTransferRequestController;
 use App\Http\Controllers\Branch\StockTransferOrderController as BranchStockTransferOrderController;
 use App\Http\Controllers\Branch\StockTransferDeliveryController as BranchStockTransferDeliveryController;
+use App\Http\Controllers\Branch\ProductPhysicalCountController as BranchProductPhysicalCountController;
 
 /*
 |--------------------------------------------------------------------------
@@ -150,6 +151,7 @@ Route::middleware('auth')->group(function () {
             Route::resource('stock-transfer-requests', BranchStockTransferRequestController::class, ['as' => 'branch']);
             Route::resource('stock-transfer-orders', BranchStockTransferOrderController::class, ['as' => 'branch']);
             Route::resource('stock-transfer-deliveries', BranchStockTransferDeliveryController::class, ['as' => 'branch']);
+            Route::resource('product-physical-counts', BranchProductPhysicalCountController::class, ['as' => 'branch']);
 
             Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');
 

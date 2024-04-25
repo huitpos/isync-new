@@ -110,9 +110,6 @@
 						'branch.purchase-orders.*',
 						'branch.purchase-deliveries.*',
 						'branch.purchase-delivery.*',
-						'branch.stock-transfer-requests.*',
-						'branch.stock-transfer-orders.*',
-						'branch.stock-transfer-deliveries.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -139,7 +136,24 @@
 								<span class="menu-title">Purchase Deliveries</span>
 							</a>
 						</div>
+					</div>
+				</div>
 
+				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
+					{{ request()->routeIs(
+						'branch.stock-transfer-requests.*',
+						'branch.stock-transfer-orders.*',
+						'branch.stock-transfer-deliveries.*',
+						'branch.product-physical-counts.*',
+					) ? 'here show' : '' }}"
+				>
+					<span class="menu-link">
+						<span class="menu-icon"><i class="fa-solid fa-truck-moving fs-2"></i></span>
+						<span class="menu-title">Inventory</span>
+						<span class="menu-arrow"></span>
+					</span>
+
+					<div class="menu-sub menu-sub-accordion">
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('branch.stock-transfer-requests.*') ? 'active' : '' }}" href="{{ route('branch.stock-transfer-requests.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 								<span class="menu-title">Stock Transfer Requests</span>
@@ -155,6 +169,12 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('branch.stock-transfer-deliveries.*') ? 'active' : '' }}" href="{{ route('branch.stock-transfer-deliveries.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 								<span class="menu-title">Stock Transfer Deliveries</span>
+							</a>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.product-physical-counts.*') ? 'active' : '' }}" href="{{ route('branch.product-physical-counts.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Product Physical Count</span>
 							</a>
 						</div>
 					</div>
