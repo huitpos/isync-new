@@ -29,6 +29,7 @@ use App\Http\Controllers\Company\SupplierTermController as CompanySupplierTermCo
 use App\Http\Controllers\Company\PurchaseRequestController as CompanyPurchaseRequestController;
 use App\Http\Controllers\Company\PurchaseOrderController as CompanyPurchaseOrderController;
 use App\Http\Controllers\Company\PurchaseDeliveryController as CompanyPurchaseDeliveryController;
+use App\Http\Controllers\Company\StockTransferRequestController as CompanyStockTransferRequestController;
 
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\ClusterController as AdminClusterController;
@@ -47,6 +48,9 @@ use App\Http\Controllers\Branch\PurchaseRequestController as BranchPurchaseReque
 use App\Http\Controllers\Branch\PurchaseOrderController as BranchPurchaseOrderController;
 use App\Http\Controllers\Branch\PurchaseDeliveryController as BranchPurchaseDeliveryController;
 use App\Http\Controllers\Branch\ProductController as BranchProductController;
+use App\Http\Controllers\Branch\StockTransferRequestController as BranchStockTransferRequestController;
+use App\Http\Controllers\Branch\StockTransferOrderController as BranchStockTransferOrderController;
+use App\Http\Controllers\Branch\StockTransferDeliveryController as BranchStockTransferDeliveryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,6 +130,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('purchase-requests', CompanyPurchaseRequestController::class, ['as' => 'company']);
         Route::resource('purchase-orders', CompanyPurchaseOrderController::class, ['as' => 'company']);
         Route::resource('purchase-deliveries', CompanyPurchaseDeliveryController::class, ['as' => 'company']);
+        Route::resource('stock-transfer-requests', CompanyStockTransferRequestController::class, ['as' => 'company']);
 
         Route::prefix('reports')->group(function () {
             Route::get('/transactions', [CompanyReportController::class, 'transactions'])->name('company.reports.transactions');
@@ -142,6 +147,9 @@ Route::middleware('auth')->group(function () {
             Route::resource('products', BranchProductController::class, ['as' => 'branch']);
             Route::get('/purchase-orders/{purchaseOrderId}/create-delivery', [BranchPurchaseDeliveryController::class, 'create'])->name('branch.purchase-delivery.create');
             Route::resource('purchase-deliveries', BranchPurchaseDeliveryController::class, ['as' => 'branch']);
+            Route::resource('stock-transfer-requests', BranchStockTransferRequestController::class, ['as' => 'branch']);
+            Route::resource('stock-transfer-orders', BranchStockTransferOrderController::class, ['as' => 'branch']);
+            Route::resource('stock-transfer-deliveries', BranchStockTransferDeliveryController::class, ['as' => 'branch']);
 
             Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');
 

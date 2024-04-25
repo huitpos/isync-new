@@ -110,6 +110,8 @@
 						'branch.purchase-orders.*',
 						'branch.purchase-deliveries.*',
 						'branch.purchase-delivery.*',
+						'branch.stock-transfer-requests.*',
+						'branch.stock-transfer-orders.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -134,6 +136,24 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('branch.purchase-deliveries.*') || request()->routeIs('branch.purchase-delivery.*') ? 'active' : '' }}" href="{{ route('branch.purchase-deliveries.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 								<span class="menu-title">Purchase Deliveries</span>
+							</a>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.stock-transfer-requests.*') ? 'active' : '' }}" href="{{ route('branch.stock-transfer-requests.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Stock Transfer Requests</span>
+							</a>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.stock-transfer-orders.*') ? 'active' : '' }}" href="{{ route('branch.stock-transfer-orders.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Stock Transfer Orders</span>
+							</a>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.stock-transfer-deliveries.*') ? 'active' : '' }}" href="{{ route('branch.stock-transfer-deliveries.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Stock Transfer Deliveries</span>
 							</a>
 						</div>
 					</div>
@@ -184,6 +204,7 @@
 						'company.purchase-requests.*',
 						'company.purchase-orders.*',
 						'company.purchase-deliveries.*',
+						'company.stock-transfer-requests.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -208,6 +229,12 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.purchase-deliveries.*') ? 'active' : '' }}" href="{{ route('company.purchase-deliveries.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Purchase Deliveries</span>
+							</a>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.stock-transfer-requests.*') ? 'active' : '' }}" href="{{ route('company.stock-transfer-requests.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Stock Transfer Requests</span>
 							</a>
 						</div>
 					</div>
