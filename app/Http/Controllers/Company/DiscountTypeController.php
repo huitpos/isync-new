@@ -92,6 +92,7 @@ class DiscountTypeController extends Controller
             $data = [
                 'name' => $field['name'],
                 'field_type' => $field['field_type'],
+                'is_required' => isset($field['required']) ? true : false,
             ];
 
             if (!empty($field['options'])) {
@@ -174,7 +175,7 @@ class DiscountTypeController extends Controller
         $postData['is_zero_rated'] = $request->is_zero_rated ?? false;
 
         $discountTypeFields = [];
-        foreach ($request->input('discount_type_fields') as $field) {
+        foreach ($request->input('discount_type_fields') as $key => $field) {
             if (empty($field['name'])) {
                 continue;
             }
@@ -182,6 +183,8 @@ class DiscountTypeController extends Controller
             $data = [
                 'name' => $field['name'],
                 'field_type' => $field['field_type'],
+                'is_required' => $field['is_required'] ?? false,
+                'is_required' => isset($field['required']) ? true : false,
             ];
 
             if (!empty($field['options'])) {
@@ -199,6 +202,7 @@ class DiscountTypeController extends Controller
 
         unset($postData['discount_type_fields']);
         unset($postData['departments']);
+        
 
         if ($this->discountTypeRepository->update($id, $postData, $discountTypeFields)) {
             $this->discountTypeRepository->syncDepartments($id, $request->departments ?? []);

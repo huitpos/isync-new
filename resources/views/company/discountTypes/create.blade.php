@@ -117,15 +117,13 @@
                                                 </select>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <div class="inner-repeater">
                                                     <div data-repeater-list="options" class="mb-5">
                                                         <div data-repeater-item>
                                                             <label class="form-label">Option:</label>
                                                             <div class="input-group">
                                                                 <input type="option" name="option" class="form-control" placeholder="Option">
-                                                                <button class="border btn btn-icon btn-light-danger" data-repeater-delete="" type="button">
-                                                                    <i class="ki-duotone ki-trash fs-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>                                                    </button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -136,7 +134,12 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-2 mt-2">
+                                                <label class="form-label">Required:</label>
+                                                <input class="form-check-input form-control" name="required" type="checkbox" value="1"/>
+                                            </div>
+
+                                            <div class="col-md-2">
                                                 <a href="javascript:;" data-repeater-delete class="btn btn-sm btn-flex btn-light-danger mt-3 mt-md-9">
                                                     <i class="ki-duotone ki-trash fs-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
                                                     Delete Field

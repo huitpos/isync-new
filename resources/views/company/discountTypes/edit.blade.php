@@ -182,7 +182,7 @@
                                                     @enderror
                                                 </div>
 
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <div class="inner-repeater">
                                                         <div data-repeater-list="options" class="mb-5">
                                                             @if (empty($field['options']))
@@ -214,7 +214,12 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Required:</label>
+                                                    <input {{ $field['is_required'] ? 'checked' : '' }} class="form-check-input form-control" name="required" type="checkbox" value="1"/>
+                                                </div>
+
+                                                <div class="col-md-2">
                                                     <a href="javascript:;" data-repeater-delete class="btn btn-sm btn-flex btn-light-danger mt-3 mt-md-9">
                                                         <i class="ki-duotone ki-trash fs-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
                                                         Delete Row
