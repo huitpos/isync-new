@@ -20,10 +20,9 @@ class SupplierTermsDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('actions', function (Model $data) {
-                return '';
                 return view('company.datatables._actions', [
-                    'param' => ['charge_account' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.charge-accounts',
+                    'param' => ['supplier_term' => $data->id, 'companySlug' => $data->company->slug],
+                    'route' => 'company.supplier-terms',
                 ]);
             });
     }
@@ -68,6 +67,7 @@ class SupplierTermsDataTable extends DataTable
             Column::make('name'),
             Column::make('days'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

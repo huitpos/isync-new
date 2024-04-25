@@ -45,7 +45,8 @@ class PurchaseDeliveriesDataTable extends DataTable
         return $model->newQuery()
             ->with([
                 'createdBy',
-                'purchaseOrder'
+                'purchaseOrder',
+                'branch'
             ])
             ->whereHas('branch', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
@@ -77,6 +78,7 @@ class PurchaseDeliveriesDataTable extends DataTable
             Column::make('id')->visible(false),
             Column::make('pd_number'),
             Column::make('purchase_order.po_number', 'purchaseOrder.po_number')->title('po_number'),
+            Column::make('branch.name', 'branch.name'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::make('created_at'),

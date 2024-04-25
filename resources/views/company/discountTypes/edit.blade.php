@@ -92,6 +92,13 @@
                     </label>
                 </div>
 
+                <div class="mb-4 mt-5">
+                    <input {{ $discountType->is_zero_rated ? 'checked' : '' }} value="1" name="is_zero_rated" class="form-check-input" type="checkbox" id="is_zero_rated">
+                    <label class="form-check-label" for="is_zero_rated">
+                        Is Zero Rated Sales
+                    </label>
+                </div>
+
                 <div class="mt-7">
                     <label class="form-label">Fields</label>
                     <!--begin::Repeater-->

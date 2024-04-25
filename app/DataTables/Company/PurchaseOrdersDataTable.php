@@ -43,7 +43,8 @@ class PurchaseOrdersDataTable extends DataTable
         $query = $model->newQuery()
         ->with([
             'purchaseRequest',
-            'createdBy'
+            'createdBy',
+            'branch'
         ])
         ->whereHas('branch.company', function ($query) use ($companyId) {
             $query->where('companies.id', $companyId);
@@ -81,6 +82,7 @@ class PurchaseOrdersDataTable extends DataTable
             Column::make('id')->visible(false),
             Column::make('po_number'),
             Column::make('pr_number'),
+            Column::make('branch.name'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('created_at'),
         ];

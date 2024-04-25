@@ -81,20 +81,28 @@
                 <div class="row mb-5">
                     <div class="col-md-6">
                         <label class="form-label">Payment Terms</label>
-                        <select name="payment_term_id" id="" class="form-select">
+                        <select name="payment_term_id" id="" class="form-select @error('payment_term_id') is-invalid @enderror">
                             @foreach($company->paymentTerms as $paymentTerm)
                                 <option value="{{ $paymentTerm->id }}" {{ $pr->payment_term_id == $paymentTerm->id ? 'selected' : '' }}>{{ $paymentTerm->name }}</option>
                             @endforeach
                         </select>
+
+                        @error('payment_term_id')
+                            <div class="invalid-feedback"> {{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Supplier Terms</label>
-                        <select name="supplier_term_id" id="" class="form-select">
+                        <select name="supplier_term_id" id="" class="form-select @error('supplier_term_id') is-invalid @enderror">
                             @foreach($company->supplierTerms as $supplierTerm)
                                 <option value="{{ $supplierTerm->id }}" {{ $pr->supplier_term_id == $supplierTerm->id ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
                             @endforeach
                         </select>
+
+                        @error('supplier_term_id')
+                            <div class="invalid-feedback"> {{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 

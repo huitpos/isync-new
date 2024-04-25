@@ -22,6 +22,9 @@ class UsersDataTable extends DataTable
             ->addColumn('roles', function (Model $data) {
                 return str_replace('_', ' ', $data->getRoleNames()->implode(', '));
             })
+            ->addColumn('status', function (Model $data) {
+                return $data->is_active ? 'Active' : 'Inactive';
+            })
             ->addColumn('actions', function (Model $data) {
                 return view('company.datatables._actions', [
                     'param' => ['user' => $data->id, 'companySlug' => $data->company->slug],
@@ -66,7 +69,7 @@ class UsersDataTable extends DataTable
             Column::make('name'),
             Column::make('email'),
             Column::make('roles'),
-            Column::make('is_active'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

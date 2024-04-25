@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\DataTables\Company\PurchaseDeliveriesDataTable;
 
 use App\Models\PurchaseDelivery;
+use App\Models\Branch;
 
 class PurchaseDeliveryController extends Controller
 {
@@ -72,7 +73,7 @@ class PurchaseDeliveryController extends Controller
     {
         $pd = PurchaseDelivery::findOrFail($id);
 
-        $branch = $pd->branch;
+        $branch = Branch::findOrFail($pd->branch_id);
 
         $status = $request->input('status');
         $pd->status = $status;
@@ -99,15 +100,15 @@ class PurchaseDeliveryController extends Controller
 
                 $newStock = $pivotData->stock + $item->qty;
 
-                if ($branch->products()->where('product_id', $id)->exists()) {
+                if ($branch->products()->where('product_id', $product->id)->exists()) {
                     // Product already exists in the branch, update the existing pivot record
-                    $branch->products()->updateExistingPivot($id, [
+                    $branch->products()->updateExistingPivot($product->id, [
                         'price' => $srp,
                         'stock' => $newStock
                     ]);
                 } else {
                     // Product doesn't exist in the branch, create a new pivot record
-                    $branch->products()->attach($id, [
+                    $branch->products()->attach($product->id, [
                         'price' => $srp,
                         'stock' => $newStock
                     ]);

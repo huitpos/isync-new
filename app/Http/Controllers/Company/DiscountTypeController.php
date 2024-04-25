@@ -170,7 +170,8 @@ class DiscountTypeController extends Controller
 
         $postData = $request->all();
         $postData['company_id'] = $company->id;
-        $postData['is_vat_exempt'] = $company->is_vat_exempt ?? false;
+        $postData['is_vat_exempt'] = $request->is_vat_exempt ?? false;
+        $postData['is_zero_rated'] = $request->is_zero_rated ?? false;
 
         $discountTypeFields = [];
         foreach ($request->input('discount_type_fields') as $field) {

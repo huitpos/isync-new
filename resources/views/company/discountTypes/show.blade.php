@@ -21,7 +21,11 @@
 
             <div class="pb-4 fs-6">
                 <div class="fw-bold">Department</div>
-                <div class="text-gray-600">{{ $discountType->department->name }}</div>
+                <div class="text-gray-600">
+                    @foreach($discountType->departments as $department)
+                        <span class="badge badge-light">{{ $department->name }}</span>
+                    @endforeach
+                </div>
             </div>
 
             <div class="pb-4 fs-6">
