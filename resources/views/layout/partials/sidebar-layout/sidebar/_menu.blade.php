@@ -112,6 +112,7 @@
 						'branch.purchase-delivery.*',
 						'branch.stock-transfer-requests.*',
 						'branch.stock-transfer-orders.*',
+						'branch.stock-transfer-deliveries.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">

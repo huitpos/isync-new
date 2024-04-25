@@ -1,11 +1,11 @@
 <x-default-layout>
 
     @section('title')
-        Stock Transfer Requests
+        Stock Transfer Deliveries
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('branch.stockTransferRequests.index', $company, $branch) }}
+        {{ Breadcrumbs::render('branch.stockTransferDeliveries.index', $company, $branch) }}
     @endsection
 
     <div class="card">
@@ -14,15 +14,6 @@
                 <div class="d-flex align-items-center position-relative my-1">
                     {!! getIcon('magnifier', 'fs-3 position-absolute ms-5') !!}
                     <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search" id="searchBar"/>
-                </div>
-            </div>
-
-            <div class="card-toolbar">
-                <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                    <a href="{{ route('branch.stock-transfer-requests.create', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">
-                        {!! getIcon('plus', 'fs-2', '', 'i') !!}
-                        Add Stock Transfer Request
-                    </a>
                 </div>
             </div>
         </div>
