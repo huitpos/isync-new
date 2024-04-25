@@ -4,17 +4,18 @@ namespace App\Http\Controllers\Branch;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+
 use App\Models\Department;
-use App\Models\PurchaseRequest;
+use App\Models\StockTransferRequest;
 
-use App\DataTables\Branch\PurchaseRequestsDataTable;
+use App\DataTables\Branch\StockTransferRequestsDataTable;
 
-class PurchaseRequestController extends Controller
+class StockTransferRequestController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, PurchaseRequestsDataTable $dataTable)
+    public function index(Request $request, StockTransferRequestsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
@@ -23,7 +24,7 @@ class PurchaseRequestController extends Controller
             'branch_id' => $branch->id,
             'branch_slug' => $branch->slug,
             'company_slug' => $company->slug,
-        ])->render('branch.purchaseRequests.index', [
+        ])->render('branch.stockTransferRequests.index', [
             'company' => $company,
             'branch' => $branch,
         ]);
@@ -41,6 +42,12 @@ class PurchaseRequestController extends Controller
             'status' => 'active'
         ])->get();
 
+        $branches = $company->branches()->where([
+            'status' => 'active'
+        ])
+        ->where('id', '!=', $branch->id)
+        ->get();
+
         $deliveryLocations = $branch->deliveryLocations()->with([
             'barangay',
             'city',
@@ -56,12 +63,13 @@ class PurchaseRequestController extends Controller
             ])->get();
         }
 
-        return view('branch.purchaseRequests.create', [
+        return view('branch.stockTransferRequests.create', [
             'company' => $company,
             'branch' => $branch,
             'suppliers' => $suppliers,
             'deliveryLocations' => $deliveryLocations,
             'departments' => $departments,
+            'branches' => $branches
         ]);
     }
 
@@ -72,17 +80,8 @@ class PurchaseRequestController extends Controller
     {
         $request->validate([
             'department_id' => 'required',
-            'date_needed' => [
-                'required',
-                'date',
-                function ($attribute, $value, $fail) {
-                    if (!strtotime($value) && !strtotime(str_replace('T', ' ', $value))) {
-                        $fail($attribute . ' is not in a valid date-time format.');
-                    }
-                },
-            ],
             'delivery_location_id' => 'required',
-            'supplier_id' => 'required',
+            'source_branch_id' => 'required',
             'pr_items' => 'required',
             'pr_items.*.product_id' => 'required',
             'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
@@ -95,51 +94,38 @@ class PurchaseRequestController extends Controller
         $branch = $request->attributes->get('branch');
         $company = $request->attributes->get('company');
 
-        $prCount = PurchaseRequest::where([
-            'branch_id' => $branch->id
+        $strCount = StockTransferRequest::where([
+            'destination_branch_id' => $branch->id
         ])->count();
 
         $branchCode = strtoupper($branch->branch_code);
         $date = date('Ymd');
-        $counter = str_pad($prCount+1, 4, '0', STR_PAD_LEFT);
-        $prNumber = "PR$branchCode$date$counter";
+        $counter = str_pad($strCount+1, 4, '0', STR_PAD_LEFT);
+        $strNumber = "STR$branchCode$date$counter";
 
         $postData = $request->all();
 
         $prData = $request->all();
-        $prData['branch_id'] = $branch->id;
-        $prData['pr_number'] = $prNumber;
+        $prData['destination_branch_id'] = $branch->id;
+        $prData['str_number'] = $strNumber;
         unset($prData['pr_items']);
 
         //save the purchase request and its items using model
-        $purchaseRequest = new PurchaseRequest();
-        $purchaseRequest->fill($prData);
-        $purchaseRequest->save();
+        $stockTransferRequest = new StockTransferRequest();
+        $stockTransferRequest->fill($prData);
+        $stockTransferRequest->save();
 
-        $purchaseRequest->items()->createMany($postData['pr_items']);
+        $stockTransferRequest->items()->createMany($postData['pr_items']);
 
-        return redirect()->route('branch.purchase-requests.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Purchase Request has been created.');
-
+        return redirect()->route('branch.stock-transfer-requests.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Stock Transfer Request has been created.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, string $companySlug, string $branchSlug, string $id)
+    public function show(string $id)
     {
-        $pr = PurchaseRequest::with([
-            'items',
-            'createdBy'
-        ])->findOrFail($id);
-
-        $company = $request->attributes->get('company');
-        $branch = $request->attributes->get('branch');
-
-        return view('branch.purchaseRequests.show', [
-            'pr' => $pr,
-            'company' => $company,
-            'branch' => $branch
-        ]);
+        //
     }
 
     /**

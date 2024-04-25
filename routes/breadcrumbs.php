@@ -362,6 +362,16 @@ Breadcrumbs::for('company.supplierTerms.edit', function (BreadcrumbTrail $trail,
     $trail->push('Edit');
 });
 
+Breadcrumbs::for('company.stockTransferRequests.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Stock Transfer Requests', route('company.stock-transfer-requests.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.stockTransferRequests.show', function (BreadcrumbTrail $trail, $company, $pd) {
+    $trail->parent('company.stockTransferRequests.index', $company);
+    $trail->push($pd->str_number);
+});
+
 
 
 
@@ -447,4 +457,37 @@ Breadcrumbs::for('branch.purchaseDeliveries.index', function (BreadcrumbTrail $t
 Breadcrumbs::for('branch.purchaseDeliveries.show', function (BreadcrumbTrail $trail, $company, $branch, $pd) {
     $trail->parent('branch.purchaseDeliveries.index', $company, $branch);
     $trail->push($pd->pd_number);
+});
+
+Breadcrumbs::for('branch.stockTransferRequests.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Stock Transfer Requests', route('branch.stock-transfer-requests.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.stockTransferRequests.create', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('branch.stockTransferRequests.index', $company, $branch);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('branch.stockTransferOrders.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Stock Transfer Orders', route('branch.stock-transfer-orders.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.stockTransferOrders.show', function (BreadcrumbTrail $trail, $company, $branch, $sto) {
+    $trail->parent('branch.stockTransferOrders.index', $company, $branch);
+    $trail->push($sto->sto_number);
+});
+
+Breadcrumbs::for('branch.stockTransferDeliveries.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Stock Transfer Deliveries', route('branch.stock-transfer-orders.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.stockTransferDeliveries.show', function (BreadcrumbTrail $trail, $company, $branch, $std) {
+    $trail->parent('branch.stockTransferDeliveries.index', $company, $branch);
+    $trail->push($std->std_number);
 });
