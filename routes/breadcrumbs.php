@@ -502,3 +502,14 @@ Breadcrumbs::for('branch.productPhysicalCount.create', function (BreadcrumbTrail
     $trail->parent('branch.productPhysicalCount.index', $company, $branch);
     $trail->push('Create');
 });
+
+Breadcrumbs::for('branch.productDisposals.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Product Disposals', route('branch.product-disposals.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.productDisposals.create', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('branch.productDisposals.index', $company, $branch);
+    $trail->push('Create');
+});

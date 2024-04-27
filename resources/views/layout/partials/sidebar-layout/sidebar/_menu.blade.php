@@ -145,6 +145,7 @@
 						'branch.stock-transfer-orders.*',
 						'branch.stock-transfer-deliveries.*',
 						'branch.product-physical-counts.*',
+						'branch.product-disposals.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -175,6 +176,12 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('branch.product-physical-counts.*') ? 'active' : '' }}" href="{{ route('branch.product-physical-counts.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 								<span class="menu-title">Product Physical Count</span>
+							</a>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.product-disposals.*') ? 'active' : '' }}" href="{{ route('branch.product-disposals.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Product Disposals</span>
 							</a>
 						</div>
 					</div>
