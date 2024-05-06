@@ -38,7 +38,11 @@ class SupplierController extends Controller
     {
         $company = $request->attributes->get('company');
 
-        return view('company.suppliers.create', compact('company'));
+        $supplierTerms = $company->supplierTerms()->where([
+            'status' => 'active'
+        ])->get();
+
+        return view('company.suppliers.create', compact('company', 'supplierTerms'));
     }
 
     /**

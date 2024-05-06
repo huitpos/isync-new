@@ -73,7 +73,7 @@
                 <div class="mb-4">
                     <label class="form-label">Supplier Term</label>
                     <select id="supplier_term_id" name="supplier_term_id" class="form-control @error('supplier_term_id') is-invalid @enderror" required>
-                        @foreach($company->supplierTerms as $supplierTerm)
+                        @foreach($supplierTerms as $supplierTerm)
                             <option value="{{ $supplierTerm->id }}" {{ old('supplier_term_id') == $supplierTerm->id ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
                         @endforeach
                     </select>
