@@ -81,7 +81,7 @@ class ProductPhysicalCountController extends Controller
 
         $physicalCount->items()->createMany($postData['pr_items']);
 
-        return redirect()->route('branch.stock-transfer-requests.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Stock Transfer Request has been created.');
+        return redirect()->route('branch.product-physical-counts.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Stock Transfer Request has been created.');
     }
 
     /**
