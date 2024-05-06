@@ -79,6 +79,7 @@ class DeliveryLocationsDataTable extends DataTable
             Column::make('province.name')->title('province'),
             Column::make('city.name')->title('city'),
             Column::make('barangay.name')->title('barangay'),
+            Column::make('status')->title('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

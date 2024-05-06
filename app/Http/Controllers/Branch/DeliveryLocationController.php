@@ -87,6 +87,7 @@ class DeliveryLocationController extends Controller
             'city_id',
             'barangay_id',
             'phone_number',
+            'status',
         ]);
 
         $locationData['branch_id'] = $branch->id;
@@ -156,6 +157,7 @@ class DeliveryLocationController extends Controller
             'city_id',
             'barangay_id',
             'phone_number',
+            'status',
         ]);
 
         $locationData['is_default'] = $request->is_default ?? false;
