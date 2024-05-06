@@ -1,11 +1,11 @@
 <x-default-layout>
 
     @section('title')
-        Purchase Requests
+        Stock Transfer Request
     @endsection
 
     @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.purchaseRequests.index', $company) }}
+        {{-- {{ Breadcrumbs::render('company.purchaseRequests.index', $company) }} --}}
     @endsection
 
     <div class="card">
