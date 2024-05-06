@@ -9,7 +9,7 @@
     @endsection
 
     <div class="card">
-        <form class="mt-3" action="{{ route('company.purchase-deliveries.update', ['companySlug' => $company->slug, 'purchase_delivery' => $pd->id]) }}" method="POST" novalidate enctype="multipart/form-data">
+        <form class="mt-3" action="{{ route('branch.purchase-deliveries.update', ['companySlug' => $company->slug, 'purchase_delivery' => $pd->id, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -102,6 +102,23 @@
                             </div>
                         </div>
                     @endforeach
+
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            @if($pd->status == 'pending')
+                                <div class="form-group">
+                                    <input type="hidden" name="status" id="status">
+                                    <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
+                                    <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group float-end">
+                                <h2>TOTAL: <span class="total">{{ number_format($pd->total_amount, 2) }}</span></h2>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>

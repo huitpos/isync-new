@@ -9,9 +9,7 @@
     @endsection
 
     <div class="card">
-        <form class="mt-3" action="{{ route('company.purchase-deliveries.update', ['companySlug' => $company->slug, 'purchase_delivery' => $pd->id]) }}" method="POST" novalidate enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
+
 
             <div class="card-body py-4">
                 <div class="row mb-5">
@@ -105,13 +103,7 @@
 
                     <div class="row mb-5">
                         <div class="col-md-6">
-                            @if($pd->status == 'pending')
-                                <div class="form-group">
-                                    <input type="hidden" name="status" id="status">
-                                    <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
-                                    <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
-                                </div>
-                            @endif
+                            
                         </div>
                         <div class="col-md-6">
                             <div class="form-group float-end">
@@ -121,7 +113,6 @@
                     </div>
                 </div>
             </div>
-        </form>
     </div>
 </x-default-layout>
 

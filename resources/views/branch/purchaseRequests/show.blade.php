@@ -9,7 +9,9 @@
     @endsection
 
     <div class="card">
-
+        <form class="mt-3" action="{{ route('branch.purchase-requests.update', ['companySlug' => $company->slug, 'purchase_request' => $pr->id, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
             <div class="card-body py-4">
                 <div class="row mb-5">
@@ -76,6 +78,34 @@
                     </div>
                 </div>
 
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <label class="form-label">Payment Terms</label>
+                        <select name="payment_term_id" id="" class="form-select @error('payment_term_id') is-invalid @enderror">
+                            @foreach($company->paymentTerms as $paymentTerm)
+                                <option value="{{ $paymentTerm->id }}" {{ $pr->payment_term_id == $paymentTerm->id ? 'selected' : '' }}>{{ $paymentTerm->name }}</option>
+                            @endforeach
+                        </select>
+
+                        @error('payment_term_id')
+                            <div class="invalid-feedback"> {{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Supplier Terms</label>
+                        <select name="supplier_term_id" id="" class="form-select @error('supplier_term_id') is-invalid @enderror">
+                            @foreach($company->supplierTerms as $supplierTerm)
+                                <option value="{{ $supplierTerm->id }}" {{ $pr->supplier_term_id == $supplierTerm->id ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
+                            @endforeach
+                        </select>
+
+                        @error('supplier_term_id')
+                            <div class="invalid-feedback"> {{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
                 <div class="mt-7">
                     <h2>Items</h2>
                     @foreach($pr->items as $item)
@@ -125,7 +155,16 @@
                             </div>
                         </div>
                     </div>
+
+                    @if($pr->status == 'pending')
+                    <div class="mt-8">
+                        <input type="hidden" name="status" id="status">
+                        <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
+                        <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                    </div>
+                    @endif
                 </div>
             </div>
+        </form>
     </div>
 </x-default-layout>

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseDelivery;
+use App\Models\Branch;
 
 use App\DataTables\Branch\PurchaseDeliveriesDataTable;
 
@@ -121,15 +122,60 @@ class PurchaseDeliveryController extends Controller
      */
     public function edit(string $id)
     {
-        
+
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request,string $companySlug, string $branchSlug, string $id)
     {
-        //
+        $pd = PurchaseDelivery::findOrFail($id);
+
+        $branch = Branch::findOrFail($pd->branch_id);
+
+        $status = $request->input('status');
+        $pd->status = $status;
+        $pd->action_by = auth()->user()->id;
+        $pd->save();
+
+        if ($status == 'rejected') {
+            foreach ($pd->items as $item) {
+                $poItem = $item->purchaseOrderItem;
+                $poItem->balance = $poItem->balance + $item->qty;
+                $poItem->save();
+            }
+        } else {
+            foreach ($pd->items as $item) {
+                $product = $item->product;
+                $product->cost = $item->unit_price;
+
+                $srp = $product->markup_type == 'percentage' ? $item->unit_price + ($item->unit_price * ($product->markup / 100)) : $item->unit_price + $product->markup;
+
+                $product->srp = $srp;
+                $product->save();
+
+                $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
+
+                $newStock = $pivotData->stock + $item->qty;
+
+                if ($branch->products()->where('product_id', $product->id)->exists()) {
+                    // Product already exists in the branch, update the existing pivot record
+                    $branch->products()->updateExistingPivot($product->id, [
+                        'price' => $srp,
+                        'stock' => $newStock
+                    ]);
+                } else {
+                    // Product doesn't exist in the branch, create a new pivot record
+                    $branch->products()->attach($product->id, [
+                        'price' => $srp,
+                        'stock' => $newStock
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Purchase delivery status updated successfully');
     }
 
     /**
