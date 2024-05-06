@@ -58,7 +58,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Supplier</label>
+                        <label class="form-label">Source Branch</label>
                         <select id="source_branch_id" name="source_branch_id" class="form-select @error('source_branch_id') is-invalid @enderror" required>
                             <option value="">Source Branch</option>
 
