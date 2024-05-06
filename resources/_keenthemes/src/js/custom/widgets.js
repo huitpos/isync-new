@@ -3548,6 +3548,7 @@ var KTWidgets = function () {
                 element.flatpickr({
                     enableTime: enableTime,
                     dateFormat: dateFormat + (enableTime ? ' H:i' : ''), // Append time format if enableTime is true
+                    minDate: element.getAttribute('data-min-date') || ''
                 });
             });
         }

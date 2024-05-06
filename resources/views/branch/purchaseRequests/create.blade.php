@@ -52,7 +52,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Date Needed</label>
-                        <input value="{{ old('date_needed') }}" name="date_needed" type="text" class="form-control @error('date_needed') is-invalid @enderror flatpack-picker" placeholder="Date Needed" required/>
+                        <input data-min-date="today" value="{{ old('date_needed') }}" name="date_needed" type="text" class="form-control @error('date_needed') is-invalid @enderror flatpack-picker" placeholder="Date Needed" required/>
 
                         @error('date_needed')
                             <div class="invalid-feedback"> {{ $message }}</div>
