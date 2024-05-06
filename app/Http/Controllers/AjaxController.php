@@ -60,9 +60,13 @@ class AjaxController extends Controller
 
     public function getDepartmentSuppliers(Request $request)
     {
-        $department = Department::with('suppliers')->find($request->department_id);
+        $department = Department::find($request->department_id);
 
-        return response()->json($department->suppliers);
+        $suppliers = $department->suppliers()->where([
+            'status' => 'active'
+        ])->get();
+
+        return response()->json($suppliers);
     }
 
     public function getCategorySubcategories(Request $request)
