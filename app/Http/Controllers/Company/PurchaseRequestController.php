@@ -56,9 +56,19 @@ class PurchaseRequestController extends Controller
 
         $company = $request->attributes->get('company');
 
+        $supplierTerms = $company->supplierTerms()->where([
+            'status' => 'active'
+        ])->get();
+
+        $paymentTerms = $company->paymentTerms()->where([
+            'status' => 'active'
+        ])->get();
+
         return view('company.purchaseRequests.show', [
             'pr' => $pr,
-            'company' => $company
+            'company' => $company,
+            'supplierTerms' => $supplierTerms,
+            'paymentTerms' => $paymentTerms
         ]);
     }
 
