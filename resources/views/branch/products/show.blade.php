@@ -83,7 +83,7 @@
             </div>
 
             <div class="pb-1 fs-6 mt-2">
-                <div class="fw-bold">Discount Exempt</div>
+                <div class="fw-bold">Discount Exempt (SC/PWD)</div>
                 <div class="text-gray-600">{{ $product->discount_exempt ? 'Yes' : 'No' }}</div>
             </div>
 

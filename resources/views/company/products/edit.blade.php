@@ -192,7 +192,7 @@
                     <div class="form-check">
                         <input {{ $product->discount_exempt ? 'checked' : '' }} class="form-check-input" name="discount_exempt" type="checkbox" value="1"/>
                         <label>
-                            Discount Exempt
+                            Discount Exempt (SC/PWD)
                         </label>
                     </div>
 
