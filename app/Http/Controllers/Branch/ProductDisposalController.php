@@ -9,8 +9,18 @@ use App\Models\ProductDisposal;
 
 use App\DataTables\Branch\ProductDisposalsDataTable;
 
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+
 class ProductDisposalController extends Controller
 {
+    protected $productRepository;
+
+    public function __construct(
+        ProductRepositoryInterface $productRepository
+    ) {
+        $this->productRepository = $productRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -132,21 +142,7 @@ class ProductDisposalController extends Controller
             foreach ($disposal->items as $item) {
                 $product = $item->product;
 
-                $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
-
-                $newStock = $pivotData->stock - $item->quantity;
-
-                if ($branch->products()->where('product_id', $product->id)->exists()) {
-                    // Product already exists in the branch, update the existing pivot record
-                    $branch->products()->updateExistingPivot($product->id, [
-                        'stock' => $newStock
-                    ]);
-                } else {
-                    // Product doesn't exist in the branch, create a new pivot record
-                    $branch->products()->attach($product->id, [
-                        'stock' => $newStock
-                    ]);
-                }
+                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_disposals', $item->quantity, null, 'subtract');
             }
         }
 

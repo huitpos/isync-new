@@ -11,11 +11,14 @@ use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\Interfaces\SubcategoryRepositoryInterface;
 use App\DataTables\Company\ProductsDataTable;
+use App\DataTables\Company\InventoryProductsDataTable;
+use App\DataTables\Company\ProductCountHistoryDataTable;
 
 use App\Imports\ProductsImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Models\Product;
+use App\Models\Branch;
 
 class ProductController extends Controller
 {
@@ -381,5 +384,36 @@ class ProductController extends Controller
         return view('company.products.import', [
             'company' => $company
         ]);
+    }
+
+    public function inventory(Request $request, $companySlug, $branchId, InventoryProductsDataTable $dataTable)
+    {
+        $company = $request->attributes->get('company');
+        $branches = auth()->user()->activeBranches;
+
+        return $dataTable->with('company_id', $company->id)
+            ->with('branch_id', $branchId)
+            ->render('company.products.inventory_products', [
+                'company' => $company,
+                'branches' => $branches,
+                'branchId' => $branchId,
+            ]);
+    }
+
+    public function inventoryProduct(Request $request, $companySlug, $branchId, ProductCountHistoryDataTable $dataTable)
+    {
+        $company = $request->attributes->get('company');
+        $branches = auth()->user()->activeBranches;
+
+        $branch = Branch::find($branchId);
+
+        return $dataTable->with('company_id', $company->id)
+            ->with('branch_id', $branchId)
+            ->render('company.products.count_history', [
+                'company' => $company,
+                'branches' => $branches,
+                'branchId' => $branchId,
+                'branch' => $branch
+            ]);
     }
 }

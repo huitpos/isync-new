@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\Product;
+use App\Models\Branch;
+use App\Models\ProductCountLog;
 use Illuminate\Support\Collection;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
@@ -82,5 +84,46 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $paymentType = Product::findOrFail($id);
         return $paymentType->delete();
+    }
+
+    public function updateBranchQuantity(Product $product, Branch $branch, $objectId, $objectType, int $qty, $srp = null, $operation = 'add'): Bool
+    {
+        $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
+
+        if ($operation == 'add') {
+            $newStock = $pivotData->stock + $qty;
+        } elseif ($operation == 'replace') {
+            $newStock = $qty;
+        } else {
+            $newStock = $pivotData->stock - $qty;
+        }
+
+        $updateData = [
+            'stock' => $newStock
+        ];
+
+        if ($srp) {
+            $updateData['price'] = $srp;
+        }
+
+        if ($branch->products()->where('product_id', $product->id)->exists()) {
+            // Product already exists in the branch, update the existing pivot record
+            $branch->products()->updateExistingPivot($product->id, $updateData);
+        } else {
+            // Product doesn't exist in the branch, create a new pivot record
+            $branch->products()->attach($product->id, $updateData);
+        }
+
+        //new ProductCountLog
+        $productCountLog = new ProductCountLog();
+        $productCountLog->branch_id = $branch->id;
+        $productCountLog->product_id = $product->id;
+        $productCountLog->object_id = $objectId;
+        $productCountLog->object_type = $objectType;
+        $productCountLog->old_quantity = $pivotData->stock;
+        $productCountLog->new_quantity = $newStock;
+        $productCountLog->save();
+
+        return true;
     }
 }

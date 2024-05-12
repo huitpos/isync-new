@@ -123,7 +123,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('banks', CompanyBankController::class, ['as' => 'company']);
         Route::resource('discount-types', CompanyDiscountTypeController::class, ['as' => 'company']);
         Route::resource('item-types', CompanyItemTypeController::class, ['as' => 'company']);
+
         Route::resource('products', CompanyProductController::class, ['as' => 'company']);
+        Route::get('/branch/{branchId}/inventory', [CompanyProductController::class, 'inventory'])->name('company.branch-inventory.index');
+        Route::get('/branch/{branchId}/inventory/{productId}', [CompanyProductController::class, 'inventoryProduct'])->name('company.branch-inventory.show');
+
         Route::get('/import-product', [CompanyProductController::class, 'showForm']);
         Route::post('/import-product', [CompanyProductController::class, 'import'])->name('company.products.import');
         Route::resource('users', CompanyUserController::class, ['as' => 'company']);

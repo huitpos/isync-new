@@ -11,8 +11,18 @@ use App\Models\Branch;
 
 use App\DataTables\Branch\PurchaseDeliveriesDataTable;
 
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+
 class PurchaseDeliveryController extends Controller
 {
+    protected $productRepository;
+
+    public function __construct(
+        ProductRepositoryInterface $productRepository
+    ) {
+        $this->productRepository = $productRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -145,9 +155,13 @@ class PurchaseDeliveryController extends Controller
                 $poItem->balance = $poItem->balance + $item->qty;
                 $poItem->save();
             }
+
+            $pd->purchaseOrder->is_closed = 0;
+            $pd->purchaseOrder->save();
         } else {
             foreach ($pd->items as $item) {
                 $product = $item->product;
+
                 $product->cost = $item->unit_price;
 
                 $srp = $product->markup_type == 'percentage' ? $item->unit_price + ($item->unit_price * ($product->markup / 100)) : $item->unit_price + $product->markup;
@@ -155,23 +169,7 @@ class PurchaseDeliveryController extends Controller
                 $product->srp = $srp;
                 $product->save();
 
-                $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
-
-                $newStock = $pivotData->stock + $item->qty;
-
-                if ($branch->products()->where('product_id', $product->id)->exists()) {
-                    // Product already exists in the branch, update the existing pivot record
-                    $branch->products()->updateExistingPivot($product->id, [
-                        'price' => $srp,
-                        'stock' => $newStock
-                    ]);
-                } else {
-                    // Product doesn't exist in the branch, create a new pivot record
-                    $branch->products()->attach($product->id, [
-                        'price' => $srp,
-                        'stock' => $newStock
-                    ]);
-                }
+                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'purchase_deliveries', $item->qty, $srp);
             }
         }
 

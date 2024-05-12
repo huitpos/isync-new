@@ -9,8 +9,18 @@ use App\DataTables\Branch\StockTransferDeliveriesDataTable;
 
 use App\Models\StockTransferDelivery;
 
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+
 class StockTransferDeliveryController extends Controller
 {
+    protected $productRepository;
+
+    public function __construct(
+        ProductRepositoryInterface $productRepository
+    ) {
+        $this->productRepository = $productRepository;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -99,21 +109,7 @@ class StockTransferDeliveryController extends Controller
             foreach ($std->items as $item) {
                 $product = $item->product;
 
-                $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
-
-                $newStock = $pivotData->stock + $item->qty;
-
-                if ($branch->products()->where('product_id', $product->id)->exists()) {
-                    // Product already exists in the branch, update the existing pivot record
-                    $branch->products()->updateExistingPivot($product->id, [
-                        'stock' => $newStock
-                    ]);
-                } else {
-                    // Product doesn't exist in the branch, create a new pivot record
-                    $branch->products()->attach($product->id, [
-                        'stock' => $newStock
-                    ]);
-                }
+                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_deliveries', $item->qty);
             }
         }
 

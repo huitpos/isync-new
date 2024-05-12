@@ -208,7 +208,7 @@
 
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(
-						'company.products.*',
+						'company.branch-inventory.index',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -218,13 +218,15 @@
 					</span>
 
 					<!--products-->
+					@if (isset($branches[0]['id']))
 					<div class="menu-sub menu-sub-accordion">
 						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.products.*') ? 'active' : '' }}" href="{{ route('company.products.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+							<a class="menu-link {{ request()->routeIs('company.branch-inventory.index') ? 'active' : '' }}" href="{{ route('company.branch-inventory.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchId' => $branches[0]['id']]) }}">
 								<span class="menu-title">Products</span>
 							</a>
 						</div>
 					</div>
+					@endif
 				</div>
 
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
@@ -301,6 +303,7 @@
 						'company.payment-types.*',
 						'company.payment-terms.*',
 						'company.supplier-terms.*',
+						'company.products.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -311,6 +314,12 @@
 
 					<!--departments-->
 					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.products.*') ? 'active' : '' }}" href="{{ route('company.products.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Products</span>
+							</a>
+						</div>
+
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.payment-types.*') ? 'active' : '' }}" href="{{ route('company.payment-types.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Payment Types</span>
