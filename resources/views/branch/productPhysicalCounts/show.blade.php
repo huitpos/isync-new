@@ -72,14 +72,6 @@
                     </div>
                     @endforeach
 
-                    <div class="row mb-5">
-                        <div class="col-md-12">
-                            <div class="form-group float-end">
-                                <h2>TOTAL: <span class="grandtotal"> {{ $count->total }}</span></h2>
-                            </div>
-                        </div>
-                    </div>
-
                     @if($count->status == 'pending')
                     <div class="mt-8">
                         <input type="hidden" name="status" id="status">
