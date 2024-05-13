@@ -31,6 +31,7 @@ use App\Http\Controllers\Company\PurchaseOrderController as CompanyPurchaseOrder
 use App\Http\Controllers\Company\PurchaseDeliveryController as CompanyPurchaseDeliveryController;
 use App\Http\Controllers\Company\StockTransferRequestController as CompanyStockTransferRequestController;
 use App\Http\Controllers\Company\ProductDisposalReasonController as CompanyProductDisposalReasonController;
+use App\Http\Controllers\Company\ProductDisposalController as CompanyProductDisposalController;
 
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\ClusterController as AdminClusterController;
@@ -139,6 +140,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('purchase-orders', CompanyPurchaseOrderController::class, ['as' => 'company']);
         Route::resource('purchase-deliveries', CompanyPurchaseDeliveryController::class, ['as' => 'company']);
         Route::resource('stock-transfer-requests', CompanyStockTransferRequestController::class, ['as' => 'company']);
+        Route::resource('product-disposals', CompanyProductDisposalController::class, ['as' => 'company']);
 
         Route::prefix('reports')->group(function () {
             Route::get('/transactions', [CompanyReportController::class, 'transactions'])->name('company.reports.transactions');

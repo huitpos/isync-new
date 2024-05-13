@@ -9,10 +9,6 @@
     @endsection
 
     <div class="card">
-        <form class="mt-3" action="{{ route('branch.product-disposals.update', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'product_disposal' => $disposal->id]) }}" method="POST" novalidate enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-
             <div class="card-body py-4">
                 <div class="row mb-5">
                     <div class="col-md-6">
@@ -86,16 +82,7 @@
                             </div>
                         </div>
                     </div>
-
-                    @if($disposal->status == 'pending')
-                    <div class="mt-8">
-                        <input type="hidden" name="status" id="status">
-                        <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
-                        <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
-                    </div>
-                    @endif
                 </div>
             </div>
-        </form>
     </div>
 </x-default-layout>

@@ -219,13 +219,19 @@
 
 					<!--products-->
 					@if (isset($branches[0]['id']))
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.branch-inventory.index') ? 'active' : '' }}" href="{{ route('company.branch-inventory.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchId' => $branches[0]['id']]) }}">
-								<span class="menu-title">Products</span>
-							</a>
+						<div class="menu-sub menu-sub-accordion">
+							<div class="menu-item">
+								<a class="menu-link {{ request()->routeIs('company.branch-inventory.index') ? 'active' : '' }}" href="{{ route('company.branch-inventory.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchId' => $branches[0]['id']]) }}">
+									<span class="menu-title">Products</span>
+								</a>
+							</div>
+
+							<div class="menu-item">
+								<a class="menu-link {{ request()->routeIs('company.product-disposals.index') ? 'active' : '' }}" href="{{ route('company.product-disposals.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchId' => $branches[0]['id']]) }}">
+									<span class="menu-title">Product Disposals</span>
+								</a>
+							</div>
 						</div>
-					</div>
 					@endif
 				</div>
 
