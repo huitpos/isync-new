@@ -71,4 +71,9 @@ class PurchaseRequest extends Model
     {
         return $this->belongsTo(Region::class);
     }
+
+    public function actionBy()
+    {
+        return $this->belongsTo(User::class, 'action_by');
+    }
 }

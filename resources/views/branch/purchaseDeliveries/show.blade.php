@@ -27,15 +27,17 @@
                 </div>
 
                 <div class="row mb-5">
-                    <div class="col-md-6">
+                    <div class="col-md-{{ $pd->status != 'pending' ? 6 : 12 }}">
                         <label class="form-label">Status</label>
                         <input value="{{ $pd->status }}" type="text" readonly class="form-control"/>
                     </div>
 
+                    @if ($pd->status != 'pending')
                     <div class="col-md-6">
-                        <label class="form-label">Action By</label>
+                        <label class="form-label">Approved/Rejected By</label>
                         <input value="{{ $pd->actionBy?->name }}" type="text" readonly class="form-control"/>
                     </div>
+                    @endif
                 </div>
 
                 <div class="row mb-5">

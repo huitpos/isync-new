@@ -38,4 +38,9 @@ class ProductDisposal extends Model
     {
         return $this->belongsTo(ProductDisposalReason::class);
     }
+
+    public function actionBy()
+    {
+        return $this->belongsTo(User::class, 'action_by');
+    }
 }

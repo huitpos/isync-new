@@ -34,4 +34,9 @@ class ProductPhysicalCount extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function actionBy()
+    {
+        return $this->belongsTo(User::class, 'action_by');
+    }
 }

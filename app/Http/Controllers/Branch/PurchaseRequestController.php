@@ -135,7 +135,8 @@ class PurchaseRequestController extends Controller
         $pr = PurchaseRequest::with([
             'items',
             'createdBy',
-            'supplier'
+            'supplier',
+            'actionBy'
         ])->findOrFail($id);
 
         $company = $request->attributes->get('company');
