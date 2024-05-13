@@ -227,8 +227,14 @@
 							</div>
 
 							<div class="menu-item">
-								<a class="menu-link {{ request()->routeIs('company.product-disposals.index') ? 'active' : '' }}" href="{{ route('company.product-disposals.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchId' => $branches[0]['id']]) }}">
+								<a class="menu-link {{ request()->routeIs('company.product-disposals.index') ? 'active' : '' }}" href="{{ route('company.product-disposals.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 									<span class="menu-title">Product Disposals</span>
+								</a>
+							</div>
+
+							<div class="menu-item">
+								<a class="menu-link {{ request()->routeIs('company.product-physical-counts.index') ? 'active' : '' }}" href="{{ route('company.product-physical-counts.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+									<span class="menu-title">Product Physical Count</span>
 								</a>
 							</div>
 						</div>
