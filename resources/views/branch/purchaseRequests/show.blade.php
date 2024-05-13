@@ -96,7 +96,7 @@
                         <label class="form-label">Supplier Terms</label>
                         <select {{ $pr->status != 'pending' ? 'disabled' : '' }} name="supplier_term_id" id="" class="form-select @error('supplier_term_id') is-invalid @enderror">
                             @foreach($supplierTerms as $supplierTerm)
-                                <option value="{{ $supplierTerm->id }}" {{ $pr->supplier_term_id == $supplierTerm->id ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
+                                <option value="{{ $supplierTerm->id }}" {{ ($pr->status != 'pending' && $pr->supplier_term_id == $supplierTerm->id) || ($pr->status == 'pending' && $pr->supplier->supplier_term_id == $supplierTerm->id) ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
                             @endforeach
                         </select>
 
