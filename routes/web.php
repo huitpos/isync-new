@@ -30,6 +30,7 @@ use App\Http\Controllers\Company\PurchaseRequestController as CompanyPurchaseReq
 use App\Http\Controllers\Company\PurchaseOrderController as CompanyPurchaseOrderController;
 use App\Http\Controllers\Company\PurchaseDeliveryController as CompanyPurchaseDeliveryController;
 use App\Http\Controllers\Company\StockTransferRequestController as CompanyStockTransferRequestController;
+use App\Http\Controllers\Company\ProductDisposalReasonController as CompanyProductDisposalReasonController;
 
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\ClusterController as AdminClusterController;
@@ -123,6 +124,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('banks', CompanyBankController::class, ['as' => 'company']);
         Route::resource('discount-types', CompanyDiscountTypeController::class, ['as' => 'company']);
         Route::resource('item-types', CompanyItemTypeController::class, ['as' => 'company']);
+        Route::resource('product-disposal-reasons', CompanyProductDisposalReasonController::class, ['as' => 'company']);
 
         Route::resource('products', CompanyProductController::class, ['as' => 'company']);
         Route::get('/branch/{branchId}/inventory', [CompanyProductController::class, 'inventory'])->name('company.branch-inventory.index');

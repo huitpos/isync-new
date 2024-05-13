@@ -33,4 +33,9 @@ class ProductDisposal extends Model
     {
         return $this->belongsTo(Department::class);
     }
+
+    public function productDisposalReason()
+    {
+        return $this->belongsTo(ProductDisposalReason::class);
+    }
 }

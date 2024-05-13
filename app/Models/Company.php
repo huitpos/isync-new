@@ -138,4 +138,9 @@ class Company extends Model
     {
         return $this->hasMany(PaymentTerm::class);
     }
+
+    public function productDisposalReasons()
+    {
+        return $this->hasMany(ProductDisposalReason::class);
+    }
 }

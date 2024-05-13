@@ -35,6 +35,13 @@
 
                 <div class="row mb-5">
                     <div class="col-md-12 mb-5">
+                        <label class="form-label">Reason</label>
+                        <input value="{{ $disposal->productDisposalReason->name }}" type="text" readonly class="form-control"/>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-md-12 mb-5">
                         <label class="form-label">Remarks</label>
                         <textarea class="form-control" readonly>{{ $disposal->remarks }}</textarea>
                     </div>

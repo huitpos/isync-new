@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Create a new product physical count
+        Create a new product disposal
     @endsection
 
     @section('breadcrumbs')
@@ -35,6 +35,17 @@
                         @error('department_id')
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-md-12 mb-5">
+                        <label class="form-label">Reason</label>
+                        <select id="product_disposal_reason_id" name="product_disposal_reason_id" class="form-select @error('product_disposal_reason_id') is-invalid @enderror" required>
+                            @foreach($reasons as $reason)
+                                <option value="{{ $reason->id }}" {{ $reason->id == old('product_disposal_reason_id') ? 'selected' : '' }}>{{ $reason->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 

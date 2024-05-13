@@ -304,6 +304,7 @@
 						'company.payment-terms.*',
 						'company.supplier-terms.*',
 						'company.products.*',
+						'company.product-disposal-reasons.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -383,6 +384,12 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.supplier-terms.*') ? 'active' : '' }}" href="{{ route('company.supplier-terms.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Supplier Terms</span>
+							</a>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.product-disposal-reasons.*') ? 'active' : '' }}" href="{{ route('company.product-disposal-reasons.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Product Disposal Reasons</span>
 							</a>
 						</div>
 					</div>

@@ -51,10 +51,13 @@ class ProductDisposalController extends Controller
             'status' => 'active'
         ])->get();
 
+        $reasons = $company->productDisposalReasons;
+
         return view('branch.productDisposals.create', [
             'company' => $company,
             'branch' => $branch,
-            'departments' => $departments
+            'departments' => $departments,
+            'reasons' => $reasons
         ]);
     }
 
@@ -101,6 +104,7 @@ class ProductDisposalController extends Controller
     {
         $disposal = ProductDisposal::with([
             'items',
+            'productDisposalReason',
             'createdBy'
         ])->findOrFail($id);
 
