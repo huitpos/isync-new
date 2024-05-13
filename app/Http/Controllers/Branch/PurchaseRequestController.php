@@ -42,7 +42,11 @@ class PurchaseRequestController extends Controller
             'status' => 'active'
         ])->get();
 
-        $deliveryLocations = $branch->deliveryLocations()->with([
+        $deliveryLocations = $branch->deliveryLocations()
+        ->where([
+            'status' => 'active'
+        ])
+        ->with([
             'barangay',
             'city',
             'province',
