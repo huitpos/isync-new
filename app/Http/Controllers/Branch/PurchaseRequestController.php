@@ -136,13 +136,18 @@ class PurchaseRequestController extends Controller
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        $supplierTerms = $company->supplierTerms()->where([
-            'status' => 'active'
-        ])->get();
+        if ($pr->status == 'pending') {
+            $supplierTerms = $company->supplierTerms()->where([
+                'status' => 'active'
+            ])->get();
 
-        $paymentTerms = $company->paymentTerms()->where([
-            'status' => 'active'
-        ])->get();
+            $paymentTerms = $company->paymentTerms()->where([
+                'status' => 'active'
+            ])->get();
+        } else {
+            $paymentTerms = $company->paymentTerms;
+            $supplierTerms = $company->supplierTerms;
+        }
 
         return view('branch.purchaseRequests.show', [
             'pr' => $pr,

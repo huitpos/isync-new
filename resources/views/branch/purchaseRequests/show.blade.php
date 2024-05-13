@@ -82,7 +82,7 @@
                     <div class="col-md-6">
                         <label class="form-label">Payment Terms</label>
                         <select {{ $pr->status != 'pending' ? 'disabled' : '' }} name="payment_term_id" id="" class="form-select @error('payment_term_id') is-invalid @enderror">
-                            @foreach($company->paymentTerms as $paymentTerm)
+                            @foreach($paymentTerms as $paymentTerm)
                                 <option value="{{ $paymentTerm->id }}" {{ $pr->payment_term_id == $paymentTerm->id ? 'selected' : '' }}>{{ $paymentTerm->name }}</option>
                             @endforeach
                         </select>
@@ -95,7 +95,7 @@
                     <div class="col-md-6">
                         <label class="form-label">Supplier Terms</label>
                         <select {{ $pr->status != 'pending' ? 'disabled' : '' }} name="supplier_term_id" id="" class="form-select @error('supplier_term_id') is-invalid @enderror">
-                            @foreach($company->supplierTerms as $supplierTerm)
+                            @foreach($supplierTerms as $supplierTerm)
                                 <option value="{{ $supplierTerm->id }}" {{ $pr->supplier_term_id == $supplierTerm->id ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
                             @endforeach
                         </select>
