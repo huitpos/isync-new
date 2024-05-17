@@ -50,8 +50,8 @@ class PurchaseOrdersDataTable extends DataTable
             $query->where('companies.id', $companyId);
         });
 
-        if ($this->status) {
-            $query->where('status', $this->status);
+        if ($this->branch_id) {
+            $query->where('branch_id', $this->branch_id);
         }
 
         return $query;
