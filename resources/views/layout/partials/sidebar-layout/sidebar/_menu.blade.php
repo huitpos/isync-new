@@ -208,7 +208,9 @@
 
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(
-						'company.branch-inventory.index',
+						'company.branch-inventory.*',
+						'company.product-physical-counts.*',
+						'company.product-disposals.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">

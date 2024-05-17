@@ -41,7 +41,7 @@ class ProductDisposalsDataTable extends DataTable
     public function query(Model $model): QueryBuilder
     {
         $companyId = $this->company_id;
-        return $model->newQuery()
+        $query = $model->newQuery()
             ->with([
                 'createdBy',
                 'branch'
@@ -49,6 +49,16 @@ class ProductDisposalsDataTable extends DataTable
             ->whereHas('branch.company', function ($query) use ($companyId) {
                 $query->where('companies.id', $companyId);
             });
+
+        if ($this->status) {
+            $query->where('status', $this->status);
+        }
+
+        if ($this->branch_id) {
+            $query->where('branch_id', $this->branch_id);
+        }
+
+        return $query;
     }
 
     /**
