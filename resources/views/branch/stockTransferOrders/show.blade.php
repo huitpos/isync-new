@@ -71,12 +71,12 @@
                     @foreach($sto->items as $item)
                     <hr>
                     <div class="form-group row mb-5 bg-light-dark p-2">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Product:</label>
                             <input value="{{ $item->product->name }}" type="text" readonly class="form-control"/>
                         </div>
 
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">UOM:</label>
                             <input value="{{ $item->uom->name }}" type="text" readonly class="form-control"/>
                         </div>
@@ -84,6 +84,11 @@
                         <div class="col-md-3">
                             <label class="form-label">Barcode:</label>
                             <input value="{{ $item->product->barcode }}" type="text" readonly class="form-control"/>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Cost:</label>
+                            <input value="{{ $item->product->cost }}" type="text" readonly class="form-control"/>
                         </div>
 
                         <div class="col-md-2">
