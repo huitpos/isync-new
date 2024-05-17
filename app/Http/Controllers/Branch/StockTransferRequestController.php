@@ -206,14 +206,14 @@ class StockTransferRequestController extends Controller
                 $transferRequestOrder->items()->createMany($stoItems);
             }
 
-            return redirect()->route('company.stock-transfer-requests.show', [
+            return redirect()->route('branch.stock-transfer-requests.show', [
                 'companySlug' => $companySlug,
                 'branchSlug' => $branchSlug,
                 'stock_transfer_request' => $str->id
             ])->with('success', 'Stock transfer request updated.');
         }
 
-        return redirect()->route('company.stock-transfer-requests.show', [
+        return redirect()->route('branch.stock-transfer-requests.show', [
             'companySlug' => $companySlug,
             'branchSlug' => $branchSlug,
             'stock_transfer_request' => $str->id

@@ -33,6 +33,7 @@ class ProductDisposalController extends Controller
             'branch_id' => $branch->id,
             'branch_slug' => $branch->slug,
             'company_slug' => $company->slug,
+            'status' => $request->query('status', null),
         ])->render('branch.productDisposals.index', [
             'company' => $company,
             'branch' => $branch,
