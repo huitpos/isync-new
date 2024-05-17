@@ -38,6 +38,7 @@
                 <div class="text-gray-600">{{ $discountType->discount }}</div>
             </div>
 
+            @if (count($discountType->fields) > 0)
             <div class="pb-1 fs-6 mb-2">
                 <div class="fw-bold">Fields</div>
                 <div class="table-responsive">
@@ -46,6 +47,7 @@
                             <tr class="fw-bold fs-6 text-gray-800">
                                 <th>Field Name</th>
                                 <th>Field Type</th>
+                                <th>Required</th>
                                 <th>Options</th>
                             </tr>
                         </thead>
@@ -54,6 +56,7 @@
                                 <tr>
                                     <td>{{ $field->name }}</td>
                                     <td>{{ $field->field_type }}</td>
+                                    <td>{{ $field->is_required ? 'Yes' : 'No' }}</td>
                                     <td>
                                         @foreach($field->options ?? [] as $option)
                                             <span class="badge badge-light">{{ $option }}</span>
@@ -65,6 +68,7 @@
                     </table>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 </x-default-layout>
