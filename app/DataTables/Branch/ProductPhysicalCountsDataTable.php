@@ -42,7 +42,8 @@ class ProductPhysicalCountsDataTable extends DataTable
     public function query(Model $model): QueryBuilder
     {
         $branchId = $this->branch_id;
-        return $model->newQuery()
+
+        $query = $model->newQuery()
             ->with([
                 'createdBy',
                 'branch'
@@ -50,6 +51,12 @@ class ProductPhysicalCountsDataTable extends DataTable
             ->whereHas('branch', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             });
+
+        if ($this->status) {
+            $query->where('status', $this->status);
+        }
+
+        return $query;
     }
 
     /**
@@ -75,7 +82,7 @@ class ProductPhysicalCountsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('sto_number'),
+            Column::make('sto_number')->title('ID'),
             Column::make('branch.name')->title('Destination Branch'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
