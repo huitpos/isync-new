@@ -76,7 +76,7 @@ class StockTransferDeliveriesDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('std_number'),
-            Column::make('branch.name')->title('Destination Branch'),
+            Column::make('branch.name')->title('Branch'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::make('created_at'),
