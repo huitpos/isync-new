@@ -54,6 +54,10 @@ class PurchaseDeliveriesDataTable extends DataTable
             $query->where('status', $this->status);
         }
 
+        if ($this->branch_id) {
+            $query->where('branch_id', $this->branch_id);
+        }
+
         return $query;
     }
 
