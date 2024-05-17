@@ -22,17 +22,17 @@ class StockTransferRequestsDataTable extends DataTable
         $companySlug = $this->company_slug;
 
         return (new EloquentDataTable($query))
-            ->editColumn('pr_number', function (Model $data) use($companySlug, $branchSlug) {
+            ->editColumn('str_number', function (Model $data) use($companySlug, $branchSlug) {
                 return '<a href="' . route('branch.stock-transfer-requests.show', [
                     'companySlug' => $companySlug,
                     'branchSlug' => $branchSlug,
                     'stock_transfer_request' => $data->id
-                ]) . '">' . $data->pr_number . '</a>';
+                ]) . '">' . $data->str_number . '</a>';
             })
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;
             })
-            ->rawColumns(['pr_number']);
+            ->rawColumns(['str_number']);
     }
 
 
