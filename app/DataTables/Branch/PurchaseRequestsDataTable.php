@@ -42,7 +42,7 @@ class PurchaseRequestsDataTable extends DataTable
     public function query(Model $model): QueryBuilder
     {
         $branchId = $this->branch_id;
-        return $model->newQuery()
+        $query = $model->newQuery()
             ->with([
                 'createdBy',
                 'branch'
@@ -50,6 +50,12 @@ class PurchaseRequestsDataTable extends DataTable
             ->whereHas('branch', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             });
+
+        if ($this->status) {
+            $query->where('status', $this->status);
+        }
+
+        return $query;
     }
 
     /**
