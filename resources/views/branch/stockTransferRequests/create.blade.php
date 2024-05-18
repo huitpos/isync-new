@@ -96,7 +96,7 @@
                                 @if (empty(old('pr_items')))
                                     <div data-repeater-item>
                                         <div class="form-group row mb-5">
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="form-label">Product:</label>
                                                 <select
                                                     name="product_id"
@@ -120,7 +120,7 @@
                                                 <input name="pr_selected_uom_text" type="hidden" class="pr_selected_uom_text">
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="form-label">Barcode:</label>
                                                 <input readonly name="barcode" type="text" class="form-control barcode"/>
                                             </div>
@@ -132,7 +132,12 @@
 
                                             <div class="col-md-2">
                                                 <label class="form-label">Quantity:</label>
-                                                <input name="quantity" value="0" type="text" class="form-control"/>
+                                                <input name="quantity" value="0" type="text" class="form-control pr_quantity"/>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">Total:</label>
+                                                <input readonly value="0" type="text" class="form-control pr_item_total text-end"/>
                                             </div>
 
                                             <div class="col-md-12 mt-3">
@@ -192,13 +197,18 @@
 
                                                 <div class="col-md-2">
                                                     <label class="form-label">Quantity:</label>
-                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="text" class="form-control @error('pr_items.' . $key . '.quantity') is-invalid @enderror"/>
+                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="text" class="form-control @error('pr_items.' . $key . '.quantity') is-invalid @enderror pr_quantity"/>
 
                                                     <div class="invalid-feedback">
                                                         @error('pr_items.' . $key . '.quantity')
                                                             <p>{{ $message }}</p>
                                                         @enderror
                                                     </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Total:</label>
+                                                    <input readonly value="0" type="text" class="form-control pr_item_total text-end"/>
                                                 </div>
 
                                                 <div class="col-md-12 mt-3">
@@ -229,6 +239,13 @@
                                         <i class="ki-duotone ki-plus fs-3"></i>
                                         Add Item
                                     </a>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group float-end">
+                                    <input type="hidden" id="pr_total" value="{{ old('total') ?? 0 }}">
+                                    <h2>TOTAL: <span class="grandtotal"> {{ old('total') ??  '0.00' }}</span></h2>
                                 </div>
                             </div>
                         </div>

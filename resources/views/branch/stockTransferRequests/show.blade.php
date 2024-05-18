@@ -77,7 +77,9 @@
 
                 <div class="mt-7">
                     <h2>Items</h2>
+                    @php $grandtotal = 0; @endphp
                     @foreach($str->items as $item)
+                        @php $grandtotal += $item->product->cost * $item->quantity @endphp
                     <hr>
                     <div class="form-group row mb-5 bg-light-dark p-2">
                         <div class="col-md-3">
@@ -115,7 +117,7 @@
                     <div class="row mb-5">
                         <div class="col-md-12">
                             <div class="form-group float-end">
-                                <h2>TOTAL: <span class="grandtotal"> {{ $str->total }}</span></h2>
+                                <h2>TOTAL: <span class="grandtotal"> {{ $grandtotal }}</span></h2>
                             </div>
                         </div>
                     </div>
