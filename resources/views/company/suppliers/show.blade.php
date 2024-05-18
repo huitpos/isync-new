@@ -33,6 +33,11 @@
                 <div class="fw-bold">Address</div>
                 <div class="text-gray-600">{{ $supplier->address }}</div>
             </div>
+
+            <div class="pb-4 fs-6">
+                <div class="fw-bold">Supplier Term</div>
+                <div class="text-gray-600">{{ $supplier->supplierTerm->name }}</div>
+            </div>
         </div>
     </div>
 </x-default-layout>

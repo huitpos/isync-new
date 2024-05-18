@@ -23,4 +23,9 @@ class Supplier extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function supplierTerm()
+    {
+        return $this->belongsTo(SupplierTerm::class);
+    }
 }
