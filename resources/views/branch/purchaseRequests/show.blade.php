@@ -103,11 +103,13 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Supplier Terms</label>
-                        <select {{ $pr->status != 'pending' ? 'disabled' : '' }} name="supplier_term_id" id="" class="form-select @error('supplier_term_id') is-invalid @enderror">
+                        <select {{ !empty($pr->supplier->supplier_term_id) ? 'disabled' : '' }} {{ $pr->status != 'pending' ? 'disabled' : '' }} name="{{ !empty($pr->supplier->supplier_term_id) ? '' : 'supplier_term_id' }}" id="" class="form-select @error('supplier_term_id') is-invalid @enderror">
                             @foreach($supplierTerms as $supplierTerm)
                                 <option value="{{ $supplierTerm->id }}" {{ ($pr->status != 'pending' && $pr->supplier_term_id == $supplierTerm->id) || ($pr->status == 'pending' && $pr->supplier->supplier_term_id == $supplierTerm->id) ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
                             @endforeach
                         </select>
+
+                        <input name="{{ empty($pr->supplier->supplier_term_id) ? '' : 'supplier_term_id' }}" value="{{ $pr->supplier->supplier_term_id }}" type="hidden" readonly class="form-control"/>
 
                         @error('supplier_term_id')
                             <div class="invalid-feedback"> {{ $message }}</div>
