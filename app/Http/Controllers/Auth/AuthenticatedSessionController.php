@@ -42,13 +42,34 @@ class AuthenticatedSessionController extends Controller
         $user->createToken('app')->plainTextToken;
         session(['_apiToken' => $user->createToken('app')->plainTextToken]);
 
+        $roles = $user->roles;
+
+        $permissions = collect();
+        foreach ($roles as $role) {
+            $permissions = $permissions->merge($role->permissions);
+        }
+
+        $permissions = $permissions->unique('id');
+
+        $permissionNames = $permissions->pluck('name')->toArray();
+
+        $companyLevelPermission = $permissions->where('level', 'company_user');
+
+        $routes = config('app.permission_routes');
+
         if ($user->hasRole('super_admin')) {
             return route('admin.dashboard');
         }
 
-        if ($user->hasRole('company_admin')) {
+        if ($companyLevelPermission->count() > 0) {
             $company =  Company::find($user->company_id);
-            return route('company.dashboard', ['companySlug' => $company->slug]);
+
+            $parentPermission = $companyLevelPermission->whereNull('parent_id')->first();
+            $childPermission = $companyLevelPermission->where('parent_id', $parentPermission->id)->first();
+
+            $route = $routes[$childPermission->name] ?? 'company.dashboard';
+
+            return route($route, ['companySlug' => $company->slug]);
         }
 
         if ($user->hasRole('branch_user')) {

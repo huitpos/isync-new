@@ -504,3 +504,40 @@ $(document).on('click', '.disable-on-click', function (e) {
 
     $(this).closest('form').submit();
 });
+
+$(document).on('change', '.permission-parent', function (e) {
+    var permissionId = $(this).attr('data-permission-id');
+    var isChecked = $(this).is(':checked');
+
+    $('.permission-child[data-parent-id="' + permissionId + '"]').prop('checked', isChecked);
+    $('.permission-grandchild[data-grandparent-id="' + permissionId + '"]').prop('checked', isChecked);
+});
+
+
+$(document).on('change', '.permission-child', function (e) {
+    var parentId = $(this).attr('data-parent-id');
+
+    var allChildren = $('.permission-child[data-parent-id="' + parentId + '"]');
+    var atLeastOneChecked = allChildren.is(':checked');
+    $('.permission-parent[data-permission-id="' + parentId + '"]').prop('checked', atLeastOneChecked);
+
+    var permissionId = $(this).attr('data-permission-id');
+    var isChecked = $(this).is(':checked');
+    $('.permission-grandchild[data-parent-id="' + permissionId + '"]').prop('checked', isChecked);
+});
+
+$(document).on('change', '.permission-grandchild', function (e) {
+    var parentId = $(this).attr('data-parent-id');
+    var grandparentId = $(this).attr('data-grandparent-id');
+
+    var allGrandChildren = $('.permission-grandchild[data-parent-id="' + parentId + '"]');
+    var atLeastOneChecked = allGrandChildren.is(':checked');
+    if (atLeastOneChecked) {
+        $('.permission-child[data-permission-id="' + parentId + '"]').prop('checked', atLeastOneChecked);
+    }
+
+    var allChildren = $('.permission-child[data-parent-id="' + grandparentId + '"]');
+    var atLeastOneChecked = allChildren.is(':checked');
+
+    $('.permission-parent[data-permission-id="' + grandparentId + '"]').prop('checked', atLeastOneChecked);
+});

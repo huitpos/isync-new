@@ -17,6 +17,7 @@ class ProductPhysicalCountController extends Controller
     public function index(Request $request, ProductPhysicalCountsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
         $branches = $company->branches;
 
         return $dataTable->with([
@@ -24,6 +25,7 @@ class ProductPhysicalCountController extends Controller
             'branch_id' => $request->query('branch_id', null),
             'company_slug' => $company->slug,
             'company_id' => $company->id,
+            'permissions' => $permissions
         ])->render('company.productPhysicalCounts.index', [
             'company' => $company,
             'branches' => $branches

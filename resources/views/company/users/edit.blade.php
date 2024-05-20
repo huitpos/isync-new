@@ -28,11 +28,12 @@
 
                     <label class="form-label">Role</label>
                     <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
-                        <option value="company_admin" {{ old('role') == 'company_admin' || in_array('company_admin', $roles ?? []) ? 'selected' : '' }}>Company Admin</option>
-                        <option value="branch_user" {{ old('role') == 'branch_user' || in_array('branch_user', $roles ?? []) ? 'selected' : '' }}>Branch User</option>
+                        @foreach($company->roles as $role)
+                            <option value="{{ $role->id }}" {{ (old('role') == $role->id || in_array($role->name, $roles)) ? 'selected' : '' }}>{{ $role->name }}</option>
+                        @endforeach
                     </select>
 
-                    @error('status')
+                    @error('role')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>

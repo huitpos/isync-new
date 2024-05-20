@@ -2,14 +2,14 @@
 
 namespace App\DataTables\Company;
 
-use App\Models\Product;
+use App\Models\Role as Model;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
-class InventoryProductsDataTable extends DataTable
+class RolesDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -19,22 +19,14 @@ class InventoryProductsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('name', function (Product $data) {
-                if (in_array('Inventory/Products/View', $this->permissions)) {
-                    return view('company.datatables._link', [
-                        'url' => route('company.branch-inventory.show', [
-                            'companySlug' => $data->company->slug,
-                            'productId' => $data->id,
-                            'branchId' => $this->branch_id
-                        ]),
-                        'text' => $data->name,
-                    ]);
-                } else {
-                    return $data->name;
-                }
+            ->addColumn('is_default', function (Model $data) {
+                return $data->is_default ? 'Yes' : 'No';
             })
-            ->addColumn('stock', function (Product $data) {
-                return $data['branches'][0]['pivot']['stock'];
+            ->addColumn('actions', function (Model $data) {
+                return view('company.datatables._actions', [
+                    'param' => ['role' => $data->id, 'companySlug' => $data->company->slug],
+                    'route' => 'company.roles',
+                ]);
             });
     }
 
@@ -42,19 +34,12 @@ class InventoryProductsDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(Product $model): QueryBuilder
+    public function query(Model $model): QueryBuilder
     {
-        $branchId = $this->branch_id;
-
         return $model->newQuery()
             ->where('company_id', $this->company_id)
             ->with([
-                'itemType',
-                'uom',
-                'createdBy',
-                'branches' => function ($query) use ($branchId) {
-                    $query->where('branches.id', $branchId);
-                }
+                'company'
             ]);
     }
 
@@ -81,10 +66,10 @@ class InventoryProductsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('name')->title('Product Name'),
-            Column::make('description'),
-            Column::make('code')->title('Item Code'),
-            Column::make('stock'),
+            Column::make('name'),
+            Column::computed('actions')
+                ->exportable(false)
+                ->printable(false),
         ];
     }
 

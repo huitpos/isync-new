@@ -390,9 +390,11 @@ class ProductController extends Controller
     {
         $company = $request->attributes->get('company');
         $branches = auth()->user()->activeBranches;
+        $permissions = $request->attributes->get('permissionNames');
 
         return $dataTable->with('company_id', $company->id)
             ->with('branch_id', $branchId)
+            ->with('permissions', $permissions)
             ->render('company.products.inventory_products', [
                 'company' => $company,
                 'branches' => $branches,

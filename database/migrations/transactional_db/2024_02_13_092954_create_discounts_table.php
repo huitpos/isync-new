@@ -25,7 +25,6 @@ return new class extends Migration
             $table->unsignedBigInteger('branch_id');
             $table->foreign('branch_id')->references('id')->on($mainDb . '.branches');
             $table->unsignedBigInteger('transaction_id');
-            $table->foreign('transaction_id')->references('transaction_id')->on($transactionalDb . '.transactions');
             $table->unsignedBigInteger('custom_discount_id');
             $table->unsignedBigInteger('discount_type_id');
             $table->string('discount_name')->nullable();

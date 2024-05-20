@@ -18,6 +18,7 @@ class ProductDisposalController extends Controller
     public function index(Request $request, ProductDisposalsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
         $branches = $company->branches;
 
         return $dataTable->with([
@@ -25,6 +26,7 @@ class ProductDisposalController extends Controller
             'branch_id' => $request->query('branch_id', null),
             'company_slug' => $company->slug,
             'company_id' => $company->id,
+            'permissions' => $permissions,
         ])->render('company.productDisposals.index', [
             'company' => $company,
             'branches' => $branches,

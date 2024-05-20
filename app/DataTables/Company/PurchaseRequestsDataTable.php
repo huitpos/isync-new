@@ -22,6 +22,19 @@ class PurchaseRequestsDataTable extends DataTable
         $companySlug = $this->company_slug;
 
         return (new EloquentDataTable($query))
+            ->addColumn('pr_number', function (Model $data) use($companySlug) {
+                if (in_array('Procurement/Purchase Requests/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.purchase-requests.show', [
+                            'companySlug' => $companySlug,
+                            'purchase_request' => $data->id
+                        ]),
+                        'text' => $data->pr_number,
+                    ]);
+                } else {
+                    return $data->pr_number;
+                }
+            })
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;
             })

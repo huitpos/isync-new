@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 use App\Models\User;
 use App\Models\Permission;
 
@@ -18,7 +18,7 @@ class RoleSeeder extends Seeder
     {
         $superAdminRole = Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
         $companyAdminRole = Role::create(['name' => 'company_admin', 'guard_name' => 'web']);
-        Role::create(['name' => 'branch_user', 'guard_name' => 'web']);
+        $branchAdminRole = Role::create(['name' => 'branch_admin', 'guard_name' => 'web']);
 
         $allPermission = Permission::create(['name' => 'all', 'guard_name' => 'web']);
 

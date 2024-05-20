@@ -64,7 +64,6 @@ CREATE TABLE `cut_offs` (
   CONSTRAINT `cut_offs_admin_id_foreign` FOREIGN KEY (`admin_id`) REFERENCES `isync`.`users` (`id`),
   CONSTRAINT `cut_offs_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
   CONSTRAINT `cut_offs_cashier_id_foreign` FOREIGN KEY (`cashier_id`) REFERENCES `isync`.`users` (`id`),
-  CONSTRAINT `cut_offs_end_of_day_id_foreign` FOREIGN KEY (`end_of_day_id`) REFERENCES `end_of_days` (`end_of_day_id`),
   CONSTRAINT `cut_offs_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -205,8 +204,7 @@ CREATE TABLE `orders` (
   CONSTRAINT `orders_is_back_out_id_foreign` FOREIGN KEY (`is_back_out_id`) REFERENCES `isync`.`users` (`id`),
   CONSTRAINT `orders_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`),
   CONSTRAINT `orders_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `isync`.`products` (`id`),
-  CONSTRAINT `orders_subcategory_id_foreign` FOREIGN KEY (`subcategory_id`) REFERENCES `isync`.`subcategories` (`id`),
-  CONSTRAINT `orders_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`)
+  CONSTRAINT `orders_subcategory_id_foreign` FOREIGN KEY (`subcategory_id`) REFERENCES `isync`.`subcategories` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `payments`;
@@ -235,8 +233,7 @@ CREATE TABLE `payments` (
   KEY `payments_payment_type_id_foreign` (`payment_type_id`),
   CONSTRAINT `payments_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
   CONSTRAINT `payments_payment_type_id_foreign` FOREIGN KEY (`payment_type_id`) REFERENCES `isync`.`payment_types` (`id`),
-  CONSTRAINT `payments_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`),
-  CONSTRAINT `payments_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`transaction_id`)
+  CONSTRAINT `payments_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `safekeeping_denominations`;
@@ -262,8 +259,7 @@ CREATE TABLE `safekeeping_denominations` (
   KEY `safekeeping_denominations_cash_denomination_id_foreign` (`cash_denomination_id`),
   CONSTRAINT `safekeeping_denominations_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `isync`.`branches` (`id`),
   CONSTRAINT `safekeeping_denominations_cash_denomination_id_foreign` FOREIGN KEY (`cash_denomination_id`) REFERENCES `isync`.`cash_denominations` (`id`),
-  CONSTRAINT `safekeeping_denominations_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`),
-  CONSTRAINT `safekeeping_denominations_safekeeping_id_foreign` FOREIGN KEY (`safekeeping_id`) REFERENCES `safekeepings` (`safekeeping_id`)
+  CONSTRAINT `safekeeping_denominations_pos_machine_id_foreign` FOREIGN KEY (`pos_machine_id`) REFERENCES `isync`.`pos_machines` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `safekeepings`;

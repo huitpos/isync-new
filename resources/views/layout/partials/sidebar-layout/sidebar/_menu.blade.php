@@ -1,3 +1,9 @@
+@php
+	$permissions = request()->attributes->get('permissionNames');
+@endphp
+
+<span style="color:white">{{ request()->route()->getName() }}</span>
+
 <div class="app-sidebar-menu overflow-hidden flex-column-fluid">
 	<div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper hover-scroll-overlay-y my-5" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
 		<div class="menu menu-column menu-rounded menu-sub-indention px-3 fw-semibold fs-6" id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false">
@@ -197,6 +203,7 @@
 				</div>
 
 			@elseif (request()->attributes->get('company'))
+				@if (in_array('Main Dashboard', $permissions))
 				<div class="menu-item">
 					<a class="menu-link {{ request()->routeIs('company.dashboard') ? 'active' : '' }}" href="{{ route('company.dashboard', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 						<span class="menu-icon">
@@ -205,7 +212,9 @@
 						<span class="menu-title">Dashboard</span>
 					</a>
 				</div>
+				@endif
 
+				@if (in_array('Inventory', $permissions))
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(
 						'company.branch-inventory.*',
@@ -222,27 +231,35 @@
 					<!--products-->
 					@if (isset($branches[0]['id']))
 						<div class="menu-sub menu-sub-accordion">
+							@if (in_array('Inventory/Products', $permissions))
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('company.branch-inventory.index') ? 'active' : '' }}" href="{{ route('company.branch-inventory.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchId' => $branches[0]['id']]) }}">
 									<span class="menu-title">Products</span>
 								</a>
 							</div>
+							@endif
 
+							@if (in_array('Inventory/Product Disposal', $permissions))
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('company.product-disposals.index') ? 'active' : '' }}" href="{{ route('company.product-disposals.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 									<span class="menu-title">Product Disposals</span>
 								</a>
 							</div>
+							@endif
 
+							@if (in_array('Inventory/Product Physical Count', $permissions))
 							<div class="menu-item">
 								<a class="menu-link {{ request()->routeIs('company.product-physical-counts.index') ? 'active' : '' }}" href="{{ route('company.product-physical-counts.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 									<span class="menu-title">Product Physical Count</span>
 								</a>
 							</div>
+							@endif
 						</div>
 					@endif
 				</div>
+				@endif
 
+				@if (in_array('Procurement', $permissions))
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(
 						'company.purchase-requests.*',
@@ -258,35 +275,46 @@
 					</span>
 
 					<div class="menu-sub menu-sub-accordion">
+						@if (in_array('Procurement/Purchase Requests', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.purchase-requests.*') ? 'active' : '' }}" href="{{ route('company.purchase-requests.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Purchase Requests</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Procurement/Purchase Orders', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.purchase-orders.*') ? 'active' : '' }}" href="{{ route('company.purchase-orders.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Purchase Orders</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Procurement/Purchase Deliveries', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.purchase-deliveries.*') ? 'active' : '' }}" href="{{ route('company.purchase-deliveries.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Purchase Deliveries</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Procurement/Stock Transfer Requests', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.stock-transfer-requests.*') ? 'active' : '' }}" href="{{ route('company.stock-transfer-requests.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Stock Transfer Requests</span>
 							</a>
 						</div>
+						@endif
 					</div>
 				</div>
+				@endif
 
+				@if (in_array('Company Access Level', $permissions))
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(
 						'company.users.*',
+						'company.roles.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -301,9 +329,17 @@
 								<span class="menu-title">Users</span>
 							</a>
 						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.roles.*') ? 'active' : '' }}" href="{{ route('company.roles.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Roles</span>
+							</a>
+						</div>
 					</div>
 				</div>
+				@endif
 
+				@if (in_array('Settings', $permissions))
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(
 						'company.departments.*',
@@ -408,6 +444,7 @@
 						</div>
 					</div>
 				</div>
+				@endif
 
 				{{-- <div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(

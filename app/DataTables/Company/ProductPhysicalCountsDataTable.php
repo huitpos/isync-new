@@ -22,10 +22,14 @@ class ProductPhysicalCountsDataTable extends DataTable
 
         return (new EloquentDataTable($query))
             ->editColumn('sto_number', function (Model $data) use($companySlug) {
-                return '<a href="' . route('company.product-physical-counts.show', [
-                    'companySlug' => $companySlug,
-                    'product_physical_count' => $data->id
-                ]) . '">' . $data->id . '</a>';
+                if (in_array('Inventory/Product Physical Count/View', $this->permissions)) {
+                    return '<a href="' . route('company.product-physical-counts.show', [
+                        'companySlug' => $companySlug,
+                        'product_physical_count' => $data->id
+                    ]) . '">' . $data->id . '</a>';
+                } else {
+                    return $data->id;
+                }
             })
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;

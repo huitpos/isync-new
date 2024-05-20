@@ -2,11 +2,18 @@
 
 namespace App\Models;
 
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Permission\Models\Role as SpatieRole;
 
-class Role extends Model
+
+class Role extends SpatieRole
 {
-    use HasFactory, HasRoles;
+    use HasFactory;
+
+    protected $fillable = ['name', 'guard_name', 'company_id'];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }

@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use App\Models\Company;
 use App\Models\Branch;
+use App\Models\Permission;
 class ValidateCompanySlug
 {
     /**
@@ -18,11 +19,32 @@ class ValidateCompanySlug
     public function handle(Request $request, Closure $next): Response
     {
         $companySlug = $request->route('companySlug');
+        $route = $request->route()->getName();
+        $sitePermissions = Permission::whereNot('route', null)->pluck('route')->toArray();
 
         /** @var \App\Models\User */
         $user = auth()->user();
 
+        $roles = $user->roles;
+
+        $permissions = collect();
+        foreach ($roles as $role) {
+            $permissions = $permissions->merge($role->permissions);
+        }
+
+        $permissions = $permissions->unique('id');
+
+        $companyUserPermissions = $permissions->where('level', 'company_user');
+
+        $permissionNames = $permissions->pluck('name')->toArray();
+        $permissionRoutes = $permissions->pluck('route')->toArray();
+        $request->attributes->add(['permissionNames' => $permissionNames]);
+
         $branches = $user->activeBranches->pluck('id')->toArray();
+
+        if ( in_array($route, $sitePermissions) && !in_array($route, $permissionRoutes)) {
+            abort(403, 'Unauthorized action.');
+        }
 
         if ($companySlug) {
             // Check if the company with this slug exists
@@ -55,10 +77,6 @@ class ValidateCompanySlug
                 $request->attributes->add(['branch' => $branch]);
 
                 return $next($request);
-            }
-
-            if (!$user->hasRole('company_admin')) {
-                abort(403, 'Unauthorized action.');
             }
         }
 

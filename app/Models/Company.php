@@ -143,4 +143,9 @@ class Company extends Model
     {
         return $this->hasMany(ProductDisposalReason::class);
     }
+
+    public function roles()
+    {
+        return $this->hasMany(Role::class);
+    }
 }

@@ -70,12 +70,7 @@
                 ],
                 columns: [
                     { data: 'id' },
-                    {
-                        data: 'pr_number',
-                        render: function(data, type, row) {
-                            return '<a href="' + row.view_url + '">' + row.pr_number + '</a>';
-                        }
-                    },
+                    { data: 'pr_number' },
                     { data: 'branch.name' },
                     {
                         data: 'date_needed',
