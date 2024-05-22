@@ -24,6 +24,9 @@ use App\Models\ApiRequestLog;
 use App\Models\DiscountType;
 use App\Models\Product;
 
+use App\Models\TakeOrderTransaction;
+use App\Models\TakeOrderOrder;
+
 use Illuminate\Support\Facades\Redis;
 
 class MiscController extends BaseController
@@ -120,7 +123,7 @@ class MiscController extends BaseController
         return $this->sendResponse($products, 'Charge Accounts retrieved successfully.');
     }
 
-    public function saveTransactions(Request $request)
+    public function saveTakeOrderTransactions(Request $request)
     {
         $requestData = $request->all();
         $validator = validator($request->all(), [
@@ -145,10 +148,13 @@ class MiscController extends BaseController
             'is_complete' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
             'branch_id' => 'required|exists:branches,id',
-
             'total_quantity' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_void_qty' => 'required|numeric',
             'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'is_return' => 'required|boolean',
+            'total_cash_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total_return_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'void_counter' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -209,6 +215,129 @@ class MiscController extends BaseController
             'total_quantity' => $request->total_quantity,
             'total_void_qty' => $request->total_void_qty,
             'vat_expense' => $request->vat_expense,
+            'is_return' => $request->is_return,
+            'total_cash_amount' => $request->total_cash_amount,
+            'total_return_amount' => $request->total_return_amount,
+            'void_counter' => $request->void_counter,
+            'void_remarks' => $request->void_remarks,
+        ];
+
+        //check if existing. update if yes
+        $transaction = TakeOrderTransaction::where([
+            'transaction_id' => $request->transaction_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        $message = 'Transaction created successfully.';
+        if ($transaction) {
+            $message = 'Transaction updated successfully.';
+            $transaction->update($postData);
+
+            return $this->sendResponse($transaction, $message);
+        }
+
+
+        return $this->sendResponse(TakeOrderTransaction::create($postData), $message);
+    }
+
+    public function saveTransactions(Request $request)
+    {
+        $requestData = $request->all();
+        $validator = validator($request->all(), [
+            'transaction_id' => 'required|numeric|min:1',
+            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'gross_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'net_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vatable_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat_exempt_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'tender_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'change' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'service_charge' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'cashier_id' => 'required|exists:users,id',
+            'total_unit_cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total_void_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'is_void' => 'required|boolean',
+            'is_back_out' => 'required|boolean',
+            'is_account_receivable' => 'required|boolean',
+            'is_sent_to_server' => 'required|boolean',
+            'is_complete' => 'required|boolean',
+            'is_cut_off' => 'required|boolean',
+            'branch_id' => 'required|exists:branches,id',
+            'total_quantity' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total_void_qty' => 'required|numeric',
+            'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'is_return' => 'required|boolean',
+            'total_cash_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total_return_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'void_counter' => 'required|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            //log request
+            $log = new ApiRequestLog();
+            $log->type = 'saveTransactions';
+            $log->method = $request->method();
+            $log->request = json_encode($requestData);
+            $log->response = json_encode($validator->errors());
+            $log->save();
+
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'transaction_id' => $request->transaction_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'control_number' => $request->control_number,
+            'receipt_number' => $request->receipt_number,
+            'gross_sales' => $request->gross_sales,
+            'net_sales' => $request->net_sales,
+            'vatable_sales' => $request->vatable_sales,
+            'vat_exempt_sales' => $request->vat_exempt_sales,
+            'vat_amount' => $request->vat_amount,
+            'discount_amount' => $request->discount_amount,
+            'tender_amount' => $request->tender_amount,
+            'change' => $request->change,
+            'service_charge' => $request->service_charge,
+            'type' => $request->type,
+            'cashier_id' => $request->cashier_id,
+            'cashier_name' => $request->cashier_name,
+            'take_order_id' => $request->take_order_id,
+            'take_order_name' => $request->take_order_name,
+            'total_unit_cost' => $request->total_unit_cost,
+            'total_void_amount' => $request->total_void_amount,
+            'shift_number' => $request->shift_number,
+            'is_void' => $request->is_void,
+            'void_by_id' => $request->void_by_id,
+            'void_by' => $request->void_by,
+            'void_at' => $request->void_at,
+            'is_back_out' => $request->is_back_out,
+            'is_back_out_id' => $request->is_back_out_id,
+            'back_out_by' => $request->back_out_by,
+            'charge_account_id' => $request->charge_account_id,
+            'charge_account_name' => $request->charge_account_name,
+            'is_account_receivable' => $request->is_account_receivable,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'is_complete' => $request->is_complete,
+            'completed_at' => $request->completed_at,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'cut_off_at' => $request->cut_off_at,
+            'branch_id' => $request->branch_id,
+            'guest_name' => $request->guest_name,
+            'is_resume_printed' => $request->is_resume_printed ?? false,
+            'treg' => $request->treg,
+            'backout_at' => $request->backout_at,
+            'total_quantity' => $request->total_quantity,
+            'total_void_qty' => $request->total_void_qty,
+            'vat_expense' => $request->vat_expense,
+            'is_return' => $request->is_return,
+            'total_cash_amount' => $request->total_cash_amount,
+            'total_return_amount' => $request->total_return_amount,
+            'void_counter' => $request->void_counter,
+            'void_remarks' => $request->void_remarks,
         ];
 
         //check if existing. update if yes
@@ -250,6 +379,26 @@ class MiscController extends BaseController
         return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
     }
 
+    public function getTakeOrderTransactions(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required|exists:branches,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $transactions = TakeOrderTransaction::where([
+            'branch_id' => $request->branch_id,
+            'is_complete' => false,
+        ])->get();
+
+        return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
+    }
+
+    
+
     public function saveOrders(Request $request)
     {
         $validator = validator($request->all(), [
@@ -285,6 +434,7 @@ class MiscController extends BaseController
             'is_open_price' => 'required|boolean',
             'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'with_serial' => 'required|boolean',
+            'is_return' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -343,6 +493,8 @@ class MiscController extends BaseController
             'remarks' => $request->remarks,
             'vat_expense' => $request->vat_expense,
             'with_serial' => $request->with_serial,
+            'is_return' => $request->is_return,
+            'serial_number' => $request->serial_number,
         ];
 
         $order = Order::where([
@@ -359,6 +511,138 @@ class MiscController extends BaseController
         }
 
         return $this->sendResponse(Order::create($postData), $message);
+    }
+
+    public function saveTakeOrderOrders(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'order_id' => 'required|numeric|min:1',
+            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'transaction_id' => 'required',
+            'product_id' => 'required|exists:products,id',
+            'cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'qty' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'original_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'gross' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'total_cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'is_vatable' => 'required|boolean',
+            'vat_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vatable_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'vat_exempt_sales' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'discount_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'department_id' => 'required|exists:departments,id',
+            'category_id' => 'required|exists:categories,id',
+            'subcategory_id' => 'required|exists:subcategories,id',
+            'unit_id' => 'required|numeric',
+            'is_void' => 'required|boolean',
+            'is_back_out' => 'required|boolean',
+            'min_amount_sold' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'is_paid' => 'required|boolean',
+            'is_sent_to_server' => 'required|boolean',
+            'is_completed' => 'required|boolean',
+            'branch_id' => 'required|exists:branches,id',
+            'is_cut_off' => 'required|boolean',
+            'is_discount_exempt' => 'required|boolean',
+            'is_open_price' => 'required|boolean',
+            'vat_expense' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'with_serial' => 'required|boolean',
+            'is_return' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'order_id' => $request->order_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'transaction_id' => $request->transaction_id,
+            'product_id' => $request->product_id,
+            'code' => $request->code,
+            'name' => $request->name,
+            'description' => $request->description,
+            'abbreviation' => $request->abbreviation,
+            'cost' => $request->cost,
+            'qty' => $request->qty,
+            'amount' => $request->amount,
+            'original_amount' => $request->original_amount,
+            'gross' => $request->gross,
+            'total' => $request->total,
+            'total_cost' => $request->total_cost,
+            'is_vatable' => $request->is_vatable,
+            'vat_amount' => $request->vat_amount,
+            'vatable_sales' => $request->vatable_sales,
+            'vat_exempt_sales' => $request->vat_exempt_sales,
+            'discount_amount' => $request->discount_amount,
+            'department_id' => $request->department_id,
+            'department_name' => $request->department_name,
+            'category_id' => $request->category_id,
+            'category_name' => $request->category_name,
+            'subcategory_id' => $request->subcategory_id,
+            'subcategory_name' => $request->subcategory_name,
+            'unit_id' => $request->unit_id,
+            'unit_name' => $request->unit_name,
+            'is_void' => $request->is_void,
+            'void_by' => $request->void_by,
+            'void_at' => $request->void_at,
+            'is_back_out' => $request->is_back_out,
+            'is_back_out_id' => $request->is_back_out_id,
+            'back_out_by' => $request->back_out_by,
+            'min_amount_sold' => $request->min_amount_sold,
+            'is_paid' => $request->is_paid,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'is_completed' => $request->is_completed,
+            'completed_at' => $request->completed_at,
+            'branch_id' => $request->branch_id,
+            'shift_number' => $request->shift_number,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'cut_off_at' => $request->cut_off_at,
+            'discount_details_id' => $request->discount_details_id,
+            'treg' => $request->treg,
+            'is_discount_exempt' => $request->is_discount_exempt,
+            'is_open_price' => $request->is_open_price,
+            'remarks' => $request->remarks,
+            'vat_expense' => $request->vat_expense,
+            'with_serial' => $request->with_serial,
+            'is_return' => $request->is_return,
+            'serial_number' => $request->serial_number,
+        ];
+
+        $order = TakeOrderOrder::where([
+            'order_id' => $request->order_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        $message = 'Order created successfully.';
+        if ($order) {
+            $message = 'Order updated successfully.';
+            $order->update($postData);
+            return $this->sendResponse($order, $message);
+        }
+
+        return $this->sendResponse(TakeOrderOrder::create($postData), $message);
+    }
+
+    public function getTakeOrderOrders(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required|exists:branches,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $orders = TakeOrderOrder::where([
+            'branch_id' => $request->branch_id,
+            'is_completed' => false,
+        ])->get();
+
+        return $this->sendResponse($orders, 'Orders retrieved successfully.');
     }
 
     public function getOrders(Request $request)
@@ -407,7 +691,6 @@ class MiscController extends BaseController
             'payment_type_id' => $request->payment_type_id,
             'payment_type_name' => $request->payment_type_name,
             'amount' => $request->amount,
-            'other_informations' => $request->other_informations,
             'is_advance_payment' => $request->is_advance_payment,
             'shift_number' => $request->shift_number,
             'is_sent_to_server' => $request->is_sent_to_server,
@@ -891,9 +1174,6 @@ class MiscController extends BaseController
             'cashier_name' => $request->cashier_name,
             'authorize_id' => $request->authorize_id,
             'authorize_name' => $request->authorize_name,
-            'customer_identification_number' => $request->customer_identification_number,
-            'customer_name' => $request->customer_name,
-            'customer_address' => $request->customer_address,
             'is_void' => $request->is_void,
             'void_by_id' => $request->void_by_id,
             'void_by' => $request->void_by,

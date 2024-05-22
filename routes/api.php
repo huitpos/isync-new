@@ -93,6 +93,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/discount-details', [MiscController::class, 'saveDiscountDetails']);
         Route::get('/discount-details', [MiscController::class, 'getDiscountDetails']);
 
+        Route::get('/branch-take-order-transactions', [MiscController::class, 'getTakeOrderTransactions']);
+        Route::post('/branch-take-order-transactions', [MiscController::class, 'saveTakeOrderTransactions']);
+
+        Route::get('/branch-take-order-orders', [MiscController::class, 'getTakeOrderOrders']);
+        Route::post('/branch-take-order-orders', [MiscController::class, 'saveTakeOrderOrders']);
+
         Route::apiResource('branches', BranchesController::class);
     });
 

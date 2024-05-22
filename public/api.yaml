@@ -387,6 +387,162 @@ paths:
                 items:
                   type: string
 
+  /api/branch-take-order-transactions:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all take-order transactions by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send take-rder transaction to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                control_number:
+                  type: string
+                receipt_number:
+                  type: string
+                gross_sales:
+                  type: number
+                net_sales:
+                  type: number
+                vatable_sales:
+                  type: number
+                vat_exempt_sales:
+                  type: number
+                vat_amount:
+                  type: number
+                discount_amount:
+                  type: number
+                tender_amount:
+                  type: number
+                change:
+                  type: number
+                service_charge:
+                  type: number
+                type:
+                  type: string
+                cashier_id:
+                  type: integer
+                cashier_name:
+                  type: string
+                take_order_id:
+                  type: integer
+                  default: null
+                take_order_name:
+                  type: string
+                total_unit_cost:
+                  type: number
+                total_void_amount:
+                  type: number
+                shift_number:
+                  type: integer
+                is_void:
+                  type: boolean
+                void_by_id:
+                  type: integer
+                  default: null
+                void_by:
+                  type: string
+                void_at:
+                  type: string
+                  default: null
+                is_back_out:
+                  type: boolean
+                is_back_out_id:
+                  type: integer
+                  default: null
+                back_out_by:
+                  type: string
+                charge_account_id:
+                  type: integer
+                  default: null
+                charge_account_name:
+                  type: string
+                is_account_receivable:
+                  type: boolean
+                is_sent_to_server:
+                  type: boolean
+                is_complete:
+                  type: boolean
+                completed_at:
+                  type: string
+                  default: null
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_id:
+                  type: integer
+                cut_off_at:
+                  type: string
+                  default: null
+                branch_id:
+                  type: integer
+                guest_name:
+                  type: string
+                is_resume_printed:
+                  type: boolean
+                treg:
+                  type: string
+                backout_at:
+                  type: string
+                  default: null
+                total_quantity:
+                  type: number
+                total_void_qty:
+                  type: number
+                vat_expense:
+                  type: number
+                is_return:
+                  type: boolean
+                total_cash_amount:
+                  type: number
+                total_return_amount:
+                  type: number
+                void_counter:
+                  type: number
+                void_remarks:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
   /api/branch-transactions:
     get:
       tags:
@@ -530,6 +686,16 @@ paths:
                   type: number
                 vat_expense:
                   type: number
+                is_return:
+                  type: boolean
+                total_cash_amount:
+                  type: number
+                total_return_amount:
+                  type: number
+                total_void_counter:
+                  type: number
+                void_remarks:
+                  type: string
       responses:
         '200':
           content:
@@ -689,6 +855,167 @@ paths:
                   type: number
                 with_serial:
                   type: boolean
+                is_return:
+                  type: boolean
+                serial_number:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/branch-take-order-orders:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all take-order orders by branch ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      tags:
+        - Sync To Server
+      summary: Send take-order orders to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                order_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                product_id:
+                  type: integer
+                code:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                abbreviation:
+                  type: string
+                cost:
+                  type: number
+                qty:
+                  type: number
+                amount:
+                  type: number
+                original_amount:
+                  type: number
+                gross:
+                  type: number
+                total:
+                  type: number
+                total_cost:
+                  type: number
+                is_vatable:
+                  type: boolean
+                vat_amount:
+                  type: number
+                vatable_sales:
+                  type: number
+                vat_exempt_sales:
+                  type: number
+                discount_amount:
+                  type: number
+                department_id:
+                  type: integer
+                department_name:
+                  type: string
+                category_id:
+                  type: integer
+                category_name:
+                  type: string
+                subcategory_id:
+                  type: integer
+                subcategory_name:
+                  type: string
+                unit_id:
+                  type: integer
+                unit_name:
+                  type: string
+                is_void:
+                  type: boolean
+                void_by:
+                  type: string
+                void_at:
+                  type: string
+                  default: null
+                is_back_out:
+                  type: boolean
+                is_back_out_id:
+                  type: integer
+                  default: null
+                back_out_by:
+                  type: string
+                min_amount_sold:
+                  type: number
+                is_paid:
+                  type: boolean
+                is_sent_to_server:
+                  type: boolean
+                is_completed:
+                  type: boolean
+                completed_at:
+                  type: string
+                  default: null
+                shift_number:
+                  type: integer
+                branch_id:
+                  type: integer
+                is_cut_off:
+                  type: boolean
+                cut_off_id:
+                  type: integer
+                cut_off_at:
+                  type: string
+                  default: null
+                discount_details_id:
+                  type: integer
+                treg:
+                  type: string
+                is_discount_exempt:
+                  type: boolean
+                is_open_price:
+                  type: boolean
+                remarks:
+                  type: string
+                vat_expense:
+                  type: number
+                with_serial:
+                  type: boolean
+                is_return:
+                  type: boolean
+                serial_number:
+                  type: string
       responses:
         '200':
           content:
@@ -757,9 +1084,6 @@ paths:
                   default: null
                 amount:
                   type: number
-                other_information:
-                  type: string
-                  default: null
                 is_advance_payment:
                   type: boolean
                 shift_number:
@@ -1265,12 +1589,6 @@ paths:
                 cashier_name:
                   type: string
                 authorize_name:
-                  type: string
-                customer_identification_number:
-                  type: string
-                customer_name:
-                  type: string
-                customer_address:
                   type: string
                 void_by_id:
                   type: integer
