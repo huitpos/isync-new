@@ -38,9 +38,18 @@ class RoleController extends Controller
         ])
         ->get();
 
-    $branchPermissions = Permission::where([
+        $branchPermissions = Permission::where([
             'parent_id' => null,
             'level' => 'branch_user'
+        ])
+        ->with([
+            'children'
+        ])
+        ->get();
+
+        $posPermissions = Permission::where([
+            'parent_id' => null,
+            'level' => 'pos'
         ])
         ->with([
             'children'
@@ -51,6 +60,7 @@ class RoleController extends Controller
             'companyPermissions' => $companyPermissions,
             'branchPermissions' => $branchPermissions,
             'company' => $company,
+            'posPermissions' => $posPermissions
         ]);
     }
 
@@ -117,11 +127,21 @@ class RoleController extends Controller
             ])
             ->get();
 
+        $posPermissions = Permission::where([
+                'parent_id' => null,
+                'level' => 'pos'
+            ])
+            ->with([
+                'children'
+            ])
+            ->get();
+
         return view('company.roles.edit', [
             'role' => $role,
             'company' => $company,
             'companyPermissions' => $companyPermissions,
             'branchPermissions' => $branchPermissions,
+            'posPermissions' => $posPermissions,
         ]);
     }
 

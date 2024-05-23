@@ -67,7 +67,7 @@ class MiscController extends BaseController
 
     public function branchUsers($branchId)
     {
-        $branch = Branch::find($branchId);
+        $branch = Branch::with(['users.roles.permissions'])->find($branchId);
 
         $users = $branch->users;
 

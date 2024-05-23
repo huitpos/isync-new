@@ -148,6 +148,42 @@ class PermissionSeeder extends Seeder
             Permission::create(['name' => 'Branch Dashboard/Transaction/Pending Transactions', 'guard_name' => 'web', 'level' => 'branch_user', 'parent_id' => $dashboard->id, 'route' => 'branch.dashboard']);
             Permission::create(['name' => 'Branch Dashboard/Transaction/Voided Transactions', 'guard_name' => 'web', 'level' => 'branch_user', 'parent_id' => $dashboard->id, 'route' => 'branch.dashboard']);
 
+        //POS
+        $pos = Permission::create(['name' => 'POS', 'guard_name' => 'web', 'level' => 'pos']);
+            Permission::create(['name' => 'POS/Resume Transaction', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Resume Transaction/Resume', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Backout', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Orders', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/View Receipt', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/View Receipt/Reprint', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/View Receipt/Void', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/AR Redeeming', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Cut Off', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Cut Off/X Reading', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Cut Off/Z Reading', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Payout', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Safekeeping', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Spot Audit', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Sync Data', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Upload Server', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Backup', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Settings', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Payment', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Discount', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Item Void', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Print', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Open Drawer', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Item Select', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Item Select/Update Price', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Item Select/Update Qty', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Item Select/Return Item', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Clear Transaction', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Pause Transaction', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/View Products', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Search Product', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/Scan Barcode', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+            Permission::create(['name' => 'POS/View Departments', 'guard_name' => 'web', 'level' => 'pos', 'parent_id' => $pos->id]);
+
         $role = Role::findByName('company_admin');
         $permissions = Permission::where('level', 'company_user')->pluck('id');
         $role->syncPermissions($permissions);
