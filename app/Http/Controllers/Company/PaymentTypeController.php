@@ -24,9 +24,13 @@ class PaymentTypeController extends Controller
     public function index(Request $request, PaymentTypesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
 
-        return $dataTable->with('company_id', $company->id)
-            ->render('company.paymentTypes.index', compact('company'));
+        return $dataTable->with([
+                'company_id' => $company->id,
+                'permissions' => $permissions
+            ])
+            ->render('company.paymentTypes.index', compact('company', 'permissions'));
     }
 
     /**

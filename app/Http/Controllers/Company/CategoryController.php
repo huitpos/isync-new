@@ -24,9 +24,14 @@ class CategoryController extends Controller
     public function index(Request $request, CategoriesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
 
-        return $dataTable->with('company_id', $company->id)->render('company.categories.index', [
+        return $dataTable->with([
+            'company_id' => $company->id,
+            'permissions' => $permissions,
+        ])->render('company.categories.index', [
             'company' => $company,
+            'permissions' => $permissions
         ]);
     }
 

@@ -20,21 +20,29 @@ class PaymentTypesDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (Model $data) {
-                if ($data->id != 1) {
-                    return view('company.datatables._link', [
-                        'url' => route('company.payment-types.show', ['companySlug' => $data->company->slug, 'payment_type' => $data->id]),
-                        'text' => $data->name,
-                    ]);
+                if (in_array('Settings/Payment Types/View', $this->permissions)) {
+                    if ($data->id != 1) {
+                        return view('company.datatables._link', [
+                            'url' => route('company.payment-types.show', ['companySlug' => $data->company->slug, 'payment_type' => $data->id]),
+                            'text' => $data->name,
+                        ]);
+                    } else {
+                        return $data->name;
+                    }
                 } else {
                     return $data->name;
                 }
             })
             ->addColumn('actions', function (Model $data) {
-                if ($data->id != 1) {
-                    return view('company.datatables._actions', [
-                        'param' => ['payment_type' => $data->id, 'companySlug' => $data->company->slug],
-                        'route' => 'company.payment-types',
-                    ]);
+                if (in_array('Settings/Payment Types/Edit', $this->permissions)) {
+                    if ($data->id != 1) {
+                        return view('company.datatables._actions', [
+                            'param' => ['payment_type' => $data->id, 'companySlug' => $data->company->slug],
+                            'route' => 'company.payment-types',
+                        ]);
+                    } else {
+                        return '';
+                    }
                 } else {
                     return '';
                 }

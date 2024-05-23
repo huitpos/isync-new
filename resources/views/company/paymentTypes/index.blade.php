@@ -19,10 +19,12 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+                    @if (in_array('Settings/Payment Types/Add', $permissions))
                     <a href="{{ route('company.payment-types.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
                         Add Payment Type
                     </a>
+                    @endif
                 </div>
             </div>
         </div>

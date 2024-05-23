@@ -19,10 +19,12 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                    <a href="{{ route('company.categories.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
-                        {!! getIcon('plus', 'fs-2', '', 'i') !!}
-                        Add Category
-                    </a>
+                    @if (in_array('Settings/Categories/Add', $permissions))
+                        <a href="{{ route('company.categories.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
+                            {!! getIcon('plus', 'fs-2', '', 'i') !!}
+                            Add Category
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>

@@ -18,12 +18,14 @@
             </div>
 
             <div class="card-toolbar">
+                @if (in_array('Settings/Departments/Add', $permissions))
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
                     <a href="{{ route('company.departments.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
                         Add Department
                     </a>
                 </div>
+                @endif
             </div>
         </div>
 

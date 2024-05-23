@@ -20,16 +20,24 @@ class CategoriesDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (Category $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.categories.show', ['companySlug' => $data->company->slug, 'category' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Categories/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.categories.show', ['companySlug' => $data->company->slug, 'category' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (Category $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['category' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.categories',
-                ]);
+                if (in_array('Settings/Categories/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['category' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.categories',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 

@@ -136,6 +136,17 @@ class PermissionSeeder extends Seeder
                 Permission::create(['name' => 'Settings/Categories/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $categories->id, 'route' => 'company.categories.create']);
                 Permission::create(['name' => 'Settings/Categories/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $categories->id, 'route' => 'company.categories.edit']);
 
+            $subcategories = Permission::create(['name' => 'Settings/Sub-Categories', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.subcategories.index']);
+            $itemTypes = Permission::create(['name' => 'Settings/Item Types', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.item-types.index']);
+            $uom = Permission::create(['name' => 'Settings/Unit of Measurements', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.unit-of-measurements.index']);
+            $discountTypes = Permission::create(['name' => 'Settings/Discount Types', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.discount-types.index']);
+            $suppliers = Permission::create(['name' => 'Settings/Suppliers', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.suppliers.index']);
+            $chargeAccounts = Permission::create(['name' => 'Settings/Charge Accounts', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.charge-accounts.index']);
+            $paymentTerms = Permission::create(['name' => 'Settings/Payment Terms', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.payment-terms.index']);
+            $supplier = Permission::create(['name' => 'Settings/Supplier Terms', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.supplier-terms.index']);
+            $productDisposalReasons = Permission::create(['name' => 'Settings/Product Disposal Reasons', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.product-disposal-reasons.index']);
+
+
         //BRANCH
         //Dashboard
         $dashboard = Permission::create(['name' => 'Branch Dashboard', 'guard_name' => 'web', 'level' => 'branch_user']);

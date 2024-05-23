@@ -20,16 +20,24 @@ class DepartmentsDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (Department $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.departments.show', ['companySlug' => $data->company->slug, 'department' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Departments/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.departments.show', ['companySlug' => $data->company->slug, 'department' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (Department $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['department' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.departments',
-                ]);
+                if (in_array('Settings/Departments/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['department' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.departments',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 
