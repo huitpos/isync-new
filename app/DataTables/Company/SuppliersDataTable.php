@@ -20,16 +20,24 @@ class SuppliersDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (Supplier $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.suppliers.show', ['companySlug' => $data->company->slug, 'supplier' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Suppliers/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.suppliers.show', ['companySlug' => $data->company->slug, 'supplier' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (Supplier $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['supplier' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.suppliers',
-                ]);
+                if (in_array('Settings/Suppliers/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['supplier' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.suppliers',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 

@@ -152,11 +152,34 @@ class PermissionSeeder extends Seeder
                 Permission::create(['name' => 'Settings/Unit of Measurements/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $uom->id, 'route' => 'company.unit-of-measurements.edit']);
 
             $discountTypes = Permission::create(['name' => 'Settings/Discount Types', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.discount-types.index']);
+                Permission::create(['name' => 'Settings/Discount Types/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $discountTypes->id, 'route' => 'company.discount-types.show']);
+                Permission::create(['name' => 'Settings/Discount Types/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $discountTypes->id, 'route' => 'company.discount-types.create']);
+                Permission::create(['name' => 'Settings/Discount Types/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $discountTypes->id, 'route' => 'company.discount-types.edit']);
+
             $suppliers = Permission::create(['name' => 'Settings/Suppliers', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.suppliers.index']);
+                Permission::create(['name' => 'Settings/Suppliers/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $suppliers->id, 'route' => 'company.suppliers.show']);
+                Permission::create(['name' => 'Settings/Suppliers/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $suppliers->id, 'route' => 'company.suppliers.create']);
+                Permission::create(['name' => 'Settings/Suppliers/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $suppliers->id, 'route' => 'company.suppliers.edit']);
+
             $chargeAccounts = Permission::create(['name' => 'Settings/Charge Accounts', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.charge-accounts.index']);
+                Permission::create(['name' => 'Settings/Charge Accounts/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $chargeAccounts->id, 'route' => 'company.charge-accounts.show']);
+                Permission::create(['name' => 'Settings/Charge Accounts/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $chargeAccounts->id, 'route' => 'company.charge-accounts.create']);
+                Permission::create(['name' => 'Settings/Charge Accounts/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $chargeAccounts->id, 'route' => 'company.charge-accounts.edit']);
+
             $paymentTerms = Permission::create(['name' => 'Settings/Payment Terms', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.payment-terms.index']);
-            $supplier = Permission::create(['name' => 'Settings/Supplier Terms', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.supplier-terms.index']);
+                Permission::create(['name' => 'Settings/Payment Terms/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $paymentTerms->id, 'route' => 'company.payment-terms.show']);
+                Permission::create(['name' => 'Settings/Payment Terms/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $paymentTerms->id, 'route' => 'company.payment-terms.create']);
+                Permission::create(['name' => 'Settings/Payment Terms/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $paymentTerms->id, 'route' => 'company.payment-terms.edit']);
+
+            $supplierTerms = Permission::create(['name' => 'Settings/Supplier Terms', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.supplier-terms.index']);
+                Permission::create(['name' => 'Settings/Supplier Terms/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $supplierTerms->id, 'route' => 'company.supplier-terms.show']);
+                Permission::create(['name' => 'Settings/Supplier Terms/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $supplierTerms->id, 'route' => 'company.supplier-terms.create']);
+                Permission::create(['name' => 'Settings/Supplier Terms/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $supplierTerms->id, 'route' => 'company.supplier-terms.edit']);
+
             $productDisposalReasons = Permission::create(['name' => 'Settings/Product Disposal Reasons', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.product-disposal-reasons.index']);
+                Permission::create(['name' => 'Settings/Product Disposal Reasons/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $productDisposalReasons->id, 'route' => 'company.product-disposal-reasons.show']);
+                Permission::create(['name' => 'Settings/Product Disposal Reasons/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $productDisposalReasons->id, 'route' => 'company.product-disposal-reasons.create']);
+                Permission::create(['name' => 'Settings/Product Disposal Reasons/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $productDisposalReasons->id, 'route' => 'company.product-disposal-reasons.edit']);
 
 
         //BRANCH

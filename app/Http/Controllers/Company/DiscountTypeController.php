@@ -24,9 +24,14 @@ class DiscountTypeController extends Controller
     public function index(Request $request, DiscountTypesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
 
-        return $dataTable->with('company_id', $company->id)->render('company.discountTypes.index', [
-            'company' => $company
+        return $dataTable->with([
+            'company_id' => $company->id,
+            'permissions' => $permissions
+        ])->render('company.discountTypes.index', [
+            'company' => $company,
+            'permissions' => $permissions
         ]);
     }
 

@@ -20,16 +20,24 @@ class DiscountTypesDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (DiscountType $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.discount-types.show', ['companySlug' => $data->company->slug, 'discount_type' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Discount Types/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.discount-types.show', ['companySlug' => $data->company->slug, 'discount_type' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (DiscountType $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['discount_type' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.discount-types',
-                ]);
+                if (in_array('Settings/Discount Types/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['discount_type' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.discount-types',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 
