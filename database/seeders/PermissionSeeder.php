@@ -107,10 +107,10 @@ class PermissionSeeder extends Seeder
                 Permission::create(['name' => 'Company Access Level/Users/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $users->id, 'route' => 'company.users.show']);
                 Permission::create(['name' => 'Company Access Level/Users/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $users->id, 'route' => 'company.users.create']);
                 Permission::create(['name' => 'Company Access Level/Users/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $users->id, 'route' => 'company.users.edit']);
-            $role = Permission::create(['name' => 'Company Access Level/Role', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $accessLevel->id, 'route' => 'company.roles.index']);
-                Permission::create(['name' => 'Company Access Level/Role/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $role->id, 'route' => 'company.roles.show']);
-                Permission::create(['name' => 'Company Access Level/Role/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $role->id, 'route' => 'company.roles.create']);
-                Permission::create(['name' => 'Company Access Level/Role/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $role->id, 'route' => 'company.roles.edit']);
+            // $role = Permission::create(['name' => 'Company Access Level/Role', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $accessLevel->id, 'route' => 'company.roles.index']);
+            //     Permission::create(['name' => 'Company Access Level/Role/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $role->id, 'route' => 'company.roles.show']);
+            //     Permission::create(['name' => 'Company Access Level/Role/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $role->id, 'route' => 'company.roles.create']);
+            //     Permission::create(['name' => 'Company Access Level/Role/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $role->id, 'route' => 'company.roles.edit']);
 
         //settings
         $settings = Permission::create(['name' => 'Settings', 'guard_name' => 'web', 'level' => 'company_user']);
@@ -137,7 +137,15 @@ class PermissionSeeder extends Seeder
                 Permission::create(['name' => 'Settings/Categories/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $categories->id, 'route' => 'company.categories.edit']);
 
             $subcategories = Permission::create(['name' => 'Settings/Sub-Categories', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.subcategories.index']);
+                Permission::create(['name' => 'Settings/Sub-Categories/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $subcategories->id, 'route' => 'company.subcategories.show']);
+                Permission::create(['name' => 'Settings/Sub-Categories/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $subcategories->id, 'route' => 'company.subcategories.create']);
+                Permission::create(['name' => 'Settings/Sub-Categories/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $subcategories->id, 'route' => 'company.subcategories.edit']);
+
             $itemTypes = Permission::create(['name' => 'Settings/Item Types', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.item-types.index']);
+                Permission::create(['name' => 'Settings/Item Types/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $itemTypes->id, 'route' => 'company.item-types.show']);
+                Permission::create(['name' => 'Settings/Item Types/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $itemTypes->id, 'route' => 'company.item-types.create']);
+                Permission::create(['name' => 'Settings/Item Types/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $itemTypes->id, 'route' => 'company.item-types.edit']);
+
             $uom = Permission::create(['name' => 'Settings/Unit of Measurements', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.unit-of-measurements.index']);
             $discountTypes = Permission::create(['name' => 'Settings/Discount Types', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.discount-types.index']);
             $suppliers = Permission::create(['name' => 'Settings/Suppliers', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.suppliers.index']);

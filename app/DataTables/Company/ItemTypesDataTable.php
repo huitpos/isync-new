@@ -20,16 +20,24 @@ class ItemTypesDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (ItemType $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.item-types.show', ['companySlug' => $data->company->slug, 'item_type' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Item Types/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.item-types.show', ['companySlug' => $data->company->slug, 'item_type' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (ItemType $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['item_type' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.item-types',
-                ]);
+                if (in_array('Settings/Item Types/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['item_type' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.item-types',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 

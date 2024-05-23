@@ -20,16 +20,24 @@ class SubcategoriesDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (Subcategory $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.subcategories.show', ['companySlug' => $data->company->slug, 'subcategory' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Sub-Categories/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.subcategories.show', ['companySlug' => $data->company->slug, 'subcategory' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (Subcategory $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['subcategory' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.subcategories',
-                ]);
+                if (in_array('Settings/Sub-Categories/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['subcategory' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.subcategories',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 
