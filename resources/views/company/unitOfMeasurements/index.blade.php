@@ -19,10 +19,12 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+                    @if (in_array('Settings/Unit of Measurements/Edit', $permissions))
                     <a href="{{ route('company.unit-of-measurements.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
                         Add Unit of Measurement
                     </a>
+                    @endif
                 </div>
             </div>
         </div>

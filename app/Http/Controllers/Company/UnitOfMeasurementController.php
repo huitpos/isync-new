@@ -26,9 +26,14 @@ class UnitOfMeasurementController extends Controller
     public function index(Request $request, UnitOfMeasurementsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
 
-        return $dataTable->with('company_id', $company->id)->render('company.unitOfMeasurements.index', [
-            'company' => $company
+        return $dataTable->with([
+            'company_id' => $company->id,
+            'permissions' => $permissions
+        ])->render('company.unitOfMeasurements.index', [
+            'company' => $company,
+            'permissions' => $permissions
         ]);
     }
 

@@ -147,6 +147,10 @@ class PermissionSeeder extends Seeder
                 Permission::create(['name' => 'Settings/Item Types/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $itemTypes->id, 'route' => 'company.item-types.edit']);
 
             $uom = Permission::create(['name' => 'Settings/Unit of Measurements', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.unit-of-measurements.index']);
+                Permission::create(['name' => 'Settings/Unit of Measurements/View', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $uom->id, 'route' => 'company.unit-of-measurements.show']);
+                Permission::create(['name' => 'Settings/Unit of Measurements/Add', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $uom->id, 'route' => 'company.unit-of-measurements.create']);
+                Permission::create(['name' => 'Settings/Unit of Measurements/Edit', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $uom->id, 'route' => 'company.unit-of-measurements.edit']);
+
             $discountTypes = Permission::create(['name' => 'Settings/Discount Types', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.discount-types.index']);
             $suppliers = Permission::create(['name' => 'Settings/Suppliers', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.suppliers.index']);
             $chargeAccounts = Permission::create(['name' => 'Settings/Charge Accounts', 'guard_name' => 'web', 'level' => 'company_user', 'parent_id' => $settings->id, 'route' => 'company.charge-accounts.index']);

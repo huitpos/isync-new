@@ -20,16 +20,24 @@ class UnitOfMeasurementsDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (UnitOfMeasurement $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.unit-of-measurements.show', ['companySlug' => $data->company->slug, 'unit_of_measurement' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Unit of Measurements/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.unit-of-measurements.show', ['companySlug' => $data->company->slug, 'unit_of_measurement' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (UnitOfMeasurement $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['unit_of_measurement' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.unit-of-measurements',
-                ]);
+                if (in_array('Settings/Unit of Measurements/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['unit_of_measurement' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.unit-of-measurements',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 
