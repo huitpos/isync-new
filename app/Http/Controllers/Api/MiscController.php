@@ -637,10 +637,17 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
-        $orders = TakeOrderOrder::where([
+        $query = TakeOrderOrder::where([
             'branch_id' => $request->branch_id,
             'is_completed' => false,
-        ])->get();
+        ]);
+
+
+        if ($request->has('transaction_id')) {
+            $query->where('transaction_id', $request->transaction_id);
+        }
+
+        $orders = $query->get();
 
         return $this->sendResponse($orders, 'Orders retrieved successfully.');
     }

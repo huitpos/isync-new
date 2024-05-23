@@ -881,6 +881,11 @@ paths:
           required: true
           description: Numeric ID of the branch to get
         - in: query
+          name: transaction_id
+          schema:
+            type: integer
+          description: Numeric ID of the transaction to get
+        - in: query
           name: device_id
           schema:
             type: integer
