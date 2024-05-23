@@ -20,16 +20,24 @@ class ChargeAccountsDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (Model $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.charge-accounts.show', ['companySlug' => $data->company->slug, 'charge_account' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Charge Accounts/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.charge-accounts.show', ['companySlug' => $data->company->slug, 'charge_account' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (Model $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['charge_account' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.charge-accounts',
-                ]);
+                if (in_array('Settings/Charge Accounts/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['charge_account' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.charge-accounts',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 

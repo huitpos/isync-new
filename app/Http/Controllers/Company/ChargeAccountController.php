@@ -24,9 +24,13 @@ class ChargeAccountController extends Controller
     public function index(Request $request, ChargeAccountsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
 
-        return $dataTable->with('company_id', $company->id)
-            ->render('company.chargeAccounts.index', compact('company'));
+        return $dataTable->with([
+                'company_id' => $company->id,
+                'permissions' => $permissions
+            ])
+            ->render('company.chargeAccounts.index', compact('company', 'permissions'));
     }
 
     /**
