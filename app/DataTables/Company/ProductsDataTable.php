@@ -20,16 +20,24 @@ class ProductsDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (Product $data) {
-                return view('company.datatables._link', [
-                    'url' => route('company.products.show', ['companySlug' => $data->company->slug, 'product' => $data->id]),
-                    'text' => $data->name,
-                ]);
+                if (in_array('Settings/Products/View', $this->permissions)) {
+                    return view('company.datatables._link', [
+                        'url' => route('company.products.show', ['companySlug' => $data->company->slug, 'product' => $data->id]),
+                        'text' => $data->name,
+                    ]);
+                } else {
+                    return $data->name;
+                }
             })
             ->addColumn('actions', function (Product $data) {
-                return view('company.datatables._actions', [
-                    'param' => ['product' => $data->id, 'companySlug' => $data->company->slug],
-                    'route' => 'company.products',
-                ]);
+                if (in_array('Settings/Products/Edit', $this->permissions)) {
+                    return view('company.datatables._actions', [
+                        'param' => ['product' => $data->id, 'companySlug' => $data->company->slug],
+                        'route' => 'company.products',
+                    ]);
+                } else {
+                    return '';
+                }
             });
     }
 

@@ -18,6 +18,7 @@ class PurchaseOrderController extends Controller
     {
         $company = $request->attributes->get('company');
         $branches = $company->branches;
+        $permissions = $request->attributes->get('permissionNames');
 
         return $dataTable->with([
             'branch_id' => $request->query('branch_id', null),
@@ -26,6 +27,7 @@ class PurchaseOrderController extends Controller
         ])->render('company.purchaseOrders.index', [
             'company' => $company,
             'branches' => $branches,
+            'permissions' => $permissions
         ]);
     }
 

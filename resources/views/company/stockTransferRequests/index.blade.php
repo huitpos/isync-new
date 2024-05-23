@@ -73,7 +73,11 @@
                     {
                         data: 'pr_number',
                         render: function(data, type, row) {
+                            @if (in_array('Procurement/Stock Transfer Requests/View', $permissions))
                             return '<a href="' + row.view_url + '">' + row.str_number + '</a>';
+                            @else
+                            return row.str_number
+                            @endif
                         }
                     },
                     { data: 'branch.name' },

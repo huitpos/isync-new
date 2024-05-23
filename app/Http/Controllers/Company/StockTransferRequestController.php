@@ -18,6 +18,7 @@ class StockTransferRequestController extends Controller
     public function index(Request $request, StockTransferRequestsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
 
         $branches = $company->branches;
 
@@ -29,6 +30,7 @@ class StockTransferRequestController extends Controller
         ])->render('company.stockTransferRequests.index', [
             'company' => $company,
             'branches' => $branches,
+            'permissions' => $permissions,
         ]);
     }
 

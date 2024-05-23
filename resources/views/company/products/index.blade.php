@@ -27,14 +27,18 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+                    @if (in_array('Settings/Products/Import Products', $permissions))
                     <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_1">
                         Import Products
                     </button>
+                    @endif
 
+                    @if (in_array('Settings/Products/Add', $permissions))
                     <a href="{{ route('company.products.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
                         Add Product
                     </a>
+                    @endif
                 </div>
             </div>
         </div>

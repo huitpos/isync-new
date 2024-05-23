@@ -18,6 +18,7 @@ class PurchaseDeliveryController extends Controller
     public function index(Request $request, PurchaseDeliveriesDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
         $branches = $company->branches;
 
         return $dataTable->with([
@@ -28,6 +29,7 @@ class PurchaseDeliveryController extends Controller
         ])->render('company.purchaseDeliveries.index', [
             'company' => $company,
             'branches' => $branches,
+            'permissions' => $permissions,
         ]);
     }
 

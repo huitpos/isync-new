@@ -73,7 +73,11 @@
                     {
                         data: 'pr_number',
                         render: function(data, type, row) {
-                            return '<a href="' + row.view_url + '">' + row.pd_number + '</a>';
+                            @if (in_array('Procurement/Purchase Deliveries/View', $permissions))
+                                return '<a href="' + row.view_url + '">' + row.pd_number + '</a>';
+                            @else
+                                return row.pd_number;
+                            @endif
                         }
                     },
                     { data: 'purchase_order.po_number' },

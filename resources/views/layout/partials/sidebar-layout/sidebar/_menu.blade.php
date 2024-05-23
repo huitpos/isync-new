@@ -365,83 +365,109 @@
 
 					<!--departments-->
 					<div class="menu-sub menu-sub-accordion">
+						@if (in_array('Settings/Products', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.products.*') ? 'active' : '' }}" href="{{ route('company.products.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Products</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Payment Types', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.payment-types.*') ? 'active' : '' }}" href="{{ route('company.payment-types.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Payment Types</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Departments', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.departments.*') ? 'active' : '' }}" href="{{ route('company.departments.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Departments</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Categories', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.categories.*') ? 'active' : '' }}" href="{{ route('company.categories.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Categories</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Sub-Categories', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.subcategories.*') ? 'active' : '' }}" href="{{ route('company.subcategories.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Sub - Categories</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Item Types', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.item-types.*') ? 'active' : '' }}" href="{{ route('company.item-types.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Item Types</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Unit of Measurements', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.unit-of-measurements.*') ? 'active' : '' }}" href="{{ route('company.unit-of-measurements.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Unit of Measurements</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Discount Types', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.discount-types.*') ? 'active' : '' }}" href="{{ route('company.discount-types.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Discount Types</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Suppliers', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.suppliers.*') ? 'active' : '' }}" href="{{ route('company.suppliers.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Suppliers</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Charge Accounts', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.charge-accounts.*') ? 'active' : '' }}" href="{{ route('company.charge-accounts.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Charge Accounts</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Payment Terms', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.payment-terms.*') ? 'active' : '' }}" href="{{ route('company.payment-terms.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Payment Terms</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Supplier Terms', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.supplier-terms.*') ? 'active' : '' }}" href="{{ route('company.supplier-terms.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Supplier Terms</span>
 							</a>
 						</div>
+						@endif
 
+						@if (in_array('Settings/Product Disposal Reasons', $permissions))
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.product-disposal-reasons.*') ? 'active' : '' }}" href="{{ route('company.product-disposal-reasons.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Product Disposal Reasons</span>
 							</a>
 						</div>
+						@endif
 					</div>
 				</div>
 				@endif

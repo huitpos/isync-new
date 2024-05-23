@@ -42,9 +42,14 @@ class ProductController extends Controller
     public function index(Request $request, ProductsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
+        $permissions = $request->attributes->get('permissionNames');
 
-        return $dataTable->with('company_id', $company->id)->render('company.products.index', [
-            'company' => $company
+        return $dataTable->with([
+            'company_id' => $company->id,
+            'permissions' => $permissions
+        ])->render('company.products.index', [
+            'company' => $company,
+            'permissions' => $permissions
         ]);
     }
 
