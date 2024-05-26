@@ -150,6 +150,8 @@ Route::middleware('auth')->group(function () {
         Route::prefix('reports')->group(function () {
             Route::get('/transactions', [CompanyReportController::class, 'transactions'])->name('company.reports.transactions');
             Route::get('/transaction/{transactionId}', [CompanyReportController::class, 'viewTransaction'])->name('company.reports.view-transaction');
+            Route::get('export-custom-users', [CompanyReportController::class, 'exportCustomUsers']);
+
         });
 
         //branch
