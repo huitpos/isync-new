@@ -63,7 +63,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Uom</label>
-                    <select id="uom_id" name="uom_id" data-control="select2" data-placeholder="select OUM" class="form-select @error('uom_id') is-invalid @enderror" required>
+                    <select id="uom_id" name="uom_id" data-control="select2" data-placeholder="select OUM" class="form-select @error('uom_id') is-invalid @enderror uom-conversion-selector" required>
                         <option value=""></option>
                         @foreach ($company->unitOfMeasurements as $uom)
                             <option value="{{ $uom->id }}" {{ $uom->id == old('uom_id') ? 'selected' : '' }}>{{ $uom->name }}</option>
@@ -71,6 +71,17 @@
                     </select>
 
                     @error('uom_id')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Delivery Uom</label>
+                    <select id="delivery_converion_id" name="delivery_uom_id" data-control="select2" data-placeholder="Select a delivery UOM" class="form-select @error('delivery_uom_id') is-invalid @enderror" required>
+                        <option value=""></option>
+                    </select>
+
+                    @error('delivery_uom_id')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>

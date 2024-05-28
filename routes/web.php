@@ -74,6 +74,7 @@ Route::get('/error', function () {
 });
 
 Route::get('/map-data', [TestController::class, 'mapData']);
+Route::get('/map-uom-data', [TestController::class, 'mapUomData']);
 
 require __DIR__ . '/auth.php';
 
@@ -94,6 +95,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/get-department-suppliers', [AjaxController::class, 'getDepartmentSuppliers']);
         Route::get('/get-product-uoms', [AjaxController::class, 'getProductUoms']);
         Route::get('/get-product-details', [AjaxController::class, 'getProductDetails']);
+        Route::get('/get-uom-conversions', [AjaxController::class, 'getUomConversions']);
     });
 
     Route::prefix('admin')->group(function () {
@@ -152,6 +154,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/transaction/{transactionId}', [CompanyReportController::class, 'viewTransaction'])->name('company.reports.view-transaction');
             Route::get('export-custom-users', [CompanyReportController::class, 'exportCustomUsers']);
 
+            Route::match(['get', 'post'], 'sales-transaction-report', [CompanyReportController::class, 'salesTransactionReport'])->name('company.reports.sales-transaction-report');
+            Route::match(['get', 'post'], 'void-transactions-report', [CompanyReportController::class, 'voidTransactionsReport'])->name('company.reports.void-transactions-report');
+            Route::match(['get', 'post'], 'vat-sales-report', [CompanyReportController::class, 'vatSalesReport'])->name('company.reports.vat-sales-report');
         });
 
         //branch

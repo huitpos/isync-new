@@ -323,6 +323,33 @@ $(document).ready(function () {
         });
     });
 
+    $('.uom-conversion-selector').on('change', function() {
+        var selectedValue = $(this).val();
+        var newOptionsHTML = '';
+    
+        tempOptions('delivery_converion_id');
+    
+        $.ajax({
+            url: '/ajax/get-uom-conversions', // Replace with your actual endpoint
+            method: 'GET',
+            data: {
+              uom_id: selectedValue
+            },
+            success: function(response) {
+                newOptionsHTML += '<option value="">Select a delivery UOM</option>';
+    
+                response.forEach(function(option) {
+                    newOptionsHTML += '<option value="' + option.id + '">' + option.text + '</option>';
+                });
+    
+                changeOptionsAndReinitialize('delivery_converion_id', newOptionsHTML);
+            },
+            error: function(xhr, status, error) {
+              console.error('Error:', error);
+            }
+        });
+    });
+
     function tempOptions(targetElement) {
         var newOptionsHTML = '<option value="">Select a ' + targetElement + '</option>';3
 

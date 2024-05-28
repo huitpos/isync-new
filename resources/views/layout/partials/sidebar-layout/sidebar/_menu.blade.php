@@ -472,25 +472,41 @@
 				</div>
 				@endif
 
-				{{-- <div data-kt-menu-trigger="click" class="menu-item menu-accordion
+				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
 					{{ request()->routeIs(
 						'company.reports.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
 						<span class="menu-icon"><i class="fa-solid fa-chart-simple fs-2"></i></span>
-						<span class="menu-title">Sales Reports</span>
+						<span class="menu-title">Reports</span>
 						<span class="menu-arrow"></span>
 					</span>
 
 					<div class="menu-sub menu-sub-accordion">
 						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.transactions') || request()->routeIs('company.reports.view-transaction') ? 'active' : '' }}" href="{{ route('company.reports.transactions', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+							<a class="menu-link {{ request()->routeIs('company.reports.sales-transaction-report') ? 'active' : '' }}" href="{{ route('company.reports.sales-transaction-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Sales Transaction Report</span>
 							</a>
 						</div>
 					</div>
-				</div> --}}
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.void-transactions-report') ? 'active' : '' }}" href="{{ route('company.reports.void-transactions-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Void Transactions Report</span>
+							</a>
+						</div>
+					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.vat-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.vat-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Vat Sales Report</span>
+							</a>
+						</div>
+					</div>
+				</div>
 			@endif
 		</div>
 	</div>

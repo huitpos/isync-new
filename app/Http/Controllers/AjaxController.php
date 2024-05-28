@@ -9,6 +9,7 @@ use App\Models\Barangay;
 use App\Models\Cluster;
 use App\Models\Product;
 use App\Models\Department;
+use App\Models\UnitOfMeasurement;
 
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\Interfaces\SubcategoryRepositoryInterface;
@@ -124,5 +125,24 @@ class AjaxController extends Controller
         $product = Product::find(request()->product_id);
 
         return response()->json($product);
+    }
+
+    public function getUomConversions(Request $request)
+    {
+        $uom = UnitOfMeasurement::find($request->uom_id);
+        $conversions = $uom->conversionsTo;
+
+        $responseData[] = [
+            'id' => $uom->id,
+            'text' => $uom->name
+        ];
+        foreach ($conversions as $conversion) {
+            $responseData[] = [
+                'id' => $conversion->from_unit_id,
+                'text' => $conversion->fromUnit->name. ' (' . $conversion->value . ' ' . $uom->name . ')'
+            ];
+        }
+
+        return response()->json($responseData);
     }
 }

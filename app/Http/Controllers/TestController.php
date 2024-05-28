@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Branch;
 use App\Models\DeliveryLocation;
+use App\Models\Product;
 
 class TestController extends Controller
 {
@@ -28,6 +29,15 @@ class TestController extends Controller
                     ]);
                 }
             }
+        }
+    }
+
+    public function mapUomData(Request $request)
+    {
+        $products = Product::all();
+        foreach ($products as $product) {
+            $product->delivery_uom_id = $product->uom_id;
+            $product->save();
         }
     }
 }
