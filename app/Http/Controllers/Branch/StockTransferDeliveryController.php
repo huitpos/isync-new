@@ -109,7 +109,7 @@ class StockTransferDeliveryController extends Controller
             foreach ($std->items as $item) {
                 $product = $item->product;
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_deliveries', $item->qty);
+                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_deliveries', $item->qty, null, 'add', $item->uom_id);
             }
         }
 

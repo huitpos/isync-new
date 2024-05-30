@@ -143,7 +143,7 @@ class ProductPhysicalCountController extends Controller
             foreach ($count->items as $item) {
                 $product = $item->product;
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_physical_counts', $item->quantity, null, 'replace');
+                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_physical_counts', $item->quantity, null, 'replace', $item->uom_id);
             }
         }
 

@@ -147,7 +147,7 @@ class ProductDisposalController extends Controller
             foreach ($disposal->items as $item) {
                 $product = $item->product;
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_disposals', $item->quantity, null, 'subtract');
+                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_disposals', $item->quantity, null, 'subtract', $item->uom_id);
             }
         }
 

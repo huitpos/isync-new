@@ -27,10 +27,20 @@ use App\Models\Product;
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
 
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+
 use Illuminate\Support\Facades\Redis;
 
 class MiscController extends BaseController
 {
+    protected $productRepository;
+
+    public function __construct(
+        ProductRepositoryInterface $productRepository
+    ) {
+        $this->productRepository = $productRepository;
+    }
+
     public function cashDenominations()
     {
         $cashDenominations = CashDenomination::all();
@@ -985,26 +995,7 @@ class MiscController extends BaseController
                     $product = Product::find($reqProduct['id']);
 
                     if ($product) {
-                        $pivotData = $product->branches->where('id', $request->branch_id)->first()->pivot;
-
-                        $oldStock = 0;
-                        if ($pivotData) {
-                            $oldStock = $pivotData->stock;
-                        }
-
-                        $newStock = $oldStock - $reqProduct['quantity'];
-
-                        if ($branch->products()->where('product_id', $product['id'])->exists()) {
-                            // Product already exists in the branch, update the existing pivot record
-                            $branch->products()->updateExistingPivot($product['id'], [
-                                'stock' => $newStock
-                            ]);
-                        } else {
-                            // Product doesn't exist in the branch, create a new pivot record
-                            $branch->products()->attach($product['id'], [
-                                'stock' => $newStock
-                            ]);
-                        }
+                        $this->productRepository->updateBranchQuantity($product, $branch, $endOfDay->id, 'end_of_days', $reqProduct['quantity'], null, 'subtract', $product->uom_id);
                     }
                 }
             }

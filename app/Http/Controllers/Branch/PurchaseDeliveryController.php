@@ -170,7 +170,7 @@ class PurchaseDeliveryController extends Controller
                 $product->srp = $srp;
                 $product->save();
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'purchase_deliveries', $item->qty, $srp);
+                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'purchase_deliveries', $item->qty, $srp, 'add', $item->uom_id);
             }
         }
 

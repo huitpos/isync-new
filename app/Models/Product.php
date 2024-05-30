@@ -41,6 +41,11 @@ class Product extends Model
         return $this->belongsTo(UnitOfMeasurement::class);
     }
 
+    public function deliveryUom()
+    {
+        return $this->belongsTo(UnitOfMeasurement::class,  'delivery_uom_id');
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');

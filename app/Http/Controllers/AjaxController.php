@@ -111,6 +111,14 @@ class AjaxController extends Controller
         $product = Product::find($request->product_id);
 
         $uom = $product->uom;
+        $deliveryUom = $product->deliveryUom;
+
+        if ($deliveryUom && $deliveryUom->id != $uom->id) {
+            $responseData[] = [
+                'id' => $deliveryUom->id,
+                'text' => $deliveryUom->name
+            ];
+        }
 
         $responseData[] = [
             'id' => $uom->id,

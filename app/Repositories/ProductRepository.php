@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Product;
 use App\Models\Branch;
 use App\Models\ProductCountLog;
+use App\Models\UnitConversion;
 use Illuminate\Support\Collection;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
@@ -86,9 +87,26 @@ class ProductRepository implements ProductRepositoryInterface
         return $paymentType->delete();
     }
 
-    public function updateBranchQuantity(Product $product, Branch $branch, $objectId, $objectType, int $qty, $srp = null, $operation = 'add'): Bool
+    public function updateBranchQuantity(Product $product, Branch $branch, $objectId, $objectType, int $qty, $srp = null, $operation = 'add', $uomId): Bool
     {
         $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
+        if ($product->uom_id != $uomId) {
+            $conversion = UnitConversion::where([
+                'from_unit_id' => $product->uom_id,
+                'to_unit_id' => $uomId
+            ])->first();
+
+            if (empty($conversion)) {
+                $conversion = UnitConversion::where([
+                    'to_unit_id' => $product->uom_id,
+                    'from_unit_id' => $uomId
+                ])->first();
+
+                $qty = $qty * $conversion->value;
+            } else {
+                $qty = $qty / $conversion->value;
+            }
+        }
 
         if ($operation == 'add') {
             $newStock = $pivotData->stock + $qty;
@@ -122,6 +140,7 @@ class ProductRepository implements ProductRepositoryInterface
         $productCountLog->object_type = $objectType;
         $productCountLog->old_quantity = $pivotData->stock;
         $productCountLog->new_quantity = $newStock;
+        $productCountLog->uom_id = $uomId;
         $productCountLog->save();
 
         return true;

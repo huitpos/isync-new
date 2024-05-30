@@ -110,7 +110,7 @@ class StockTransferOrderController extends Controller
             foreach ($sto->items as $item) {
                 $product = $item->product;
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_orders', $item->quantity, null, 'subtract');
+                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_orders', $item->quantity, null, 'subtract', $item->uom_id);
             }
 
             $sto = StockTransferOrder::with([
