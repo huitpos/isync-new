@@ -29,7 +29,6 @@ class Transaction extends Model
             $query->where('branch_id', $this->branch_id)
                   ->where('pos_machine_id', $this->pos_machine_id);
         });
-
     }
 
     public function payments()
