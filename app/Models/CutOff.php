@@ -12,4 +12,9 @@ class CutOff extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    public function machine()
+    {
+        return $this->belongsTo(PosMachine::class, 'pos_machine_id');
+    }
 }

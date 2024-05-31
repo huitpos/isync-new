@@ -157,6 +157,7 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'sales-transaction-report', [CompanyReportController::class, 'salesTransactionReport'])->name('company.reports.sales-transaction-report');
             Route::match(['get', 'post'], 'void-transactions-report', [CompanyReportController::class, 'voidTransactionsReport'])->name('company.reports.void-transactions-report');
             Route::match(['get', 'post'], 'vat-sales-report', [CompanyReportController::class, 'vatSalesReport'])->name('company.reports.vat-sales-report');
+            Route::match(['get', 'post'], 'x-reading-report', [CompanyReportController::class, 'xReadingReport'])->name('company.reports.x-reading-report');
         });
 
         //branch

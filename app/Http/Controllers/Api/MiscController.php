@@ -934,7 +934,6 @@ class MiscController extends BaseController
             'total_cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_sk' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cashier_id' => 'required|exists:users,id',
-            'admin_id' => 'required|exists:users,id',
             'shift_number' => 'required',
             'is_sent_to_server' => 'required|boolean',
             'reading_number' => 'required|numeric',
@@ -1031,7 +1030,6 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'cut_off_id' => 'required|numeric|min:1',
-            'end_of_day_id' => 'required|exists:transactional_db.end_of_days,end_of_day_id',
             'pos_machine_id' => 'required|exists:pos_machines,id',
             'branch_id' => 'required|exists:branches,id',
             'beginning_amount' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
@@ -1051,7 +1049,6 @@ class MiscController extends BaseController
             'total_cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'total_sk' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'cashier_id' => 'required|exists:users,id',
-            'admin_id' => 'required|exists:users,id',
             'shift_number' => 'required',
             'is_sent_to_server' => 'required|boolean',
             'reading_number' => 'required|numeric',

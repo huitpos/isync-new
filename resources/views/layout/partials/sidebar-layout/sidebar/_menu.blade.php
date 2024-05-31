@@ -506,6 +506,14 @@
 							</a>
 						</div>
 					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.x-reading-report') ? 'active' : '' }}" href="{{ route('company.reports.x-reading-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">X Reading Report</span>
+							</a>
+						</div>
+					</div>
 				</div>
 			@endif
 		</div>
