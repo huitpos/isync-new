@@ -77,7 +77,9 @@
                 </div>
 
                 <div class="modal-body">
-                        <input type="file" name="file">
+                    <input type="file" name="file">
+
+                    <a href="/download-product-import-template">Download template</a>
                 </div>
 
                 <div class="modal-footer">

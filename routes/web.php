@@ -58,6 +58,9 @@ use App\Http\Controllers\Branch\StockTransferDeliveryController as BranchStockTr
 use App\Http\Controllers\Branch\ProductPhysicalCountController as BranchProductPhysicalCountController;
 use App\Http\Controllers\Branch\ProductDisposalController as BranchProductDisposalController;
 
+use Illuminate\Support\Facades\Response;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -71,6 +74,17 @@ use App\Http\Controllers\Branch\ProductDisposalController as BranchProductDispos
 
 Route::get('/error', function () {
     abort(500);
+});
+
+Route::get('/download-product-import-template', function () {
+    $filePath = storage_path('app/Files/product_import_template.xlsx'); // Adjust the path as necessary
+
+    if (!file_exists($filePath)) {
+        dd("here");
+        abort(404, "File not found");
+    }
+
+    return Response::download($filePath);
 });
 
 Route::get('/map-data', [TestController::class, 'mapData']);

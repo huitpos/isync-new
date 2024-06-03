@@ -29,6 +29,9 @@ class ProductsDataTable extends DataTable
                     return $data->name;
                 }
             })
+            ->filterColumn('name', function($query, $keyword) {
+                return $query->where('name', 'like', '%' . $keyword . '%');
+            })
             ->addColumn('actions', function (Product $data) {
                 if (in_array('Settings/Products/Edit', $this->permissions)) {
                     return view('company.datatables._actions', [
@@ -80,11 +83,11 @@ class ProductsDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('name')->title('Product Name'),
-            Column::make('description'),
-            Column::make('item_type.name', 'itemType.name')->title('Item Type'),
-            Column::make('uom.name')->title('UOM'),
-            Column::make('code')->title('Item Code'),
-            Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('description')->searchable(false),
+            Column::make('item_type.name', 'itemType.name')->title('Item Type')->searchable(false),
+            Column::make('uom.name')->title('UOM')->searchable(false),
+            Column::make('code')->title('Item Code')->searchable(false),
+            Column::make('created_by.name', 'createdBy.name')->title('created by')->searchable(false),
             Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
