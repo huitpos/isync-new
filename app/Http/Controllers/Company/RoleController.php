@@ -80,8 +80,10 @@ class RoleController extends Controller
         $role->company_id = $company->id;
 
         if ($role->save()) {
-            $permissions = Permission::whereIn('id', $request->permission)->pluck('name');
-            $role->givePermissionTo($permissions);
+            if ($request->permission) {
+                $permissions = Permission::whereIn('id', $request->permission)->pluck('name');
+                $role->givePermissionTo($permissions);
+            }
 
             return redirect()->route('company.roles.index', ['companySlug' => $company->slug])->with('success', 'Role created successfully.');
         }
