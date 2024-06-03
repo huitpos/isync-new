@@ -63,7 +63,7 @@ class UserController extends Controller
             'password' => 'required',
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'nullable|email|unique:users,email',
         ]);
 
         $data = $request->all();
@@ -117,7 +117,7 @@ class UserController extends Controller
             'username' => 'required|unique:users,username,' . $id,
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $id,
+            'email' => 'nullable|email|unique:users,email,' . $id,
         ]);
 
         $postData = $request->all();

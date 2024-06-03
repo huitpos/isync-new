@@ -49,7 +49,7 @@ class UserController extends Controller
             'password' => 'required',
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'nullable|email|unique:users,email',
             'branches' => [
                 Rule::requiredIf(function () use ($request) {
                     return $request->role === 'branch_user';
@@ -104,7 +104,7 @@ class UserController extends Controller
             'username' => 'required|unique:users,username,' . $id,
             'first_name' => 'required',
             'last_name' => 'required',
-            'email' => 'required|email|unique:users,email,' . $id,
+            'email' => 'nullable|email|unique:users,email,' . $id,
             'branches' => [
                 Rule::requiredIf(function () use ($request) {
                     return $request->role === 'branch_user';
