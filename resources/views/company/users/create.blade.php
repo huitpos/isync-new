@@ -23,11 +23,12 @@
                 <div class="mb-4">
                     <label class="form-label">Role</label>
                     <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
-                        <option value="company_admin" {{ old('role') == 'company_admin' ? 'selected' : '' }}>Company Admin</option>
-                        <option value="branch_user" {{ old('role') == 'branch_user' ? 'selected' : '' }}>Branch User</option>
+                        @foreach($company->roles as $role)
+                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                        @endforeach
                     </select>
 
-                    @error('status')
+                    @error('role')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
@@ -37,7 +38,7 @@
                     <select class="form-select @error('branches') is-invalid @enderror" name="branches[]" data-control="select2" data-close-on-select="false" data-placeholder="Select branch" data-allow-clear="true" multiple="multiple">
                         @foreach ($company->activeBranches as $branch)
                             <option {{ in_array($branch->id, old('branches') ?? []) ? 'selected' : '' }} value="{{ $branch->id }}">{{ $branch->name }}</option>
-                        @endforeach
+                    @endforeach
                     </select>
 
                     @error('branches')

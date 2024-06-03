@@ -22,6 +22,23 @@
                 </div>
 
                 <div class="mb-4">
+                    @php
+                        $roles = $user->getRoleNames()->toArray();
+                    @endphp
+
+                    <label class="form-label">Role</label>
+                    <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
+                        @foreach($company->roles as $role)
+                            <option value="{{ $role->id }}" {{ (old('role') == $role->id || in_array($role->name, $roles)) ? 'selected' : '' }}>{{ $role->name }}</option>
+                        @endforeach
+                    </select>
+
+                    @error('role')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
                     <label class="form-label">Email</label>
                     <input value="{{ old('email') ?? $user->email }}" autocomplete="off" name="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email" required/>
 

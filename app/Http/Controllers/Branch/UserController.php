@@ -70,7 +70,7 @@ class UserController extends Controller
         $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
         $data['company_id'] = $company->id;
         $data['branches'][] = $branch->id;
-        $data['role'] = 'branch_user';
+        $data['role'] = $data['role'];
 
         if ($this->userRepository->create($data)) {
             return redirect()->route('branch.users.index', ['companySlug' => $request->attributes->get('company')->slug, 'branchSlug' => $request->attributes->get('branch')->slug])->with('success', 'User created successfully.');
@@ -127,7 +127,7 @@ class UserController extends Controller
             unset($postData['password']);
         }
 
-        if ($this->userRepository->update($id, $postData, false, false)) {
+        if ($this->userRepository->update($id, $postData, true, false)) {
             return redirect()->route('branch.users.index', ['companySlug' => $companySlug, 'branchSlug' => $branchSlug])->with('success', 'User updated successfully.');
         }
 
