@@ -218,7 +218,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Email</label>
-                    <input value="{{ old('email') ?? $company->client->user->email }}" autocomplete="off" name="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email Address" required/>
+                    <input value="{{ old('email') ?? $company->client->user->email ?? '' }}" autocomplete="off" name="email" type="email" class="form-control @error('email') is-invalid @enderror" placeholder="Email Address" required/>
 
                     @error('email')
                         <div class="invalid-feedback"> {{ $message }}</div>
