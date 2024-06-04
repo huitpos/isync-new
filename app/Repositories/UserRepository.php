@@ -27,7 +27,7 @@ class UserRepository implements UserRepositoryInterface
     public function create(array $data): User
     {
         $role = $data['role'];
-        $branches = $data['branches'];
+        $branches = $data['branches'] ?? null;
 
         unset($data['role']);
         unset($data['branches']);
@@ -36,7 +36,9 @@ class UserRepository implements UserRepositoryInterface
 
         $user->assignRole($role);
 
-        $user->branches()->attach($branches);
+        if ($branches) {
+            $user->branches()->attach($branches);
+        }
 
         return $user;
     }
