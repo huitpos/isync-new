@@ -80,7 +80,6 @@ Route::get('/download-product-import-template', function () {
     $filePath = storage_path('app/Files/product_import_template.xlsx'); // Adjust the path as necessary
 
     if (!file_exists($filePath)) {
-        dd("here");
         abort(404, "File not found");
     }
 

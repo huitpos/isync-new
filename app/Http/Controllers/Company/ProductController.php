@@ -278,12 +278,6 @@ class ProductController extends Controller
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
         ]);
 
-        $path = '';
-        if ($file = $request->file('image')) {
-            $customFileName = 'product_' . $productId . '.' . $file->extension();
-            $path = Storage::disk('s3')->putFileAs('product_images', $file, $customFileName, 'public');
-        }
-
         $productData = [
             'company_id' => $company->id,
             'name' => $request->input('name'),
@@ -295,7 +289,6 @@ class ProductController extends Controller
             'uom_id' => $request->input('uom_id'),
             'delivery_uom_id' => $request->input('delivery_uom_id'),
             'item_type_id' => $request->input('item_type_id'),
-            'image' => $path,
             'sku' => $request->input('sku'),
             'barcode' => $request->input('barcode'),
             'srp' => $request->input('srp'),
@@ -309,6 +302,17 @@ class ProductController extends Controller
             'minimum_stock_level' => $request->input('minimum_stock_level'),
             'maximum_stock_level' => $request->input('maximum_stock_level'),
         ];
+
+        if ($file = $request->file('image')) {
+            $customFileName = 'product_' . $productId . '.' . $file->extension();
+            $path = Storage::disk('s3')->putFileAs('product_images', $file, $customFileName, 'public');
+
+            $productData['image'] = $path;
+        }
+
+        if ($request->image_remove) {
+            $productData['image'] = null;
+        }
 
         $bundledItems = [];
         if (!empty($request->input('bundled_items'))) {
