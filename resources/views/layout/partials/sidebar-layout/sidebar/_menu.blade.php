@@ -1,8 +1,10 @@
 @php
 	$permissions = request()->attributes->get('permissionNames');
+	$companyPermissionCount = request()->attributes->get('companyPermissionCount');
+	$branchPermissionCount = request()->attributes->get('branchPermissionCount');
 @endphp
 
-<span style="color:white">{{ request()->route()->getName() }}</span>
+
 
 <div class="app-sidebar-menu overflow-hidden flex-column-fluid">
 	<div id="kt_app_sidebar_menu_wrapper" class="app-sidebar-wrapper hover-scroll-overlay-y my-5" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_sidebar_logo, #kt_app_sidebar_footer" data-kt-scroll-wrappers="#kt_app_sidebar_menu" data-kt-scroll-offset="5px" data-kt-scroll-save-state="true">
@@ -53,7 +55,7 @@
 				</button>
 
 				<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-primary fw-semibold w-auto min-w-300px mw-300px" data-kt-menu="true">
-					@if (auth()->user()->hasRole('company_admin'))
+					@if ($companyPermissionCount > 0)
 					<div class="menu-item mt-2">
 						<a href="{{ route('company.dashboard', ['companySlug' => request()->attributes->get('company')->slug]) }}" class="menu-link p-2">
 							{{ request()->attributes->get('company')->company_name }}
@@ -68,10 +70,10 @@
 					@endphp
 
 					@if ($branches->count() > 1)
-					<label class="form-label fw-semibold p-2">Branches:</label>
+						<label class="form-label fw-semibold p-2">Branches:</label>
 					@endif
 
-					@foreach(auth()->user()->activeBranches as $branch)
+					@foreach($branches as $branch)
 						<div class="menu-item p-0">
 							<a href="{{ route('branch.dashboard', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => $branch->slug]) }}" class="menu-link p-2 mb-1">
 								{{ $branch->name }}

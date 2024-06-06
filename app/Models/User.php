@@ -51,7 +51,7 @@ class User extends Authenticatable
 
     public function activeBranches()
     {
-        return $this->belongsToMany(Branch::class)->where('status', 'active');
+        return $this->belongsToMany(Branch::class)->where('status', 'active')->orderBy('name');
     }
 
     public function company()
