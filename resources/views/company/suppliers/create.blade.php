@@ -71,6 +71,15 @@
                 </div>
 
                 <div class="mb-4">
+                    <label class="form-label">TIN</label>
+                    <input value="{{ old('tin') }}" name="tin" type="text" class="form-control @error('tin') is-invalid @enderror" placeholder="TIN" required/>
+
+                    @error('tin')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
                     <label class="form-label">Supplier Term</label>
                     <select id="supplier_term_id" name="supplier_term_id" class="form-control @error('supplier_term_id') is-invalid @enderror" required>
                         @foreach($supplierTerms as $supplierTerm)
