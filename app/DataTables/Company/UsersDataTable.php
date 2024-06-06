@@ -40,6 +40,7 @@ class UsersDataTable extends DataTable
     public function query(Model $model): QueryBuilder
     {
         return $model->newQuery()
+            ->with(['createdBy'])
             ->where('company_id', $this->company_id);
     }
 
@@ -69,6 +70,7 @@ class UsersDataTable extends DataTable
             Column::make('name'),
             Column::make('email'),
             Column::make('roles'),
+            Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)

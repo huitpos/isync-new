@@ -51,6 +51,7 @@ class SubcategoriesDataTable extends DataTable
             ->where('company_id', $this->company_id)
             ->with([
                 'company',
+                'category',
                 'createdBy',
             ]);
     }
@@ -80,6 +81,7 @@ class SubcategoriesDataTable extends DataTable
             Column::make('id')->visible(false),
             Column::make('name')->title('Subcategory'),
             Column::make('description'),
+            Column::make('category.name', 'category.name')->title('Category'),
             Column::make('created_by.name', 'createdBy.name')->title('Created By'),
             Column::make('status'),
             Column::computed('actions')
