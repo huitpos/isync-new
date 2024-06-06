@@ -163,7 +163,7 @@
 
                 <div class="mb-4 mt-4">
                     <label class="form-label">Phone Number</label>
-                    <input value="{{ old('name') }}" name="phone_number" type="text" class="form-control @error('phone_number') is-invalid @enderror" placeholder="Phone Number" required/>
+                    <input value="{{ old('phone_number') }}" name="phone_number" type="text" class="form-control @error('phone_number') is-invalid @enderror" placeholder="Phone Number" required/>
 
                     @error('phone_number')
                         <div class="invalid-feedback"> {{ $message }}</div>
