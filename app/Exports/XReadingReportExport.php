@@ -51,8 +51,8 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             'Machine #',
             'Shift No',
             'X-reading #',
-            'Beginning OR #',
-            'Ending OR #',
+            'Beginning SI #',
+            'Ending SI #',
             'Cut Off Date',
             'Gross Sales',
             'Net Sales',
@@ -186,21 +186,25 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
     public function registerEvents(): array
     {
         $columnLetter = $this->getColumnLetter($this->numberOfColumns);
+        $branch = Branch::find($this->branchId);
+        $startDate = $this->startDate;
+        $endDate = $this->endDate;
+
         return [
-            AfterSheet::class => function(AfterSheet $event) use($columnLetter) {
+            AfterSheet::class => function(AfterSheet $event) use($columnLetter, $branch, $startDate, $endDate) {
                 $event->sheet->mergeCells('A1:'.$columnLetter.'1');
-                $event->sheet->setCellValue('A1', 'Huit Enterprises Inc.');
+                $event->sheet->setCellValue('A1', $branch->company->company_name);
 
                 $event->sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $event->sheet->getStyle('A1')->getFont()->setBold(true);
 
                 $event->sheet->mergeCells('A2:'.$columnLetter.'2');
-                $event->sheet->setCellValue('A2', 'Branch Name');
+                $event->sheet->setCellValue('A2', $branch->name);
 
                 $event->sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $event->sheet->mergeCells('A3:'.$columnLetter.'3');
-                $event->sheet->setCellValue('A3', 'Address');
+                $event->sheet->setCellValue('A3', $branch->unit_floor_number . ', ' . $branch->street . ', ' . $branch->city->name . ', ' . $branch->province->name . ', ' . $branch->region->name);
 
                 $event->sheet->getStyle('A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
@@ -209,13 +213,13 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
                 $event->sheet->getStyle('A4')->getFont()->setBold(true);
 
                 $event->sheet->mergeCells('A5:'.$columnLetter.'5');
-                $event->sheet->setCellValue('A5', 'Date range: mm/yyyy - mm/yyyy');
+                $event->sheet->setCellValue('A5', 'Date range: ' . $startDate . ' - ' . $endDate);
 
-                $event->sheet->mergeCells('A6:'.$columnLetter.'6');
-                $event->sheet->setCellValue('A6', 'Date generated:');
+                $event->sheet->mergeCells('A6:Q6');
+                $event->sheet->setCellValue('A6', 'Date generated: ' . now()->format('Y-m-d H:i:s'));
 
-                $event->sheet->mergeCells('A7:'.$columnLetter.'7');
-                $event->sheet->setCellValue('A7', 'Created by:');
+                $event->sheet->mergeCells('A7:Q7');
+                $event->sheet->setCellValue('A7', 'Created by: ' . auth()->user()->name);
 
                 $totalRows = $event->sheet->getHighestRow();
 

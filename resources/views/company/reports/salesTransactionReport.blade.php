@@ -28,9 +28,9 @@
                 <div class="mb-4">
                     <div class="col-md-6">
                         <label class="form-label">Date From</label>
-                        <input data-min-date="today" value="{{ old('date_from') ?? date('Y-m-d', strtotime('-30 days')) }}" name="date_needed" type="text" class="form-control @error('date_needed') is-invalid @enderror flatpack-picker" placeholder="Date From" required/>
+                        <input data-min-date="today" value="{{ old('start_date') ?? date('Y-m-d', strtotime('-30 days')) }}" name="start_date" type="text" class="form-control @error('start_date') is-invalid @enderror flatpack-picker" placeholder="Date From" required/>
 
-                        @error('date_needed')
+                        @error('start_date')
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
                     </div>
@@ -39,9 +39,9 @@
                 <div class="mb-4">
                     <div class="col-md-6">
                         <label class="form-label">Date To</label>
-                        <input data-min-date="today" value="{{ old('date_to') ?? date('Y-m-d') }}" name="date_needed" type="text" class="form-control @error('date_needed') is-invalid @enderror flatpack-picker" placeholder="Date To" required/>
+                        <input data-min-date="today" value="{{ old('end_date') ?? date('Y-m-d') }}" name="end_date" type="text" class="form-control @error('end_date') is-invalid @enderror flatpack-picker" placeholder="Date To" required/>
 
-                        @error('date_needed')
+                        @error('end_date')
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
                     </div>
