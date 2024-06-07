@@ -47,7 +47,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-5 disable-on-click">Generate</button>
+                <button type="submit" class="btn btn-primary mt-5">Generate</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>
         </div>
