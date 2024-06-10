@@ -40,4 +40,9 @@ class ItemLocation extends Model
     {
         return $this->belongsTo(Barangay::class);
     }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'item_location_product');
+    }
 }

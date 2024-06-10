@@ -490,6 +490,25 @@
                     @enderror
                 </div>
 
+                <div class="mb-4">
+                    <label class="form-label">Item location</label>
+                    @php
+                        $itemLocations = [];
+                        foreach ($product->itemLocations as $location) {
+                            $itemLocations[] = $location->id;
+                        }
+                    @endphp
+                    <select class="form-select" name="item_locations[]" data-control="select2" data-close-on-select="false" data-placeholder="Select location" data-allow-clear="true" multiple="multiple">
+                        @foreach ($company->itemLocations as $location)
+                            <option value="{{ $location->id }}" {{ in_array($location->id, $itemLocations) ? 'selected' : '' }}>{{ $location->name }}</option>
+                        @endforeach
+                    </select>
+
+                    @error('description')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
                 <button type="submit" class="btn btn-primary mt-5 disable-on-click">Submit</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>

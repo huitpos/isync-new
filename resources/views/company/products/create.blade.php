@@ -443,6 +443,15 @@
                     @enderror
                 </div>
 
+                <div class="mb-4">
+                    <label class="form-label">Item Location</label>
+                    <select class="form-select" name="item_locations[]" data-control="select2" data-close-on-select="false" data-placeholder="Select location" data-allow-clear="true" multiple="multiple">
+                        @foreach ($company->itemLocations as $location)
+                            <option value="{{ $location->id }}">{{ $location->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <button type="submit" class="btn btn-primary mt-5 disable-on-click">Submit</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>

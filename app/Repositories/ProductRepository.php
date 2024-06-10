@@ -34,7 +34,10 @@ class ProductRepository implements ProductRepositoryInterface
     {
         $lastNumber = Product::where('company_id', $productData['company_id'])->max('code');
         $productData['code'] = $lastNumber + 1;
-
+        
+        $itemLocations = $productData['item_locations'] ?? null;
+        unset($productData['item_locations']);
+        
         $product = Product::create($productData);
 
         if (!empty($bundledData)) {
@@ -52,11 +55,19 @@ class ProductRepository implements ProductRepositoryInterface
             }
         }
 
+        if ($itemLocations) {
+            $product->itemLocations()->sync($itemLocations);
+        }
+
         return $product;
     }
 
     public function update(String $id, array $productData, array $bundledData, array $rawData): Product
     {
+        $itemLocations = $productData['item_locations'] ?? null;
+        unset($productData['item_locations']);
+        
+
         $product = Product::findOrFail($id);
         $product->update($productData);
 
@@ -76,6 +87,10 @@ class ProductRepository implements ProductRepositoryInterface
                     'uom_id' => $rawItem['uom_id'],
                 ]);
             }
+        }
+
+        if ($itemLocations) {
+            $product->itemLocations()->sync($itemLocations);
         }
 
         return $product;

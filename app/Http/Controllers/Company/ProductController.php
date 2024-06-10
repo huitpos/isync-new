@@ -145,6 +145,7 @@ class ProductController extends Controller
             'status' => $request->input('status'),
             'minimum_stock_level' => $request->input('minimum_stock_level'),
             'maximum_stock_level' => $request->input('maximum_stock_level'),
+            'item_locations' => $request->input('item_locations'),
         ];
 
         $bundledItems = [];
@@ -301,6 +302,7 @@ class ProductController extends Controller
             'status' => $request->input('status'),
             'minimum_stock_level' => $request->input('minimum_stock_level'),
             'maximum_stock_level' => $request->input('maximum_stock_level'),
+            'item_locations' => $request->input('item_locations'),
         ];
 
         if ($file = $request->file('image')) {

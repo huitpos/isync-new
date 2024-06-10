@@ -148,4 +148,9 @@ class Company extends Model
     {
         return $this->hasMany(Role::class);
     }
+
+    public function itemLocations()
+    {
+        return $this->hasMany(ItemLocation::class);
+    }
 }
