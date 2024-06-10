@@ -470,6 +470,12 @@
 							</a>
 						</div>
 						@endif
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.item-locations.*') ? 'active' : '' }}" href="{{ route('company.item-locations.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Item Locations</span>
+							</a>
+						</div>
 					</div>
 				</div>
 				@endif
