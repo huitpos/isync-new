@@ -18,7 +18,9 @@ class ProductPhysicalCountController extends Controller
     {
         $company = $request->attributes->get('company');
         $permissions = $request->attributes->get('permissionNames');
-        $branches = $company->branches;
+        $branches = $company->branches()->where([
+            'status' => 'active'
+        ])->get();
 
         return $dataTable->with([
             'status' => $request->query('status', null),
