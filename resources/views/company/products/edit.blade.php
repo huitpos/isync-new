@@ -88,8 +88,8 @@
                 <div class="mb-4">
                     <label class="form-label">Delivery Uom</label>
                     <select id="delivery_converion_id" name="delivery_uom_id" data-control="select2" data-placeholder="select OUM" class="form-select @error('uom_id') is-invalid @enderror" required>
-                        <option value="{{ $product->uom->id }}">{{ $product->uom->name }}</option>
-                        @foreach ($product->uom->conversionsTo as $uom)
+                        <option value="{{ $product->uom?->id }}">{{ $product->uom?->name }}</option>
+                        @foreach ($product->uom?->conversionsTo ?? [] as $uom)
                         {{$uom}}
                             <option value="{{ $uom->from_unit_id }}" {{ $uom->from_unit_id == old('uom_id') || $uom->from_unit_id == $product->delivery_uom_id ? 'selected' : '' }}>{{ $uom->fromUnit->name }}</option>
                         @endforeach

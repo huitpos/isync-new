@@ -64,14 +64,15 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow
                 'abbreviation' => $row[4],
                 'uom_id' => array_search(strtolower($row[5]), $units),
                 'barcode' => $row[6],
-                'department_id' => array_search(strtolower($row[7]), $departments),
+                'department_id' => array_search(strtolower($row[7]), $departments) ?? null,
                 'category_id' => array_search(strtolower($row[8]), $categories),
                 'subcategory_id' => array_search(strtolower($row[9]), $subcategories),
                 'markup_type' => $row[10],
                 'markup' => $row[11],
                 'cost' => $row[12],
                 'item_type_id' => array_search(strtolower($row[13]), $itemTypes),
-                'srp' => $row[10] == 'percentage' ? $row[12] + ($row[12] * ($row[11] / 100)) : $row[12] + $row[11],
+                // 'srp' => $row[10] == 'percentage' ? $row[12] + ($row[12] * ($row[11] / 100)) : $row[12] + $row[11],
+                'srp' => $row[14],
                 'company_id' => $this->companyId,
                 'code' => $lastNumber,
                 'minimum_stock_level' => 0,
@@ -99,7 +100,7 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow
 
         return [
             '*.0' => [
-                'required',
+                // 'required',
                 Rule::in(['active', 'inactive']),
             ],
             '*.1' => [
@@ -107,70 +108,70 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow
                 'distinct',
             ],
             '*.2' => [
-                'required',
+                // 'required',
             ],
             '*.3' => [
-                'required',
-                'distinct',
-                'unique:products,sku,NULL,id,company_id,' . $this->companyId,
+                // 'required',
+                // 'distinct',
+                // 'unique:products,sku,NULL,id,company_id,' . $this->companyId,
             ],
             '*.4' => [
-                'required',
+                // 'required',
             ],
             '*.5' => [
-                'required',
+                // 'required',
                 function ($attribute, $value, $fail) use($units) {
                     if (!array_search(strtolower($value), $units)) {
-                        $fail('UOM does not exists');
+                        // $fail('UOM does not exists');
                     }
                 },
             ],
             '*.6' => [
-                'required',
-                'distinct',
-                'unique:products,barcode,NULL,id,company_id,' . $this->companyId,
+                // 'required',
+                // 'distinct',
+                // 'unique:products,barcode,NULL,id,company_id,' . $this->companyId,
             ],
             '*.7' => [
-                'required',
+                // 'required',
                 function ($attribute, $value, $fail) use($departments) {
                     if (!array_search(strtolower($value), $departments)) {
-                        $fail('Department does not exists');
+                        // $fail('Department does not exists');
                     }
                 },
             ],
             '*.8' => [
-                'required',
+                // 'required',
                 function ($attribute, $value, $fail) use($categories) {
                     if (!array_search(strtolower($value), $categories)) {
-                        $fail('Category does not exists');
+                        // $fail('Category does not exists');
                     }
                 },
             ],
             '*.9' => [
-                'required',
+                // 'required',
                 function ($attribute, $value, $fail) use($subcategories) {
                     if (!array_search(strtolower($value), $subcategories)) {
-                        $fail('Subcategory does not exists');
+                        // $fail('Subcategory does not exists');
                     }
                 },
             ],
             '*.10' => [
-                'required',
-                Rule::in(['fixed', 'percentage']),
+                // 'required',
+                // Rule::in(['fixed', 'percentage']),
             ],
             '*.11' => [
-                'required',
-                'numeric'
+                // 'required',
+                // 'numeric'
             ],
             '*.12' => [
-                'required',
-                'numeric'
+                // 'required',
+                // 'numeric'
             ],
             '*.13' => [
-                'required',
+                // 'required',
                 function ($attribute, $value, $fail) use($itemTypes) {
                     if (!array_search(strtolower($value), $itemTypes)) {
-                        $fail('Item Type does not exists');
+                        // $fail('Item Type does not exists');
                     }
                 },
             ],
