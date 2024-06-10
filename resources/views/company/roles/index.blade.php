@@ -1,11 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Users
-    @endsection
-
-    @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.users.index', $company) }}
+        Roles
     @endsection
 
     <div class="card">
