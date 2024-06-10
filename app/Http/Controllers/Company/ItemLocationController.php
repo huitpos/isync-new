@@ -66,25 +66,12 @@ class ItemLocationController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'unit_floor_number' => 'required',
-            'street' => 'required',
-            'region_id' => 'required',
-            'province_id' => 'required',
-            'city_id' => 'required',
-            'barangay_id' => 'required',
         ]);
 
         $company = $request->attributes->get('company');
 
         $locationData = $request->only([
             'name',
-            'unit_floor_number',
-            'street',
-            'region_id',
-            'province_id',
-            'city_id',
-            'barangay_id',
-            'phone_number',
             'status',
         ]);
 
@@ -136,23 +123,10 @@ class ItemLocationController extends Controller
 
         $request->validate([
             'name' => 'required',
-            'unit_floor_number' => 'required',
-            'street' => 'required',
-            'region_id' => 'required',
-            'province_id' => 'required',
-            'city_id' => 'required',
-            'barangay_id' => 'required',
         ]);
 
         $locationData = $request->only([
             'name',
-            'unit_floor_number',
-            'street',
-            'region_id',
-            'province_id',
-            'city_id',
-            'barangay_id',
-            'phone_number',
             'status',
         ]);
 

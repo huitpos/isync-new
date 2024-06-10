@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\CreatedUpdatedBy;
+
 class ItemLocation extends Model
 {
     use HasFactory;
+    use CreatedUpdatedBy;
 
     protected $guarded = [];
 
@@ -44,5 +47,10 @@ class ItemLocation extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'item_location_product');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

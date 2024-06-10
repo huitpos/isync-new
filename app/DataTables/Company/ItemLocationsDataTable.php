@@ -39,6 +39,9 @@ class ItemLocationsDataTable extends DataTable
                 // } else {
                 //     return '';
                 // }
+            })
+            ->editColumn('created_at', function (Model $data) {
+                return $data->created_at;
             });
     }
 
@@ -52,10 +55,7 @@ class ItemLocationsDataTable extends DataTable
             ->where('company_id', $this->company_id)
             ->with([
                 'company',
-                'region',
-                'province',
-                'city',
-                'barangay'
+                'createdBy'
             ]);
     }
 
@@ -83,13 +83,9 @@ class ItemLocationsDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('name'),
-            Column::make('unit_floor_number'),
-            Column::make('street'),
-            Column::make('region.name')->title('region'),
-            Column::make('province.name')->title('province'),
-            Column::make('city.name')->title('city'),
-            Column::make('barangay.name')->title('barangay'),
+            Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status')->title('status'),
+            Column::make('created_at'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),
