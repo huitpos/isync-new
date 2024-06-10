@@ -163,6 +163,7 @@ class RoleController extends Controller
 
             $role->givePermissionTo($request->permission);
 
+            return redirect()->route('company.roles.index', ['companySlug' => $company->slug])->with('success', 'Role updated successfully.');
             return redirect()->back()->with('success', 'Role created successfully.');
         }
     }
