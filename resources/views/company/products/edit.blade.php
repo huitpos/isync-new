@@ -509,6 +509,15 @@
                     @enderror
                 </div>
 
+                <div class="mb-4 mt-7">
+                    <label class="form-label">Max Discount</label>
+                    <input value="{{ old('max_discount') ?? $product->max_discount }}" name="max_discount" type="text" class="form-control @error('max_discount') is-invalid @enderror" placeholder="Min. Stock Level" required/>
+
+                    @error('max_discount')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
                 <button type="submit" class="btn btn-primary mt-5 disable-on-click">Submit</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>
