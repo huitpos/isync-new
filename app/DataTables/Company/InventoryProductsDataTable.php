@@ -34,7 +34,7 @@ class InventoryProductsDataTable extends DataTable
                 }
             })
             ->addColumn('stock', function (Product $data) {
-                return $data['branches'][0]['pivot']['stock'];
+                return $data['branches'][0]['pivot']['stock'] ?? 0;
             });
     }
 
