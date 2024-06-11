@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 
 use App\Models\UnitOfMeasurement;
 use App\Models\Department;
@@ -16,13 +17,16 @@ use App\Models\Subcategory;
 use App\Models\ItemType;
 use App\Models\Product;
 
-class ProductsImport implements ToCollection, WithValidation, WithStartRow
+class ProductsImport implements ToCollection, WithValidation, WithStartRow, WithCalculatedFormulas
 {
     protected $companyId;
     protected $data = [];
 
     public function __construct(int $companyId)
     {
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', '-1');
+
         $this->companyId = $companyId;
     }
 
