@@ -138,7 +138,7 @@ class MiscController extends BaseController
         $requestData = $request->all();
         $validator = validator($request->all(), [
             'transaction_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'pos_machine_id' => 'required',
             'gross_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'net_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
@@ -148,7 +148,7 @@ class MiscController extends BaseController
             'tender_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'change' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'service_charge' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'cashier_id' => 'required|exists:users,id',
+            'cashier_id' => 'required',
             'total_unit_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_void_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'is_void' => 'required|boolean',
@@ -157,7 +157,7 @@ class MiscController extends BaseController
             'is_sent_to_server' => 'required|boolean',
             'is_complete' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
-            'branch_id' => 'required|exists:branches,id',
+            'branch_id' => 'required',
             'total_quantity' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_void_qty' => 'required|numeric',
             'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
@@ -256,7 +256,7 @@ class MiscController extends BaseController
         $requestData = $request->all();
         $validator = validator($request->all(), [
             'transaction_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'pos_machine_id' => 'required',
             'gross_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'net_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
@@ -266,7 +266,7 @@ class MiscController extends BaseController
             'tender_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'change' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'service_charge' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'cashier_id' => 'required|exists:users,id',
+            'cashier_id' => 'required',
             'total_unit_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_void_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'is_void' => 'required|boolean',
@@ -275,7 +275,7 @@ class MiscController extends BaseController
             'is_sent_to_server' => 'required|boolean',
             'is_complete' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
-            'branch_id' => 'required|exists:branches,id',
+            'branch_id' => 'required',
             'total_quantity' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_void_qty' => 'required|numeric',
             'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
@@ -372,8 +372,8 @@ class MiscController extends BaseController
     public function getTransactions(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -392,7 +392,7 @@ class MiscController extends BaseController
     public function getTakeOrderTransactions(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
+            'branch_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -413,9 +413,9 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'order_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
-            'transaction_id' => 'required|exists:transactional_db.transactions,transaction_id',
-            'product_id' => 'required|exists:products,id',
+            'pos_machine_id' => 'required',
+            'transaction_id' => 'required',
+            'product_id' => 'required',
             'cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'qty' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
@@ -428,9 +428,9 @@ class MiscController extends BaseController
             'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'vat_exempt_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'department_id' => 'required|exists:departments,id',
-            'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:subcategories,id',
+            'department_id' => 'required',
+            'category_id' => 'required',
+            'subcategory_id' => 'required',
             'unit_id' => 'required|numeric',
             'is_void' => 'required|boolean',
             'is_back_out' => 'required|boolean',
@@ -438,7 +438,7 @@ class MiscController extends BaseController
             'is_paid' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
             'is_completed' => 'required|boolean',
-            'branch_id' => 'required|exists:branches,id',
+            'branch_id' => 'required',
             'is_cut_off' => 'required|boolean',
             'is_discount_exempt' => 'required|boolean',
             'is_open_price' => 'required|boolean',
@@ -527,9 +527,9 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'order_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'pos_machine_id' => 'required',
             'transaction_id' => 'required',
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required',
             'cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'qty' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
@@ -542,9 +542,9 @@ class MiscController extends BaseController
             'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'vat_exempt_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'department_id' => 'required|exists:departments,id',
-            'category_id' => 'required|exists:categories,id',
-            'subcategory_id' => 'required|exists:subcategories,id',
+            'department_id' => 'required',
+            'category_id' => 'required',
+            'subcategory_id' => 'required',
             'unit_id' => 'required|numeric',
             'is_void' => 'required|boolean',
             'is_back_out' => 'required|boolean',
@@ -552,7 +552,7 @@ class MiscController extends BaseController
             'is_paid' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
             'is_completed' => 'required|boolean',
-            'branch_id' => 'required|exists:branches,id',
+            'branch_id' => 'required',
             'is_cut_off' => 'required|boolean',
             'is_discount_exempt' => 'required|boolean',
             'is_open_price' => 'required|boolean',
@@ -640,7 +640,7 @@ class MiscController extends BaseController
     public function getTakeOrderOrders(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
+            'branch_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -665,8 +665,8 @@ class MiscController extends BaseController
     public function getOrders(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -686,10 +686,10 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'payment_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
-            'branch_id' => 'required|exists:branches,id',
-            'transaction_id' => 'required|exists:transactional_db.transactions,transaction_id',
-            'payment_type_id' => 'required|exists:payment_types,id',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'transaction_id' => 'required',
+            'payment_type_id' => 'required',
             'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'is_advance_payment' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
@@ -740,8 +740,8 @@ class MiscController extends BaseController
     public function getPayments(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -761,15 +761,15 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'safekeeping_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
-            'branch_id' => 'required|exists:branches,id',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
             'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'cashier_id' => 'required|exists:users,id',
-            'authorize_id' => 'required|exists:users,id',
+            'cashier_id' => 'required',
+            'authorize_id' => 'required',
             'is_cut_off' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
 
-            'end_of_day_id' => 'required|exists:transactional_db.end_of_days,end_of_day_id',
+            'end_of_day_id' => 'required',
             'is_auto' => 'required|boolean',
             'short_over' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
         ]);
@@ -816,8 +816,8 @@ class MiscController extends BaseController
     public function getSafekeepings(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -837,14 +837,14 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'safekeeping_denomination_id' => 'required|numeric|min:1',
-            'safekeeping_id' => 'required|exists:transactional_db.safekeepings,safekeeping_id',
-            'cash_denomination_id' => 'required|exists:cash_denominations,id',
+            'safekeeping_id' => 'required',
+            'cash_denomination_id' => 'required',
             'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'qty' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
-            'end_of_day_id' => 'required|exists:transactional_db.end_of_days,end_of_day_id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+            'end_of_day_id' => 'required',
             'is_cut_off' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
         ]);
@@ -890,8 +890,8 @@ class MiscController extends BaseController
     public function getSafekeepingDenominations(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -915,8 +915,8 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'end_of_day_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
-            'branch_id' => 'required|exists:branches,id',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
             'beginning_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'ending_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_transactions' => 'required|numeric',
@@ -933,7 +933,7 @@ class MiscController extends BaseController
             'total_discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_sk' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'cashier_id' => 'required|exists:users,id',
+            'cashier_id' => 'required',
             'shift_number' => 'required',
             'is_sent_to_server' => 'required|boolean',
             'reading_number' => 'required|numeric',
@@ -1010,8 +1010,8 @@ class MiscController extends BaseController
     public function getEndOfDays(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1030,8 +1030,8 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'cut_off_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
-            'branch_id' => 'required|exists:branches,id',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
             'beginning_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'ending_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_transactions' => 'required|numeric',
@@ -1048,7 +1048,7 @@ class MiscController extends BaseController
             'total_discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_sk' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'cashier_id' => 'required|exists:users,id',
+            'cashier_id' => 'required',
             'shift_number' => 'required',
             'is_sent_to_server' => 'required|boolean',
             'reading_number' => 'required|numeric',
@@ -1114,8 +1114,8 @@ class MiscController extends BaseController
     public function getCutOffs(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1134,16 +1134,16 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'discount_id' => 'required|numeric|min:1',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
-            'branch_id' => 'required|exists:branches,id',
-            'transaction_id' => 'required|exists:transactional_db.transactions,transaction_id',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'transaction_id' => 'required',
             'custom_discount_id' => 'required|numeric',
-            'discount_type_id' => 'required|exists:discount_types,id',
+            'discount_type_id' => 'required',
             'value' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'vat_exempt_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'cashier_id' => 'required|exists:users,id',
+            'cashier_id' => 'required',
             'is_void' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
@@ -1200,8 +1200,8 @@ class MiscController extends BaseController
     public function getDiscounts(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1221,8 +1221,8 @@ class MiscController extends BaseController
         $validator = validator($request->all(), [
             'discount_details_id' => 'required|numeric|min:1',
             'discount_id' => 'required|numeric',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
-            'branch_id' => 'required|exists:branches,id',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
             'custom_discount_id' => 'required|numeric',
             'transaction_id' => 'required|numeric',
             'order_id' => 'required|numeric',
@@ -1286,8 +1286,8 @@ class MiscController extends BaseController
     public function getDiscountDetails(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required|exists:branches,id',
-            'pos_machine_id' => 'required|exists:pos_machines,id',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
