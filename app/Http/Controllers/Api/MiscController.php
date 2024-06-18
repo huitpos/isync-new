@@ -396,6 +396,16 @@ class MiscController extends BaseController
             'is_cut_off' => false,
         ])->get();
 
+        if ($transactions->count() == 0) {
+            $transactions = Transaction::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('transaction_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
         return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
     }
 
@@ -414,10 +424,17 @@ class MiscController extends BaseController
             'is_complete' => false,
         ])->get();
 
+        if ($transactions->count() == 0) {
+            $transactions = TakeOrderTransaction::where([
+                'branch_id' => $request->branch_id,
+            ])
+            ->orderBy('transaction_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
         return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
     }
-
-    
 
     public function saveOrders(Request $request)
     {
@@ -662,7 +679,6 @@ class MiscController extends BaseController
             'is_completed' => false,
         ]);
 
-
         if ($request->has('transaction_id')) {
             $query->where('transaction_id', $request->transaction_id);
         }
@@ -764,6 +780,16 @@ class MiscController extends BaseController
             'is_cut_off' => false,
         ])->get();
 
+        if ($payments->count() == 0) {
+            $payments = Payment::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('payment_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
         return $this->sendResponse($payments, 'Payments retrieved successfully.');
     }
 
@@ -839,6 +865,16 @@ class MiscController extends BaseController
             'pos_machine_id' => $request->pos_machine_id,
             'is_cut_off' => false,
         ])->get();
+
+        if ($safekeepings->count() == 0) {
+            $safekeepings = Safekeeping::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('safekeeping_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
 
         return $this->sendResponse($safekeepings, 'Safekeepings retrieved successfully.');
     }
@@ -1389,6 +1425,16 @@ class MiscController extends BaseController
             'is_cut_off' => false,
         ])->get();
 
+        if ($records->count() == 0) {
+            $records = PaymentOtherInformation::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('payment_other_information_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
         return $this->sendResponse($records, 'Payment Other Informations retrieved successfully.');
     }
 
@@ -1460,6 +1506,16 @@ class MiscController extends BaseController
             'pos_machine_id' => $request->pos_machine_id,
             'is_cut_off' => false,
         ])->get();
+
+        if ($records->count() == 0) {
+            $records = DiscountOtherInformation::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('discount_other_information_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
 
         return $this->sendResponse($records, 'Discount Other Informations retrieved successfully.');
     }
@@ -1533,6 +1589,16 @@ class MiscController extends BaseController
             'is_cut_off' => false,
         ])->get();
 
+        if ($records->count() == 0) {
+            $records = CutOffDepartment::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('cut_off_department_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
         return $this->sendResponse($records, 'cut off departments retrieved successfully.');
     }
 
@@ -1603,6 +1669,16 @@ class MiscController extends BaseController
             'pos_machine_id' => $request->pos_machine_id,
             'is_cut_off' => false,
         ])->get();
+
+        if ($records->count() == 0) {
+            $records = CutOffDiscount::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('cut_off_discount_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
 
         return $this->sendResponse($records, 'cut off discounts retrieved successfully.');
     }
@@ -1675,6 +1751,16 @@ class MiscController extends BaseController
             'pos_machine_id' => $request->pos_machine_id,
             'is_cut_off' => false,
         ])->get();
+
+        if ($records->count() == 0) {
+            $records = CutOffPayment::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('cut_off_payment_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
 
         return $this->sendResponse($records, 'cut off payments retrieved successfully.');
     }
