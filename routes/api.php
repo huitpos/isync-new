@@ -99,7 +99,33 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/branch-take-order-orders', [MiscController::class, 'getTakeOrderOrders']);
         Route::post('/branch-take-order-orders', [MiscController::class, 'saveTakeOrderOrders']);
 
-        Route::apiResource('branches', BranchesController::class);
+        Route::get('/payment-other-informations', [MiscController::class, 'getPaymentOtherInformations']);
+        Route::post('/payment-other-informations', [MiscController::class, 'savePaymentOtherInformations']);
+
+        Route::get('/discount-other-informations', [MiscController::class, 'getDiscountOtherInformations']);
+        Route::post('/discount-other-informations', [MiscController::class, 'saveDiscountOtherInformations']);
+
+        //cutOffDepartments
+        Route::get('/cut-off-departments', [MiscController::class, 'getCutOffDepartments']);
+        Route::post('/cut-off-departments', [MiscController::class, 'saveCutOffDepartments']);
+
+        //cutOffDiscounts
+        Route::get('/cut-off-discounts', [MiscController::class, 'getCutOffDiscounts']);
+        Route::post('/cut-off-discounts', [MiscController::class, 'saveCutOffDiscounts']);
+
+        //cutOffPayments
+        Route::get('/cut-off-payments', [MiscController::class, 'getCutOffPayments']);
+        Route::post('/cut-off-payments', [MiscController::class, 'saveCutOffPayments']);
+
+        //endOfDayDiscounts
+        Route::get('/end-of-day-discounts', [MiscController::class, 'getEndOfDayDiscounts']);
+        Route::post('/end-of-day-discounts', [MiscController::class, 'saveEndOfDayDiscounts']);
+
+        //endOfDayPayments
+        Route::get('/end-of-day-payments', [MiscController::class, 'getEndOfDayPayments']);
+        Route::post('/end-of-day-payments', [MiscController::class, 'saveEndOfDayPayments']);
+
+        Route::post('/end-of-day-departments', [MiscController::class, 'saveEndOfDayDepartments']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);

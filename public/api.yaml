@@ -1811,3 +1811,510 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /api/payment-other-informations:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send payment other informations to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                payment_other_information_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                payment_id:
+                  type: integer
+                name:
+                  type: string
+                value:
+                  type: string
+                is_cut_off:
+                  type: boolean
+                cut_off_id:
+                  type: integer
+                is_void:
+                  type: boolean
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get payment other informations by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/discount-other-informations:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send discount other informations to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                discount_other_information_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                discount_id:
+                  type: integer
+                name:
+                  type: string
+                value:
+                  type: string
+                is_cut_off:
+                  type: boolean
+                cut_off_id:
+                  type: integer
+                is_void:
+                  type: boolean
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get payment other informations by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/cut-off-departments:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send discount other informations to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                cut_off_department_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                cut_off_id:
+                  type: integer
+                department_id:
+                  type: integer
+                name:
+                  type: string
+                transaction_count:
+                  type: integer
+                amount:
+                  type: number
+                end_of_day_id:
+                  type: integer
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+                is_cut_off:
+                  type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get payment other informations by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/cut-off-discounts:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send discount other informations to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                cut_off_discount_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                cut_off_id:
+                  type: integer
+                discount_type_id:
+                  type: integer
+                name:
+                  type: string
+                transaction_count:
+                  type: integer
+                amount:
+                  type: number
+                end_of_day_id:
+                  type: integer
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+                is_cut_off:
+                  type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get payment other informations by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/cut-off-payments:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                cut_off_payment_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                cut_off_id:
+                  type: integer
+                payment_type_id:
+                  type: integer
+                name:
+                  type: string
+                transaction_count:
+                  type: integer
+                amount:
+                  type: number
+                end_of_day_id:
+                  type: integer
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+                is_cut_off:
+                  type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get payment other informations by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/end-of-day-discounts:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                end_of_day_discount_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                end_of_day_id:
+                  type: integer
+                discount_type_id:
+                  type: integer
+                name:
+                  type: string
+                transaction_count:
+                  type: integer
+                amount:
+                  type: number
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/end-of-day-payments:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                end_of_day_payment_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                end_of_day_id:
+                  type: integer
+                payment_type_id:
+                  type: integer
+                name:
+                  type: string
+                transaction_count:
+                  type: integer
+                amount:
+                  type: number
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/end-of-day-departments:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                end_of_day_department_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                end_of_day_id:
+                  type: integer
+                discount_type_id:
+                  type: integer
+                name:
+                  type: string
+                transaction_count:
+                  type: integer
+                amount:
+                  type: number
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string

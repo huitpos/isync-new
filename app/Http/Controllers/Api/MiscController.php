@@ -23,6 +23,14 @@ use App\Models\DiscountDetail;
 use App\Models\ApiRequestLog;
 use App\Models\DiscountType;
 use App\Models\Product;
+use App\Models\PaymentOtherInformation;
+use App\Models\DiscountOtherInformation;
+use App\Models\CutOffDepartment;
+use App\Models\CutOffDiscount;
+use App\Models\CutOffPayment;
+use App\Models\EndOfDayDiscount;
+use App\Models\EndOfDayPayment;
+use App\Models\EndOfDayDepartment;
 
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
@@ -30,6 +38,8 @@ use App\Models\TakeOrderOrder;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 
 use Illuminate\Support\Facades\Redis;
+
+use function PHPSTORM_META\map;
 
 class MiscController extends BaseController
 {
@@ -1019,9 +1029,18 @@ class MiscController extends BaseController
         }
 
         $endOfDays = EndOfDay::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->orderBy('end_of_day_id', 'desc')
+            ->limit(2)
+            ->get();
+
+        foreach ($endOfDays as $endOfDay) {
+            $endOfDay->departments = $endOfDay->departments;
+            $endOfDay->payments = $endOfDay->payments;
+            $endOfDay->discounts = $endOfDay->discounts;
+        }
 
         return $this->sendResponse($endOfDays, 'End of Days retrieved successfully.');
     }
@@ -1282,7 +1301,7 @@ class MiscController extends BaseController
 
         return $this->sendResponse(DiscountDetail::create($postData), $message);
     }
-    
+
     public function getDiscountDetails(Request $request)
     {
         $validator = validator($request->all(), [
@@ -1300,5 +1319,507 @@ class MiscController extends BaseController
         ])->get();
 
         return $this->sendResponse($discounts, 'Discount details retrieved successfully.');
+    }
+
+    public function savePaymentOtherInformations(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'payment_other_information_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'transaction_id' => 'required',
+            'payment_id' => 'required',
+            'name' => 'required',
+            'value' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'is_cut_off' => 'required',
+            'cut_off_id' => 'required',
+            'is_void' => 'required',
+            'is_sent_to_server' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'payment_other_information_id' => $request->payment_other_information_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'transaction_id' => $request->transaction_id,
+            'payment_id' => $request->payment_id,
+            'name' => $request->name,
+            'value' => $request->value,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'is_void' => $request->is_void,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'payment other informations created successfully.';
+        $record = PaymentOtherInformation::where([
+            'payment_other_information_id' => $request->payment_other_information_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'payment other informations updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(PaymentOtherInformation::create($postData), $message);
+    }
+
+    public function getPaymentOtherInformations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $records = PaymentOtherInformation::where([
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'is_cut_off' => false,
+        ])->get();
+
+        return $this->sendResponse($records, 'Payment Other Informations retrieved successfully.');
+    }
+
+    public function saveDiscountOtherInformations(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'discount_other_information_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'transaction_id' => 'required',
+            'discount_id' => 'required',
+            'name' => 'required',
+            'value' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'is_cut_off' => 'required',
+            'cut_off_id' => 'required',
+            'is_void' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'discount_other_information_id' => $request->discount_other_information_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'transaction_id' => $request->transaction_id,
+            'discount_id' => $request->discount_id,
+            'name' => $request->name,
+            'value' => $request->value,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'is_void' => $request->is_void,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'discount other informations created successfully.';
+        $record = DiscountOtherInformation::where([
+            'discount_other_information_id' => $request->discount_other_information_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'discount other informations updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(DiscountOtherInformation::create($postData), $message);
+    }
+
+    public function getDiscountOtherInformations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $records = DiscountOtherInformation::where([
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'is_cut_off' => false,
+        ])->get();
+
+        return $this->sendResponse($records, 'Discount Other Informations retrieved successfully.');
+    }
+
+    public function saveCutOffDepartments(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'cut_off_department_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'cut_off_id' => 'required',
+            'department_id' => 'required',
+            'name' => 'required',
+            'transaction_count' => 'required',
+            'amount' => 'required',
+            'end_of_day_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+            'is_cut_off' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'cut_off_department_id' => $request->cut_off_department_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'department_id' => $request->department_id,
+            'name' => $request->name,
+            'transaction_count' => $request->transaction_count,
+            'amount' => $request->amount,
+            'end_of_day_id' => $request->end_of_day_id,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'cut off department created successfully.';
+        $record = CutOffDepartment::where([
+            'cut_off_department_id' => $request->cut_off_department_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'cut off department updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(CutOffDepartment::create($postData), $message);
+    }
+
+    public function getCutOffDepartments(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $records = CutOffDepartment::where([
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'is_cut_off' => false,
+        ])->get();
+
+        return $this->sendResponse($records, 'cut off departments retrieved successfully.');
+    }
+
+    public function saveCutOffDiscounts(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'cut_off_discount_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'cut_off_id' => 'required',
+            'discount_type_id' => 'required',
+            'name' => 'required',
+            'transaction_count' => 'required',
+            'amount' => 'required',
+            'end_of_day_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'cut_off_discount_id' => $request->cut_off_discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'cut_off_id' => $request->cut_off_id,
+            'discount_type_id' => $request->discount_type_id,
+            'name' => $request->name,
+            'transaction_count' => $request->transaction_count,
+            'amount' => $request->amount,
+            'end_of_day_id' => $request->end_of_day_id,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+            'is_cut_off' => $request->is_cut_off,
+        ];
+
+        $message = 'cut off discount created successfully.';
+        $record = CutOffDiscount::where([
+            'cut_off_discount_id' => $request->cut_off_discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'cut off discount updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(CutOffDiscount::create($postData), $message);
+    }
+
+    public function getCutOffDiscounts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $records = CutOffDiscount::where([
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'is_cut_off' => false,
+        ])->get();
+
+        return $this->sendResponse($records, 'cut off discounts retrieved successfully.');
+    }
+
+    public function saveCutOffPayments(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'cut_off_payment_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'cut_off_id' => 'required',
+            'payment_type_id' => 'required',
+            'name' => 'required',
+            'transaction_count' => 'required',
+            'amount' => 'required',
+            'end_of_day_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+            'is_cut_off' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'cut_off_payment_id' => $request->cut_off_payment_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'cut_off_id' => $request->cut_off_id,
+            'payment_type_id' => $request->payment_type_id,
+            'name' => $request->name,
+            'transaction_count' => $request->transaction_count,
+            'amount' => $request->amount,
+            'end_of_day_id' => $request->end_of_day_id,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+            'is_cut_off' => $request->is_cut_off,
+        ];
+
+        $message = 'cut off payment created successfully.';
+        $record = CutOffPayment::where([
+            'cut_off_payment_id' => $request->cut_off_payment_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'cut off payment updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(CutOffPayment::create($postData), $message);
+    }
+
+    public function getCutOffPayments(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $records = CutOffPayment::where([
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'is_cut_off' => false,
+        ])->get();
+
+        return $this->sendResponse($records, 'cut off payments retrieved successfully.');
+    }
+
+    public function saveEndOfDayDiscounts(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'end_of_day_discount_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'end_of_day_id' => 'required',
+            'discount_type_id' => 'required',
+            'name' => 'required',
+            'transaction_count' => 'required',
+            'amount' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'end_of_day_discount_id' => $request->end_of_day_discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'end_of_day_id' => $request->end_of_day_id,
+            'discount_type_id' => $request->discount_type_id,
+            'name' => $request->name,
+            'transaction_count' => $request->transaction_count,
+            'amount' => $request->amount,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'end of day discount created successfully.';
+        $record = EndOfDayDiscount::where([
+            'end_of_day_discount_id' => $request->end_of_day_discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'end of day discount updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(EndOfDayDiscount::create($postData), $message);
+    }
+
+    public function saveEndOfDayPayments(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'end_of_day_payment_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'end_of_day_id' => 'required',
+            'payment_type_id' => 'required',
+            'name' => 'required',
+            'transaction_count' => 'required',
+            'amount' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'end_of_day_payment_id' => $request->end_of_day_payment_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'end_of_day_id' => $request->end_of_day_id,
+            'payment_type_id' => $request->payment_type_id,
+            'name' => $request->name,
+            'transaction_count' => $request->transaction_count,
+            'amount' => $request->amount,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'end of day payment created successfully.';
+        $record = EndOfDayPayment::where([
+            'end_of_day_payment_id' => $request->end_of_day_payment_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'end of day payment updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(EndOfDayPayment::create($postData), $message);
+    }
+
+    public function saveEndOfDayDepartments(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'end_of_day_department_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'end_of_day_id' => 'required',
+            'discount_type_id' => 'required',
+            'name' => 'required',
+            'transaction_count' => 'required',
+            'amount' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'end_of_day_department_id' => $request->end_of_day_department_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'end_of_day_id' => $request->end_of_day_id,
+            'discount_type_id' => $request->discount_type_id,
+            'name' => $request->name,
+            'transaction_count' => $request->transaction_count,
+            'amount' => $request->amount,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'end of day department created successfully.';
+        $record = EndOfDayDepartment::where([
+            'end_of_day_department_id' => $request->end_of_day_department_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'end of day department updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(EndOfDayDepartment::create($postData), $message);
     }
 }
