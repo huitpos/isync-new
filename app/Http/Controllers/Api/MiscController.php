@@ -1376,7 +1376,7 @@ class MiscController extends BaseController
             'transaction_id' => 'required',
             'payment_id' => 'required',
             'name' => 'required',
-            'value' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'value' => 'required',
             'is_cut_off' => 'required',
             'cut_off_id' => 'required',
             'is_void' => 'required',
