@@ -705,6 +705,16 @@ class MiscController extends BaseController
             'is_cut_off' => false,
         ])->get();
 
+        if ($orders->count() == 0) {
+            $orders = Order::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('order_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
         return $this->sendResponse($orders, 'Orders retrieved successfully.');
     }
 
