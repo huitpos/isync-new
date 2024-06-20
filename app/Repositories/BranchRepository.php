@@ -45,7 +45,9 @@ class BranchRepository implements BranchRepositoryInterface
 
     public function getTransactionAmount(String $id): Float
     {
-        $amount = Transaction::where('branch_id', $id)->sum('net_sales');
+        $amount = Transaction::where('branch_id', $id)
+            ->where('is_complete', true)
+            ->sum('net_sales');
 
         return $amount;
     }
