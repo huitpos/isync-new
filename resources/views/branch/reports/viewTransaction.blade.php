@@ -106,7 +106,7 @@
                                                 {{ $item->qty }}
                                             </td>
                                             <td>
-                                                {{ $item->uom->name }}
+                                                {{ $item->uom?->name }}
                                             </td>
                                             <td class="text-end">
                                                 ₱ {{ number_format($item->amount, 2) }}
