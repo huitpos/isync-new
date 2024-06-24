@@ -79,6 +79,7 @@ class MachineController extends BaseController
             'or_counter' => 'required',
             'x_reading_counter' => 'required',
             'z_reading_counter' => 'required',
+            'void_counter' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -90,6 +91,7 @@ class MachineController extends BaseController
             'or_counter' => $request->or_counter,
             'x_reading_counter' => $request->x_reading_counter,
             'z_reading_counter' => $request->z_reading_counter,
+            'void_counter' => $request->void_counter,
         ]);
 
         return $this->sendResponse($machine, 'Machine updated successfully');
