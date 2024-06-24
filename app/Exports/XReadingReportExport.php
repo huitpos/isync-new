@@ -122,7 +122,7 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
         $data = [
             $cutoff->machine->machine_number, //Machine #
             $cutoff->shift_number, //Shift No
-            $cutoff->id, //X-reading #
+            $cutoff->reading_number, //X-reading #
             $cutoff->beginning_or, //Beginning OR #
             $cutoff->ending_or, //Ending OR #
             $cutoff->treg, //Cut Off Date
