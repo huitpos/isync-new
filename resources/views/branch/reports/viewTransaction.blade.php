@@ -14,7 +14,7 @@
                 <div class="card-body pt-0">
                     <div class="d-flex flex-column flex-sm-row gap-7 gap-md-10 fw-bold">
                         <div class="flex-root d-flex flex-column">
-                            <span class="text-muted">Receipt Number</span>
+                            <span class="text-muted">Sales Invoice Number</span>
                             <span class="fs-5">{{ $transaction->receipt_number }}</span>
                         </div>
 

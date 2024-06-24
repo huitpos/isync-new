@@ -51,7 +51,7 @@ class VatSalesReportExport implements FromCollection, WithHeadings, WithMapping,
         return [
             'Date', //done
             'Machine Number', //done
-            'Receipt Number', //done
+            'Sales Invoice Number', //done
             'Sub Total', //done
             'Total Amount Due', //done
             'Vat Amount', //done
