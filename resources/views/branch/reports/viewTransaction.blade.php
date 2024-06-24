@@ -97,7 +97,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="fw-semibold text-gray-600">
-                                        @foreach($transaction->items as $item)
+                                        @foreach($transaction->nonVoiditems as $item)
                                         <tr>
                                             <td>
                                                 {{ $item->name }}

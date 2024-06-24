@@ -31,6 +31,15 @@ class Transaction extends Model
         });
     }
 
+    public function nonVoiditems()
+    {
+        return $this->hasMany(Order::class, 'transaction_id', 'transaction_id')->where(function ($query) {
+            $query->where('branch_id', $this->branch_id)
+                  ->where('is_void', false)
+                  ->where('pos_machine_id', $this->pos_machine_id);
+        });
+    }
+
     public function payments()
     {
         return $this->hasMany(Payment::class, 'transaction_id', 'transaction_id')->where(function ($query) {
