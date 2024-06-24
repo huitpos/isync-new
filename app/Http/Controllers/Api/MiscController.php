@@ -1037,6 +1037,16 @@ class MiscController extends BaseController
             'total_short_over' => $request->total_short_over,
         ];
 
+        if ($request['products']) {
+            foreach ($request['products'] as $reqProduct) {
+                $product = Product::find($reqProduct['productId']);
+
+                if ($product) {
+                    $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
+                }
+            }
+        }
+
         $endOfDay = EndOfDay::where([
             'end_of_day_id' => $request->end_of_day_id,
             'pos_machine_id' => $request->pos_machine_id,
@@ -1045,16 +1055,6 @@ class MiscController extends BaseController
 
         $message = 'End of Day created successfully.';
         if ($endOfDay) {
-            if ($request['products']) {
-                foreach ($request['products'] as $reqProduct) {
-                    $product = Product::find($reqProduct['id']);
-
-                    if ($product) {
-                        $this->productRepository->updateBranchQuantity($product, $branch, $endOfDay->id, 'end_of_days', $reqProduct['quantity'], null, 'subtract', $product->uom_id);
-                    }
-                }
-            }
-
             $message = 'End of Day updated successfully.';
             $endOfDay->update($postData);
             return $this->sendResponse($endOfDay, $message);

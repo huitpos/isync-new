@@ -104,7 +104,7 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function updateBranchQuantity(Product $product, Branch $branch, $objectId, $objectType, int $qty, $srp = null, $operation = 'add', $uomId): Bool
     {
-        $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
+        $pivotData = $product->branches->where('id', $branch->id)->first()?->pivot;
         if ($product->uom_id != $uomId) {
             $conversion = UnitConversion::where([
                 'from_unit_id' => $product->uom_id,
@@ -128,7 +128,7 @@ class ProductRepository implements ProductRepositoryInterface
         } elseif ($operation == 'replace') {
             $newStock = $qty;
         } else {
-            $newStock = $pivotData->stock - $qty;
+            $newStock = $pivotData?->stock - $qty;
         }
 
         $updateData = [
@@ -144,6 +144,7 @@ class ProductRepository implements ProductRepositoryInterface
             $branch->products()->updateExistingPivot($product->id, $updateData);
         } else {
             // Product doesn't exist in the branch, create a new pivot record
+            $updateData['price'] = $product->srp;
             $branch->products()->attach($product->id, $updateData);
         }
 
@@ -153,7 +154,7 @@ class ProductRepository implements ProductRepositoryInterface
         $productCountLog->product_id = $product->id;
         $productCountLog->object_id = $objectId;
         $productCountLog->object_type = $objectType;
-        $productCountLog->old_quantity = $pivotData->stock;
+        $productCountLog->old_quantity = $pivotData?->stock ?? 0;
         $productCountLog->new_quantity = $newStock;
         $productCountLog->uom_id = $uomId;
         $productCountLog->save();
