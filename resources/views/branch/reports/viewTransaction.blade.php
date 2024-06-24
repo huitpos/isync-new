@@ -122,7 +122,7 @@
                                                 Total
                                             </td>
                                             <td class="text-gray-900 fs-3 fw-bolder text-end">
-                                                ₱ {{ number_format($transaction->gross_sales, 2) }}
+                                                ₱ {{ number_format($transaction->net_sales, 2) }}
                                             </td>
                                         </tr>
                                     </tbody>
