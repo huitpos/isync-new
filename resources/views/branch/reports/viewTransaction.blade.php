@@ -109,7 +109,7 @@
                                                 {{ $item->uom?->name }}
                                             </td>
                                             <td class="text-end">
-                                                ₱ {{ number_format($item->amount, 2) }}
+                                                ₱ {{ number_format($item->total, 2) }}
                                             </td>
                                             <td class="text-end">
                                                 ₱ {{ number_format($item->gross, 2) }}
