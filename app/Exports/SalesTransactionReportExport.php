@@ -109,7 +109,7 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
             $transaction->discount_amount ?: '0.00',
             $paymentTypeNames->join(', '),
             $transaction->is_void ? 1 : 0,
-            $transaction->items->sum('qty'),
+            $transaction->nonVoiditems->sum('qty'),
             $transaction->tender_amount ?: '0.00',
             $transaction->service_charge ?: '0.00',
             $transaction->type,
