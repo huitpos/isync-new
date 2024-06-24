@@ -82,7 +82,7 @@ class CompanyRepository implements CompanyRepositoryInterface
 
         $transactions = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
             ->where('is_complete', true)
-            ->orderBy('id', 'desc')
+            ->orderBy('treg', 'desc')
             ->get();
 
         return $transactions;
@@ -94,7 +94,7 @@ class CompanyRepository implements CompanyRepositoryInterface
 
         $transactions = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
             ->where('is_complete', false)
-            ->orderBy('id', 'desc')
+            ->orderBy('treg', 'desc')
             ->get();
 
         return $transactions;
