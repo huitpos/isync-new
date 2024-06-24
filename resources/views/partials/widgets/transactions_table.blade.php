@@ -76,7 +76,7 @@
 								@foreach ($completedTransactions as $completedTransaction)
 								<tr>
 									<td class="text-start">
-										<span class="text-gray-600">{{ $completedTransaction->created_at }}</span>
+										<span class="text-gray-600">{{ $completedTransaction->treg }}</span>
 									</td>
 
 									@if (isset($addBranch) && $addBranch)
@@ -181,7 +181,7 @@
 								@foreach ($pendingTransactions as $pendingTransaction)
 								<tr>
 									<td class="text-start">
-										<span class="text-gray-600">{{ $pendingTransaction->completed_at }}</span>
+										<span class="text-gray-600">{{ $pendingTransaction->treg }}</span>
 									</td>
 
 									<td class="text-start">
