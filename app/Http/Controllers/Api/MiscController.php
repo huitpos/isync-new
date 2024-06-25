@@ -424,15 +424,6 @@ class MiscController extends BaseController
             'is_complete' => false,
         ])->get();
 
-        if ($transactions->count() == 0) {
-            $transactions = TakeOrderTransaction::where([
-                'branch_id' => $request->branch_id,
-            ])
-            ->orderBy('transaction_id', 'desc')
-            ->limit(2)
-            ->get();
-        }
-
         return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
     }
 
