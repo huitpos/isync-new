@@ -32,6 +32,12 @@ class ProductsDataTable extends DataTable
                     'text' => $data->name,
                 ]);
             })
+            ->editColumn('cost', function (Product $data) {
+                return number_format($data->cost, 2);
+            })
+            ->editColumn('srp', function (Product $data) {
+                return number_format($data->srp, 2);
+            })
             ->addColumn('actions', function (Product $data) use ($companySlug, $branchSlug) {
                 return view('branch.datatables._actions', [
                     'param' => [
@@ -87,11 +93,10 @@ class ProductsDataTable extends DataTable
             Column::make('item_type.name', 'itemType.name')->title('Item Type'),
             Column::make('uom.name')->title('UOM'),
             Column::make('code')->title('Item Code'),
+            Column::make('cost'),
+            Column::make('srp'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
-            Column::make('status'),
-            Column::computed('actions')
-                ->exportable(false)
-                ->printable(false),
+            Column::make('status')
         ];
     }
 
