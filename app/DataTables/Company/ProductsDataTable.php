@@ -29,6 +29,12 @@ class ProductsDataTable extends DataTable
                     return $data->name;
                 }
             })
+            ->editColumn('cost', function (Product $data) {
+                return number_format($data->cost, 2);
+            })
+            ->editColumn('srp', function (Product $data) {
+                return number_format($data->srp, 2);
+            })
             ->filterColumn('name', function($query, $keyword) {
                 return $query->where('name', 'like', '%' . $keyword . '%');
             })
@@ -87,6 +93,8 @@ class ProductsDataTable extends DataTable
             Column::make('item_type.name', 'itemType.name')->title('Item Type')->searchable(false),
             Column::make('uom.name')->title('UOM')->searchable(false),
             Column::make('code')->title('Item Code')->searchable(false),
+            Column::make('cost')->title('cost')->searchable(false),
+            Column::make('srp')->title('srp')->searchable(false),
             Column::make('created_by.name', 'createdBy.name')->title('created by')->searchable(false),
             Column::make('status'),
             Column::computed('actions')
