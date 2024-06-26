@@ -127,7 +127,7 @@ class MiscController extends BaseController
         return $this->sendResponse($chargeAccounts, 'Charge Accounts retrieved successfully.');
     }
 
-    public function products($branchId)
+    public function products(Request $request, $branchId)
     {
         $branch = Branch::with([
             'company',
@@ -138,9 +138,18 @@ class MiscController extends BaseController
             },
         ])->find($branchId);
 
-        $products = $branch->company->products;
+        if ($request->from_date) {
+            $products = $branch->company->products()
+                ->where(function ($query) use ($request) {
+                    $query->where('updated_at', '>=', $request->from_date)
+                          ->orWhere('created_at', '>=', $request->from_date);
+                })
+                ->get();
+        } else {
+            $products = $branch->company->products;
+        }
 
-        return $this->sendResponse($products, 'Charge Accounts retrieved successfully.');
+        return $this->sendResponse($products, 'Products retrieved successfully.');
     }
 
     public function saveTakeOrderTransactions(Request $request)
