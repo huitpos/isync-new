@@ -36,6 +36,7 @@ class VatSalesReportExport implements FromCollection, WithHeadings, WithMapping,
     public function collection()
     {
         $transactions = Transaction::where('branch_id', $this->branchId)
+            ->where('is_complete', true)
             ->get();
 
         return new Collection($transactions);
