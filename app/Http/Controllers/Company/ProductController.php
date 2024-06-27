@@ -379,7 +379,7 @@ class ProductController extends Controller
         $import = new ProductsImport($request->attributes->get('company')->id);
 
         Excel::import($import, $path);
-
+        dd($import->getData());
         foreach ($import->getData() as $product) {
             Product::updateOrCreate(
                 [

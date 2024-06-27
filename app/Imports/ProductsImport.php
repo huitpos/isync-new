@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\WithLimit;
+use Maatwebsite\Excel\Concerns\WithColumnLimit;
 
 use App\Models\UnitOfMeasurement;
 use App\Models\Department;
@@ -17,7 +19,7 @@ use App\Models\Subcategory;
 use App\Models\ItemType;
 use App\Models\Product;
 
-class ProductsImport implements ToCollection, WithValidation, WithStartRow, WithCalculatedFormulas
+class ProductsImport implements ToCollection, WithValidation, WithStartRow, WithCalculatedFormulas, WithLimit, WithColumnLimit
 {
     protected $companyId;
     protected $data = [];
@@ -38,8 +40,19 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow, With
         return 2;
     }
 
+    public function limit(): int
+    {
+        return 500;
+    }
+
+    public function endColumn(): string
+    {
+        return 'O';
+    }
+
     public function collection(Collection $rows)
     {
+        dd($rows);
         $lastNumber = Product::where('company_id', $this->companyId)->max('code'); 
 
         $units = UnitOfMeasurement::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
