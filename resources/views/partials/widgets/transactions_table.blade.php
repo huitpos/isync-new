@@ -62,8 +62,8 @@
 									<th class="text-start">Shift</th>
 									<th class="text-end">Gross Sales</th>
 									<th class="text-end">Net Sales</th>
-									<th class="text-end">Vat Sales</th>
 									<th class="text-end">Vat Amount</th>
+									<th class="text-end">Vat Sales</th>
 									<th class="text-end">Vat Exempt</th>
 									<th class="text-end">Discount</th>
 									<th class="text-start">Type of Payment</th>
