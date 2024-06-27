@@ -52,7 +52,6 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow, With
 
     public function collection(Collection $rows)
     {
-        dd($rows);
         $lastNumber = Product::where('company_id', $this->companyId)->max('code'); 
 
         $units = UnitOfMeasurement::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
