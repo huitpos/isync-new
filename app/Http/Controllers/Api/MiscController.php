@@ -1918,4 +1918,48 @@ class MiscController extends BaseController
 
         return $this->sendResponse(EndOfDayDepartment::create($postData), $message);
     }
+
+    public function bulkSaveTransactions(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'conditions.branch_id' => 'required',
+            'conditions.pos_machine_id' => 'required',
+            'conditions.transaction_id' => 'required|array',
+            'data' => 'required|array',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = $request->all();
+
+        // Extract the data and conditions
+        $data = $postData['data'];
+        $conditions = $postData['conditions'];
+
+        // Build the query dynamically
+        $query = Transaction::query();
+
+        foreach ($conditions as $key => $value) {
+            if (is_array($value)) {
+                $query->whereIn($key, $value);
+            } else {
+                $query->where($key, $value);
+            }
+        }
+
+        try {
+            // Perform the bulk update and check if it was successful
+            $affectedRows = $query->update($data);
+
+            if ($affectedRows > 0) {
+                return response()->json(['message' => 'Records updated successfully!', 'affectedRows' => $affectedRows]);
+            } else {
+                return response()->json(['message' => 'No records were updated or fields did not exist.', 'affectedRows' => $affectedRows], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurred while updating the records.', 'error' => $e->getMessage()], 500);
+        }
+    }
 }

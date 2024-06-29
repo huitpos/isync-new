@@ -126,6 +126,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/end-of-day-payments', [MiscController::class, 'saveEndOfDayPayments']);
 
         Route::post('/end-of-day-departments', [MiscController::class, 'saveEndOfDayDepartments']);
+
+        Route::post('/update-branch-transactions', [MiscController::class, 'bulkSaveTransactions']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
