@@ -272,6 +272,7 @@ class MiscController extends BaseController
 
     public function saveTransactions(Request $request)
     {
+        
         $requestData = $request->all();
         $validator = validator($request->all(), [
             'transaction_id' => 'required|numeric|min:1',

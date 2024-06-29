@@ -83,6 +83,7 @@ class CompanyRepository implements CompanyRepositoryInterface
         $transactions = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
             ->where('is_complete', true)
             ->orderBy('receipt_number', 'desc')
+            ->limit(100)
             ->get();
 
         return $transactions;
@@ -95,6 +96,7 @@ class CompanyRepository implements CompanyRepositoryInterface
         $transactions = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
             ->where('is_complete', false)
             ->orderBy('treg', 'desc')
+            ->limit(100)
             ->get();
 
         return $transactions;

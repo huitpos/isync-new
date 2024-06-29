@@ -75,6 +75,7 @@ class BranchRepository implements BranchRepositoryInterface
         $transactions = Transaction::where('branch_id', $id)
             ->where('is_complete', true)
             ->orderBy('receipt_number', 'desc')
+            ->limit(100)
             ->get();
 
         return $transactions;
@@ -85,6 +86,7 @@ class BranchRepository implements BranchRepositoryInterface
         $transactions = Transaction::where('branch_id', $id)
             ->where('is_complete', false)
             ->orderBy('treg', 'desc')
+            ->limit(100)
             ->get();
 
         return $transactions;
