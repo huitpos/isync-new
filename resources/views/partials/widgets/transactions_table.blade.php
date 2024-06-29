@@ -161,6 +161,9 @@
 							<thead>
 								<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
 									<th class="text-start">Date</th>
+									@if (isset($addBranch) && $addBranch)
+										<th class="text-start">Branch</th>
+									@endif
 									<th class="text-start">Machine No.</th>
 									<th class="text-start">OR No.</th>
 									<th class="text-start">Cashier</th>
@@ -183,6 +186,12 @@
 									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->treg }}</span>
 									</td>
+
+									@if (isset($addBranch) && $addBranch)
+										<td class="text-start">
+											<span class="text-gray-600">{{ $pendingTransaction->branch->name }}</span>
+										</td>
+									@endif
 
 									<td class="text-start">
 										<span class="text-gray-600">{{ $pendingTransaction->machine?->machine_number }}</span>

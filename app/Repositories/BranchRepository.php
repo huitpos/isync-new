@@ -74,7 +74,7 @@ class BranchRepository implements BranchRepositoryInterface
     {
         $transactions = Transaction::where('branch_id', $id)
             ->where('is_complete', true)
-            ->orderBy('treg', 'desc')
+            ->orderBy('receipt_number', 'desc')
             ->get();
 
         return $transactions;
