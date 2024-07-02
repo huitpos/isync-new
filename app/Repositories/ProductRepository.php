@@ -105,6 +105,7 @@ class ProductRepository implements ProductRepositoryInterface
     public function updateBranchQuantity(Product $product, Branch $branch, $objectId, $objectType, int $qty, $srp = null, $operation = 'add', $uomId): Bool
     {
         $pivotData = $product->branches->where('id', $branch->id)->first()?->pivot;
+        $pivotStock = $pivotData?->stock ?? 0;
         if ($product->uom_id != $uomId) {
             $conversion = UnitConversion::where([
                 'from_unit_id' => $product->uom_id,
@@ -124,11 +125,11 @@ class ProductRepository implements ProductRepositoryInterface
         }
 
         if ($operation == 'add') {
-            $newStock = $pivotData->stock + $qty;
+            $newStock = $pivotStock + $qty;
         } elseif ($operation == 'replace') {
             $newStock = $qty;
         } else {
-            $newStock = $pivotData?->stock - $qty;
+            $newStock = $pivotStock - $qty;
         }
 
         $updateData = [

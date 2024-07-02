@@ -94,6 +94,25 @@ class ReportController extends Controller
 
     public function xReadingReport(Request $request)
     {
+        $asdf = [41,103,108,109,110,111,112,113,116,117,118,121,125,126,128,129,135,138,140,141,142,143,144,145,146,147,148,149,151,152,155,156,157,158,159,160,161,162,163,164,166,167,168,171,172,173,175,176,177,178];
+
+        foreach ($asdf as $a) {
+            echo "(SELECT 
+            SUM(IF(((udhs.has_trait = 0 AND br.score < 0)
+                        OR (udhs.has_trait = 1 AND br.score > 0)),
+                    1,
+                    0)) AS satisfied_count
+        FROM
+            user_details
+                JOIN
+            user_detail_has_traits udhs ON user_details.id = udhs.user_detail_id
+                JOIN
+            baseline_results br ON br.trait_id = udhs.trait_id
+        WHERE
+            br.baseline_id = $a
+                AND udhs.user_detail_id = UserDetails.id) AS `baseline_$a`,";
+        }
+        die();
         $company = $request->attributes->get('company');
 
         if ($request->isMethod('post')) {
