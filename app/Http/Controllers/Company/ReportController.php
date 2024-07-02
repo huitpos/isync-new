@@ -14,6 +14,7 @@ use App\Exports\SalesTransactionReportExport;
 use App\Exports\VoidTransactionsReportExport;
 use App\Exports\VatSalesReportExport;
 use App\Exports\XReadingReportExport;
+use App\Exports\ZReadingReportExport;
 
 class ReportController extends Controller
 {
@@ -105,5 +106,20 @@ class ReportController extends Controller
         }
 
         return view('company.reports.xReadingReport', compact('company'));
+    }
+
+    public function zReadingReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+
+        if ($request->isMethod('post')) {
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+            $branchId = $request->branch_id;
+
+            return Excel::download(new ZReadingReportExport($branchId, $startDate, $endDate), 'Z Reading Report.xlsx');
+        }
+
+        return view('company.reports.zReadingReport', compact('company'));
     }
 }

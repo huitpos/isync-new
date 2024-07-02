@@ -33,4 +33,9 @@ class EndOfDay extends Model
             $query->where('branch_id', $this->branch_id);
         });
     }
+
+    public function machine()
+    {
+        return $this->belongsTo(PosMachine::class, 'pos_machine_id');
+    }
 }
