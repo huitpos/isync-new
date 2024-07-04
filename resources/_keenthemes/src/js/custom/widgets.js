@@ -3539,20 +3539,33 @@ var KTWidgets = function () {
 
     var initFlatpackPicker = function() {
         var elements = document.querySelectorAll('.flatpack-picker');
-
+    
         if (elements.length > 0) {
             [].slice.call(elements).map(function(element) {
                 var enableTime = element.getAttribute('data-enable-time') === 'true' || false;
                 var dateFormat = element.getAttribute('data-date-format') || 'Y-m-d';
-
-                element.flatpickr({
+    
+                var flatpickrConfig = {
                     enableTime: enableTime,
                     dateFormat: dateFormat + (enableTime ? ' H:i' : ''), // Append time format if enableTime is true
                     minDate: element.getAttribute('data-min-date') || ''
-                });
+                };
+    
+                if (element.hasAttribute('data-month-select-only')) {
+                    flatpickrConfig.plugins = [
+                        new monthSelectPlugin({
+                            shorthand: true, // defaults to false
+                            dateFormat: "F Y", // defaults to "F Y"
+                            altFormat: "F Y" // defaults to "F Y"
+                        })
+                    ];
+                }
+    
+                element.flatpickr(flatpickrConfig);
             });
         }
     }
+    
 
     // Public methods
     return {

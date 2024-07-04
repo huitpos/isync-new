@@ -39,6 +39,7 @@
     <!--end::Custom Stylesheets-->
 
     @livewireStyles
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
 </head>
 <!--end::Head-->
 
@@ -67,6 +68,7 @@
     {!! sprintf('<script src="%s"></script>', asset($path)) !!}
 @endforeach
 <!--end::Custom Javascript-->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 @stack('scripts')
 <!--end::Javascript-->
 
