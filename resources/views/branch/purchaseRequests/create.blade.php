@@ -200,11 +200,19 @@
 
                                                 <div class="col-md-2">
                                                     <label class="form-label">UOM:</label>
-                                                    <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control @error('company_id') is-invalid @enderror select2-ajax pr_uom_id" required>
+                                                    <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control @error('pr_items.' . $key . '.uom_id') is-invalid @enderror select2-ajax pr_uom_id" required>
+                                                        @if (!empty($item['uom_id']))
                                                         <option value="{{ $item['uom_id'] }}" selected="selected">{{ $item['pr_selected_uom_text'] }}</option>
+                                                        @endif
                                                     </select>
     
                                                     <input name="pr_selected_uom_text" value="{{ $item['pr_selected_uom_text'] }}" type="hidden" class="pr_selected_uom_text">
+
+                                                    <div class="invalid-feedback">
+                                                        @error('pr_items.' . $key . '.uom_id')
+                                                            <p>{{ $message }}</p>
+                                                        @enderror
+                                                    </div>
                                                 </div>
 
                                                 <div class="col-md-2">
