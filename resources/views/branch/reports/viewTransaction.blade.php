@@ -103,7 +103,7 @@
                                                 {{ $item->name }}
                                             </td>
                                             <td class="text-end">
-                                                {{ $item->qty }}
+                                                {{ $item->is_return ? $item->qty * -1 : $item->qty }}
                                             </td>
                                             <td>
                                                 {{ $item->uom?->name }}
