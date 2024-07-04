@@ -118,8 +118,8 @@ class ProductController extends Controller
             'max_discount' => [
                 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
                 function ($attribute, $value, $fail) use ($request) {
-                    if ($value > $request->input('cost')) {
-                        $fail('The ' . $attribute . ' must not be greater than cost.');
+                    if ($value < $request->input('cost')) {
+                        $fail('The ' . $attribute . ' must be greater than cost.');
                     }
                 },
             ]
@@ -286,8 +286,8 @@ class ProductController extends Controller
             'max_discount' => [
                 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
                 function ($attribute, $value, $fail) use ($request) {
-                    if ($value > $request->input('cost')) {
-                        $fail('The ' . $attribute . ' must not be greater than cost.');
+                    if ($value < $request->input('cost')) {
+                        $fail('The ' . $attribute . ' must be greater than cost.');
                     }
                 },
             ]
