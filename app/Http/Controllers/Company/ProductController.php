@@ -115,6 +115,14 @@ class ProductController extends Controller
             'raw_items.*.uom_id' => 'required_with:raw_items.*.product_id',
             'bundled_items.*.product_id' => 'nullable',
             'bundled_items.*.quantity' => 'required_with:bundled_items.*.product_id',
+            'max_discount' => [
+                'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value > $request->input('cost')) {
+                        $fail('The ' . $attribute . ' must not be greater than cost.');
+                    }
+                },
+            ]
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -275,6 +283,14 @@ class ProductController extends Controller
             'raw_items.*.product_id' => 'nullable',
             'raw_items.*.quantity' => 'required_with:raw_items.*.product_id',
             'raw_items.*.uom_id' => 'required_with:raw_items.*.product_id',
+            'max_discount' => [
+                'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value > $request->input('cost')) {
+                        $fail('The ' . $attribute . ' must not be greater than cost.');
+                    }
+                },
+            ]
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
