@@ -71,7 +71,7 @@ class ProductDisposalController extends Controller
             'department_id' => 'required',
             'pr_items' => 'required',
             'pr_items.*.product_id' => 'required',
-            'pr_items.*.uom_id' => 'required',
+            'pr_items.*.uom_id' => 'required_with:pr_items.*.product_id',
             'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
         ],
         [

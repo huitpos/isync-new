@@ -69,10 +69,12 @@ class ProductPhysicalCountController extends Controller
             'pr_items' => 'required',
             'pr_items.*.product_id' => 'required',
             'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
+            'pr_items.*.uom_id' => 'required_with:pr_items.*.product_id',
         ],
         [
             'pr_items' => 'Product is required',
             'pr_items.*.quantity' => 'Quantity field required',
+            'pr_items.*.uom_id' => 'The product you selected has no UOM. Please assign a UOM first before continuing'
         ]);
 
         $branch = $request->attributes->get('branch');
@@ -84,11 +86,18 @@ class ProductPhysicalCountController extends Controller
         $physicalCountData['branch_id'] = $branch->id;
         $physicalCountData['action_by'] = auth()->user()->id;
         unset($physicalCountData['pr_items']);
+        unset($physicalCountData['pr_selected_product_text']);
 
         //save the purchase request and its items using model
         $physicalCount = new ProductPhysicalCount();
         $physicalCount->fill($physicalCountData);
         $physicalCount->save();
+
+        foreach ($postData['pr_items'] as &$item) {
+            unset($item['pr_selected_product_text']);
+            unset($item['pr_selected_uom_text']);
+            unset($item['barcode']);
+        }
 
         $physicalCount->items()->createMany($postData['pr_items']);
 
