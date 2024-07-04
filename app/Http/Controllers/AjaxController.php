@@ -108,10 +108,15 @@ class AjaxController extends Controller
 
     public function getProductUoms(Request $request)
     {
+        $responseData = [];
         $product = Product::find($request->product_id);
 
         $uom = $product->uom;
         $deliveryUom = $product->deliveryUom;
+
+        if (empty($uom)) {
+            return response()->json($responseData);
+        }
 
         if ($deliveryUom && $deliveryUom->id != $uom->id) {
             $responseData[] = [

@@ -490,24 +490,21 @@ const initConditionsSelect2 = () => {
         }
 
         if (element.hasAttribute('data-ajax-url')) {
-            var query = {};
-
-            if (element.getAttribute('data-param-link')) {
-                var paramLink = element.getAttribute('data-param-link');
-                var paramName = element.getAttribute('data-param-name');
-                var paramValueElement = document.querySelector(paramLink);
-
-                var query = {};
-
-                query[paramName] = paramValueElement.value;
-            }
-
             options.ajax = {
                 url: element.getAttribute('data-ajax-url'),
                 dataType: 'json',
                 delay: 250,
                 cache: true,
                 data: function (params) {
+                    var query = {};
+                    query['term'] = params.term;
+
+                    if (element.getAttribute('data-param-link')) {
+                        var paramLink = element.getAttribute('data-param-link');
+                        var paramName = element.getAttribute('data-param-name');
+                        var paramValueElement = document.querySelector(paramLink);
+                        query[paramName] = paramValueElement.value;
+                    }
                     return query;
                 }
             };

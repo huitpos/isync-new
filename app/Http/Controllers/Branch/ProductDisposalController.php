@@ -71,11 +71,13 @@ class ProductDisposalController extends Controller
             'department_id' => 'required',
             'pr_items' => 'required',
             'pr_items.*.product_id' => 'required',
+            'pr_items.*.uom_id' => 'required',
             'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
         ],
         [
             'pr_items' => 'Product is required',
             'pr_items.*.quantity' => 'Quantity field required',
+            'pr_items.*.uom_id' => 'The product you selected has no UOM. Please assign a UOM first before continuing'
         ]);
 
         $branch = $request->attributes->get('branch');

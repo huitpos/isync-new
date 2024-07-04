@@ -64,7 +64,11 @@
                         <!--begin::Form group-->
                         <div class="form-group">
                             <div data-repeater-list="pr_items">
-                                @if (empty(old('pr_items')))
+                                @php
+                                    $old = old();
+                                    $items = old('pr_items');
+                                @endphp
+                                @if (empty($items))
                                     <div data-repeater-item>
                                         <div class="form-group row mb-5">
                                             <div class="col-md-4">
@@ -80,7 +84,7 @@
                                                     required
                                                 ></select>
 
-                                                <input type="hidden" class="pr_selected_product_text">
+                                                <input name="pr_selected_product_text" type="hidden" class="pr_selected_product_text">
                                             </div>
 
                                             <div class="col-md-3">
@@ -88,7 +92,7 @@
                                                 <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control @error('company_id') is-invalid @enderror select2-ajax pr_uom_id" required>
                                                 </select>
 
-                                                <input type="hidden" class="pr_selected_uom_text">
+                                                <input name="pr_selected_uom_text" type="hidden" class="pr_selected_uom_text">
                                             </div>
 
                                             <div class="col-md-3">
@@ -116,10 +120,10 @@
                                         <hr>
                                     </div>
                                 @else
-                                    @foreach (old('pr_items') as $key => $item)
+                                    @foreach ($items as $key => $item)
                                         <div data-repeater-item>
                                             <div class="form-group row mb-5">
-                                                <div class="col-md-2">
+                                                <div class="col-md-4">
                                                     <label class="form-label">Product:</label>
                                                     <select
                                                         name="product_id"
@@ -134,21 +138,29 @@
                                                         <option value="{{ $item['product_id'] ?? '' }}" selected="selected">{{ $item['pr_selected_product_text'] ?? '' }}</option>
                                                     </select>
 
-                                                    <input name="pr_selected_product_text" value="{{ $item['pr_selected_product_text'] }}" type="hidden" class="pr_selected_product_text">
+                                                    <input name="pr_selected_product_text" value="{{ $item['pr_selected_product_text'] ?? '' }}" type="hidden" class="pr_selected_product_text">
                                                 </div>
 
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <label class="form-label">UOM:</label>
-                                                    <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control @error('company_id') is-invalid @enderror select2-ajax pr_uom_id" required>
-                                                        <option value="{{ $item['uom_id'] }}" selected="selected">{{ $item['pr_selected_uom_text'] }}</option>
+                                                    <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control @error('pr_items.' . $key . '.uom_id') is-invalid @enderror select2-ajax pr_uom_id" required>
+                                                        @if (!empty($item['uom_id']))
+                                                            <option value="{{ $item['uom_id'] }}" selected="selected">{{ $item['pr_selected_uom_text'] ?? '' }}</option>
+                                                        @endif
                                                     </select>
     
-                                                    <input name="pr_selected_uom_text" value="{{ $item['pr_selected_uom_text'] }}" type="hidden" class="pr_selected_uom_text">
+                                                    <input name="pr_selected_uom_text" value="{{ $item['pr_selected_uom_text'] ?? '' }}" type="hidden" class="pr_selected_uom_text">
+
+                                                    <div class="invalid-feedback">
+                                                        @error('pr_items.' . $key . '.uom_id')
+                                                            <p>{{ $message }}</p>
+                                                        @enderror
+                                                    </div>
                                                 </div>
 
-                                                <div class="col-md-2">
+                                                <div class="col-md-3">
                                                     <label class="form-label">Barcode:</label>
-                                                    <input readonly value="{{ $item['barcode'] }}" name="barcode" type="text" class="form-control barcode"/>
+                                                    <input readonly value="{{ $item['barcode'] ?? '' }}" name="barcode" type="text" class="form-control barcode"/>
                                                 </div>
 
                                                 <div class="col-md-2">
