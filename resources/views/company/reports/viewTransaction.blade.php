@@ -55,6 +55,13 @@
                             <span class="fs-5">{{ $transaction->machine->id }}</span>
                         </div>
                     </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-7 gap-md-10 fw-bold mt-5">
+                        <div class="flex-root d-flex flex-column">
+                            <span class="text-muted">Void</span>
+                            <span class="fs-5">{{ $transaction->is_void ? 'Yes' : 'No' }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -97,7 +104,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="fw-semibold text-gray-600">
-                                        @foreach($transaction->nonVoiditems as $item)
+                                        @foreach($transaction->is_void ? $transaction->items : $transaction->nonVoiditems as $item)
                                         <tr>
                                             <td>
                                                 {{ $item->name }}
