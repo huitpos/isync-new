@@ -25,6 +25,9 @@ class UsersDataTable extends DataTable
             ->addColumn('status', function (Model $data) {
                 return $data->is_active ? 'Active' : 'Inactive';
             })
+            ->editColumn('created_at', function (Model $data) {
+                return \Carbon\Carbon::parse($data->created_at)->format('d/m/Y H:i:s');;
+            })
             ->addColumn('actions', function (Model $data) {
                 return view('company.datatables._actions', [
                     'param' => ['user' => $data->id, 'companySlug' => $data->company->slug],
@@ -71,6 +74,7 @@ class UsersDataTable extends DataTable
             Column::make('email'),
             Column::make('roles'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('created_at')->title('created at'),
             Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
