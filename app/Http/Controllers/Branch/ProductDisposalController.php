@@ -95,6 +95,12 @@ class ProductDisposalController extends Controller
         $productDisposal->fill($disposalsData);
         $productDisposal->save();
 
+        foreach($postData['pr_items'] as &$item) {
+            unset($item['pr_selected_product_text']);
+            unset($item['pr_selected_uom_text']);
+            unset($item['barcode']);
+        }
+
         $productDisposal->items()->createMany($postData['pr_items']);
 
         return redirect()->route('branch.product-disposals.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Product disposals has been created.');
