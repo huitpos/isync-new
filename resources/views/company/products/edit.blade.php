@@ -511,7 +511,7 @@
 
                 <div class="mb-4 mt-7">
                     <label class="form-label">Max Discount</label>
-                    <input value="{{ old('max_discount') ?? $product->max_discount }}" name="max_discount" type="text" class="form-control @error('max_discount') is-invalid @enderror" placeholder="Min. Stock Level" required/>
+                    <input value="{{ old('max_discount') ?? $product->max_discount }}" name="max_discount" type="text" class="form-control @error('max_discount') is-invalid @enderror" required/>
 
                     @error('max_discount')
                         <div class="invalid-feedback"> {{ $message }}</div>
