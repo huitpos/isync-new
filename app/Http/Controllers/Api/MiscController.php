@@ -254,6 +254,7 @@ class MiscController extends BaseController
             'total_return_amount' => $request->total_return_amount,
             'void_counter' => $request->void_counter,
             'void_remarks' => $request->void_remarks,
+            'customer_name' => $request->customer_name,
         ];
 
         //check if existing. update if yes
@@ -373,6 +374,7 @@ class MiscController extends BaseController
             'total_return_amount' => $request->total_return_amount,
             'void_counter' => $request->void_counter,
             'void_remarks' => $request->void_remarks,
+            'customer_name' => $request->customer_name,
         ];
 
         //check if existing. update if yes
