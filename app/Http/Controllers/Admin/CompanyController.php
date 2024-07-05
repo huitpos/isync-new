@@ -132,7 +132,7 @@ class CompanyController extends Controller
 
         file_put_contents($filePath, $imageData);
 
-        $this->companyRepository->create([
+        $company = $this->companyRepository->create([
             'client_id' => $client->id,
             'company_registered_name' => $request['company_registered_name'],
             'company_name' => $request['company_name'],
@@ -153,6 +153,7 @@ class CompanyController extends Controller
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
             'client_id' => $client->id,
+            'company_id' => $company->id
         ]);
 
         return redirect()->route('admin.companies.index')->with('success', 'Data has been stored successfully!');
