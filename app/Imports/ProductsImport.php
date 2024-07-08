@@ -15,6 +15,7 @@ use Maatwebsite\Excel\Concerns\WithColumnLimit;
 use App\Models\UnitOfMeasurement;
 use App\Models\Department;
 use App\Models\Category;
+use App\Models\ItemLocation;
 use App\Models\Subcategory;
 use App\Models\ItemType;
 use App\Models\Product;
@@ -47,7 +48,7 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow, With
 
     public function endColumn(): string
     {
-        return 'O';
+        return 'Q';
     }
 
     public function collection(Collection $rows)
@@ -69,9 +70,11 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow, With
         $itemTypes = ItemType::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
         $itemTypes = array_map('strtolower', $itemTypes);
 
+        $itemLocations = ItemLocation::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $itemLocations = array_map('strtolower', $itemLocations);
+
         foreach ($rows as $key => $row) {
             $lastNumber++;
-
             $this->data[] = [
                 'status' => $row[0],
                 'name' => $row[1],
@@ -81,8 +84,8 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow, With
                 'uom_id' => array_search(strtolower($row[5]), $units),
                 'barcode' => $row[6],
                 'department_id' => array_search(strtolower($row[7]), $departments) ?? null,
-                'category_id' => array_search(strtolower($row[8]), $categories),
-                'subcategory_id' => array_search(strtolower($row[9]), $subcategories),
+                'category_id' => array_search(strtolower($row[8]), $categories) ?? null,
+                'subcategory_id' => array_search(strtolower($row[9]), $subcategories) ?? null,
                 'markup_type' => $row[10],
                 'markup' => $row[11],
                 'cost' => $row[12],
@@ -93,6 +96,9 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow, With
                 'code' => $lastNumber,
                 'minimum_stock_level' => 0,
                 'maximum_stock_level' => 0,
+                'subcategory_id' => array_search(strtolower($row[9]), $subcategories) ?? null,
+                'item_locations' => array_search(strtolower($row[15]), $itemLocations),
+                'max_discount' => $row[16] ?? 0,
             ];
         }
     }
