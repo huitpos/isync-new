@@ -115,6 +115,7 @@ class DiscountTypeController extends Controller
 
         unset($postData['discount_type_fields']);
         unset($postData['departments']);
+
         if ($discountType = $this->discountTypeRepository->create($postData, $discountTypeFields)) {
             $this->discountTypeRepository->syncDepartments($discountType->id, $request->departments ?? []);
             return redirect()->route('company.discount-types.index', ['companySlug' => $company->slug])->with('success', 'Discount type created successfully.');
@@ -178,6 +179,7 @@ class DiscountTypeController extends Controller
         $postData['company_id'] = $company->id;
         $postData['is_vat_exempt'] = $request->is_vat_exempt ?? false;
         $postData['is_zero_rated'] = $request->is_zero_rated ?? false;
+        $postData['is_manual'] = $request->is_manual ?? false;
 
         $discountTypeFields = [];
         foreach ($request->input('discount_type_fields') as $key => $field) {
