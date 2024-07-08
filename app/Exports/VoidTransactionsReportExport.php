@@ -74,9 +74,9 @@ class VoidTransactionsReportExport implements FromCollection, WithHeadings, With
             $transaction->treg,
             $transaction->receipt_number,
             $transaction->machine->machine_number,
-            $transaction->discount_amount ?: '0.00',
-            $transaction->gross_sales ?: '0.00',
-            $transaction->net_sales ?: '0.00',
+            number_format($transaction->discount_amount ?: 0, 2),
+            number_format($transaction->gross_sales ?: 0, 2),
+            number_format($transaction->net_sales ?: 0, 2),
             $transaction->void_remarks,
             $transaction->cashier_name,
             ''

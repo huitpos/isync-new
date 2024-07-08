@@ -71,11 +71,11 @@ class VatSalesReportExport implements FromCollection, WithHeadings, WithMapping,
             $transaction->treg,
             $transaction->machine->machine_number,
             $transaction->receipt_number,
-            $amountDue ?: '0.00',
-            $amountDue ?: '0.00',
-            $vatAmount ?: '0.00',
-            $vatableSales ?: '0.00',
-            $transaction->vat_exempt_sales ?: '0.00',
+            number_format($amountDue ?: 0, 2),
+            number_format($amountDue ?: 0, 2),
+            number_format($vatAmount ?: 0, 2),
+            number_format($vatableSales ?: 0, 2),
+            number_format($transaction->vat_exempt_sales ?: 0, 2),
         ];
     }
 

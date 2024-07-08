@@ -126,14 +126,14 @@ class ZReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             $endOfDays->reading_number, //Z-Read No.
             $endOfDays->beginning_or, //Beginning Official Receipt.
             $endOfDays->ending_or, //Ending Official Receipt
-            $endOfDays->beginning_amount ?: '0.00', //Beginning Balance
-            $endOfDays->ending_amount ?: '0.00', //Ending Balance
-            $endOfDays->gross_sales ?: '0.00', //Gross Sales
-            $endOfDays->net_sales ?: '0.00', //Net Sales
-            $endOfDays->vatable_sales ?: '0.00', //Vatable Sales
-            $endOfDays->vat_exempt_sales ?: '0.00', //Vat Exempt Sales
-            $endOfDays->vat_expense ?: '0.00', //Vat Discount
-            $endOfDays->total_service_charge ?: '0.00', //Service Charge
+            number_format($endOfDays->beginning_amount ?: 0, 2), //Beginning Balance
+            number_format($endOfDays->ending_amount ?: 0, 2), //Ending Balance
+            number_format($endOfDays->gross_sales ?: 0, 2), //Gross Sales
+            number_format($endOfDays->net_sales ?: 0, 2), //Net Sales
+            number_format($endOfDays->vatable_sales ?: 0, 2), //Vatable Sales
+            number_format($endOfDays->vat_exempt_sales ?: 0, 2), //Vat Exempt Sales
+            number_format($endOfDays->vat_expense ?: 0, 2), //Vat Discount
+            number_format($endOfDays->total_service_charge ?: 0, 2), //Service Charge
         ];
 
         foreach ($this->paymentTypes as $paymentType) {
@@ -145,10 +145,10 @@ class ZReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             ->whereIn('cut_off_id', $cutOffIds)
             ->get();
 
-            $data[] = $payments->sum('amount') ?: '0.00';
+            $data[] = number_format($payments->sum('amount') ?: 0, 2);
         }
 
-        $data[] = $endOfDays->void_amount ?: '0.00'; //Void
+        $data[] = number_format($endOfDays->void_amount ?: 0, 2); //Void
 
         foreach ($this->discountTypes as $discountType) {
             $discounts = Discount::where([
@@ -160,7 +160,7 @@ class ZReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             ->get();
 
 
-            $data[] = $discounts->sum('discount_amount') ?: '0.00';
+            $data[] = number_format($discounts->sum('discount_amount') ?: 0, 2);
         }
 
         $data[] = $endOfDays->cashier_name; //Cashier Name

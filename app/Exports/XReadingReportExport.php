@@ -126,12 +126,12 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             $cutoff->beginning_or, //Beginning OR #
             $cutoff->ending_or, //Ending OR #
             $cutoff->treg, //Cut Off Date
-            $cutoff->gross_sales ?: '0.00', //Gross Sales
-            $cutoff->net_sales ?: '0.00', //Net Sales
-            $cutoff->vatable_sales ?: '0.00', //Vatable Sales
-            $cutoff->vat_exempt_sales ?: '0.00', //Vat Exempt Sales
-            $cutoff->vat_amount ?: '0.00', //Vat Amount,
-            $cutoff->vat_expense ?: '0.00' //Vat Discount
+            number_format($cutoff->gross_sales ?: 0, 2), //Gross Sales
+            number_format($cutoff->net_sales ?: 0, 2), //Net Sales
+            number_format($cutoff->vatable_sales ?: 0, 2), //Vatable Sales
+            number_format($cutoff->vat_exempt_sales ?: 0, 2), //Vat Exempt Sales
+            number_format($cutoff->vat_amount ?: 0, 2), //Vat Amount,
+            number_format($cutoff->vat_expense ?: 0, 2) //Vat Discount
         ];
 
         foreach($this->paymentTypes as $paymentType) {
@@ -142,13 +142,13 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             ])
             ->get();
 
-            $data[] = $payments->sum('amount') ?: '0.00';
+            $data[] = number_format($payments->sum('amount') ?: 0, 2);
         }
 
         $data =  array_merge($data, [
-            $cutoff->total_service_charge ?: '0.00', //Service Charge
-            $cutoff->total_short_over ?: '0.00', //Short/Over
-            $cutoff->void_amount ?: '0.00' // void
+            number_format($cutoff->total_service_charge ?: 0, 2), //Service Charge
+            number_format($cutoff->total_short_over ?: 0, 2), //Short/Over
+            number_format($cutoff->void_amount ?: 0, 2) // void
         ]);
 
         foreach ($this->discountTypes as $discountType) {
@@ -160,7 +160,7 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             ->get();
 
 
-            $data[] = $discounts->sum('discount_amount') ?: '0.00';
+            $data[] = number_format($discounts->sum('discount_amount') ?: 0, 2);
         }
 
         $data[] = $cutoff->cashier_name;
