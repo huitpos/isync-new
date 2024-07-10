@@ -144,12 +144,10 @@ class MiscController extends BaseController
                     $query->where('updated_at', '>=', $request->from_date)
                           ->orWhere('created_at', '>=', $request->from_date);
                 })
-                ->where('status', 'active')
                 ->where('uom_id', '>', 0)
                 ->get();
         } else {
             $products = $branch->company->products()
-                ->where('status', 'active')
                 ->where('uom_id', '>', 0)
                 ->get();
         }
