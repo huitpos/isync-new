@@ -276,7 +276,6 @@ class MiscController extends BaseController
 
     public function saveTransactions(Request $request)
     {
-        
         $requestData = $request->all();
         $validator = validator($request->all(), [
             'transaction_id' => 'required|numeric|min:1',
@@ -409,6 +408,7 @@ class MiscController extends BaseController
             'branch_id' => $request->branch_id,
             'pos_machine_id' => $request->pos_machine_id,
             'is_cut_off' => false,
+            'is_back_out' => false
         ])->get();
 
         if ($transactions->count() == 0) {
