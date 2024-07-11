@@ -86,7 +86,7 @@
                                 <th>{{ $transaction->discount_amount }}</th>
                                 <th>{{ $paymentTypeNames->join(', ') }}</th>
                                 <th>{{ $transaction->is_void ? 'Yes' : 'No' }}</th>
-                                <th>{{ $transaction->nonVoiditems->sum('qty') }}</th>
+                                <th>{{ $transaction->total_quantity }}</th>
                                 <th>{{ $transaction->tender_amount }}</th>
                                 <th>{{ $transaction->service_charge }}</th>
                                 <th>{{ $transaction->type }}</th>
