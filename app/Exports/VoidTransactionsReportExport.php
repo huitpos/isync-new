@@ -37,9 +37,11 @@ class VoidTransactionsReportExport implements FromCollection, WithHeadings, With
     public function collection()
     {
         $transactions = Transaction::where([
-            'branch_id' => $this->branchId,
-            'is_void' => true
-        ])->get();
+                'branch_id' => $this->branchId,
+                'is_void' => true
+            ])
+            ->whereBetween('treg', [$this->startDate, $this->endDate])
+            ->get();
 
         return new Collection($transactions);
     }

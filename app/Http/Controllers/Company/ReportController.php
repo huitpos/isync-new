@@ -93,19 +93,15 @@ class ReportController extends Controller
         $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
 
         if ($request->isMethod('post')) {
-            $startDate = $request->input('start_date');
-            $endDate = $request->input('end_date');
-            $branchId = $request->branch_id;
-
             return Excel::download(new VoidTransactionsReportExport($branchId, $startDate, $endDate), 'void transactions report.xlsx');
         }
 
         $transactions = Transaction::where([
-            'branch_id' => $branchId,
-            'is_void' => true,
-        ])
-        ->whereBetween('treg', [$startDate, $endDate])
-        ->get();
+                'branch_id' => $branchId,
+                'is_void' => true,
+            ])
+            ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
 
         return view('company.reports.voidTransactionsReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
     }
@@ -114,15 +110,27 @@ class ReportController extends Controller
     {
         $company = $request->attributes->get('company');
 
-        if ($request->isMethod('post')) {
-            $startDate = $request->input('start_date');
-            $endDate = $request->input('end_date');
-            $branchId = $request->branch_id;
+        $branches = $company->activeBranches;
 
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->query('start_date', date('F Y'));
+
+        $parsedDate = Carbon::parse($dateParam);
+
+        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
+        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+
+        if ($request->isMethod('post')) {
             return Excel::download(new VatSalesReportExport($branchId, $startDate, $endDate), 'vat sales report.xlsx');
         }
 
-        return view('company.reports.vatSalesReport', compact('company'));
+        $transactions = Transaction::where('branch_id', $branchId)
+            ->where('is_complete', true)
+            ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        return view('company.reports.vatSalesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
     }
 
     public function xReadingReport(Request $request)
