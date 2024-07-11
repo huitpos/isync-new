@@ -9,13 +9,13 @@
             <form class="mt-3" method="POST" novalidate>
                 @csrf
 
-                <div class="mb-4">
-                    <div class="col-md-6">
+                <div class="row mb-5">
+                    <div class="col-md-4">
                         <label class="form-label">Branch</label>
 
                         <select id="branch_id" name="branch_id" class="form-select @error('branch') is-invalid @enderror" required>
-                            @foreach ($company->activeBranches as $branch)
-                                <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}" {{ $branch->id == $branchId ? 'selected' : '' }}>{{ $branch->name }}</option>
                             @endforeach
                         </select>
 
@@ -23,33 +23,145 @@
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
                     </div>
-                </div>
 
-                <div class="mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label">Date From</label>
-                        <input data-min-date="today" value="{{ old('start_date') ?? date('Y-m-d', strtotime('-30 days')) }}" name="start_date" type="text" class="form-control @error('start_date') is-invalid @enderror flatpack-picker" placeholder="Date From" required/>
+                    <div class="col-md-4">
+                        <label class="form-label">Date</label>
+                        <input id="start_date" data-month-select-only="true" value="{{ old('start_date') ?? $dateParam }}" name="start_date" type="text" class="form-control @error('start_date') is-invalid @enderror flatpack-picker" placeholder="Date From" required/>
 
                         @error('start_date')
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
                     </div>
-                </div>
-
-                <div class="mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label">Date To</label>
-                        <input data-min-date="today" value="{{ old('end_date') ?? date('Y-m-d') }}" name="end_date" type="text" class="form-control @error('end_date') is-invalid @enderror flatpack-picker" placeholder="Date To" required/>
-
-                        @error('end_date')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary mt-8">Export</button>
                     </div>
                 </div>
-
-                <button type="submit" class="btn btn-primary mt-5">Generate</button>
-                <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>
+
+            <div class="table-responsive">
+                <table id="kt_datatable_zero_configuration" class="table table-striped table-row-bordered gy-5">
+                    <thead>
+                        <tr class="fw-semibold fs-6 text-muted">
+                            <th>Machine #</th>
+                            <th>Shift No</th>
+                            <th>X-reading #</th>
+                            <th>Beginning SI #</th>
+                            <th>Ending SI #</th>
+                            <th>Cut Off Date</th>
+                            <th>Gross Sales</th>
+                            <th>Net Sales</th>
+                            <th>Vatable Sales</th>
+                            <th>Vat Exempt Sales</th>
+                            <th>Vat Amount</th>
+                            <th>Vat Discount</th>
+
+                            @foreach ($paymentTypes as $paymentType)
+                                <th>{{ $paymentType->name }}</th>
+                            @endforeach
+
+                            <th>Service Charge</th>
+                            <th>Short/Over</th>
+                            <th>Void</th>
+
+                            @foreach ($discountTypes as $discountType)
+                                <th>{{ $discountType->name }}</th>
+                            @endforeach
+
+                            <th>Cashier Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($cutoffs as $cutoff)
+                            @php
+                                $transactions = \App\Models\Transaction::where([
+                                    'cut_off_id' => $cutoff->cut_off_id,
+                                    'branch_id' => $cutoff->branch_id,
+                                ])
+                                ->get();
+
+                                $transactionIds = $transactions->pluck('transaction_id')->unique()->toArray();
+                            @endphp
+                            <tr>
+                                <th>{{ $cutoff->machine->machine_number }}</th>
+                                <th>{{ $cutoff->shift_number }}</th>
+                                <th>{{ $cutoff->reading_number }}</th>
+                                <th>{{ $cutoff->beginning_or }}</th>
+                                <th>{{ $cutoff->ending_or }}</th>
+                                <th>{{ $cutoff->treg }}</th>
+                                <th>{{ $cutoff->gross_sales }}</th>
+                                <th>{{ $cutoff->net_sales }}</th>
+                                <th>{{ $cutoff->vatable_sales }}</th>
+                                <th>{{ $cutoff->vat_exempt_sales }}</th>
+                                <th>{{ $cutoff->vat_amount }}</th>
+                                <th>{{ $cutoff->vat_expense }}</th>
+
+                                @foreach ($paymentTypes as $paymentType)
+                                    @php
+                                        $payments = \App\Models\Payment::where([
+                                            'cut_off_id' => $cutoff->cut_off_id,
+                                            'payment_type_id' => $paymentType->id,
+                                            'branch_id' => $cutoff->branch_id,
+                                        ])
+                                        ->get();
+                                    @endphp
+                                    <th>{{ $payments->sum('amount') }}</th>
+                                @endforeach
+
+                                <th>{{ $cutoff->total_service_charge }}</th>
+                                <th>{{ $cutoff->total_short_over }}</th>
+                                <th>{{ $cutoff->void_amount }}</th>
+
+                                @foreach ($discountTypes as $discountType)
+                                    @php
+                                        $discounts = \App\Models\Discount::where([
+                                            'discount_type_id' => $discountType->id,
+                                            'branch_id' => $cutoff->branch_id,
+                                        ])
+                                        ->whereIn('transaction_id', $transactionIds)
+                                        ->get();
+
+                                    @endphp
+                                    <th>{{ $discounts->sum('discount_amount') }}</th>
+                                @endforeach
+
+                                <th>{{ $cutoff->cashier_name }}</th>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            $("#kt_datatable_zero_configuration").DataTable();
+
+            document.addEventListener('DOMContentLoaded', (event) => {
+                const startDate = document.getElementById('start_date');
+                const branchId = document.getElementById('branch_id');
+
+                function updateURLAndRefresh() {
+                    const dateValue = startDate.value;
+                    const branchValue = branchId.value;
+                    const url = new URL(window.location.href);
+                    if (dateValue) {
+                        url.searchParams.set('start_date', dateValue);
+                    } else {
+                        url.searchParams.delete('start_date');
+                    }
+                    if (branchValue) {
+                        url.searchParams.set('branch_id', branchValue);
+                    } else {
+                        url.searchParams.delete('branch_id');
+                    }
+                    window.location.href = url.toString();
+                }
+
+                startDate.addEventListener('change', updateURLAndRefresh);
+                branchId.addEventListener('change', updateURLAndRefresh);
+            });
+        </script>
+    @endpush
 </x-default-layout>
+
