@@ -1041,6 +1041,7 @@ class MiscController extends BaseController
             'reading_number' => $request->reading_number,
             'void_qty' => $request->void_qty,
             'total_short_over' => $request->total_short_over,
+            'generated_date' => $request->generated_date,
         ];
 
         if ($request['products']) {

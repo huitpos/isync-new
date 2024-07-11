@@ -16,6 +16,8 @@ use App\Exports\VatSalesReportExport;
 use App\Exports\XReadingReportExport;
 use App\Exports\ZReadingReportExport;
 
+use Carbon\Carbon;
+
 class ReportController extends Controller
 {
     public function transactions(Request $request, TransactionsDataTable $dataTable)
@@ -52,15 +54,27 @@ class ReportController extends Controller
     {
         $company = $request->attributes->get('company');
 
-        if ($request->isMethod('post')) {
-            $startDate = $request->input('start_date');
-            $endDate = $request->input('end_date');
-            $branchId = $request->branch_id;
+        $branches = $company->activeBranches;
 
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->query('start_date', date('F Y'));
+
+        $parsedDate = Carbon::parse($dateParam);
+
+        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
+        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+
+        if ($request->isMethod('post')) {
             return Excel::download(new SalesTransactionReportExport($branchId, $startDate, $endDate), 'sales transaction report.xlsx');
         }
 
-        return view('company.reports.salesTransactionReport', compact('company'));
+        $transactions = Transaction::where('branch_id', $branchId)
+            ->where('is_complete', true)
+            ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        return view('company.reports.salesTransactionReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
     }
 
     public function voidTransactionsReport(Request $request)

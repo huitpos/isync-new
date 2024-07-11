@@ -39,6 +39,7 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
     {
         $transactions = Transaction::where('branch_id', $this->branchId)
             ->where('is_complete', true)
+            ->whereBetween('treg', [$this->startDate, $this->endDate])
             ->get();
 
         return new Collection($transactions);
@@ -108,7 +109,7 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
             number_format($transaction->vat_exempt_sales ?: 0, 2),
             number_format($transaction->discount_amount ?: 0, 2),
             $paymentTypeNames->join(', '),
-            $transaction->is_void ? 1 : 0,
+            $transaction->is_void ? 'Yes' : 'No',
             $transaction->nonVoiditems->sum('qty'),
             number_format($transaction->tender_amount ?: 0, 2),
             number_format($transaction->service_charge ?: 0, 2),
