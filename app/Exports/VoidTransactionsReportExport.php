@@ -67,8 +67,6 @@ class VoidTransactionsReportExport implements FromCollection, WithHeadings, With
 
     public function map($transaction): array
     {
-        $paymentTypeNames = $transaction->payments->pluck('payment_type_name');
-
         return [
             $transaction->void_counter,
             $transaction->treg,

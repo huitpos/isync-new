@@ -81,6 +81,17 @@ class ReportController extends Controller
     {
         $company = $request->attributes->get('company');
 
+        $branches = $company->activeBranches;
+
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->query('start_date', date('F Y'));
+
+        $parsedDate = Carbon::parse($dateParam);
+
+        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
+        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+
         if ($request->isMethod('post')) {
             $startDate = $request->input('start_date');
             $endDate = $request->input('end_date');
@@ -89,7 +100,14 @@ class ReportController extends Controller
             return Excel::download(new VoidTransactionsReportExport($branchId, $startDate, $endDate), 'void transactions report.xlsx');
         }
 
-        return view('company.reports.voidTransactionsReport', compact('company'));
+        $transactions = Transaction::where([
+            'branch_id' => $branchId,
+            'is_void' => true,
+        ])
+        ->whereBetween('treg', [$startDate, $endDate])
+        ->get();
+
+        return view('company.reports.voidTransactionsReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
     }
 
     public function vatSalesReport(Request $request)
