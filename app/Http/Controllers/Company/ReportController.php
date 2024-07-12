@@ -34,9 +34,16 @@ class ReportController extends Controller
     public function viewTransaction(Request $request, $companySlug, $id)
     {
         $company = $request->attributes->get('company');
+        $branches = $company->branches;
+
+        $branchIds = $branches->pluck('id')->unique();
 
         $transaction = Transaction::where(['id' => $id])
+            ->whereIn('branch_id', $branchIds)
             ->first();
+        if (!$transaction) {
+            abort(404);
+        }
 
         return view('company.reports.viewTransaction', compact('company', 'transaction'));
     }

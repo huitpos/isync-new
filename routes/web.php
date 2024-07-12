@@ -197,6 +197,12 @@ Route::middleware('auth')->group(function () {
             Route::prefix('reports')->group(function () {
                 Route::get('/transactions', [BranchReportController::class, 'transactions'])->name('branch.reports.transactions');
                 Route::get('/transaction/{transactionId}', [BranchReportController::class, 'viewTransaction'])->name('branch.reports.view-transaction');
+
+                Route::match(['get', 'post'], 'sales-transaction-report', [BranchReportController::class, 'salesTransactionReport'])->name('branch.reports.sales-transaction-report');
+                Route::match(['get', 'post'], 'void-transactions-report', [BranchReportController::class, 'voidTransactionsReport'])->name('branch.reports.void-transactions-report');
+                Route::match(['get', 'post'], 'vat-sales-report', [BranchReportController::class, 'vatSalesReport'])->name('branch.reports.vat-sales-report');
+                Route::match(['get', 'post'], 'x-reading-report', [BranchReportController::class, 'xReadingReport'])->name('branch.reports.x-reading-report');
+                Route::match(['get', 'post'], 'z-reading-report', [BranchReportController::class, 'zReadingReport'])->name('branch.reports.z-reading-report');
             });
         });
     });

@@ -441,15 +441,15 @@ class ProductController extends Controller
             ]);
     }
 
-    public function inventoryProduct(Request $request, $companySlug, $branchId, ProductCountHistoryDataTable $dataTable)
+    public function inventoryProduct(Request $request, $companySlug, $branchId, $productId, ProductCountHistoryDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branches = auth()->user()->activeBranches;
 
         $branch = Branch::find($branchId);
-
         return $dataTable->with('company_id', $company->id)
             ->with('branch_id', $branchId)
+            ->with('product_id', $productId)
             ->render('company.products.count_history', [
                 'company' => $company,
                 'branches' => $branches,

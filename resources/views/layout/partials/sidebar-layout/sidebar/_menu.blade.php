@@ -204,6 +204,58 @@
 					</a>
 				</div>
 
+				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
+					{{ request()->routeIs(
+						'branch.reports.*',
+					) ? 'here show' : '' }}"
+				>
+					<span class="menu-link">
+						<span class="menu-icon"><i class="fa-solid fa-chart-simple fs-2"></i></span>
+						<span class="menu-title">Reports</span>
+						<span class="menu-arrow"></span>
+					</span>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.sales-transaction-report') ? 'active' : '' }}" href="{{ route('branch.reports.sales-transaction-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Sales Transaction Report</span>
+							</a>
+						</div>
+					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.void-transactions-report') ? 'active' : '' }}" href="{{ route('branch.reports.void-transactions-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Void Transactions Report</span>
+							</a>
+						</div>
+					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.vat-sales-report') ? 'active' : '' }}" href="{{ route('branch.reports.vat-sales-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Vat Sales Report</span>
+							</a>
+						</div>
+					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.x-reading-report') ? 'active' : '' }}" href="{{ route('branch.reports.x-reading-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">X Reading Report</span>
+							</a>
+						</div>
+					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.z-reading-report') ? 'active' : '' }}" href="{{ route('branch.reports.z-reading-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Z Reading Report</span>
+							</a>
+						</div>
+					</div>
+				</div>
+
 			@elseif (request()->attributes->get('company'))
 				@if (in_array('Main Dashboard', $permissions))
 				<div class="menu-item">

@@ -33,6 +33,7 @@ class ProductCountHistoryDataTable extends DataTable
     {
         return $model->newQuery()
             ->where('branch_id', $this->branch_id)
+            ->where('product_id', $this->product_id)
             ->with([
                 'product'
             ])
