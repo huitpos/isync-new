@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\CutOff;
 use App\Models\PaymentType;
 use App\Models\DiscountType;
+use App\Models\EndOfDay;
 
 use App\DataTables\Company\Reports\TransactionsDataTable;
 use App\Exports\TestExport;
@@ -176,14 +177,35 @@ class ReportController extends Controller
     {
         $company = $request->attributes->get('company');
 
-        if ($request->isMethod('post')) {
-            $startDate = $request->input('start_date');
-            $endDate = $request->input('end_date');
-            $branchId = $request->branch_id;
+        $branches = $company->activeBranches;
 
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->query('start_date', date('F Y'));
+
+        $parsedDate = Carbon::parse($dateParam);
+
+        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
+        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+
+        if ($request->isMethod('post')) {
             return Excel::download(new ZReadingReportExport($branchId, $startDate, $endDate), 'Z Reading Report.xlsx');
         }
 
-        return view('company.reports.zReadingReport', compact('company'));
+        $paymentTypes = PaymentType::where('company_id', $company->id)
+            ->orWhere('company_id', null)
+            ->orderBy('id')
+            ->get();
+
+        $discountTypes = DiscountType::where('company_id', $company->id)
+            ->orWhere('company_id', null)
+            ->orderBy('id')
+            ->get();
+
+        $endOfDays = EndOfDay::where('branch_id', $branchId)
+            ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        return view('company.reports.zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays'));
     }
 }

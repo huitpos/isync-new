@@ -198,5 +198,4 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
             },
         ];
     }
-
 }
