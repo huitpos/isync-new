@@ -37,9 +37,8 @@ use App\Models\TakeOrderOrder;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 
-use Illuminate\Support\Facades\Redis;
+use Carbon\Carbon;
 
-use function PHPSTORM_META\map;
 
 class MiscController extends BaseController
 {
@@ -404,12 +403,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $transactions = Transaction::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-            'is_back_out' => false
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($transactions->count() == 0) {
             $transactions = Transaction::where([
@@ -705,11 +707,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $orders = Order::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($orders->count() == 0) {
             $orders = Order::where([
@@ -790,11 +796,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $payments = Payment::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($payments->count() == 0) {
             $payments = Payment::where([
@@ -876,11 +886,16 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $safekeepings = Safekeeping::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+                'is_cut_off' => false,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($safekeepings->count() == 0) {
             $safekeepings = Safekeeping::where([
@@ -960,10 +975,25 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $safekeepings = SafekeepingDenomination::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($safekeepings->count() == 0) {
+            $safekeepings = SafekeepingDenomination::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('safekeeping_denomination_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
 
         return $this->sendResponse($safekeepings, 'Safekeepings retrieved successfully.');
     }
@@ -1081,13 +1111,25 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $endOfDays = EndOfDay::where([
                 'branch_id' => $request->branch_id,
                 'pos_machine_id' => $request->pos_machine_id,
             ])
-            ->orderBy('end_of_day_id', 'desc')
-            ->limit(2)
+            ->whereBetween('treg', [$yesterday, $today])
             ->get();
+
+        if ($endOfDays->count() == 0) {
+            $endOfDays = EndOfDay::where([
+                    'branch_id' => $request->branch_id,
+                    'pos_machine_id' => $request->pos_machine_id,
+                ])
+                ->orderBy('end_of_day_id', 'desc')
+                ->limit(2)
+                ->get();
+        }
 
         foreach ($endOfDays as $endOfDay) {
             $endOfDay->departments = $endOfDay->departments;
@@ -1194,10 +1236,25 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $cutOffs = CutOff::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($cutOffs->count() == 0) {
+            $cutOffs = CutOff::where([
+                    'branch_id' => $request->branch_id,
+                    'pos_machine_id' => $request->pos_machine_id,
+                ])
+                ->orderBy('cut_off_id', 'desc')
+                ->limit(2)
+                ->get();
+        }
 
         return $this->sendResponse($cutOffs, 'Cut Offs retrieved successfully.');
     }
@@ -1366,10 +1423,25 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $discounts = DiscountDetail::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($discounts->count() == 0) {
+            $discounts = DiscountDetail::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('discount_details_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
 
         return $this->sendResponse($discounts, 'Discount details retrieved successfully.');
     }
@@ -1436,11 +1508,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $records = PaymentOtherInformation::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($records->count() == 0) {
             $records = PaymentOtherInformation::where([
@@ -1518,11 +1594,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $records = DiscountOtherInformation::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($records->count() == 0) {
             $records = DiscountOtherInformation::where([
@@ -1600,11 +1680,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $records = CutOffDepartment::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($records->count() == 0) {
             $records = CutOffDepartment::where([
@@ -1681,11 +1765,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $records = CutOffDiscount::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($records->count() == 0) {
             $records = CutOffDiscount::where([
@@ -1763,11 +1851,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
         $records = CutOffPayment::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'is_cut_off' => false,
-        ])->get();
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
 
         if ($records->count() == 0) {
             $records = CutOffPayment::where([
