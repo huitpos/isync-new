@@ -61,9 +61,9 @@
                                 <th>{{ $transaction->treg }}</th>
                                 <th>{{ $transaction->receipt_number }}</th>
                                 <th>{{ $transaction->machine->machine_number }}</th>
-                                <th>{{ $transaction->discount_amount }}</th>
-                                <th>{{ $transaction->gross_sales }}</th>
-                                <th>{{ $transaction->net_sales }}</th>
+                                <th>{{ number_format($transaction->discount_amount, 2) }}</th>
+                                <th>{{ number_format($transaction->gross_sales, 2) }}</th>
+                                <th>{{ number_format($transaction->net_sales, 2) }}</th>
                                 <th>{{ $transaction->void_remarks }}</th>
                                 <th>{{ $transaction->cashier_name }}</th>
                                 <th></th>

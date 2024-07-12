@@ -78,19 +78,19 @@
                                 <th>1</th>
                                 <th>{{ $transaction->cashier_name }}</th>
                                 <th>{{ $transaction->shift_number }}</th>
-                                <th>{{ $transaction->gross_sales }}</th>
-                                <th>{{ $transaction->net_sales }}</th>
-                                <th>{{ $transaction->vatable_sales }}</th>
-                                <th>{{ $transaction->vat_amount }}</th>
-                                <th>{{ $transaction->vat_exempt_sales }}</th>
-                                <th>{{ $transaction->discount_amount }}</th>
+                                <th>{{ number_format($transaction->gross_sales, 2) }}</th>
+                                <th>{{ number_format($transaction->net_sales, 2) }}</th>
+                                <th>{{ number_format($transaction->vatable_sales, 2) }}</th>
+                                <th>{{ number_format($transaction->vat_amount, 2) }}</th>
+                                <th>{{ number_format($transaction->vat_exempt_sales, 2) }}</th>
+                                <th>{{ number_format($transaction->discount_amount, 2) }}</th>
                                 <th>{{ $paymentTypeNames->join(', ') }}</th>
                                 <th>{{ $transaction->is_void ? 'Yes' : 'No' }}</th>
                                 <th>{{ $transaction->total_quantity }}</th>
-                                <th>{{ $transaction->tender_amount }}</th>
-                                <th>{{ $transaction->service_charge }}</th>
+                                <th>{{ number_format($transaction->tender_amount, 2) }}</th>
+                                <th>{{ number_format($transaction->service_charge, 2) }}</th>
                                 <th>{{ $transaction->type }}</th>
-                                <th>{{ $transaction->change }}</th>
+                                <th>{{ number_format($transaction->change, 2) }}</th>
                                 <th></th>
                             </tr>
                         @endforeach

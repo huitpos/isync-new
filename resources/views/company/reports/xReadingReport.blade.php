@@ -88,12 +88,12 @@
                                 <th>{{ $cutoff->beginning_or }}</th>
                                 <th>{{ $cutoff->ending_or }}</th>
                                 <th>{{ $cutoff->treg }}</th>
-                                <th>{{ $cutoff->gross_sales }}</th>
-                                <th>{{ $cutoff->net_sales }}</th>
-                                <th>{{ $cutoff->vatable_sales }}</th>
-                                <th>{{ $cutoff->vat_exempt_sales }}</th>
-                                <th>{{ $cutoff->vat_amount }}</th>
-                                <th>{{ $cutoff->vat_expense }}</th>
+                                <th>{{ number_format($cutoff->gross_sales, 2) }}</th>
+                                <th>{{ number_format($cutoff->net_sales, 2) }}</th>
+                                <th>{{ number_format($cutoff->vatable_sales, 2) }}</th>
+                                <th>{{ number_format($cutoff->vat_exempt_sales, 2) }}</th>
+                                <th>{{ number_format($cutoff->vat_amount, 2) }}</th>
+                                <th>{{ number_format($cutoff->vat_expense, 2) }}</th>
 
                                 @foreach ($paymentTypes as $paymentType)
                                     @php
@@ -104,12 +104,12 @@
                                         ])
                                         ->get();
                                     @endphp
-                                    <th>{{ $payments->sum('amount') }}</th>
+                                    <th>{{ number_format($payments->sum('amount'), 2) }}</th>
                                 @endforeach
 
-                                <th>{{ $cutoff->total_service_charge }}</th>
-                                <th>{{ $cutoff->total_short_over }}</th>
-                                <th>{{ $cutoff->void_amount }}</th>
+                                <th>{{ number_format($cutoff->total_service_charge, 2) }}</th>
+                                <th>{{ number_format($cutoff->total_short_over, 2) }}</th>
+                                <th>{{ number_format($cutoff->void_amount, 2) }}</th>
 
                                 @foreach ($discountTypes as $discountType)
                                     @php
@@ -121,7 +121,7 @@
                                         ->get();
 
                                     @endphp
-                                    <th>{{ $discounts->sum('discount_amount') }}</th>
+                                    <th>{{ number_format($discounts->sum('discount_amount'), 2) }}</th>
                                 @endforeach
 
                                 <th>{{ $cutoff->cashier_name }}</th>

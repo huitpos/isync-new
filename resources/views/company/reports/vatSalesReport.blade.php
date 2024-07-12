@@ -63,11 +63,11 @@
                                 <th>{{ $transaction->treg }}</th>
                                 <th>{{ $transaction->machine->machine_number }}</th>
                                 <th>{{ $transaction->receipt_number }}</th>
-                                <th>{{ $amountDue }}</th>
-                                <th>{{ $amountDue }}</th>
-                                <th>{{ $vatAmount }}</th>
-                                <th>{{ $vatableSales }}</th>
-                                <th>{{ $transaction->vat_exempt_sales }}</th>
+                                <th>{{ number_format($amountDue, 2) }}</th>
+                                <th>{{ number_format($amountDue, 2) }}</th>
+                                <th>{{ number_format($vatAmount, 2) }}</th>
+                                <th>{{ number_format($vatableSales, 2) }}</th>
+                                <th>{{ number_format($transaction->vat_exempt_sales, 2) }}</th>
                             </tr>
                         @endforeach
                     </tbody>
