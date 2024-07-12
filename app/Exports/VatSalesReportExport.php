@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 use App\Models\Transaction;
 use App\Models\Branch;
@@ -71,11 +72,11 @@ class VatSalesReportExport implements FromCollection, WithHeadings, WithMapping,
             $transaction->treg,
             $transaction->machine->machine_number,
             $transaction->receipt_number,
-            number_format($amountDue ?: 0, 2),
-            number_format($amountDue ?: 0, 2),
-            number_format($vatAmount ?: 0, 2),
-            number_format($vatableSales ?: 0, 2),
-            number_format($transaction->vat_exempt_sales ?: 0, 2),
+            $amountDue ?: 0,
+            $amountDue ?: 0,
+            $vatAmount ?: 0,
+            $vatableSales ?: 0,
+            $transaction->vat_exempt_sales ?: 0,
         ];
     }
 
@@ -87,6 +88,17 @@ class VatSalesReportExport implements FromCollection, WithHeadings, WithMapping,
     public function startCell(): string
     {
         return 'A9'; // Data will start from cell A2
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'D' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'H' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+        ];
     }
 
     /**
@@ -145,6 +157,7 @@ class VatSalesReportExport implements FromCollection, WithHeadings, WithMapping,
 
                 foreach ($totalColumns as $column) {
                     $event->sheet->setCellValue($column . ($totalRows + 1), '=SUM('.$column.'10:' . $column . $totalRows . ')');
+                    $event->sheet->getStyle($column . ($totalRows + 1))->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                 }
             },
         ];

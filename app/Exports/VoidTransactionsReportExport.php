@@ -67,6 +67,15 @@ class VoidTransactionsReportExport implements FromCollection, WithHeadings, With
         ];
     }
 
+    public function columnFormats(): array
+    {
+        return [
+            'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+        ];
+    }
+
     public function map($transaction): array
     {
         return [
@@ -74,9 +83,9 @@ class VoidTransactionsReportExport implements FromCollection, WithHeadings, With
             $transaction->treg,
             $transaction->receipt_number,
             $transaction->machine->machine_number,
-            number_format($transaction->discount_amount ?: 0, 2),
-            number_format($transaction->gross_sales ?: 0, 2),
-            number_format($transaction->net_sales ?: 0, 2),
+            $transaction->discount_amount ?: 0,
+            $transaction->gross_sales ?: 0,
+            $transaction->net_sales ?: 0,
             $transaction->void_remarks,
             $transaction->cashier_name,
             ''
@@ -137,10 +146,15 @@ class VoidTransactionsReportExport implements FromCollection, WithHeadings, With
 
                 $totalRows = $event->sheet->getHighestRow();
 
-                $totalColumns = [];
+                $totalColumns = [
+                    'E',
+                    'F',
+                    'G'
+                ];
 
                 foreach ($totalColumns as $column) {
                     $event->sheet->setCellValue($column . ($totalRows + 1), '=SUM('.$column.'10:' . $column . $totalRows . ')');
+                    $event->sheet->getStyle($column . ($totalRows + 1))->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                 }
             },
         ];

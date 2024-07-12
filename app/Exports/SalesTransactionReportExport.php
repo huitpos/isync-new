@@ -80,13 +80,16 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
     public function columnFormats(): array
     {
         return [
-            'H' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Gross Sales
-            'I' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Net Sales
-            'J' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // VAT Sales
-            'K' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // VAT Amount
-            'L' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Discount
-            'P' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Amount Paid
-            'Q' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Service Charge
+            'H' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'I' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'J' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'K' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'L' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'M' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'P' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'Q' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'R' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'T' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
         ];
     }
 
@@ -104,17 +107,17 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
             $transaction->shift_number,
             $transaction->gross_sales,
             $transaction->net_sales,
-            number_format($transaction->vatable_sales ?: 0, 2),
-            number_format($transaction->vat_amount ?: 0, 2),
-            number_format($transaction->vat_exempt_sales ?: 0, 2),
-            number_format($transaction->discount_amount ?: 0, 2),
+            $transaction->vatable_sales ?: 0,
+            $transaction->vat_amount ?: 0,
+            $transaction->vat_exempt_sales ?: 0,
+            $transaction->discount_amount ?: 0,
             $paymentTypeNames->join(', '),
             $transaction->is_void ? 'Yes' : 'No',
             $transaction->nonVoiditems->sum('qty'),
-            number_format($transaction->tender_amount ?: 0, 2),
-            number_format($transaction->service_charge ?: 0, 2),
+            $transaction->tender_amount ?: 0,
+            $transaction->service_charge ?: 0,
             $transaction->type,
-            number_format($transaction->change ?: 0, 2),
+            $transaction->change ?: 0,
             ''
         ];
     }
@@ -190,6 +193,7 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
 
                 foreach ($totalColumns as $column) {
                     $event->sheet->setCellValue($column . ($totalRows + 1), '=SUM('.$column.'10:' . $column . $totalRows . ')');
+                    $event->sheet->getStyle($column . ($totalRows + 1))->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                 }
             },
         ];
