@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Sales Transaction Report
+        Sales Invoices Report
     @endsection
 
     <div class="card">
@@ -10,7 +10,21 @@
                 @csrf
 
                 <div class="row mb-5">
-                    <div class="col-md-2">
+                    <div class="col-md-4">
+                        <label class="form-label">Branch</label>
+
+                        <select id="branch_id" name="branch_id" class="form-select @error('branch') is-invalid @enderror" required>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}" {{ $branch->id == $branchId ? 'selected' : '' }}>{{ $branch->name }}</option>
+                            @endforeach
+                        </select>
+
+                        @error('branch')
+                            <div class="invalid-feedback"> {{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
                         <label class="form-label">Date</label>
                         <input id="start_date" data-month-select-only="true" value="{{ old('start_date') ?? $dateParam }}" name="start_date" type="text" class="form-control @error('start_date') is-invalid @enderror flatpack-picker" placeholder="Date From" required/>
 
@@ -90,14 +104,21 @@
 
             document.addEventListener('DOMContentLoaded', (event) => {
                 const startDate = document.getElementById('start_date');
+                const branchId = document.getElementById('branch_id');
 
                 function updateURLAndRefresh() {
                     const dateValue = startDate.value;
+                    const branchValue = branchId.value;
                     const url = new URL(window.location.href);
                     if (dateValue) {
                         url.searchParams.set('start_date', dateValue);
                     } else {
                         url.searchParams.delete('start_date');
+                    }
+                    if (branchValue) {
+                        url.searchParams.set('branch_id', branchValue);
+                    } else {
+                        url.searchParams.delete('branch_id');
                     }
                     window.location.href = url.toString();
                 }

@@ -17,7 +17,7 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use App\Models\Transaction;
 use App\Models\Branch;
 
-class SalesTransactionReportExport implements FromCollection, WithHeadings, WithMapping, WithCustomStartCell, WithEvents, ShouldAutoSize, WithColumnFormatting
+class SalesInvoicesReportExport implements FromCollection, WithHeadings, WithMapping, WithCustomStartCell, WithEvents, ShouldAutoSize, WithColumnFormatting
 {
     protected $startDate;
     protected $endDate;
@@ -39,7 +39,6 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
     {
         $transactions = Transaction::where('branch_id', $this->branchId)
             ->where('is_complete', true)
-            ->where('is_void', false)
             ->whereBetween('treg', [$this->startDate, $this->endDate])
             ->get();
 
@@ -68,6 +67,7 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
             'VAT Exempt', //done
             'Discount', //done
             'Type Of Payment', //done
+            'Void', //done
             'Quantity', //done
             'Amount Paid', //done
             'Service Charge', //done
@@ -112,6 +112,7 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
             $transaction->vat_exempt_sales ?: 0,
             $transaction->discount_amount ?: 0,
             $paymentTypeNames->join(', '),
+            $transaction->is_void ? 'Yes' : 'No',
             $transaction->nonVoiditems->sum('qty'),
             $transaction->tender_amount ?: 0,
             $transaction->service_charge ?: 0,

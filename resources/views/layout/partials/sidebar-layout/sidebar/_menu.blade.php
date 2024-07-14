@@ -217,6 +217,14 @@
 
 					<div class="menu-sub menu-sub-accordion">
 						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.sales-invoices-report') ? 'active' : '' }}" href="{{ route('branch.reports.sales-invoices-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Sales Invoices Report</span>
+							</a>
+						</div>
+					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('branch.reports.sales-transaction-report') ? 'active' : '' }}" href="{{ route('branch.reports.sales-transaction-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 								<span class="menu-title">Sales Transaction Report</span>
 							</a>
@@ -542,6 +550,14 @@
 						<span class="menu-title">Reports</span>
 						<span class="menu-arrow"></span>
 					</span>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.sales-invoices-report') ? 'active' : '' }}" href="{{ route('company.reports.sales-invoices-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Sales Invoices Report</span>
+							</a>
+						</div>
+					</div>
 
 					<div class="menu-sub menu-sub-accordion">
 						<div class="menu-item">
