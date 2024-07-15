@@ -84,6 +84,7 @@
                             <tr>
                                 <td>{{ $data->machine->machine_number }}</td>
                                 <td>{{ $data->treg }}</td>
+                                <td>{{ $data->reading_number }}</td>
                                 <td>{{ $data->beginning_or }}</td>
                                 <td>{{ $data->ending_or }}</td>
                                 <td>{{ number_format($data->beginning_amount, 2) }}</td>
@@ -92,7 +93,6 @@
                                 <td>{{ number_format($data->net_sales, 2) }}</td>
                                 <td>{{ number_format($data->vatable_sales, 2) }}</td>
                                 <td>{{ number_format($data->vat_exempt_sales, 2) }}</td>
-                                <td>{{ number_format($data->vat_expense, 2) }}</td>
                                 <td>{{ number_format($data->total_service_charge, 2) }}</td>
 
                                 @foreach ($paymentTypes as $paymentType)
