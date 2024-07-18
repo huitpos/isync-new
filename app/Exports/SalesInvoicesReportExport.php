@@ -39,7 +39,7 @@ class SalesInvoicesReportExport implements FromCollection, WithHeadings, WithMap
     {
         $transactions = Transaction::where('branch_id', $this->branchId)
             ->where('is_complete', true)
-            ->whereBetween('treg', [$this->startDate, $this->endDate])
+            ->whereBetween('completed_at', [$this->startDate, $this->endDate])
             ->get();
 
         return new Collection($transactions);
@@ -98,7 +98,7 @@ class SalesInvoicesReportExport implements FromCollection, WithHeadings, WithMap
         $paymentTypeNames = $transaction->payments->pluck('payment_type_name');
 
         return [
-            $transaction->treg,
+            $transaction->completed_at,
             $transaction->machine->machine_number,
             $transaction->receipt_number,
             '',

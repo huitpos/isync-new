@@ -83,7 +83,7 @@ class ReportController extends Controller
 
         $transactions = Transaction::where('branch_id', $branchId)
             ->where('is_complete', true)
-            ->whereBetween('treg', [$startDate, $endDate])
+            ->whereBetween('completed_at', [$startDate, $endDate])
             ->get();
 
         return view('company.reports.salesInvoicesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
@@ -111,7 +111,7 @@ class ReportController extends Controller
         $transactions = Transaction::where('branch_id', $branchId)
             ->where('is_complete', true)
             ->where('is_void', false)
-            ->whereBetween('treg', [$startDate, $endDate])
+            ->whereBetween('completed_at', [$startDate, $endDate])
             ->get();
 
         return view('company.reports.salesTransactionReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));

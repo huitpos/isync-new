@@ -56,7 +56,7 @@
                                 $paymentTypeNames = $transaction->payments->pluck('payment_type_name');
                             @endphp
                             <tr>
-                                <td>{{ $transaction->treg }}</td>
+                                <td>{{ $transaction->completed_at }}</td>
                                 <th>{{ $transaction->machine->machine_number }}</th>
                                 <th>{{ $transaction->receipt_number }}</th>
                                 <th></th>
