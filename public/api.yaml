@@ -696,6 +696,8 @@ paths:
                   type: number
                 void_remarks:
                   type: string
+                total_zero_rated_amount:
+                  type: number
       responses:
         '200':
           content:
@@ -859,6 +861,10 @@ paths:
                   type: boolean
                 serial_number:
                   type: string
+                is_zero_rated:
+                  type: boolean
+                zero_rated_amount:
+                  type: number
       responses:
         '200':
           content:
@@ -1414,6 +1420,12 @@ paths:
                   type: number
                 total_short_over:
                   type: number
+                beg_reading_number:
+                  type: number
+                end_reading_number:
+                  type: number
+                total_zero_rated_amount:
+                  type: number
       responses:
         '200':
           content:
@@ -1536,6 +1548,8 @@ paths:
                   type: number
                 total_short_over:
                   type: number
+                total_zero_rated_amount:
+                  type: number
       responses:
         '200':
           content:
@@ -1610,6 +1624,8 @@ paths:
                   type: string
                 vat_expense:
                   type: number
+                is_zero_rated:
+                  type: boolean
       responses:
         '200':
           content:
@@ -1710,6 +1726,8 @@ paths:
                   type: string
                 vat_expense:
                   type: number
+                is_zero_rated:
+                  type: boolean
 
       responses:
         '200':

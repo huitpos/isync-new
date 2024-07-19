@@ -371,6 +371,7 @@ class MiscController extends BaseController
             'void_counter' => $request->void_counter,
             'void_remarks' => $request->void_remarks,
             'customer_name' => $request->customer_name,
+            'total_zero_rated_amount' => $request->total_zero_rated_amount,
         ];
 
         //check if existing. update if yes
@@ -540,6 +541,8 @@ class MiscController extends BaseController
             'with_serial' => $request->with_serial,
             'is_return' => $request->is_return,
             'serial_number' => $request->serial_number,
+            'is_zero_rated' => $request->is_zero_rated,
+            'zero_rated_amount' => $request->zero_rated_amount,
         ];
 
         $order = Order::where([
@@ -1072,6 +1075,9 @@ class MiscController extends BaseController
             'void_qty' => $request->void_qty,
             'total_short_over' => $request->total_short_over,
             'generated_date' => $request->generated_date,
+            'beg_reading_number' => $request->beg_reading_number,
+            'end_reading_number' => $request->end_reading_number,
+            'total_zero_rated_amount' => $request->total_zero_rated_amount,
         ];
 
         if ($request['products']) {
@@ -1210,6 +1216,7 @@ class MiscController extends BaseController
             'reading_number' => $request->reading_number,
             'void_qty' => $request->void_qty,
             'total_short_over' => $request->total_short_over,
+            'total_zero_rated_amount' => $request->total_zero_rated_amount,
         ];
 
         $cutOff = CutOff::where([
@@ -1311,6 +1318,7 @@ class MiscController extends BaseController
             'shift_number' => $request->shift_number,
             'treg' => $request->treg,
             'vat_expense' => $request->vat_expense,
+            'is_zero_rated' => $request->is_zero_rated,
         ];
 
         $message = 'Discount created successfully.';
@@ -1397,6 +1405,7 @@ class MiscController extends BaseController
             'shift_number' => $request->shift_number,
             'treg' => $request->treg,
             'vat_expense' => $request->vat_expense,
+            'is_zero_rated' => $request->is_zero_rated,
         ];
 
         $message = 'Discount Details created successfully.';
