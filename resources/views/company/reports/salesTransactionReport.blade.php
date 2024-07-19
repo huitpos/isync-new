@@ -56,7 +56,6 @@
                             <th>VAT Exempt</th>
                             <th>Discount</th>
                             <th>Type Of Payment</th>
-                            <th>Void</th>
                             <th>Quantity</th>
                             <th>Amount Paid</th>
                             <th>Service Charge</th>
@@ -85,7 +84,6 @@
                                 <th>{{ number_format($transaction->vat_exempt_sales, 2) }}</th>
                                 <th>{{ number_format($transaction->discount_amount, 2) }}</th>
                                 <th>{{ $paymentTypeNames->join(', ') }}</th>
-                                <th>{{ $transaction->is_void ? 'Yes' : 'No' }}</th>
                                 <th>{{ $transaction->total_quantity }}</th>
                                 <th>{{ number_format($transaction->tender_amount, 2) }}</th>
                                 <th>{{ number_format($transaction->service_charge, 2) }}</th>

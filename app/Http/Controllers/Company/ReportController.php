@@ -11,6 +11,7 @@ use App\Models\CutOff;
 use App\Models\PaymentType;
 use App\Models\DiscountType;
 use App\Models\EndOfDay;
+use App\Models\Discount;
 
 use App\DataTables\Company\Reports\TransactionsDataTable;
 use App\Exports\TestExport;
@@ -20,6 +21,7 @@ use App\Exports\VatSalesReportExport;
 use App\Exports\XReadingReportExport;
 use App\Exports\ZReadingReportExport;
 use App\Exports\SalesInvoicesReportExport;
+use App\Exports\DiscountsReportExport;
 
 use Carbon\Carbon;
 
@@ -243,5 +245,56 @@ class ReportController extends Controller
             ->get();
 
         return view('company.reports.zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays'));
+    }
+
+    public function discountsReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+
+        $branchId = $request->input('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('start_date', date('F Y'));
+
+        $parsedDate = Carbon::parse($dateParam);
+
+        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
+        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+
+        $discountTypes = DiscountType::where('company_id', $company->id)
+            ->orWhere('company_id', null)
+            ->orderBy('id')
+            ->get();
+
+        $filterDiscountTypes = $request->input('discount_types', [$discountTypes->first()->id]);
+
+        if ($request->isMethod('post') && !$request->input('search')) {
+            return Excel::download(new DiscountsReportExport($branchId, $startDate, $endDate, $filterDiscountTypes), 'Discounts Report.xlsx');
+        }
+
+        $discounts = Discount::select([
+                'transactions.completed_at as date',
+                'transactions.receipt_number',
+                'transactions.gross_sales',
+                'discounts.discount_name',
+                'discounts.discount_amount',
+                'discounts.discount_id',
+                'discounts.pos_machine_id',
+                'discounts.branch_id',
+            ])
+            ->join('transactions', function($join) {
+                    $join->on('transactions.transaction_id', '=', 'discounts.transaction_id');
+                    $join->on('transactions.branch_id', '=', 'discounts.branch_id');
+                    $join->on('transactions.pos_machine_id', '=', 'discounts.pos_machine_id');
+            })
+            ->whereBetween('discounts.treg', [$startDate, $endDate])
+            ->where('discounts.is_void', false)
+            ->where('transactions.is_void', false)
+            ->where('transactions.is_complete', true)
+            ->whereIn('discounts.discount_type_id', $filterDiscountTypes)
+            ->where('discounts.branch_id', $branchId)
+            ->get();
+
+        return view('company.reports.discountsReport', compact('company', 'branches', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes'));
     }
 }

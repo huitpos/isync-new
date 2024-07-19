@@ -262,6 +262,14 @@
 							</a>
 						</div>
 					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.discounts-report') ? 'active' : '' }}" href="{{ route('branch.reports.discounts-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Discounts Report</span>
+							</a>
+						</div>
+					</div>
 				</div>
 
 			@elseif (request()->attributes->get('company'))
@@ -595,6 +603,14 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.reports.z-reading-report') ? 'active' : '' }}" href="{{ route('company.reports.z-reading-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Z Reading Report</span>
+							</a>
+						</div>
+					</div>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.discounts-report') ? 'active' : '' }}" href="{{ route('company.reports.discounts-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Discounts Report</span>
 							</a>
 						</div>
 					</div>
