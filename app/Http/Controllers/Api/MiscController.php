@@ -31,6 +31,9 @@ use App\Models\CutOffPayment;
 use App\Models\EndOfDayDiscount;
 use App\Models\EndOfDayPayment;
 use App\Models\EndOfDayDepartment;
+use App\Models\TakeOrderDiscount;
+use App\Models\TakeOrderDiscountDetail;
+use App\Models\TakeOrderDiscountOtherInformation;
 
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
@@ -1269,6 +1272,93 @@ class MiscController extends BaseController
         return $this->sendResponse($cutOffs, 'Cut Offs retrieved successfully.');
     }
 
+    public function saveTakeOrderDiscounts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'discount_id' => 'required|numeric|min:1',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'transaction_id' => 'required',
+            'custom_discount_id' => 'required|numeric',
+            'discount_type_id' => 'required',
+            'value' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'vat_exempt_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'cashier_id' => 'required',
+            'is_void' => 'required|boolean',
+            'is_sent_to_server' => 'required|boolean',
+            'is_cut_off' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'discount_id' => $request->discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'transaction_id' => $request->transaction_id,
+            'custom_discount_id' => $request->custom_discount_id,
+            'discount_type_id' => $request->discount_type_id,
+            'discount_name' => $request->discount_name,
+            'value' => $request->value,
+            'discount_amount' => $request->discount_amount,
+            'vat_exempt_amount' => $request->vat_exempt_amount,
+            'type' => $request->type,
+            'cashier_id' => $request->cashier_id,
+            'cashier_name' => $request->cashier_name,
+            'authorize_id' => $request->authorize_id,
+            'authorize_name' => $request->authorize_name,
+            'is_void' => $request->is_void,
+            'void_by_id' => $request->void_by_id,
+            'void_by' => $request->void_by,
+            'void_at' => $request->void_at,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'shift_number' => $request->shift_number,
+            'treg' => $request->treg,
+            'vat_expense' => $request->vat_expense,
+            'is_zero_rated' => $request->is_zero_rated,
+        ];
+
+        $message = 'Discount created successfully.';
+        $discount = TakeOrderDiscount::where([
+            'discount_id' => $request->discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($discount) {
+            $message = 'Discount updated successfully.';
+            $discount->update($postData);
+            return $this->sendResponse($discount, $message);
+        }
+
+        return $this->sendResponse(TakeOrderDiscount::create($postData), $message);
+    }
+
+    public function getTakeOrderDiscounts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $discounts = TakeOrderDiscount::where([
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id,
+        ])->get();
+
+        return $this->sendResponse($discounts, 'Discounts retrieved successfully.');
+    }
+
     public function saveDiscounts(Request $request)
     {
         $validator = validator($request->all(), [
@@ -1354,6 +1444,108 @@ class MiscController extends BaseController
         ])->get();
 
         return $this->sendResponse($discounts, 'Discounts retrieved successfully.');
+    }
+
+    public function saveTakeorderDiscountDetails(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'discount_details_id' => 'required|numeric|min:1',
+            'discount_id' => 'required|numeric',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'custom_discount_id' => 'required|numeric',
+            'transaction_id' => 'required|numeric',
+            'order_id' => 'required|numeric',
+            'discount_type_id' => 'required|numeric',
+            'value' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'vat_exempt_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'is_void' => 'required|boolean',
+            'is_sent_to_server' => 'required|boolean',
+            'is_cut_off' => 'required|boolean',
+            'is_vat_exempt' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'discount_details_id' => $request->discount_details_id,
+            'discount_id' => $request->discount_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'custom_discount_id' => $request->custom_discount_id,
+            'transaction_id' => $request->transaction_id,
+            'order_id' => $request->order_id,
+            'discount_type_id' => $request->discount_type_id,
+            'value' => $request->value,
+            'discount_amount' => $request->discount_amount,
+            'vat_exempt_amount' => $request->vat_exempt_amount,
+            'type' => $request->type,
+            'is_void' => $request->is_void,
+            'void_by_id' => $request->void_by_id,
+            'void_by' => $request->void_by,
+            'void_at' => $request->void_at,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'is_vat_exempt' => $request->is_vat_exempt,
+            'shift_number' => $request->shift_number,
+            'treg' => $request->treg,
+            'vat_expense' => $request->vat_expense,
+            'is_zero_rated' => $request->is_zero_rated,
+        ];
+
+        $message = 'Discount Details created successfully.';
+        $discountDetails = TakeOrderDiscountDetail::where([
+            'discount_details_id' => $request->discount_details_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($discountDetails) {
+            $message = 'Discount Details updated successfully.';
+            $discountDetails->update($postData);
+            return $this->sendResponse($discountDetails, $message);
+        }
+
+        return $this->sendResponse(TakeOrderDiscountDetail::create($postData), $message);
+    }
+
+    public function getTakeOrderDiscountDetails(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $discounts = TakeOrderDiscountDetail::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($discounts->count() == 0) {
+            $discounts = TakeOrderDiscountDetail::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('discount_details_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($discounts, 'Discount details retrieved successfully.');
     }
 
     public function saveDiscountDetails(Request $request)
@@ -1543,6 +1735,58 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'Payment Other Informations retrieved successfully.');
     }
 
+    public function saveTakeOrderDiscountOtherInformations(Request $request) 
+    {
+        $validator = validator($request->all(), [
+            'discount_other_information_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'transaction_id' => 'required',
+            'discount_id' => 'required',
+            'name' => 'required',
+            'value' => 'required',
+            'is_cut_off' => 'required',
+            'cut_off_id' => 'required',
+            'is_void' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'discount_other_information_id' => $request->discount_other_information_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'transaction_id' => $request->transaction_id,
+            'discount_id' => $request->discount_id,
+            'name' => $request->name,
+            'value' => $request->value,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'is_void' => $request->is_void,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'discount other informations created successfully.';
+        $record = TakeOrderDiscountOtherInformation::where([
+            'discount_other_information_id' => $request->discount_other_information_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'discount other informations updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(TakeOrderDiscountOtherInformation::create($postData), $message);
+    }
+
     public function saveDiscountOtherInformations(Request $request) 
     {
         $validator = validator($request->all(), [
@@ -1593,6 +1837,40 @@ class MiscController extends BaseController
         }
 
         return $this->sendResponse(DiscountOtherInformation::create($postData), $message);
+    }
+
+    public function getTakeOrderDiscountOtherInformations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = TakeOrderDiscountOtherInformation::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id,
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = TakeOrderDiscountOtherInformation::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('discount_other_information_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'Discount Other Informations retrieved successfully.');
     }
 
     public function getDiscountOtherInformations(Request $request)

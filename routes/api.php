@@ -90,8 +90,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/discounts', [MiscController::class, 'saveDiscounts']);
         Route::get('/discounts', [MiscController::class, 'getDiscounts']);
 
+        Route::post('/take-order-discounts', [MiscController::class, 'saveTakeOrderDiscounts']);
+        Route::get('/take-order-discounts', [MiscController::class, 'getTakeOrderDiscounts']);
+
         Route::post('/discount-details', [MiscController::class, 'saveDiscountDetails']);
         Route::get('/discount-details', [MiscController::class, 'getDiscountDetails']);
+
+        Route::post('/take-order-discount-details', [MiscController::class, 'saveTakeOrderDiscountDetails']);
+        Route::get('/take-order-discount-details', [MiscController::class, 'getTakeOrderDiscountDetails']);
+        
 
         Route::get('/branch-take-order-transactions', [MiscController::class, 'getTakeOrderTransactions']);
         Route::post('/branch-take-order-transactions', [MiscController::class, 'saveTakeOrderTransactions']);
@@ -104,6 +111,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/discount-other-informations', [MiscController::class, 'getDiscountOtherInformations']);
         Route::post('/discount-other-informations', [MiscController::class, 'saveDiscountOtherInformations']);
+
+        Route::get('/take-order-discount-other-informations', [MiscController::class, 'getTakeOrderDiscountOtherInformations']);
+        Route::post('/take-order-discount-other-informations', [MiscController::class, 'saveTakeOrderDiscountOtherInformations']);
 
         //cutOffDepartments
         Route::get('/cut-off-departments', [MiscController::class, 'getCutOffDepartments']);
