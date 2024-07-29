@@ -98,7 +98,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/take-order-discount-details', [MiscController::class, 'saveTakeOrderDiscountDetails']);
         Route::get('/take-order-discount-details', [MiscController::class, 'getTakeOrderDiscountDetails']);
-        
 
         Route::get('/branch-take-order-transactions', [MiscController::class, 'getTakeOrderTransactions']);
         Route::post('/branch-take-order-transactions', [MiscController::class, 'saveTakeOrderTransactions']);

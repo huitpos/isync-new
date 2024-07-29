@@ -1559,6 +1559,113 @@ paths:
                 items:
                   type: string
 
+  /api/take-order-discounts:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send discounts to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                discount_id:
+                  type: integer
+                  minimum: 1
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                custom_discount_id:
+                  type: integer
+                discount_type_id:
+                  type: integer
+                value:
+                  type: number
+                discount_amount:
+                  type: number
+                vat_exempt_amount:
+                  type: number
+                cashier_id:
+                  type: integer
+                authorize_id:
+                  type: integer
+                is_void:
+                  type: boolean
+                is_sent_to_server:
+                  type: boolean
+                is_cut_off:
+                  type: boolean
+                discount_name:
+                  type: string
+                type:
+                  type: string
+                cashier_name:
+                  type: string
+                authorize_name:
+                  type: string
+                void_by_id:
+                  type: integer
+                void_by:
+                  type: string
+                void_at:
+                  type: string
+                  default: null
+                cut_off_id:
+                  type: integer
+                shift_number:
+                  type: integer
+                treg:
+                  type: string
+                vat_expense:
+                  type: number
+                is_zero_rated:
+                  type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all discounts by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
   /api/discounts:
     post:
       tags:
@@ -1638,6 +1745,109 @@ paths:
       tags:
         - Sync From Server
       summary: Get all discounts by branch ID and machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/take-order-discount-details:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send discount details to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                discount_details_id:
+                  type: integer
+                discount_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                custom_discount_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                order_id:
+                  type: integer
+                discount_type_id:
+                  type: integer
+                value:
+                  type: number
+                discount_amount:
+                  type: number
+                vat_exempt_amount:
+                  type: number
+                type:
+                  type: string
+                is_void:
+                  type: boolean
+                void_by_id:
+                  type: number
+                void_by:
+                  type: string
+                void_at:
+                  type: string
+                  default: null
+                is_sent_to_server:
+                  type: boolean
+                is_cut_off:
+                  type: boolean
+                cut_off_id:
+                  type: number
+                is_vat_exempt:
+                  type: boolean
+                shift_number:
+                  type: string
+                treg:
+                  type: string
+                vat_expense:
+                  type: number
+                is_zero_rated:
+                  type: boolean
+
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all discount details by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1852,6 +2062,83 @@ paths:
                 transaction_id:
                   type: integer
                 payment_id:
+                  type: integer
+                name:
+                  type: string
+                value:
+                  type: string
+                is_cut_off:
+                  type: boolean
+                cut_off_id:
+                  type: integer
+                is_void:
+                  type: boolean
+                is_sent_to_server:
+                  type: boolean
+                treg:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get payment other informations by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/take-order-discount-other-informations:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send discount other informations to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                discount_other_information_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                discount_id:
                   type: integer
                 name:
                   type: string
