@@ -1101,6 +1101,9 @@ class MiscController extends BaseController
 
         TakeOrderTransaction::where('branch_id', $request->branch_id)->delete();
         TakeOrderOrder::where('branch_id', $request->branch_id)->delete();
+        TakeOrderDiscount::where('branch_id', $request->branch_id)->delete();
+        TakeOrderDiscountDetail::where('branch_id', $request->branch_id)->delete();
+        TakeOrderDiscountOtherInformation::where('branch_id', $request->branch_id)->delete();
 
         $message = 'End of Day created successfully.';
         if ($endOfDay) {
