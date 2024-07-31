@@ -1356,10 +1356,16 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
-        $discounts = TakeOrderDiscount::where([
+        $query = TakeOrderDiscount::where([
             'branch_id' => $request->branch_id,
             'pos_machine_id' => $request->pos_machine_id,
-        ])->get();
+        ]);
+
+        if ($request->has('transaction_id')) {
+            $query->where('transaction_id', $request->transaction_id);
+        }
+
+        $discounts = $query->get();
 
         return $this->sendResponse($discounts, 'Discounts retrieved successfully.');
     }
@@ -1533,12 +1539,17 @@ class MiscController extends BaseController
         $today = Carbon::today()->format('Y-m-d 23:59:59');
         $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
 
-        $discounts = TakeOrderDiscountDetail::where([
+        $query = TakeOrderDiscountDetail::where([
                 'branch_id' => $request->branch_id,
                 'pos_machine_id' => $request->pos_machine_id,
             ])
-            ->whereBetween('treg', [$yesterday, $today])
-            ->get();
+            ->whereBetween('treg', [$yesterday, $today]);
+
+        if ($request->has('transaction_id')) {
+            $query->where('transaction_id', $request->transaction_id);
+        }
+
+        $discounts = $query->get();
 
         if ($discounts->count() == 0) {
             $discounts = TakeOrderDiscountDetail::where([
@@ -1858,12 +1869,17 @@ class MiscController extends BaseController
         $today = Carbon::today()->format('Y-m-d 23:59:59');
         $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
 
-        $records = TakeOrderDiscountOtherInformation::where([
+        $query = TakeOrderDiscountOtherInformation::where([
                 'branch_id' => $request->branch_id,
                 'pos_machine_id' => $request->pos_machine_id,
             ])
-            ->whereBetween('treg', [$yesterday, $today])
-            ->get();
+            ->whereBetween('treg', [$yesterday, $today]);
+
+        if ($request->has('transaction_id')) {
+            $query->where('transaction_id', $request->transaction_id);
+        }
+
+        $records = $query->get();
 
         if ($records->count() == 0) {
             $records = TakeOrderDiscountOtherInformation::where([
