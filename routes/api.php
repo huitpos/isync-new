@@ -137,6 +137,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/end-of-day-departments', [MiscController::class, 'saveEndOfDayDepartments']);
 
         Route::post('/update-branch-transactions', [MiscController::class, 'bulkSaveTransactions']);
+
+        Route::get('/cash-funds', [MiscController::class, 'getCashFunds']);
+        Route::post('/cash-funds', [MiscController::class, 'saveCashFunds']);
+
+        Route::get('/cash-fund-denominations', [MiscController::class, 'getCashFundDenominations']);
+        Route::post('/cash-fund-denominations', [MiscController::class, 'saveCashFundDenominations']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);

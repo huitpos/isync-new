@@ -34,6 +34,8 @@ use App\Models\EndOfDayDepartment;
 use App\Models\TakeOrderDiscount;
 use App\Models\TakeOrderDiscountDetail;
 use App\Models\TakeOrderDiscountOtherInformation;
+use App\Models\CashFund;
+use App\Models\CashFundDenomination;
 
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
@@ -2353,5 +2355,179 @@ class MiscController extends BaseController
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while updating the records.', 'error' => $e->getMessage()], 500);
         }
+    }
+
+    public function saveCashFunds(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'cash_fund_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'amount' => 'required',
+            'cashier_id' => 'required',
+            'is_cut_off' => 'required',
+            'cut_off_id' => 'required',
+            'end_of_day_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'shift_number' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'cash_fund_id' => $request->cash_fund_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'amount' => $request->amount,
+            'cashier_id' => $request->cashier_id,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'end_of_day_id' => $request->end_of_day_id,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'shift_number' => $request->shift_number,
+            'treg' => $request->treg,
+            'cashier_name' => $request->cashier_name,
+        ];
+
+        $message = 'Cash fund created successfully.';
+        $record = CashFund::where([
+            'cash_fund_id' => $request->cash_fund_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Cash fund updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(CashFund::create($postData), $message);
+    }
+
+    public function getCashFunds(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = CashFund::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = CashFund::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('cash_fund_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'cash fund retrieved successfully.');
+    }
+
+    public function saveCashFundDenominations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'cash_fund_denomination_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'cash_fund_id' => 'required',
+            'cash_denomination_id' => 'required',
+            'amount' => 'required',
+            'qty' => 'required',
+            'total' => 'required',
+            'is_cut_off' => 'required',
+            'cut_off_id' => 'required',
+            'end_of_day_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'shift_number' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'cash_fund_denomination_id' => $request->cash_fund_denomination_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'cash_fund_id' => $request->cash_fund_id,
+            'cash_denomination_id' => $request->cash_denomination_id,
+            'name' => $request->name,
+            'amount' => $request->amount,
+            'qty' => $request->qty,
+            'total' => $request->total,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'end_of_day_id' => $request->end_of_day_id,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'shift_number' => $request->shift_number,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'Cash fund denomination created successfully.';
+        $record = CashFundDenomination::where([
+            'cash_fund_denomination_id' => $request->cash_fund_denomination_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Cash fund denomination updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(CashFundDenomination::create($postData), $message);
+    }
+
+    public function getCashFundDenominations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = CashFundDenomination::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = CashFundDenomination::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('cash_fund_denomination_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'cash fund denomination retrieved successfully.');
     }
 }

@@ -2623,3 +2623,175 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /api/cash-funds:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send cash funds to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                cash_fund_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                amount:
+                  type: number
+                cashier_id:
+                  type: integer
+                cashier_name:
+                  type: string
+                  default: null
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_id:
+                  type: integer
+                  default: 0
+                end_of_day_id:
+                  type: integer
+                  default: 0
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                shift_number:
+                  type: integer
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get cash funds by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/cash-fund-denominations:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send cash fund denomination to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                cash_fund_denomination_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                cash_fund_id:
+                  type: integer
+                cash_denomination_id:
+                  type: integer
+                name:
+                  type: string
+                  default: null
+                amount:
+                  type: number
+                qty:
+                  type: number
+                total:
+                  type: number
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_id:
+                  type: integer
+                  default: 0
+                end_of_day_id:
+                  type: integer
+                  default: 0
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                shift_number:
+                  type: integer
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get cash fund denomination by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
