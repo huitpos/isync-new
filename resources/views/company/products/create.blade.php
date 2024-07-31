@@ -279,7 +279,7 @@
                                                 <select class="form-select @error('raw_items.' . $key . '.uom_id') is-invalid @enderror" name="uom_id">
                                                     <option value="">Unit of measurement</option>
                                                     @foreach($company->unitOfMeasurements as $uom)
-                                                        <option value="{{ $uom->id }}"  {{ $product->id == $rawItem['uom_id'] ? 'selected' : '' }}>{{ $uom->name }}</option>
+                                                        <option value="{{ $uom->id }}"  {{ $uom->id == $rawItem['uom_id'] ? 'selected' : '' }}>{{ $uom->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
