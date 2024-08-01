@@ -230,7 +230,7 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Confirm Passwword</label>
+                    <label class="form-label">Confirm Paswword</label>
                     <div data-kt-password-meter="true">
                         <div>
                             <div class="position-relative mb-3">
