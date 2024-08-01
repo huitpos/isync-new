@@ -78,7 +78,7 @@
 
                 <div class="mb-4">
                     <label class="form-label">Discount</label>
-                    <input value="{{ old('discount') ?? $discountType->discount }}" name="discount" type="text" class="form-control @error('discount') is-invalid @enderror" placeholder="Discount" required/>
+                    <input value="{{ old('discount') ?? $discountType->discount }}" name="discount" type="number" class="form-control @error('discount') is-invalid @enderror" placeholder="Discount" required/>
 
                     @error('discount')
                         <div class="invalid-feedback"> {{ $message }}</div>

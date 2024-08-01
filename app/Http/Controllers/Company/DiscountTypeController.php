@@ -60,7 +60,7 @@ class DiscountTypeController extends Controller
             'name' => 'required',
             'description' => 'required',
             'type' => 'required',
-            'discount' => 'required',
+            'discount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'status' => 'required',
             'discount_type_fields.*.name' => 'nullable',
             'discount_type_fields.*.field_type' => 'required_with:discount_type_fields.*.name',
@@ -171,7 +171,7 @@ class DiscountTypeController extends Controller
             'name' => 'required',
             'description' => 'required',
             'type' => 'required',
-            'discount' => 'required',
+            'discount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'status' => 'required',
         ]);
 
