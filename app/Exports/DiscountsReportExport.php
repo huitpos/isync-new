@@ -29,6 +29,7 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
     protected $discountTypes;
     protected $numberOfColumns;
     protected $headers;
+    protected $filterDiscountTypes;
 
     public function __construct($branchId, $startDate, $endDate, $filterDiscountTypes)
     {
@@ -40,10 +41,11 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
         $headers =  [
             'Date',
             'Sales Invoice No.',
-            'Name',
-            'OSCA/SC/PWD ID',
+            'Discount Type',
+            'Discount Details',
             'Gross Sales',
             'Sales Discount Granted',
+            'Approved By',
         ];
 
         $this->numberOfColumns = count($headers);
@@ -66,6 +68,7 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
                 'discounts.discount_id',
                 'discounts.pos_machine_id',
                 'discounts.branch_id',
+                'discounts.authorize_name',
             ])
             ->join('transactions', function($join) {
                     $join->on('transactions.transaction_id', '=', 'discounts.transaction_id');
@@ -107,8 +110,9 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
         }
 
         $data[] = $otherInfos;
-        $data[] = $discount->gross_sales;
-        $data[] = $discount->discount_amount;
+        $data[] = number_format($discount->gross_sales, 2);
+        $data[] = number_format($discount->discount_amount, 2);
+        $data[] = $discount->authorize_name;
 
         return $data;
     }
@@ -154,7 +158,7 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
                 $event->sheet->getStyle('A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $event->sheet->mergeCells('A4:'.$columnLetter.'4');
-                $event->sheet->setCellValue('A4', 'X Reading Report');
+                $event->sheet->setCellValue('A4', 'Discount Report');
                 $event->sheet->getStyle('A4')->getFont()->setBold(true);
 
                 $event->sheet->mergeCells('A5:'.$columnLetter.'5');
