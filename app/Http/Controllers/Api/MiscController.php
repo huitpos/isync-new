@@ -1327,6 +1327,8 @@ class MiscController extends BaseController
             'treg' => $request->treg,
             'vat_expense' => $request->vat_expense,
             'is_zero_rated' => $request->is_zero_rated,
+            'gross_amount' => $request->gross_amount,
+            'net_amount' => $request->net_amount,
         ];
 
         $message = 'Discount created successfully.';
@@ -1420,6 +1422,8 @@ class MiscController extends BaseController
             'treg' => $request->treg,
             'vat_expense' => $request->vat_expense,
             'is_zero_rated' => $request->is_zero_rated,
+            'gross_amount' => $request->gross_amount,
+            'net_amount' => $request->net_amount,
         ];
 
         $message = 'Discount created successfully.';

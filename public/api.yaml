@@ -1626,6 +1626,10 @@ paths:
                   type: number
                 is_zero_rated:
                   type: boolean
+                gross_amount:
+                  type: number
+                net_amount:
+                  type: number
       responses:
         '200':
           content:
@@ -1733,6 +1737,10 @@ paths:
                   type: number
                 is_zero_rated:
                   type: boolean
+                gross_amount:
+                  type: number
+                net_amount:
+                  type: number
       responses:
         '200':
           content:
