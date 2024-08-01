@@ -43,6 +43,7 @@
                             <td>Gross Sales</td>
                             <td>Sales Discount Granted</td>
                             <td>Cashier Name</td>
+                            <td>Net Sales</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,9 +57,10 @@
                                         {{ $otherInfo->name }}: {{ $otherInfo->value }}<br>
                                     @endforeach
                                 </td>
-                                <td>{{ $discount->gross_sales }}</td>
+                                <td>{{ number_format($discount->gross_sales, 2) }}</td>
                                 <td>{{ $discount->discount_amount }}</td>
                                 <td>{{ $discount->cashier_name }}</td>
+                                <td>{{ number_format($discount->net_sales, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

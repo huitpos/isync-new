@@ -256,6 +256,7 @@ class ReportController extends Controller
                 'transactions.completed_at as date',
                 'transactions.receipt_number',
                 'transactions.gross_sales',
+                'transactions.net_sales',
                 'discounts.discount_name',
                 'discounts.discount_amount',
                 'discounts.discount_id',
