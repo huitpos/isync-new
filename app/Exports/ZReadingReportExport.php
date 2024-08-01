@@ -165,6 +165,8 @@ class ZReadingReportExport implements FromCollection, WithHeadings, WithMapping,
         }
 
         $data[] = $endOfDays->cashier_name; //Cashier Name
+        $data[] = $endOfDays->beg_reading_number;
+        $data[] = $endOfDays->end_reading_number; //Cashier Name
 
         return $data;
     }

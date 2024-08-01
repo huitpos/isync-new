@@ -125,8 +125,8 @@
                                 @endforeach
 
                                 <td>{{ $data->cashier_name }}</td>
-                                <td></td>
-                                <td></td>
+                                <td>{{ $data->beg_reading_number }}</td>
+                                <td>{{ $data->end_reading_number }}</td>
                             </tr>
                         @endforeach
                     </tbody>
