@@ -65,6 +65,7 @@ class SalesInvoicesReportExport implements FromCollection, WithHeadings, WithMap
             'VAT Sales', //done
             'VAT Amount', //done
             'VAT Exempt', //done
+            'VAT Expense', //done
             'Discount', //done
             'Type Of Payment', //done
             'Void', //done
@@ -110,6 +111,7 @@ class SalesInvoicesReportExport implements FromCollection, WithHeadings, WithMap
             $transaction->vatable_sales ?: 0,
             $transaction->vat_amount ?: 0,
             $transaction->vat_exempt_sales ?: 0,
+            $transaction->vat_expense ?: 0,
             $transaction->discount_amount ?: 0,
             $paymentTypeNames->join(', '),
             $transaction->is_void ? 'Yes' : 'No',

@@ -66,6 +66,7 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
             'VAT Sales', //done
             'VAT Amount', //done
             'VAT Exempt', //done
+            'VAT Expense', //done
             'Discount', //done
             'Type Of Payment', //done
             'Quantity', //done
@@ -110,6 +111,7 @@ class SalesTransactionReportExport implements FromCollection, WithHeadings, With
             $transaction->vatable_sales ?: 0,
             $transaction->vat_amount ?: 0,
             $transaction->vat_exempt_sales ?: 0,
+            $transaction->vat_expense ?: 0,
             $transaction->discount_amount ?: 0,
             $paymentTypeNames->join(', '),
             $transaction->total_quantity,

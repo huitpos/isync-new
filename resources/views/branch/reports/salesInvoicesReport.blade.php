@@ -40,6 +40,7 @@
                             <th>VAT Sales</th>
                             <th>VAT Amount</th>
                             <th>VAT Exempt</th>
+                            <th>VAT Expense</th>
                             <th>Discount</th>
                             <th>Type Of Payment</th>
                             <th>Void</th>
@@ -69,6 +70,7 @@
                                 <th>{{ number_format($transaction->vatable_sales, 2) }}</th>
                                 <th>{{ number_format($transaction->vat_amount, 2) }}</th>
                                 <th>{{ number_format($transaction->vat_exempt_sales, 2) }}</th>
+                                <th>{{ number_format($transaction->vat_expense, 2) }}</th>
                                 <th>{{ number_format($transaction->discount_amount, 2) }}</th>
                                 <th>{{ $paymentTypeNames->join(', ') }}</th>
                                 <th>{{ $transaction->is_void ? 'Yes' : 'No' }}</th>
