@@ -46,6 +46,7 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
             'Gross Sales',
             'Sales Discount Granted',
             'Approved By',
+            'Cashier Name'
         ];
 
         $this->numberOfColumns = count($headers);
@@ -69,6 +70,7 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
                 'discounts.pos_machine_id',
                 'discounts.branch_id',
                 'discounts.authorize_name',
+                'transactions.cashier_name',
             ])
             ->join('transactions', function($join) {
                     $join->on('transactions.transaction_id', '=', 'discounts.transaction_id');
@@ -113,6 +115,7 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
         $data[] = number_format($discount->gross_sales, 2);
         $data[] = number_format($discount->discount_amount, 2);
         $data[] = $discount->authorize_name;
+        $data[] = $discount->cashier_name;
 
         return $data;
     }

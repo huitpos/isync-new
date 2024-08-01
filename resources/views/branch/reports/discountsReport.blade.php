@@ -42,6 +42,7 @@
                             <td>OSCA/SC/PWD ID</td>
                             <td>Gross Sales</td>
                             <td>Sales Discount Granted</td>
+                            <td>Cashier Name</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,6 +58,7 @@
                                 </td>
                                 <td>{{ $discount->gross_sales }}</td>
                                 <td>{{ $discount->discount_amount }}</td>
+                                <td>{{ $discount->cashier_name }}</td>
                             </tr>
                         @endforeach
                     </tbody>
