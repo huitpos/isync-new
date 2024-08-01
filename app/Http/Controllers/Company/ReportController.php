@@ -12,6 +12,7 @@ use App\Models\PaymentType;
 use App\Models\DiscountType;
 use App\Models\EndOfDay;
 use App\Models\Discount;
+use App\Models\Branch;
 
 use App\DataTables\Company\Reports\TransactionsDataTable;
 use App\Exports\TestExport;
@@ -69,7 +70,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
 
         $branches = $company->activeBranches;
-
+        
         $branchId = $request->query('branch_id', $branches->first()->id);
 
         $dateParam = $request->query('start_date', date('F Y'));
@@ -80,7 +81,8 @@ class ReportController extends Controller
         $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
 
         if ($request->isMethod('post')) {
-            return Excel::download(new SalesInvoicesReportExport($branchId, $startDate, $endDate), 'sales invoices report.xlsx');
+            $branch = Branch::find($branchId);
+            return Excel::download(new SalesInvoicesReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Invoices Report - $dateParam.xlsx");
         }
 
         $transactions = Transaction::where('branch_id', $branchId)
@@ -107,7 +109,8 @@ class ReportController extends Controller
         $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
 
         if ($request->isMethod('post')) {
-            return Excel::download(new SalesTransactionReportExport($branchId, $startDate, $endDate), 'sales transaction report.xlsx');
+            $branch = Branch::find($branchId);
+            return Excel::download(new SalesTransactionReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Transaction Report - $dateParam.xlsx");
         }
 
         $transactions = Transaction::where('branch_id', $branchId)
@@ -135,7 +138,8 @@ class ReportController extends Controller
         $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
 
         if ($request->isMethod('post')) {
-            return Excel::download(new VoidTransactionsReportExport($branchId, $startDate, $endDate), 'void transactions report.xlsx');
+            $branch = Branch::find($branchId);
+            return Excel::download(new VoidTransactionsReportExport($branchId, $startDate, $endDate), "$branch->name - Void Transactions Report - $dateParam.xlsx");
         }
 
         $transactions = Transaction::where([
@@ -164,7 +168,8 @@ class ReportController extends Controller
         $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
 
         if ($request->isMethod('post')) {
-            return Excel::download(new VatSalesReportExport($branchId, $startDate, $endDate), 'vat sales report.xlsx');
+            $branch = Branch::find($branchId);
+            return Excel::download(new VatSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Vat Sales Report - $dateParam.xlsx");
         }
 
         $transactions = Transaction::where('branch_id', $branchId)
@@ -191,7 +196,8 @@ class ReportController extends Controller
         $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
 
         if ($request->isMethod('post')) {
-            return Excel::download(new XReadingReportExport($branchId, $startDate, $endDate), 'X Reading Report.xlsx');
+            $branch = Branch::find($branchId);
+            return Excel::download(new XReadingReportExport($branchId, $startDate, $endDate), "$branch->name - X Reading Report - $dateParam.xlsx");
         }
 
         $cutoffs = CutOff::where('branch_id', $branchId)
@@ -227,7 +233,8 @@ class ReportController extends Controller
         $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
 
         if ($request->isMethod('post')) {
-            return Excel::download(new ZReadingReportExport($branchId, $startDate, $endDate), 'Z Reading Report.xlsx');
+            $branch = Branch::find($branchId);
+            return Excel::download(new ZReadingReportExport($branchId, $startDate, $endDate), "$branch->name - Z Reading Report - $dateParam.xlsx");
         }
 
         $paymentTypes = PaymentType::where('company_id', $company->id)
@@ -269,7 +276,8 @@ class ReportController extends Controller
         $filterDiscountTypes = $request->input('discount_types', [$discountTypes->first()->id]);
 
         if ($request->isMethod('post') && !$request->input('search')) {
-            return Excel::download(new DiscountsReportExport($branchId, $startDate, $endDate, $filterDiscountTypes), 'Discounts Report.xlsx');
+            $branch = Branch::find($branchId);
+            return Excel::download(new DiscountsReportExport($branchId, $startDate, $endDate, $filterDiscountTypes), "$branch->name - Discounts Report - $dateParam.xlsx");
         }
 
         $discounts = Discount::select([
