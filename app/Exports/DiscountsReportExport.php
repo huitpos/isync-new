@@ -44,10 +44,10 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
             'Discount Type',
             'Discount Details',
             'Gross Sales',
-            'Sales Discount Granted',
-            'Approved By',
-            'Cashier Name',
             'Net Sales',
+            'Sales Discount Granted',
+            'Cashier Name',
+            'Approved By',
         ];
 
         $this->numberOfColumns = count($headers);
@@ -115,10 +115,10 @@ class DiscountsReportExport implements FromCollection, WithHeadings, WithMapping
 
         $data[] = $otherInfos;
         $data[] = number_format($discount->gross_sales, 2);
-        $data[] = number_format($discount->discount_amount, 2);
-        $data[] = $discount->authorize_name;
-        $data[] = $discount->cashier_name;
         $data[] = number_format($discount->net_sales, 2);
+        $data[] = number_format($discount->discount_amount, 2);
+        $data[] = $discount->cashier_name;
+        $data[] = $discount->authorize_name;
 
         return $data;
     }
