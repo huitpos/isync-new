@@ -40,6 +40,7 @@
                             <td>Net Sales</td>
                             <td>Vatable Sales</td>
                             <td>Vat Discount</td>
+                            <td>Vat Amount</td>
                             <td>Service Charge</td>
 
                             @foreach ($paymentTypes as $paymentType)
@@ -80,6 +81,7 @@
                                 <td>{{ number_format($data->vatable_sales, 2) }}</td>
                                 <td>{{ number_format($data->vat_exempt_sales, 2) }}</td>
                                 <td>{{ number_format($data->vat_expense, 2) }}</td>
+                                <td>{{ number_format($data->vat_amount, 2) }}</td>
                                 <td>{{ number_format($data->total_service_charge, 2) }}</td>
 
                                 @foreach ($paymentTypes as $paymentType)

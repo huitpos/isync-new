@@ -61,6 +61,7 @@ class ZReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             'Vatable Sales',
             'Vat Exempt Sales',
             'Vat Discount',
+            'Vat Amount',
             'Service Charge',
         ];
 
@@ -134,6 +135,7 @@ class ZReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             $endOfDays->vatable_sales ?: 0, //Vatable Sales
             $endOfDays->vat_exempt_sales ?: 0, //Vat Exempt Sales
             $endOfDays->vat_expense ?: 0, //Vat Discount
+            $endOfDays->vat_amount ?: 0, //Vat Amount
             $endOfDays->total_service_charge ?: 0, //Service Charge
         ];
 
