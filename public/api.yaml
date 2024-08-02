@@ -1426,6 +1426,8 @@ paths:
                   type: number
                 total_zero_rated_amount:
                   type: number
+                print_string:
+                  type: string
       responses:
         '200':
           content:
@@ -1550,6 +1552,8 @@ paths:
                   type: number
                 total_zero_rated_amount:
                   type: number
+                print_string:
+                  type: string
       responses:
         '200':
           content:

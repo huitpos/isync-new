@@ -1083,6 +1083,7 @@ class MiscController extends BaseController
             'beg_reading_number' => $request->beg_reading_number,
             'end_reading_number' => $request->end_reading_number,
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
+            'print_string' => $request->print_string,
         ];
 
         if ($request['products']) {
@@ -1225,6 +1226,7 @@ class MiscController extends BaseController
             'void_qty' => $request->void_qty,
             'total_short_over' => $request->total_short_over,
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
+            'print_string' => $request->print_string,
         ];
 
         $cutOff = CutOff::where([
