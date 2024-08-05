@@ -1654,11 +1654,10 @@ paths:
           required: true
           description: Numeric ID of the branch to get
         - in: query
-          name: pos_machine_id
+          name: transaction_id
           schema:
             type: integer
-          required: true
-          description: ID of the machine to get
+          description: Numeric ID of the transaction to get
         - in: query
           name: device_id
           schema:
@@ -1868,11 +1867,10 @@ paths:
           required: true
           description: Numeric ID of the branch to get
         - in: query
-          name: pos_machine_id
+          name: transaction_id
           schema:
             type: integer
-          required: true
-          description: ID of the machine to get
+          description: Numeric ID of the transaction to get
         - in: query
           name: device_id
           schema:
@@ -2186,11 +2184,10 @@ paths:
           required: true
           description: Numeric ID of the branch to get
         - in: query
-          name: pos_machine_id
+          name: transaction_id
           schema:
             type: integer
-          required: true
-          description: ID of the machine to get
+          description: Numeric ID of the transaction to get
         - in: query
           name: device_id
           schema:
