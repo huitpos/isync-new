@@ -1539,29 +1539,15 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
-        $today = Carbon::today()->format('Y-m-d 23:59:59');
-        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
-
         $query = TakeOrderDiscountDetail::where([
                 'branch_id' => $request->branch_id
-            ])
-            ->whereBetween('treg', [$yesterday, $today]);
+            ]);
 
         if ($request->has('transaction_id')) {
             $query->where('transaction_id', $request->transaction_id);
         }
 
         $discounts = $query->get();
-
-        if ($discounts->count() == 0) {
-            $discounts = TakeOrderDiscountDetail::where([
-                'branch_id' => $request->branch_id,
-                'pos_machine_id' => $request->pos_machine_id
-            ])
-            ->orderBy('discount_details_id', 'desc')
-            ->limit(2)
-            ->get();
-        }
 
         return $this->sendResponse($discounts, 'Discount details retrieved successfully.');
     }
@@ -1872,24 +1858,13 @@ class MiscController extends BaseController
 
         $query = TakeOrderDiscountOtherInformation::where([
                 'branch_id' => $request->branch_id
-            ])
-            ->whereBetween('treg', [$yesterday, $today]);
+            ]);
 
         if ($request->has('transaction_id')) {
             $query->where('transaction_id', $request->transaction_id);
         }
 
         $records = $query->get();
-
-        if ($records->count() == 0) {
-            $records = TakeOrderDiscountOtherInformation::where([
-                'branch_id' => $request->branch_id,
-                'pos_machine_id' => $request->pos_machine_id
-            ])
-            ->orderBy('discount_other_information_id', 'desc')
-            ->limit(2)
-            ->get();
-        }
 
         return $this->sendResponse($records, 'Discount Other Informations retrieved successfully.');
     }
