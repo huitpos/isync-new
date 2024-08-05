@@ -143,6 +143,7 @@ class ClientController extends Controller
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
             'client_id' => $client->id,
+            'company_id' => $company->id,
             'role' => 'company_admin'
         ]);
 
