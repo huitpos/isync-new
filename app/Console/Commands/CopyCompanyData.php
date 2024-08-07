@@ -17,11 +17,13 @@ use App\Models\ItemType;
 use App\Models\PaymentTerm;
 use App\Models\Product;
 use App\Models\ProductDisposalReason;
+use App\Models\Role;
 use App\Models\Subcategory;
 use App\Models\Supplier;
 use App\Models\SupplierTerm;
 use App\Models\UnitOfMeasurement;
 use App\Models\UnitConversion;
+use App\Models\Permission;
 
 class CopyCompanyData extends Command
 {
@@ -63,6 +65,7 @@ class CopyCompanyData extends Command
         //item locations - done
         //products
         
+        Role::where('company_id', $toCompanyId)->delete();
         Product::where('company_id', $toCompanyId)->delete();
         ProductDisposalReason::where('company_id', $toCompanyId)->delete();
         PaymentTerm::where('company_id', $toCompanyId)->delete();
@@ -76,6 +79,24 @@ class CopyCompanyData extends Command
         PaymentType::where('company_id', $toCompanyId)->delete();
         SupplierTerm::where('company_id', $toCompanyId)->delete();
         Supplier::where('company_id', $toCompanyId)->delete();
+
+        $roles = Role::where('company_id', $fromCompanyId)
+            ->with('permissions')
+            ->get();
+
+        $newRoles = $roles->map(function($role) use ($toCompanyId) {
+            $newRole = $role->replicate();
+            $newRole->company_id = $toCompanyId;
+            $newRole->save();
+
+            // Save the old role ID for later use
+            $newRole->old_id = $role->id;
+
+            $permissions = Permission::whereIn('id', $role->permissions->pluck('id'))->pluck('name');
+            $newRole->givePermissionTo($permissions);
+
+            return $newRole;
+        });
         
 
         $paymentTypes = PaymentType::where('company_id', $fromCompanyId)->get();
