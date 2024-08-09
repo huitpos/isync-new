@@ -176,6 +176,8 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'x-reading-report', [CompanyReportController::class, 'xReadingReport'])->name('company.reports.x-reading-report');
             Route::match(['get', 'post'], 'z-reading-report', [CompanyReportController::class, 'zReadingReport'])->name('company.reports.z-reading-report');
             Route::match(['get', 'post'], 'discounts-report', [CompanyReportController::class, 'discountsReport'])->name('company.reports.discounts-report');
+
+            Route::get('stock-card', [CompanyReportController::class, 'stockCard'])->name('company.reports.stock-card');
         });
 
         //branch

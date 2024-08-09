@@ -266,6 +266,10 @@ var KTApp = function () {
                 };
             }
 
+            if (element.getAttribute('data-minimum-input')) {
+                options.minimumInputLength = element.getAttribute('data-minimum-input');
+            }
+
             $(element).select2(options);
 
             // Handle Select2's KTMenu parent case

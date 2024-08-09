@@ -23,7 +23,7 @@ use App\Exports\XReadingReportExport;
 use App\Exports\ZReadingReportExport;
 use App\Exports\SalesInvoicesReportExport;
 use App\Exports\DiscountsReportExport;
-
+use App\Models\Product;
 use Carbon\Carbon;
 
 class ReportController extends Controller
@@ -306,5 +306,24 @@ class ReportController extends Controller
             ->get();
 
         return view('company.reports.discountsReport', compact('company', 'branches', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes'));
+    }
+
+    public function stockCard(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+
+        $branchId = $request->input('branch_id', $branches->first()->id);
+        $productId = $request->query('product_id', null);
+
+        $product = null;
+        $pivotData = null;
+        if ($branchId && $productId) {
+            $product = Product::findOrFail($productId);
+
+            $pivotData = $product->branches->where('id', $branchId)->first()?->pivot;
+        }
+
+        return view('company.reports.stockCard', compact('company', 'branches', 'branchId', 'productId', 'product', 'pivotData'));
     }
 }
