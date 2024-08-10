@@ -214,6 +214,14 @@ var KTApp = function () {
                         start = moment().subtract(1, 'month').startOf('month');
                         end = moment().subtract(1, 'month').endOf('month');
                         break;
+                    case 'Year to Date':
+                        start = moment().startOf('year');
+                        end = moment();
+                        break;
+                    case 'Last Year':
+                        start = moment().subtract(1, 'year').startOf('year');
+                        end = moment().subtract(1, 'year').endOf('year');
+                        break;
                     default:
                         // Handle any other cases or defaults
                         start = moment().subtract(29, 'days');
@@ -245,8 +253,6 @@ var KTApp = function () {
                     element.setAttribute("data-end-date", end.format('YYYY-MM-DD'));
                 }
     
-                console.log("Selected Range: " + label);
-    
                 // Store the selected range label in a data attribute
                 element.setAttribute("data-selected-range", label);
             }
@@ -261,7 +267,9 @@ var KTApp = function () {
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'Year to Date': [moment().startOf('year'), moment()],
+                    'Last Year': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
                 }
             }, cb);
     
@@ -271,6 +279,7 @@ var KTApp = function () {
             element.setAttribute("data-kt-initialized", "1");
         });
     }
+    
     
 
     var createSelect2 = function () {
