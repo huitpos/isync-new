@@ -3480,50 +3480,33 @@ var KTWidgets = function () {
 
     // Daterangepicker
     var initDaterangepicker = function () {
-        if (!document.querySelector('#kt_dashboard_daterangepicker')) {
-            return;
-        }
-
-        var picker = $('#kt_dashboard_daterangepicker');
-        var start = moment();
+        var start = moment().subtract(29, "days");
         var end = moment();
 
-        function cb(start, end, label) {
-            var title = '';
-            var range = '';
-
-            if ((end - start) < 100 || label == 'Today') {
-                title = 'Today:';
-                range = start.format('MMM D');
-            } else if (label == 'Yesterday') {
-                title = 'Yesterday:';
-                range = start.format('MMM D');
-            } else {
-                range = start.format('MMM D') + ' - ' + end.format('MMM D');
-            }
-
-            $('#kt_dashboard_daterangepicker_date').html(range);
-            $('#kt_dashboard_daterangepicker_title').html(title);
+        function cb(element, start, end) {
+            element.html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"));
         }
 
-        picker.daterangepicker({
-            direction: KTUtil.isRTL(),
-            startDate: start,
-            endDate: end,
-            opens: 'left',
-            applyClass: 'btn-primary',
-            cancelClass: 'btn-light-primary',
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-            }
-        }, cb);
+        var elements = document.querySelectorAll('.daterange-picker');
+        if (elements.length > 0) {
+            [].slice.call(elements).map(function(element) {
+                alert("here");
+                element.daterangepicker({
+                    startDate: start,
+                    endDate: end,
+                    ranges: {
+                    "Today": [moment(), moment()],
+                    "Yesterday": [moment().subtract(1, "days"), moment().subtract(1, "days")],
+                    "Last 7 Days": [moment().subtract(6, "days"), moment()],
+                    "Last 30 Days": [moment().subtract(29, "days"), moment()],
+                    "This Month": [moment().startOf("month"), moment().endOf("month")],
+                    "Last Month": [moment().subtract(1, "month").startOf("month"), moment().subtract(1, "month").endOf("month")]
+                    }
+                });
+            });
 
-        cb(start, end, '');
+            cb(element, start, end);
+        }
     }
 
     // Dark mode toggler

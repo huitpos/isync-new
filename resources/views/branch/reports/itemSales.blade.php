@@ -12,7 +12,14 @@
                 <div class="row mb-5">
                     <div class="col-md-4">
                         <label class="form-label">Date</label>
-                        <input id="start_date" data-month-select-only="true" value="{{ old('start_date') ?? $dateParam }}" name="start_date" type="text" class="form-control @error('start_date') is-invalid @enderror flatpack-picker" placeholder="Date From" required/>
+                        <input id="date_range" 
+                            data-selected-range="{{ $selectedRangeParam }}" 
+                            data-kt-daterangepicker="true" 
+                            data-start-date="{{ $startDateParam }}" 
+                            data-end-date="{{ $endDateParam }}" 
+                            name="date_range" 
+                            type="text" 
+                            class="form-control"/>
                     </div>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary mt-8">Export</button>

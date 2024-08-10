@@ -155,65 +155,123 @@ var KTApp = function () {
     }
 
     var createDateRangePickers = function() {
-        // Check if jQuery included
+        // Check if jQuery is included
         if (typeof jQuery == 'undefined') {
             return;
         }
-
-        // Check if daterangepicker included
+    
+        // Check if daterangepicker is included
         if (typeof $.fn.daterangepicker === 'undefined') {
             return;
         }
-
+    
         var elements = [].slice.call(document.querySelectorAll('[data-kt-daterangepicker="true"]'));
-        var start = moment().subtract(29, 'days');
-        var end = moment();
-
+    
         elements.map(function (element) {
             if (element.getAttribute("data-kt-initialized") === "1") {
                 return;
             }
-
+    
             var display = element.querySelector('div');
             var attrOpens  = element.hasAttribute('data-kt-daterangepicker-opens') ? element.getAttribute('data-kt-daterangepicker-opens') : 'left';
             var range = element.getAttribute('data-kt-daterangepicker-range');
-
-            var cb = function(start, end) {
+            var selectedRange = element.getAttribute('data-selected-range') || 'Last 30 Days';
+    
+            var start, end;
+    
+            if (selectedRange === 'Custom Range') {
+                // Read custom dates from data attributes
+                var startDateAttr = element.getAttribute('data-start-date');
+                var endDateAttr = element.getAttribute('data-end-date');
+    
+                // Set start and end to custom dates if available
+                start = moment(startDateAttr, 'YYYY-MM-DD');
+                end = moment(endDateAttr, 'YYYY-MM-DD');
+            } else {
+                // Default to predefined ranges
+                switch (selectedRange) {
+                    case 'Today':
+                        start = moment();
+                        end = moment();
+                        break;
+                    case 'Yesterday':
+                        start = moment().subtract(1, 'days');
+                        end = moment().subtract(1, 'days');
+                        break;
+                    case 'Last 7 Days':
+                        start = moment().subtract(6, 'days');
+                        end = moment();
+                        break;
+                    case 'Last 30 Days':
+                        start = moment().subtract(29, 'days');
+                        end = moment();
+                        break;
+                    case 'This Month':
+                        start = moment().startOf('month');
+                        end = moment().endOf('month');
+                        break;
+                    case 'Last Month':
+                        start = moment().subtract(1, 'month').startOf('month');
+                        end = moment().subtract(1, 'month').endOf('month');
+                        break;
+                    default:
+                        // Handle any other cases or defaults
+                        start = moment().subtract(29, 'days');
+                        end = moment();
+                        break;
+                }
+            }
+    
+            // Callback function that will be executed when a date range is selected
+            var cb = function(start, end, label) {
                 var current = moment();
-
+    
+                // If display element is present
                 if (display) {
-                    if ( current.isSame(start, "day") && current.isSame(end, "day") ) {
+                    // Check if the start and end dates are the same (single day selection)
+                    if (current.isSame(start, "day") && current.isSame(end, "day")) {
                         display.innerHTML = start.format('D MMM YYYY');
                     } else {
                         display.innerHTML = start.format('D MMM YYYY') + ' - ' + end.format('D MMM YYYY');
                     }
                 }
+    
+                // Check if the user selected a custom range
+                if (label === 'Custom Range') {
+                    element.setAttribute("data-start-date", start.format('YYYY-MM-DD'));
+                    element.setAttribute("data-end-date", end.format('YYYY-MM-DD'));
+                } else {
+                    element.setAttribute("data-start-date", start.format('YYYY-MM-DD'));
+                    element.setAttribute("data-end-date", end.format('YYYY-MM-DD'));
+                }
+    
+                console.log("Selected Range: " + label);
+    
+                // Store the selected range label in a data attribute
+                element.setAttribute("data-selected-range", label);
             }
-
-            if ( range === "today" ) {
-                start = moment();
-                end = moment();
-            }
-
+    
             $(element).daterangepicker({
                 startDate: start,
                 endDate: end,
                 opens: attrOpens,
                 ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                 }
             }, cb);
-
-            cb(start, end);
-
+    
+            // Initial call to set the display
+            cb(start, end, selectedRange);
+    
             element.setAttribute("data-kt-initialized", "1");
         });
     }
+    
 
     var createSelect2 = function () {
         // Check if jQuery included
