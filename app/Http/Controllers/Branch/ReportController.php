@@ -22,8 +22,11 @@ use App\Exports\XReadingReportExport;
 use App\Exports\ZReadingReportExport;
 use App\Exports\SalesInvoicesReportExport;
 use App\Exports\DiscountsReportExport;
+use App\Exports\ItemSalesReportExport;
 
 use Maatwebsite\Excel\Facades\Excel;
+
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
@@ -278,5 +281,64 @@ class ReportController extends Controller
             ->get();
 
         return view('branch.reports.discountsReport', compact('company', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes'));
+    }
+
+    public function itemSales(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+
+        $branch = $request->attributes->get('branch');
+
+        $branchId = $branch->id;
+
+        $dateParam = $request->input('start_date', date('F Y'));
+
+        $parsedDate = Carbon::parse($dateParam);
+
+        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
+        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+
+        if ($request->isMethod('post') && !$request->input('search')) {
+            $branch = Branch::find($branchId);
+            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $dateParam.xlsx");
+        }
+
+        $query = "SELECT
+                    transactional_db.orders.product_id,
+                    products.name AS `product_name`,
+                    products.sku,
+                    products.cost,
+                    products.srp,
+                    departments.name AS `department`,
+                    SUM(transactional_db.orders.gross) AS gross,
+                    SUM(transactional_db.orders.qty) AS qty,
+                    SUM(transactional_db.discount_details.discount_amount) AS `discount`,
+                    SUM(transactional_db.orders.total) AS `net`
+                FROM transactional_db.transactions
+                INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                    AND transactions.branch_id = orders.branch_id
+                    AND transactions.pos_machine_id = orders.pos_machine_id
+                    AND orders.is_void = FALSE
+                    AND orders.is_completed = TRUE
+                    AND orders.is_back_out = FALSE
+                LEFT JOIN transactional_db.discount_details ON orders.order_id = discount_details.order_id
+                    AND orders.branch_id = discount_details.branch_id
+                    AND orders.pos_machine_id = discount_details.pos_machine_id
+                INNER JOIN isync.products ON orders.product_id = products.id
+                INNER JOIN isync.departments on products.department_id = departments.id
+                WHERE transactions.is_complete = TRUE
+                    AND transactions.branch_id = $branchId
+                    AND transactions.is_void = FALSE
+                    AND transactions.is_back_out = FALSE
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+                GROUP BY orders.product_id";
+
+        $itemSales = DB::select($query);
+
+        // Convert the array of objects into a collection
+        $itemSales = collect($itemSales);
+
+        return view('branch.reports.itemSales', compact('company', 'branchId', 'dateParam', 'itemSales'));
     }
 }
