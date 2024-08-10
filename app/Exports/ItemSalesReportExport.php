@@ -11,6 +11,10 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+
 
 use App\Models\CutOff;
 use App\Models\Branch;
@@ -200,6 +204,10 @@ class ItemSalesReportExport implements FromCollection, WithHeadings, WithMapping
                 $event->sheet->setCellValue('H10', number_format(100, 2));
 
                 $totalRows = $event->sheet->getHighestRow();
+
+                $cellRange = 'A9:J'.$totalRows;
+                $event->sheet->getStyle($cellRange)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                $event->sheet->getStyle($cellRange)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
             },
         ];
     }
@@ -214,5 +222,4 @@ class ItemSalesReportExport implements FromCollection, WithHeadings, WithMapping
         }
         return $letter;
     }
-
 }

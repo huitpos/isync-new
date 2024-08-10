@@ -318,16 +318,21 @@ class ReportController extends Controller
 
         $branchId = $request->input('branch_id', $branches->first()->id);
 
-        $dateParam = $request->input('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        //startDate = 29 days ago
+        $startDate = Carbon::now()->subDays(29)->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
 
         if ($request->isMethod('post') && !$request->input('search')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $dateParam.xlsx");
+            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
         }
 
         $query = "SELECT
@@ -365,6 +370,10 @@ class ReportController extends Controller
         // Convert the array of objects into a collection
         $itemSales = collect($itemSales);
 
-        return view('company.reports.itemSales', compact('company', 'branches', 'branchId', 'dateParam', 'itemSales'));
+        $selectedRangeParam = $request->input('selectedRange', 'Last 30 Days');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.itemSales', compact('company', 'branches', 'branchId', 'dateParam', 'itemSales', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 }
