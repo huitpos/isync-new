@@ -269,6 +269,12 @@
 								<span class="menu-title">Discounts Report</span>
 							</a>
 						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.item-sales-report') ? 'active' : '' }}" href="{{ route('branch.reports.item-sales-report', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Item Sales Report</span>
+							</a>
+						</div>
 					</div>
 				</div>
 
@@ -611,6 +617,12 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.reports.discounts-report') ? 'active' : '' }}" href="{{ route('company.reports.discounts-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Discounts Report</span>
+							</a>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.item-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.item-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Item Sales Report</span>
 							</a>
 						</div>
 					</div>
