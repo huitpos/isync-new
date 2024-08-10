@@ -176,6 +176,7 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'x-reading-report', [CompanyReportController::class, 'xReadingReport'])->name('company.reports.x-reading-report');
             Route::match(['get', 'post'], 'z-reading-report', [CompanyReportController::class, 'zReadingReport'])->name('company.reports.z-reading-report');
             Route::match(['get', 'post'], 'discounts-report', [CompanyReportController::class, 'discountsReport'])->name('company.reports.discounts-report');
+            Route::match(['get', 'post'], 'item-sales', [CompanyReportController::class, 'itemSales'])->name('company.reports.item-sales-report');
         });
 
         //branch
@@ -206,7 +207,8 @@ Route::middleware('auth')->group(function () {
                 Route::match(['get', 'post'], 'vat-sales-report', [BranchReportController::class, 'vatSalesReport'])->name('branch.reports.vat-sales-report');
                 Route::match(['get', 'post'], 'x-reading-report', [BranchReportController::class, 'xReadingReport'])->name('branch.reports.x-reading-report');
                 Route::match(['get', 'post'], 'z-reading-report', [BranchReportController::class, 'zReadingReport'])->name('branch.reports.z-reading-report');
-                Route::match(['get', 'post'], 'discounts_reports', [BranchReportController::class, 'discountsReport'])->name('branch.reports.discounts-report');
+                Route::match(['get', 'post'], 'discounts-reports', [BranchReportController::class, 'discountsReport'])->name('branch.reports.discounts-report');
+                Route::match(['get', 'post'], 'item-sales', [BranchReportController::class, 'itemSales'])->name('branch.reports.item-sales-report');
             });
         });
     });
