@@ -29,7 +29,9 @@
                             data-end-date="{{ $endDateParam }}" 
                             name="date_range" 
                             type="text" 
-                            class="form-control"/>
+                            class="form-control"
+                            data-kt-daterangepicker-opens="right"
+                        />
                     </div>
 
                     <div class="col-md-4">

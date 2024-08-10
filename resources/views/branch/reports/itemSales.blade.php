@@ -19,7 +19,9 @@
                             data-end-date="{{ $endDateParam }}" 
                             name="date_range" 
                             type="text" 
-                            class="form-control"/>
+                            class="form-control"
+                            data-kt-daterangepicker-opens="right"
+                        />
                     </div>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary mt-8">Export</button>
