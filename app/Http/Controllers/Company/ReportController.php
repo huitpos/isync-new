@@ -386,17 +386,59 @@ class ReportController extends Controller
         $branchId = $request->input('branch_id', $branches->first()->id);
         $productId = $request->query('product_id', null);
 
+        $dateParam = $request->input('date_range', null);
+
+        //startDate = 29 days ago
+        $startDate = Carbon::now()->subDays(29)->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
         $product = null;
         $pivotData = null;
         $transactions = null;
+        $physicalCounts = null;
         if ($branchId && $productId) {
             $product = Product::findOrFail($productId);
 
             $pivotData = $product->branches->where('id', $branchId)->first()?->pivot;
 
-            $transactionQuery = "SELECT";
+            $transactionQuery = "SELECT
+                    transactions.treg as `trasaction_date`,
+                    transactions.receipt_number,
+                    orders.qty,
+                    unit_of_measurements.name as `unit`,
+                    orders.gross,
+                    orders.cost,
+                    orders.gross - orders.total_cost as `profit`
+                FROM transactional_db.transactions
+                INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                    AND transactions.branch_id = orders.branch_id
+                    AND transactions.pos_machine_id = orders.pos_machine_id
+                    AND orders.is_void = FALSE
+                    AND orders.is_completed = TRUE
+                    AND orders.is_back_out = FALSE
+                INNER JOIN isync.products ON orders.product_id = products.id
+                INNER JOIN isync.unit_of_measurements on orders.unit_id = unit_of_measurements.id
+                WHERE transactions.is_complete = TRUE
+                    AND transactions.branch_id = $branchId
+                    AND transactions.is_void = FALSE
+                    AND transactions.is_back_out = FALSE
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'";
 
             $transactions = DB::select($transactionQuery);
+
+            $physicalCountQuery = "Select
+                    product_physical_counts.created_at as `physical_count_date`
+                FROM product_physical_counts
+                INNER JOIN product_physical_count_items ON product_physical_counts.id = product_physical_count_items.product_physical_count_id";
+
+            $physicalCounts = DB::select($physicalCountQuery);
+            dd($physicalCounts);
         }
 
         dd($transactions);
