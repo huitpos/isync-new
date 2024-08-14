@@ -4,7 +4,7 @@
         Sales Invoices Report
     @endsection
 
-    <div class="card">
+    <div class="card mb-5">
         <div class="card-body py-4">
             <form class="mt-3" method="POST" novalidate>
                 @csrf
@@ -124,13 +124,87 @@
                 </div>
 
                 <div class="col-md-2">
-                    @if($product->image)
+                    @if($product && $product->image)
                     <div class="pb-1 fs-6">
                         <div class="text-gray-600">
                             <div class="image-input-wrapper w-250px h-250px" style="border: 1px dashed #92A0B3; background-size:contain; background-repeat: no-repeat; background-image: url('{{ Storage::disk('s3')->url($product->image) }}'); background-position: center;"></div>
                         </div>
                     </div>
                     @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body py-4">
+            <ul class="nav nav-pills nav-pills-custom mb-3">
+                <li class="nav-item mb-3 me-3 me-lg-6">
+                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5 active" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#physical_count_div">
+                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Physical Count</span>
+                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3 me-3 me-lg-6">
+                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#transactions_div">
+                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Transactions</span>
+                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3 me-3 me-lg-6">
+                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#incoming_stocks_div">
+                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Incoming Stocks</span>
+                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3 me-3 me-lg-6">
+                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#transfer_stock_in_div">
+                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Transfer Stocks (In)</span>
+                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3 me-3 me-lg-6">
+                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#transfer_stock_out_div">
+                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Transfer Stocks (Out)</span>
+                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3 me-3 me-lg-6">
+                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#disposal_div">
+                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Disposal</span>
+                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="physical_count_div">
+                    physicl count1
+                </div>
+
+                <div class="tab-pane fade" id="transactions_div">
+                    physicl count2
+                </div>
+
+                <div class="tab-pane fade" id="incoming_stocks_div">
+                    physicl count3
+                </div>
+
+                <div class="tab-pane fade" id="transfer_stock_in_div">
+                    physicl count4
+                </div>
+
+                <div class="tab-pane fade" id="transfer_stock_out_div">
+                    physicl count5
+                </div>
+
+                <div class="tab-pane fade" id="disposal_div">
+                    physicl count6
                 </div>
             </div>
         </div>

@@ -388,11 +388,18 @@ class ReportController extends Controller
 
         $product = null;
         $pivotData = null;
+        $transactions = null;
         if ($branchId && $productId) {
             $product = Product::findOrFail($productId);
 
             $pivotData = $product->branches->where('id', $branchId)->first()?->pivot;
+
+            $transactionQuery = "SELECT";
+
+            $transactions = DB::select($transactionQuery);
         }
+
+        dd($transactions);
 
         return view('company.reports.stockCard', compact('company', 'branches', 'branchId', 'productId', 'product', 'pivotData'));
     }
