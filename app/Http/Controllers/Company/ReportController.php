@@ -353,6 +353,7 @@ class ReportController extends Controller
                     AND orders.is_void = FALSE
                     AND orders.is_completed = TRUE
                     AND orders.is_back_out = FALSE
+                    AND orders.is_return = FALSE
                 LEFT JOIN transactional_db.discount_details ON orders.order_id = discount_details.order_id
                     AND orders.branch_id = discount_details.branch_id
                     AND orders.pos_machine_id = discount_details.pos_machine_id
