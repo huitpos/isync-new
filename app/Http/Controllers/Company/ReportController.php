@@ -372,7 +372,7 @@ class ReportController extends Controller
         // Convert the array of objects into a collection
         $itemSales = collect($itemSales);
 
-        $selectedRangeParam = $request->input('selectedRange', 'Last 30 Days');
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
@@ -576,7 +576,7 @@ class ReportController extends Controller
             $disposals = DB::select($disposalQuery);
         }
 
-        $selectedRangeParam = $request->input('selectedRange', 'Last 30 Days');
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
