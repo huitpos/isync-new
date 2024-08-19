@@ -88,6 +88,10 @@ class AjaxController extends Controller
             $productsQuery->where('department_id', $request->department_id);
         }
 
+        if ($request->has('company_id')) {
+            $productsQuery->where('company_id', $request->company_id);
+        }
+
         if ($request->has('term')) {
             $term = '%' . $request->term . '%'; // Add wildcard % before and after the search term
             $productsQuery->where('name', 'like', $term);

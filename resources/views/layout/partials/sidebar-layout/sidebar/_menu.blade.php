@@ -275,6 +275,12 @@
 								<span class="menu-title">Item Sales Report</span>
 							</a>
 						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.stock-card') ? 'active' : '' }}" href="{{ route('branch.reports.stock-card', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Stock Card</span>
+							</a>
+						</div>
 					</div>
 				</div>
 
@@ -566,64 +572,76 @@
 					</span>
 
 					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.sales-invoices-report') ? 'active' : '' }}" href="{{ route('company.reports.sales-invoices-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Sales Invoices Report</span>
-							</a>
-						</div>
-					</div>
+						<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+							<span class="menu-link">
+								<span class="menu-title">Sales Reports</span>
+								<span class="menu-arrow"></span>
+							</span>
 
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.sales-transaction-report') ? 'active' : '' }}" href="{{ route('company.reports.sales-transaction-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Sales Transaction Report</span>
-							</a>
-						</div>
-					</div>
+							<div class="menu-sub menu-sub-accordion pt-3">
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.sales-invoices-report') ? 'active' : '' }}" href="{{ route('company.reports.sales-invoices-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Sales Invoices Report</span>
+									</a>
+								</div>
+		
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.sales-transaction-report') ? 'active' : '' }}" href="{{ route('company.reports.sales-transaction-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Sales Transaction Report</span>
+									</a>
+								</div>
+		
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.void-transactions-report') ? 'active' : '' }}" href="{{ route('company.reports.void-transactions-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Void Transactions Report</span>
+									</a>
+								</div>
+		
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.vat-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.vat-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Vat Sales Report</span>
+									</a>
+								</div>
+		
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.x-reading-report') ? 'active' : '' }}" href="{{ route('company.reports.x-reading-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">X Reading Report</span>
+									</a>
+								</div>
+		
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.z-reading-report') ? 'active' : '' }}" href="{{ route('company.reports.z-reading-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Z Reading Report</span>
+									</a>
+								</div>
+		
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.discounts-report') ? 'active' : '' }}" href="{{ route('company.reports.discounts-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Discounts Report</span>
+									</a>
+								</div>
 
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.void-transactions-report') ? 'active' : '' }}" href="{{ route('company.reports.void-transactions-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Void Transactions Report</span>
-							</a>
-						</div>
-					</div>
-
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.vat-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.vat-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Vat Sales Report</span>
-							</a>
-						</div>
-					</div>
-
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.x-reading-report') ? 'active' : '' }}" href="{{ route('company.reports.x-reading-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">X Reading Report</span>
-							</a>
-						</div>
-					</div>
-
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.z-reading-report') ? 'active' : '' }}" href="{{ route('company.reports.z-reading-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Z Reading Report</span>
-							</a>
-						</div>
-					</div>
-
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.discounts-report') ? 'active' : '' }}" href="{{ route('company.reports.discounts-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Discounts Report</span>
-							</a>
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.item-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.item-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Item Sales Report</span>
+									</a>
+								</div>
+							</div>
 						</div>
 
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.reports.item-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.item-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Item Sales Report</span>
-							</a>
+						<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+							<span class="menu-link">
+								<span class="menu-title">Inventory Reports</span>
+								<span class="menu-arrow"></span>
+							</span>
+
+							<div class="menu-sub menu-sub-accordion pt-3">
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.stock-card') ? 'active' : '' }}" href="{{ route('company.reports.stock-card', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Stock Card</span>
+									</a>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
