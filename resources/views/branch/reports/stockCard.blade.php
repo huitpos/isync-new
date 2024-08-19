@@ -10,17 +10,7 @@
                 @csrf
 
                 <div class="row mb-10">
-                    <div class="col-md-6">
-                        <label class="form-label">Branch</label>
-
-                        <select id="branch_id" name="branch_id" class="form-select @error('branch') is-invalid @enderror" required>
-                            @foreach ($branches as $branch)
-                                <option value="{{ $branch->id }}" {{ $branch->id == $branchId ? 'selected' : '' }}>{{ $branch->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="form-label">Product</label>
                         
                         <input type="hidden" id="company_id" value="{{ $company->id }}">
@@ -412,21 +402,15 @@
             $("#stock_transfer_out_table").DataTable();
             $("#disposal_table").DataTable();
 
-            //if branch_id is changed and product_id, reload the page with those values. same url
-            document.getElementById('branch_id').addEventListener('change', function() {
-                reload();
-            });
-
             $("#product_id").on('change', function(e) {
                 reload();
             });
 
             function reload()
             {
-                let branch_id = document.getElementById('branch_id').value;
                 let product_id = document.getElementById('product_id').value;
 
-                if (!branch_id || !product_id) {
+                if (!product_id) {
                     return;
                 }
 
@@ -450,7 +434,6 @@
 
                 var url = new URL(window.location.href);
 
-                url.searchParams.set('branch_id', branch_id);
                 url.searchParams.set('product_id', product_id);
 
                 url.searchParams.set('selectedRange', selectedRange);

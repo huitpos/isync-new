@@ -398,17 +398,22 @@ class ReportController extends Controller
             $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
         }
 
-        $product = null;
-        $pivotData = null;
-        $transactions = null;
-        $physicalCounts = null;
+        $product = [];
+        $pivotData = [];
+        $transactions = [];
+        $physicalCounts = [];
+        $incomingStocks = [];
+        $stockTransferIn = [];
+        $stockTransferOut = [];
+        $disposals = [];
         if ($branchId && $productId) {
             $product = Product::findOrFail($productId);
 
             $pivotData = $product->branches->where('id', $branchId)->first()?->pivot;
 
-            $transactionQuery = "SELECT
-                    transactions.treg as `trasaction_date`,
+            $transactionQuery = "
+                SELECT
+                    transactions.treg as `transaction_date`,
                     transactions.receipt_number,
                     orders.qty,
                     unit_of_measurements.name as `unit`,
@@ -428,21 +433,168 @@ class ReportController extends Controller
                     AND transactions.branch_id = $branchId
                     AND transactions.is_void = FALSE
                     AND transactions.is_back_out = FALSE
-                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'";
+                    AND orders.product_id = $productId
+                    -- AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+                ";
 
             $transactions = DB::select($transactionQuery);
 
-            $physicalCountQuery = "Select
-                    product_physical_counts.created_at as `physical_count_date`
-                FROM product_physical_counts
-                INNER JOIN product_physical_count_items ON product_physical_counts.id = product_physical_count_items.product_physical_count_id";
+            $physicalCountQuery = "
+                    SELECT
+                        product_physical_counts.created_at AS `physical_count_date`,
+                        product_physical_count_items.quantity,
+                        product_count_logs.old_quantity,
+                        product_count_logs.new_quantity,
+                        CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
+                        CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
+                        unit_of_measurements.`name` AS `uom`
+                    FROM product_physical_counts
+                    INNER JOIN product_physical_count_items ON product_physical_counts.id = product_physical_count_items.product_physical_count_id
+                    INNER JOIN users createdBy ON product_physical_counts.created_by = createdBy.id
+                    INNER JOIN unit_of_measurements ON product_physical_count_items.uom_id = unit_of_measurements.id
+                    LEFT JOIN users actionBy ON product_physical_counts.action_by = actionBy.id
+                    LEFT JOIN product_count_logs ON product_physical_count_items.product_id = product_count_logs.product_id
+                        AND product_count_logs.branch_id = product_physical_counts.branch_id
+                        AND product_count_logs.object_id = product_physical_counts.id
+                        AND product_count_logs.object_type = 'product_physical_counts'
+                    WHERE product_physical_count_items.product_id = $productId
+                        AND product_physical_counts.branch_id = $branchId
+                        AND product_physical_counts.created_at BETWEEN '$startDate' AND '$endDate'
+                ";
 
             $physicalCounts = DB::select($physicalCountQuery);
-            dd($physicalCounts);
+
+            $incomingStocksQuery = "
+                SELECT purchase_deliveries.created_at AS `delivery_date`,
+                    purchase_orders.po_number,
+                    purchase_deliveries.pd_number,
+                    suppliers.`name` AS `supplier`,
+                    purchase_deliveries.sales_invoice_number,
+                    purchase_delivery_items.qty,
+                    purchase_delivery_items.unit_price,
+                    CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
+                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`
+                FROM purchase_deliveries
+                INNER JOIN purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
+                INNER JOIN purchase_orders ON purchase_deliveries.purchase_order_id = purchase_orders.id
+                INNER JOIN suppliers ON purchase_orders.supplier_id = suppliers.id
+                INNER JOIN users createdBy ON purchase_deliveries.created_by = createdBy.id
+                LEFT JOIN users actionBy ON purchase_deliveries.action_by = actionBy.id
+                WHERE purchase_deliveries.status = 'approved'
+                    AND purchase_delivery_items.product_id = $productId
+                    AND purchase_deliveries.branch_id = $branchId
+                    AND purchase_deliveries.created_at BETWEEN '$startDate' AND '$endDate'
+            ";
+
+            $incomingStocks = DB::select($incomingStocksQuery);
+
+            $stockTransferInQuery = "
+                SELECT stock_transfer_deliveries.created_at AS `delivery_date`,
+                    stock_transfer_orders.sto_number,
+                    stock_transfer_deliveries.std_number,
+                    source_branch.name AS `source_branch`,
+                    destination_branch.name AS `destination_branch`,
+                    stock_transfer_delivery_items.qty,
+                    unit_of_measurements.`name` AS `uom`,
+                    products.cost,
+                    CONCAT(requestedBy.first_name, ' ', requestedBy.last_name) AS `requested_by`,
+                    CONCAT(approvedBy.first_name, ' ', approvedBy.last_name) AS `approved_by`,
+                    CONCAT(receivedBy.first_name, ' ', receivedBy.last_name) AS `received_by`
+                FROM stock_transfer_deliveries
+                INNER JOIN stock_transfer_delivery_items ON stock_transfer_delivery_items.stock_transfer_delivery_id = stock_transfer_deliveries.id
+                INNER JOIN stock_transfer_orders ON stock_transfer_deliveries.stock_transfer_order_id = stock_transfer_orders.id
+                INNER JOIN stock_transfer_requests ON stock_transfer_orders.stock_transfer_request_id = stock_transfer_requests.id
+                INNER JOIN branches AS source_branch ON stock_transfer_requests.source_branch_id = source_branch.id
+                INNER JOIN branches AS destination_branch ON stock_transfer_requests.destination_branch_id = destination_branch.id
+                INNER JOIN unit_of_measurements ON stock_transfer_delivery_items.uom_id = unit_of_measurements.id
+                INNER JOIN products ON stock_transfer_delivery_items.product_id = products.id
+                INNER JOIN users AS requestedBy ON stock_transfer_requests.created_by = requestedBy.id
+                INNER JOIN users AS approvedBy ON stock_transfer_requests.action_by = approvedBy.id
+                INNER JOIN users AS receivedBy ON stock_transfer_deliveries.created_by = receivedBy.id 
+                WHERE stock_transfer_deliveries.status = 'approved'
+                    AND stock_transfer_delivery_items.product_id = $productId
+                    AND stock_transfer_requests.destination_branch_id = $branchId
+                    AND stock_transfer_requests.created_at BETWEEN '$startDate' AND '$endDate'
+            ";
+
+            $stockTransferIn = DB::select($stockTransferInQuery);
+
+            $stockTransferOutQuery = "
+                SELECT stock_transfer_deliveries.created_at AS `delivery_date`,
+                    stock_transfer_orders.sto_number,
+                    stock_transfer_deliveries.std_number,
+                    source_branch.name AS `source_branch`,
+                    destination_branch.name AS `destination_branch`,
+                    stock_transfer_delivery_items.qty,
+                    unit_of_measurements.`name` AS `uom`,
+                    products.cost,
+                    CONCAT(requestedBy.first_name, ' ', requestedBy.last_name) AS `requested_by`,
+                    CONCAT(approvedBy.first_name, ' ', approvedBy.last_name) AS `approved_by`,
+                    CONCAT(receivedBy.first_name, ' ', receivedBy.last_name) AS `received_by`
+                FROM stock_transfer_deliveries
+                INNER JOIN stock_transfer_delivery_items ON stock_transfer_delivery_items.stock_transfer_delivery_id = stock_transfer_deliveries.id
+                INNER JOIN stock_transfer_orders ON stock_transfer_deliveries.stock_transfer_order_id = stock_transfer_orders.id
+                INNER JOIN stock_transfer_requests ON stock_transfer_orders.stock_transfer_request_id = stock_transfer_requests.id
+                INNER JOIN branches AS source_branch ON stock_transfer_requests.source_branch_id = source_branch.id
+                INNER JOIN branches AS destination_branch ON stock_transfer_requests.destination_branch_id = destination_branch.id
+                INNER JOIN unit_of_measurements ON stock_transfer_delivery_items.uom_id = unit_of_measurements.id
+                INNER JOIN products ON stock_transfer_delivery_items.product_id = products.id
+                INNER JOIN users AS requestedBy ON stock_transfer_requests.created_by = requestedBy.id
+                INNER JOIN users AS approvedBy ON stock_transfer_requests.action_by = approvedBy.id
+                INNER JOIN users AS receivedBy ON stock_transfer_deliveries.created_by = receivedBy.id 
+                WHERE stock_transfer_deliveries.status = 'approved'
+                    AND stock_transfer_delivery_items.product_id = $productId
+                    AND stock_transfer_requests.source_branch_id = $branchId
+                    AND stock_transfer_requests.created_at BETWEEN '$startDate' AND '$endDate'
+            ";
+
+            $stockTransferOut = DB::select($stockTransferOutQuery);
+
+            $disposalQuery = "
+                SELECT product_disposals.created_at AS `date`,
+                    product_disposal_items.quantity,
+                    unit_of_measurements.`name` AS `uom`,
+                    products.cost,
+                    product_disposal_reasons.`name` AS `reason`,
+                    CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
+                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`
+                FROM product_disposals
+                INNER JOIN product_disposal_items ON product_disposal_items.product_disposal_id = product_disposals.id
+                INNER JOIN unit_of_measurements ON product_disposal_items.uom_id = unit_of_measurements.id
+                INNER JOIN products ON product_disposal_items.product_id = products.id
+                INNER JOIN product_disposal_reasons ON product_disposals.product_disposal_reason_id = product_disposal_reasons.id
+                INNER JOIN users createdBy ON product_disposals.created_by = createdBy.id
+                LEFT JOIN users actionBy ON product_disposals.action_by = actionBy.id
+                WHERE product_disposals.status = 'approved'
+                    AND product_disposal_items.product_id = $productId
+                    AND product_disposals.created_at BETWEEN '$startDate' AND '$endDate'
+            ";
+
+            // echo($disposalQuery);
+            // die();
+            $disposals = DB::select($disposalQuery);
         }
 
-        dd($transactions);
+        $selectedRangeParam = $request->input('selectedRange', 'Last 30 Days');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.stockCard', compact('company', 'branches', 'branchId', 'productId', 'product', 'pivotData'));
+        return view('company.reports.stockCard', compact(
+            'company',
+            'branches',
+            'branchId',
+            'productId',
+            'product',
+            'pivotData',
+            'physicalCounts',
+            'transactions',
+            'incomingStocks',
+            'stockTransferIn',
+            'stockTransferOut',
+            'disposals',
+            'selectedRangeParam',
+            'startDateParam',
+            'endDateParam',
+        ));
     }
 }
