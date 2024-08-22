@@ -36,6 +36,7 @@ use App\Models\TakeOrderDiscountDetail;
 use App\Models\TakeOrderDiscountOtherInformation;
 use App\Models\CashFund;
 use App\Models\CashFundDenomination;
+use App\Models\AuditTrail;
 
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
@@ -131,6 +132,22 @@ class MiscController extends BaseController
         return $this->sendResponse($chargeAccounts, 'Charge Accounts retrieved successfully.');
     }
 
+    public function priceChangeReasons(Request $request, $branchId)
+    {
+        $branch = Branch::with([
+            'company',
+            'company.products' => function ($query) {
+                $query->whereHas('itemType', function ($subQuery) {
+                    $subQuery->where('show_in_cashier', true);
+                })->with('bundledItems', 'rawItems');
+            },
+        ])->find($branchId);
+
+        $products = $branch->company->changePriceReasons()->get();
+
+        return $this->sendResponse($products, 'Price Change Reasons retrieved successfully.');
+    }
+
     public function products(Request $request, $branchId)
     {
         $branch = Branch::with([
@@ -144,6 +161,7 @@ class MiscController extends BaseController
 
         if ($request->from_date) {
             $products = $branch->company->products()
+                ->with('itemType')
                 ->where(function ($query) use ($request) {
                     $query->where('updated_at', '>=', $request->from_date)
                           ->orWhere('created_at', '>=', $request->from_date);
@@ -152,6 +170,7 @@ class MiscController extends BaseController
                 ->get();
         } else {
             $products = $branch->company->products()
+                ->with('itemType')
                 ->where('uom_id', '>', 0)
                 ->get();
         }
@@ -2520,5 +2539,86 @@ class MiscController extends BaseController
         }
 
         return $this->sendResponse($records, 'cash fund denomination retrieved successfully.');
+    }
+
+    public function saveAuditTrails(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'audit_trail_id' => 'required',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+            'user_id' => 'required',
+            'transaction_id' => 'required',
+            'authorize_id' => 'required',
+            'is_sent_to_server' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'audit_trail_id' => $request->audit_trail_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'user_id' => $request->user_id,
+            'user_name' => $request->user_name,
+            'transaction_id' => $request->transaction_id,
+            'action' => $request->action,
+            'description' => $request->description,
+            'authorize_id' => $request->authorize_id,
+            'authorize_name' => $request->authorize_name,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg
+        ];
+
+        $message = 'Audit Trail created successfully.';
+        $record = AuditTrail::where([
+            'audit_trail_id' => $request->audit_trail_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Audit Trail updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(AuditTrail::create($postData), $message);
+    }
+
+    public function getAuditTrails(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = AuditTrail::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = AuditTrail::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('audit_trail_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'audit trail retrieved successfully.');
     }
 }
