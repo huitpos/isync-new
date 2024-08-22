@@ -360,6 +360,33 @@ paths:
                 items:
                   type: string
   
+  /api/price-change-reasons/{branchId}:
+    get:
+      tags:
+        - Sync From Server
+      summary: Get all charge price change reasons by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  
   /api/branch-products/{branchId}:
     get:
       tags:
@@ -2777,6 +2804,86 @@ paths:
       tags:
         - Sync From Server
       summary: Get cash fund denomination by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/audit-trails:
+    post:
+      tags:
+        - Sync To Server
+      summary: Send audit trail to the server.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                audit_trail_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                user_id:
+                  type: integer
+                user_name:
+                  type: string
+                transaction_id:
+                  type: integer
+                action:
+                  type: string
+                description:
+                  type: string
+                authorize_id:
+                  type: integer
+                authorize_name:
+                  type: string
+                  default: null
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      summary: Get audit trail by machine ID.
       parameters:
         - in: query
           name: branch_id

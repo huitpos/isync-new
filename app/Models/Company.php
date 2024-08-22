@@ -153,4 +153,9 @@ class Company extends Model
     {
         return $this->hasMany(ItemLocation::class);
     }
+
+    public function changePriceReasons()
+    {
+        return $this->hasMany(ChangePriceReason::class);
+    }
 }
