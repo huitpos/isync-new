@@ -550,6 +550,12 @@
 								<span class="menu-title">Item Locations</span>
 							</a>
 						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.change-price-reasons.*') ? 'active' : '' }}" href="{{ route('company.change-price-reasons.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Change Price Reasons</span>
+							</a>
+						</div>
 					</div>
 				</div>
 				@endif
