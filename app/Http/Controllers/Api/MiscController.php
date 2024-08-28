@@ -168,7 +168,8 @@ class MiscController extends BaseController
             $products = $branch->company->products()
                 ->with(
                     'itemType',
-                    'uom'
+                    'uom',
+                    'itemLocations'
                 )
                 ->where(function ($query) use ($request) {
                     $query->where('updated_at', '>=', $request->from_date)
@@ -180,7 +181,8 @@ class MiscController extends BaseController
             $products = $branch->company->products()
                 ->with(
                     'itemType',
-                    'uom'
+                    'uom',
+                    'itemLocations'
                 )
                 ->where('uom_id', '>', 0)
                 ->get();
