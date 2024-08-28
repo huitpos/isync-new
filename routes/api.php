@@ -147,6 +147,24 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/audit-trails', [MiscController::class, 'saveAuditTrails']);
         Route::get('/audit-trails', [MiscController::class, 'getAuditTrails']);
+
+        Route::get('/cut-off-products', [MiscController::class, 'getCutOffProducts']);
+        Route::post('/cut-off-products', [MiscController::class, 'saveCutOffProducts']);
+
+        Route::get('/payouts', [MiscController::class, 'getPayouts']);
+        Route::post('/payouts', [MiscController::class, 'savePayouts']);
+
+        Route::get('/official-receipt-informations', [MiscController::class, 'getOfficialReceiptInformations']);
+        Route::post('/official-receipt-informations', [MiscController::class, 'saveOfficialReceiptInformations']);
+
+        Route::get('/spot-audits', [MiscController::class, 'getSpotAudits']);
+        Route::post('/spot-audits', [MiscController::class, 'saveSpotAudits']);
+
+        Route::get('/spot-audit-denominations', [MiscController::class, 'getSpotAuditDenominations']);
+        Route::post('/spot-audit-denominations', [MiscController::class, 'saveSpotAuditDenominations']);
+
+        Route::get('/end-of-day-products', [MiscController::class, 'getEndOfDayProducts']);
+        Route::post('/end-of-day-products', [MiscController::class, 'saveEndOfDayProducts']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
