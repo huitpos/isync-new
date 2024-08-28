@@ -3455,3 +3455,34 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /api/branch-product-soh:
+    get:
+      tags:
+        - Sync From Server
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: product_id
+          schema:
+            type: integer
+          required: true
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
