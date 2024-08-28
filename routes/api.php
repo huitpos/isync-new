@@ -65,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/discount-types/{branchId}', [MiscController::class, 'discountTypes']);
         Route::get('/charge-accounts/{branchId}', [MiscController::class, 'chargeAccounts']);
         Route::get('/branch-products/{branchId}', [MiscController::class, 'products']);
+        Route::get('/price-change-reasons/{branchId}', [MiscController::class, 'priceChangeReasons']);
 
         Route::get('/branch-transactions', [MiscController::class, 'getTransactions']);
         Route::post('/branch-transactions', [MiscController::class, 'saveTransactions']);
@@ -143,6 +144,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/cash-fund-denominations', [MiscController::class, 'getCashFundDenominations']);
         Route::post('/cash-fund-denominations', [MiscController::class, 'saveCashFundDenominations']);
+
+        Route::post('/audit-trails', [MiscController::class, 'saveAuditTrails']);
+        Route::get('/audit-trails', [MiscController::class, 'getAuditTrails']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
