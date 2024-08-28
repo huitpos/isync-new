@@ -144,6 +144,10 @@ class MiscController extends BaseController
 
         if ($request->from_date) {
             $products = $branch->company->products()
+                ->with(
+                    'itemType',
+                    'uom'
+                )
                 ->where(function ($query) use ($request) {
                     $query->where('updated_at', '>=', $request->from_date)
                           ->orWhere('created_at', '>=', $request->from_date);
@@ -152,6 +156,10 @@ class MiscController extends BaseController
                 ->get();
         } else {
             $products = $branch->company->products()
+                ->with(
+                    'itemType',
+                    'uom'
+                )
                 ->where('uom_id', '>', 0)
                 ->get();
         }
