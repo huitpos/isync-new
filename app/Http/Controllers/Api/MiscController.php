@@ -3230,4 +3230,28 @@ class MiscController extends BaseController
 
         return $this->sendResponse($records, 'end of day product retrieved successfully.');
     }
+
+    public function getProductSoh(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'product_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $product = Product::findOrFail($request->product_id);
+
+        $pivotData = $product->branches->where('id', $request->branch_id)->first()?->pivot;
+
+        $response = [
+            'product_id' => $product->id,
+            'name' => $product->name,
+            'soh' => $pivotData->stock ?? 0,
+        ];
+
+        return $this->sendResponse($response, 'product retrieved successfully.');
+    }
 }
