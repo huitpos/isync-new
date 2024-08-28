@@ -35,6 +35,7 @@ use App\Http\Controllers\Company\ProductDisposalController as CompanyProductDisp
 use App\Http\Controllers\Company\ProductPhysicalCountController as CompanyProductPhysicalCountController;
 use App\Http\Controllers\Company\RoleController as CompanyRoleController;
 use App\Http\Controllers\Company\ItemLocationController as CompanyItemLocationController;
+use App\Http\Controllers\Company\ChangePriceReasonController as CompanyChangePriceReasonController;
 
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\ClusterController as AdminClusterController;
@@ -163,6 +164,7 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('roles', CompanyRoleController::class, ['as' => 'company']);
         Route::resource('item-locations', CompanyItemLocationController::class, ['as' => 'company']);
+        Route::resource('change-price-reasons', CompanyChangePriceReasonController::class, ['as' => 'company']);
 
         Route::prefix('reports')->group(function () {
             Route::get('/transactions', [CompanyReportController::class, 'transactions'])->name('company.reports.transactions');

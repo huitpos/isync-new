@@ -36,7 +36,13 @@ use App\Models\TakeOrderDiscountDetail;
 use App\Models\TakeOrderDiscountOtherInformation;
 use App\Models\CashFund;
 use App\Models\CashFundDenomination;
-
+use App\Models\AuditTrail;
+use App\Models\CutOffProduct;
+use App\Models\EndOfDayProduct;
+use App\Models\OfficialReceiptInformation;
+use App\Models\Payout;
+use App\Models\SpotAudit;
+use App\Models\SpotAuditDenomination;
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
 
@@ -131,6 +137,22 @@ class MiscController extends BaseController
         return $this->sendResponse($chargeAccounts, 'Charge Accounts retrieved successfully.');
     }
 
+    public function priceChangeReasons(Request $request, $branchId)
+    {
+        $branch = Branch::with([
+            'company',
+            'company.products' => function ($query) {
+                $query->whereHas('itemType', function ($subQuery) {
+                    $subQuery->where('show_in_cashier', true);
+                })->with('bundledItems', 'rawItems');
+            },
+        ])->find($branchId);
+
+        $products = $branch->company->changePriceReasons()->get();
+
+        return $this->sendResponse($products, 'Price Change Reasons retrieved successfully.');
+    }
+
     public function products(Request $request, $branchId)
     {
         $branch = Branch::with([
@@ -144,6 +166,10 @@ class MiscController extends BaseController
 
         if ($request->from_date) {
             $products = $branch->company->products()
+                ->with(
+                    'itemType',
+                    'uom'
+                )
                 ->where(function ($query) use ($request) {
                     $query->where('updated_at', '>=', $request->from_date)
                           ->orWhere('created_at', '>=', $request->from_date);
@@ -152,6 +178,10 @@ class MiscController extends BaseController
                 ->get();
         } else {
             $products = $branch->company->products()
+                ->with(
+                    'itemType',
+                    'uom'
+                )
                 ->where('uom_id', '>', 0)
                 ->get();
         }
@@ -377,6 +407,7 @@ class MiscController extends BaseController
             'void_remarks' => $request->void_remarks,
             'customer_name' => $request->customer_name,
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
+            'company_id' => $request->company_id,
         ];
 
         //check if existing. update if yes
@@ -548,6 +579,8 @@ class MiscController extends BaseController
             'serial_number' => $request->serial_number,
             'is_zero_rated' => $request->is_zero_rated,
             'zero_rated_amount' => $request->zero_rated_amount,
+            'price_change_reason_id' => $request->price_change_reason_id,
+            'company_id' => $request->company_id,
         ];
 
         $order = Order::where([
@@ -775,6 +808,7 @@ class MiscController extends BaseController
             'void_at' => $request->void_at ?? null,
             'void_by' => $request->void_by ?? null,
             'void_by_id' => $request->void_by_id ?? null,
+            'company_id' => $request->company_id,
         ];
 
         $payment = Payment::where([
@@ -865,6 +899,7 @@ class MiscController extends BaseController
             'end_of_day_id' => $request->end_of_day_id,
             'is_auto' => $request->is_auto,
             'short_over' => $request->short_over,
+            'company_id' => $request->company_id,
         ];
 
         $safekeeping = Safekeeping::where([
@@ -954,6 +989,7 @@ class MiscController extends BaseController
             'end_of_day_id' => $request->end_of_day_id,
             'is_cut_off' => $request->is_cut_off,
             'is_sent_to_server' => $request->is_sent_to_server,
+            'company_id' => $request->company_id,
         ];
 
         $safekeepingDenomination = SafekeepingDenomination::where([
@@ -1084,6 +1120,7 @@ class MiscController extends BaseController
             'end_reading_number' => $request->end_reading_number,
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
             'print_string' => $request->print_string,
+            'company_id' => $request->company_id,
         ];
 
         if ($request['products']) {
@@ -1227,6 +1264,7 @@ class MiscController extends BaseController
             'total_short_over' => $request->total_short_over,
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
             'print_string' => $request->print_string,
+            'company_id' => $request->company_id,
         ];
 
         $cutOff = CutOff::where([
@@ -1424,6 +1462,7 @@ class MiscController extends BaseController
             'is_zero_rated' => $request->is_zero_rated,
             'gross_amount' => $request->gross_amount,
             'net_amount' => $request->net_amount,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'Discount created successfully.';
@@ -1511,6 +1550,7 @@ class MiscController extends BaseController
             'treg' => $request->treg,
             'vat_expense' => $request->vat_expense,
             'is_zero_rated' => $request->is_zero_rated,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'Discount Details created successfully.';
@@ -1687,6 +1727,7 @@ class MiscController extends BaseController
             'is_void' => $request->is_void,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'payment other informations created successfully.';
@@ -1773,6 +1814,7 @@ class MiscController extends BaseController
             'is_void' => $request->is_void,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'discount other informations created successfully.';
@@ -1937,6 +1979,7 @@ class MiscController extends BaseController
             'end_of_day_id' => $request->end_of_day_id,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'cut off department created successfully.';
@@ -2022,6 +2065,7 @@ class MiscController extends BaseController
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
             'is_cut_off' => $request->is_cut_off,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'cut off discount created successfully.';
@@ -2108,6 +2152,7 @@ class MiscController extends BaseController
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
             'is_cut_off' => $request->is_cut_off,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'cut off payment created successfully.';
@@ -2190,6 +2235,7 @@ class MiscController extends BaseController
             'amount' => $request->amount,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'end of day discount created successfully.';
@@ -2238,6 +2284,7 @@ class MiscController extends BaseController
             'amount' => $request->amount,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'end of day payment created successfully.';
@@ -2286,6 +2333,7 @@ class MiscController extends BaseController
             'amount' => $request->amount,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'end of day department created successfully.';
@@ -2380,6 +2428,7 @@ class MiscController extends BaseController
             'shift_number' => $request->shift_number,
             'treg' => $request->treg,
             'cashier_name' => $request->cashier_name,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'Cash fund created successfully.';
@@ -2470,6 +2519,7 @@ class MiscController extends BaseController
             'is_sent_to_server' => $request->is_sent_to_server,
             'shift_number' => $request->shift_number,
             'treg' => $request->treg,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'Cash fund denomination created successfully.';
@@ -2520,5 +2570,662 @@ class MiscController extends BaseController
         }
 
         return $this->sendResponse($records, 'cash fund denomination retrieved successfully.');
+    }
+
+    public function saveAuditTrails(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'audit_trail_id' => 'required',
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+            'user_id' => 'required',
+            'transaction_id' => 'required',
+            'authorize_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'order_id' => 'required',
+            'price_change_reason_id' => 'required',
+            'company_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'audit_trail_id' => $request->audit_trail_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'user_id' => $request->user_id,
+            'user_name' => $request->user_name,
+            'transaction_id' => $request->transaction_id,
+            'action' => $request->action,
+            'description' => $request->description,
+            'authorize_id' => $request->authorize_id,
+            'authorize_name' => $request->authorize_name,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+            'order_id' => $request->order_id,
+            'price_change_reason_id' => $request->price_change_reason_id,
+            'company_id' => $request->company_id,
+        ];
+
+        $message = 'Audit Trail created successfully.';
+        $record = AuditTrail::where([
+            'audit_trail_id' => $request->audit_trail_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Audit Trail updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(AuditTrail::create($postData), $message);
+    }
+
+    public function getAuditTrails(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = AuditTrail::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = AuditTrail::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('audit_trail_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'audit trail retrieved successfully.');
+    }
+
+    public function saveCutOffProducts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'cut_off_product_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'company_id' => 'required',
+            'cut_off_id' => 'required',
+            'product_id' => 'required',
+            'qty' => 'required',
+            'is_cut_off' => 'required',
+            'end_of_day_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'cut_off_product_id' => $request->cut_off_product_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'company_id' => $request->company_id,
+            'cut_off_id' => $request->cut_off_id,
+            'product_id' => $request->product_id,
+            'qty' => $request->qty,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_at' => $request->cut_off_at,
+            'end_of_day_id' => $request->end_of_day_id,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'Cut off product created successfully.';
+        $record = CutOffProduct::where([
+            'cut_off_product_id' => $request->cut_off_product_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Cut off product updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(CutOffProduct::create($postData), $message);
+    }
+
+    public function getCutOffProducts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = CutOffProduct::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = CutOffProduct::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('cut_off_product_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'cut off product retrieved successfully.');
+    }
+
+    public function savePayouts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'payout_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'company_id' => 'required',
+            'control_number' => 'required',
+            'amount' => 'required',
+            'reason' => 'required',
+            'cashier_id' => 'required',
+            'cashier_name' => 'required',
+            'authorize_id' => 'required',
+            'authorize_name' => 'required',
+            'is_sent_to_server' => 'required',
+            'is_cut_off' => 'required',
+            'cut_off_id' => 'required',
+            'treg' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'payout_id' => $request->payout_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'company_id' => $request->company_id,
+            'control_number' => $request->control_number,
+            'amount' => $request->amount,
+            'reason' => $request->reason,
+            'cashier_id' => $request->cashier_id,
+            'cashier_name' => $request->cashier_name,
+            'authorize_id' => $request->authorize_id,
+            'authorize_name' => $request->authorize_name,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'cut_off_at' => $request->cut_off_at,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'Payout created successfully.';
+        $record = Payout::where([
+            'payout_id' => $request->payout_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Payout updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(Payout::create($postData), $message);
+    }
+
+    public function getPayouts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = Payout::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = Payout::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('payout_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'payout retrieved successfully.');
+    }
+
+    public function saveOfficialReceiptInformations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'official_receipt_information_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'company_id' => 'required',
+            'transaction_id' => 'required',
+            'name' => 'required',
+            'address' => 'required',
+            'tin' => 'required',
+            'business_style' => 'required',
+            'is_void' => 'required',
+            'is_sent_to_server' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'official_receipt_information_id' => $request->official_receipt_information_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'company_id' => $request->company_id,
+            'transaction_id' => $request->transaction_id,
+            'name' => $request->name,
+            'address' => $request->address,
+            'tin' => $request->tin,
+            'business_style' => $request->business_style,
+            'is_void' => $request->is_void,
+            'void_by' => $request->void_by,
+            'void_name' => $request->void_name,
+            'void_at' => $request->void_at,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'Official receipt information created successfully.';
+        $record = OfficialReceiptInformation::where([
+            'official_receipt_information_id' => $request->official_receipt_information_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Official receipt information updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(OfficialReceiptInformation::create($postData), $message);
+    }
+
+    public function getOfficialReceiptInformations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = OfficialReceiptInformation::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = OfficialReceiptInformation::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('official_receipt_information_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'official receipt information retrieved successfully.');
+    }
+
+    public function saveSpotAudits(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'spot_audit_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'company_id' => 'required',
+            'beginning_or' => 'required',
+            'ending_or' => 'required',
+            'beginning_amount' => 'required',
+            'ending_amount' => 'required',
+            'total_transactions' => 'required',
+            'gross_sales' => 'required',
+            'net_sales' => 'required',
+            'vatable_sales' => 'required',
+            'vat_exempt_sales' => 'required',
+            'vat_amount' => 'required',
+            'vat_expense' => 'required',
+            'void_qty' => 'required',
+            'void_amount' => 'required',
+            'total_change' => 'required',
+            'total_payout' => 'required',
+            'total_service_charge' => 'required',
+            'total_discount_amount' => 'required',
+            'total_cost' => 'required',
+            'safekeeping_amount' => 'required',
+            'safekeeping_short_over' => 'required',
+            'total_sk' => 'required',
+            'total_short_over' => 'required',
+            'cashier_id' => 'required',
+            'cashier_name' => 'required',
+            'admin_id' => 'required',
+            'admin_name' => 'required',
+            'shift_number' => 'required',
+            'is_cut_off' => 'required',
+            'cut_off_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'spot_audit_id' => $request->spot_audit_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'company_id' => $request->company_id,
+            'beginning_or' => $request->beginning_or,
+            'ending_or' => $request->ending_or,
+            'beginning_amount' => $request->beginning_amount,
+            'ending_amount' => $request->ending_amount,
+            'total_transactions' => $request->total_transactions,
+            'gross_sales' => $request->gross_sales,
+            'net_sales' => $request->net_sales,
+            'vatable_sales' => $request->vatable_sales,
+            'vat_exempt_sales' => $request->vat_exempt_sales,
+            'vat_amount' => $request->vat_amount,
+            'vat_expense' => $request->vat_expense,
+            'void_qty' => $request->void_qty,
+            'void_amount' => $request->void_amount,
+            'total_change' => $request->total_change,
+            'total_payout' => $request->total_payout,
+            'total_service_charge' => $request->total_service_charge,
+            'total_discount_amount' => $request->total_discount_amount,
+            'total_cost' => $request->total_cost,
+            'safekeeping_amount' => $request->safekeeping_amount,
+            'safekeeping_short_over' => $request->safekeeping_short_over,
+            'total_sk' => $request->total_sk,
+            'total_short_over' => $request->total_short_over,
+            'cashier_id' => $request->cashier_id,
+            'cashier_name' => $request->cashier_name,
+            'admin_id' => $request->admin_id,
+            'admin_name' => $request->admin_name,
+            'shift_number' => $request->shift_number,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'Spot audit created successfully.';
+        $record = SpotAudit::where([
+            'spot_audit_id' => $request->spot_audit_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Spot audit updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(SpotAudit::create($postData), $message);
+    }
+
+    public function getSpotAudits(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = SpotAudit::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = SpotAudit::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('spot_audit_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'spot audit retrieved successfully.');
+    }
+
+    public function saveSpotAuditDenominations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'spot_audit_denomination_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'company_id' => 'required',
+            'spot_audit_id' => 'required',
+            'cash_denomination_id' => 'required',
+            'name' => 'required',
+            'amount' => 'required',
+            'qty' => 'required',
+            'total' => 'required',
+            'is_cut_off' => 'required',
+            'cut_off_id' => 'required',
+            'is_sent_to_server' => 'required',
+            'shift_number' => 'required',
+            'treg' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'spot_audit_denomination_id' => $request->spot_audit_denomination_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'company_id' => $request->company_id,
+            'spot_audit_id' => $request->spot_audit_id,
+            'cash_denomination_id' => $request->cash_denomination_id,
+            'name' => $request->name,
+            'amount' => $request->amount,
+            'qty' => $request->qty,
+            'total' => $request->total,
+            'is_cut_off' => $request->is_cut_off,
+            'cut_off_id' => $request->cut_off_id,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'shift_number' => $request->shift_number,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'Spot audit denomination created successfully.';
+        $record = SpotAuditDenomination::where([
+            'spot_audit_denomination_id' => $request->spot_audit_denomination_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'Spot audit denomination updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(SpotAuditDenomination::create($postData), $message);
+    }
+
+    public function getSpotAuditDenominations(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = SpotAuditDenomination::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = SpotAuditDenomination::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('spot_audit_denomination_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'spot audit denomination retrieved successfully.');
+    }
+
+    public function saveEndOfDayProducts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'end_of_day_product_id' => 'required',
+            'pos_machine_id' => 'required',
+            'branch_id' => 'required',
+            'company_id' => 'required',
+            'end_of_day_id' => 'required',
+            'product_id' => 'required',
+            'qty' => 'required',
+            'is_sent_to_server' => 'required',
+            'treg' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $postData = [
+            'end_of_day_product_id' => $request->end_of_day_product_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'company_id' => $request->company_id,
+            'end_of_day_id' => $request->end_of_day_id,
+            'product_id' => $request->product_id,
+            'qty' => $request->qty,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+        ];
+
+        $message = 'End of day product created successfully.';
+        $record = EndOfDayProduct::where([
+            'end_of_day_product_id' => $request->end_of_day_product_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'End of day product updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(EndOfDayProduct::create($postData), $message);
+    }
+
+    public function getEndOfDayProducts(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $today = Carbon::today()->format('Y-m-d 23:59:59');
+        $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
+
+        $records = EndOfDayProduct::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->whereBetween('treg', [$yesterday, $today])
+            ->get();
+
+        if ($records->count() == 0) {
+            $records = EndOfDayProduct::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
+            ])
+            ->orderBy('end_of_day_product_id', 'desc')
+            ->limit(2)
+            ->get();
+        }
+
+        return $this->sendResponse($records, 'end of day product retrieved successfully.');
     }
 }

@@ -18,7 +18,6 @@ paths:
     post:
       tags:
         - Auth
-      summary: Login a user.
       requestBody:
         required: true
         content:
@@ -46,7 +45,6 @@ paths:
     post:
       tags:
         - POS Machine
-      summary: Activate a machine.
       requestBody:
         required: true
         content:
@@ -86,7 +84,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get company data by company ID.
       parameters:
         - in: path
           name: companyId
@@ -113,7 +110,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get branch data by branch ID.
       parameters:
         - in: path
           name: branchId
@@ -140,7 +136,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Test connection to the server.
       responses:
         '200':
           content:
@@ -154,7 +149,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all cash denominations.
       parameters:
         - in: query
           name: device_id
@@ -175,7 +169,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all departments by branch ID.
       parameters:
         - in: path
           name: branchId
@@ -202,7 +195,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all categories by branch ID.
       parameters:
         - in: path
           name: branchId
@@ -229,7 +221,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all sub categories by branch ID.
       parameters:
         - in: path
           name: branchId
@@ -256,7 +247,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all users by branch ID.
       parameters:
         - in: path
           name: branchId
@@ -283,7 +273,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all payment types by branch ID.
       parameters:
         - in: path
           name: branchId
@@ -310,7 +299,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all discount types by branch ID.
       parameters:
         - in: path
           name: branchId
@@ -337,7 +325,32 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all charge accounts by branch ID.
+      parameters:
+        - in: path
+          name: branchId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  
+  /api/price-change-reasons/{branchId}:
+    get:
+      tags:
+        - Sync From Server
       parameters:
         - in: path
           name: branchId
@@ -364,7 +377,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all charge accounts by branch ID.
       parameters:
         - in: path
           name: branchId
@@ -391,7 +403,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all take-order transactions by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -416,7 +427,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send take-rder transaction to the server.
       requestBody:
         content:
           application/json:
@@ -547,7 +557,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all transactions by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -578,7 +587,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send transaction to the server.
       requestBody:
         content:
           application/json:
@@ -698,6 +706,9 @@ paths:
                   type: string
                 total_zero_rated_amount:
                   type: number
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -711,7 +722,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all orders by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -742,7 +752,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send orders to the server.
       requestBody:
         content:
           application/json:
@@ -865,6 +874,12 @@ paths:
                   type: boolean
                 zero_rated_amount:
                   type: number
+                price_change_reason_id:
+                  type: integer
+                  default: null
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -878,7 +893,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all take-order orders by branch ID.
       parameters:
         - in: query
           name: branch_id
@@ -908,7 +922,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send take-order orders to the server.
       requestBody:
         content:
           application/json:
@@ -1040,7 +1053,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all payments by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1071,7 +1083,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send payments to the server.
       requestBody:
         content:
           application/json:
@@ -1122,6 +1133,9 @@ paths:
                 void_by_id:
                   type: integer
                   default: null
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -1135,7 +1149,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all safekeeping data by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1166,7 +1179,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send safekeeping to the server.
       requestBody:
         content:
           application/json:
@@ -1213,6 +1225,9 @@ paths:
                   default: false
                 short_over:
                   type: number
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -1226,7 +1241,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all safekeeping denomination data by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1257,7 +1271,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send safekeeping denomination to the server.
       requestBody:
         content:
           application/json:
@@ -1299,6 +1312,9 @@ paths:
                 is_sent_to_server:
                   type: boolean
                   default: false
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -1312,7 +1328,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all end of day data by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1343,7 +1358,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send end of day to the server.
       requestBody:
         content:
           application/json:
@@ -1428,6 +1442,9 @@ paths:
                   type: number
                 print_string:
                   type: string
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -1440,7 +1457,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all end of day data by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1471,7 +1487,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send cut_off to the server.
       requestBody:
         content:
           application/json:
@@ -1554,6 +1569,9 @@ paths:
                   type: number
                 print_string:
                   type: string
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -1567,7 +1585,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send discounts to the server.
       requestBody:
         content:
           application/json:
@@ -1645,7 +1662,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all discounts by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1677,7 +1693,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send discounts to the server.
       requestBody:
         content:
           application/json:
@@ -1744,6 +1759,9 @@ paths:
                   type: number
                 net_amount:
                   type: number
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -1755,7 +1773,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all discounts by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1788,7 +1805,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send discount details to the server.
       requestBody:
         content:
           application/json:
@@ -1858,7 +1874,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all discount details by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1890,7 +1905,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send discount details to the server.
       requestBody:
         content:
           application/json:
@@ -1948,6 +1962,9 @@ paths:
                   type: number
                 is_zero_rated:
                   type: boolean
+                company_id:
+                  type: integer
+                  default: null
 
       responses:
         '200':
@@ -1960,7 +1977,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get all discount details by branch ID and machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -1993,7 +2009,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get machine data by machine ID.
       parameters:
         - in: path
           name: machineId
@@ -2018,7 +2033,6 @@ paths:
     put:
       tags:
         - Sync To Server
-      summary: Send machine details to the server.
       parameters:
         - in: path
           name: machineId
@@ -2054,7 +2068,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send payment other informations to the server.
       requestBody:
         content:
           application/json:
@@ -2087,6 +2100,8 @@ paths:
                   type: boolean
                 treg:
                   type: string
+                company_id:
+                  type: integer
       responses:
         '200':
           content:
@@ -2098,7 +2113,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get payment other informations by machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -2131,7 +2145,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send discount other informations to the server.
       requestBody:
         content:
           application/json:
@@ -2175,7 +2188,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get payment other informations by machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -2207,7 +2219,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send discount other informations to the server.
       requestBody:
         content:
           application/json:
@@ -2240,6 +2251,8 @@ paths:
                   type: boolean
                 treg:
                   type: string
+                company_id:
+                  type: integer
       responses:
         '200':
           content:
@@ -2251,7 +2264,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get payment other informations by machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -2284,7 +2296,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send discount other informations to the server.
       requestBody:
         content:
           application/json:
@@ -2317,6 +2328,8 @@ paths:
                   type: string
                 is_cut_off:
                   type: boolean
+                company_id:
+                  type: integer
       responses:
         '200':
           content:
@@ -2328,7 +2341,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get payment other informations by machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -2361,7 +2373,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send discount other informations to the server.
       requestBody:
         content:
           application/json:
@@ -2394,6 +2405,8 @@ paths:
                   type: string
                 is_cut_off:
                   type: boolean
+                company_id:
+                  type: integer
       responses:
         '200':
           content:
@@ -2405,7 +2418,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get payment other informations by machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -2470,6 +2482,8 @@ paths:
                   type: string
                 is_cut_off:
                   type: boolean
+                company_id:
+                  type: integer
       responses:
         '200':
           content:
@@ -2481,7 +2495,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get payment other informations by machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -2542,6 +2555,8 @@ paths:
                   type: boolean
                 treg:
                   type: string
+                company_id:
+                  type: integer
       responses:
         '200':
           content:
@@ -2583,6 +2598,8 @@ paths:
                   type: boolean
                 treg:
                   type: string
+                company_id:
+                  type: integer
       responses:
         '200':
           content:
@@ -2624,6 +2641,8 @@ paths:
                   type: boolean
                 treg:
                   type: string
+                company_id:
+                  type: integer
       responses:
         '200':
           content:
@@ -2637,7 +2656,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send cash funds to the server.
       requestBody:
         content:
           application/json:
@@ -2676,6 +2694,9 @@ paths:
                 treg:
                   type: string
                   default: null
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -2687,7 +2708,6 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get cash funds by machine ID.
       parameters:
         - in: query
           name: branch_id
@@ -2720,7 +2740,6 @@ paths:
     post:
       tags:
         - Sync To Server
-      summary: Send cash fund denomination to the server.
       requestBody:
         content:
           application/json:
@@ -2765,6 +2784,9 @@ paths:
                 treg:
                   type: string
                   default: null
+                company_id:
+                  type: integer
+                  default: null
       responses:
         '200':
           content:
@@ -2776,7 +2798,636 @@ paths:
     get:
       tags:
         - Sync From Server
-      summary: Get cash fund denomination by machine ID.
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/audit-trails:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                audit_trail_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                user_id:
+                  type: integer
+                user_name:
+                  type: string
+                transaction_id:
+                  type: integer
+                action:
+                  type: string
+                description:
+                  type: string
+                authorize_id:
+                  type: integer
+                authorize_name:
+                  type: string
+                  default: null
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                treg:
+                  type: string
+                  default: null
+                order_id:
+                  type: integer
+                  default: null
+                price_change_reason_id:
+                  type: integer
+                  default: null
+                company_id:
+                  type: integer
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+          
+  /api/cut-off-products:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                cut_off_product_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                company_id:
+                  type: integer
+                cut_off_id:
+                  type: integer
+                product_id:
+                  type: integer
+                qty:
+                  type: integer
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_at:
+                  type: string
+                  default: null
+                end_of_day_id:
+                  type: integer
+                  default: 0
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/end-of-day-products:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                end_of_day_product_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                company_id:
+                  type: integer
+                end_of_day_id:
+                  type: integer
+                product_id:
+                  type: integer
+                qty:
+                  type: integer
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/payouts:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                payout_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                company_id:
+                  type: integer
+                control_number:
+                  type: string
+                amount:
+                  type: number
+                reason:
+                  type: string
+                cashier_id:
+                  type: integer
+                cashier_name:
+                  type: string
+                  default: null
+                authorize_id:
+                  type: integer
+                  default: null
+                authorize_name:
+                  type: string
+                  default: null
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_id:
+                  type: integer
+                  default: 0
+                cut_off_at:
+                  type: string
+                  default: null
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/official-receipt-informations:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                official_receipt_information_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                company_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                name:
+                  type: string
+                address:
+                  type: string
+                tin:
+                  type: string
+                business_style:
+                  type: string
+                is_void:
+                  type: boolean
+                  default: false
+                void_by_id:
+                  type: integer
+                  default: null
+                void_name:
+                  type: string
+                  default: null
+                void_at:
+                  type: string
+                  default: null
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/spot-audits:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                spot_audit_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                company_id:
+                  type: integer
+                beginning_or: 
+                  type: number
+                ending_or:
+                  type: number
+                beginning_amount:
+                  type: number
+                ending_amount:
+                  type: number
+                total_transactions:
+                  type: integer
+                gross_sales:
+                  type: number
+                net_sales:
+                  type: number
+                vatable_sales:
+                  type: number
+                vat_exempt_sales:
+                  type: number
+                vat_amount:
+                  type: number
+                vat_expense:
+                  type: number
+                void_qty:
+                  type: integer
+                void_amount:
+                  type: number
+                total_change:
+                  type: number
+                total_payout:
+                  type: number
+                total_service_charge:
+                  type: number
+                total_discount_amount:
+                  type: number
+                total_cost:
+                  type: number
+                safekeeping_amount:
+                  type: number
+                safekeeping_short_over:
+                  type: number
+                total_sk:
+                  type: number
+                total_short_over:
+                  type: number
+                cashier_id:
+                  type: integer
+                cashier_name:
+                  type: string
+                  default: null
+                admin_id:
+                  type: integer
+                  default: null
+                admin_name:
+                  type: string
+                  default: null
+                shift_number:
+                  type: integer
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_id:
+                  type: integer
+                  default: 0
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: pos_machine_id
+          schema:
+            type: integer
+          required: true
+          description: ID of the machine to get
+        - in: query
+          name: device_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the device
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/spot-audit-denominations:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                spot_audit_denomination_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                branch_id:
+                  type: integer
+                company_id:
+                  type: integer
+                spot_audit_id:
+                  type: integer
+                cash_denomination_id:
+                  type: integer
+                name:
+                  type: string
+                  default: null
+                amount:
+                  type: number
+                qty:
+                  type: integer
+                total:
+                  type: number
+                is_cut_off:
+                  type: boolean
+                  default: false
+                cut_off_id:
+                  type: integer
+                  default: 0
+                is_sent_to_server:
+                  type: boolean
+                  default: false
+                shift_number:
+                  type: integer
+                treg:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    get:
+      tags:
+        - Sync From Server
       parameters:
         - in: query
           name: branch_id
