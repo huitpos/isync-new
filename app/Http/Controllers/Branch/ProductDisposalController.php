@@ -90,6 +90,17 @@ class ProductDisposalController extends Controller
         $disposalsData['action_by'] = auth()->user()->id;
         unset($disposalsData['pr_items']);
 
+        $pdisCount = ProductDisposal::where([
+            'branch_id' => $branch->id
+        ])->count();
+
+        $branchCode = strtoupper($branch->code);
+        $date = date('Ymd');
+        $counter = str_pad($pdisCount+1, 4, '0', STR_PAD_LEFT);
+        $pdisNumber = "PDIS$branchCode$date$counter";
+
+        $disposalsData['pdis_number'] = $pdisNumber;
+
         //save the purchase request and its items using model
         $productDisposal = new ProductDisposal();
         $productDisposal->fill($disposalsData);

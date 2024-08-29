@@ -27,7 +27,7 @@ class ProductDisposalsDataTable extends DataTable
                     'companySlug' => $companySlug,
                     'branchSlug' => $branchSlug,
                     'product_disposal' => $data->id
-                ]) . '">' . $data->id . '</a>';
+                ]) . '">' . $data->pdis_number . '</a>';
             })
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;
@@ -81,7 +81,7 @@ class ProductDisposalsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('sto_number')->title('ID'),
+            Column::make('sto_number')->title('pdis number'),
             Column::make('branch.name')->title('Branch'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
