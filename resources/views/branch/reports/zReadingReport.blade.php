@@ -72,6 +72,7 @@
                             <tr>
                                 <td>{{ $data->machine->machine_number }}</td>
                                 <td>{{ $data->treg }}</td>
+                                <td>{{ $data->reading_number }}</td>
                                 <td>{{ $data->beginning_or }}</td>
                                 <td>{{ $data->ending_or }}</td>
                                 <td>{{ number_format($data->beginning_amount, 2) }}</td>
