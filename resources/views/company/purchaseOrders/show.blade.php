@@ -141,7 +141,13 @@
                     @endforeach
 
                     <div class="row mb-5">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a href="{{ route('company.purchase-orders.print', ['companySlug' => $company->slug, 'id' => $po->id]) }}" class="btn btn-primary">Print</a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
                             <div class="form-group float-end">
                                 <h2>TOTAL: <span class="grandtotal"> {{ $po->total }}</span></h2>
                             </div>

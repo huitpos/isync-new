@@ -10,6 +10,8 @@ use App\DataTables\Company\PurchaseDeliveriesDataTable;
 use App\Models\PurchaseDelivery;
 use App\Models\Branch;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
 class PurchaseDeliveryController extends Controller
 {
     /**
@@ -86,5 +88,23 @@ class PurchaseDeliveryController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function print(Request $request, string $slug, string $id)
+    {
+        $pr = PurchaseDelivery::with([
+            'items',
+            'createdBy'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+
+        $pdf = Pdf::loadView('company.purchaseDeliveries.print', [
+            'pr' => $pr,
+            'company' => $company,
+            'branch' => $pr->branch
+        ]);
+
+        return $pdf->download("PD-$pr->pd_number.pdf");
     }
 }

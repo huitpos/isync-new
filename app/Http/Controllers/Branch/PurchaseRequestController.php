@@ -8,6 +8,8 @@ use App\Models\Department;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
 use App\DataTables\Branch\PurchaseRequestsDataTable;
 
 class PurchaseRequestController extends Controller
@@ -256,5 +258,23 @@ class PurchaseRequestController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function print(Request $request, string $slug, string $branchSlug, string $id)
+    {
+        $pr = PurchaseRequest::with([
+            'items',
+            'createdBy'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+
+        $pdf = Pdf::loadView('company.purchaseRequests.print', [
+            'pr' => $pr,
+            'company' => $company,
+            'branch' => $pr->branch
+        ]);
+
+        return $pdf->download("PR-$pr->pr_number.pdf");
     }
 }

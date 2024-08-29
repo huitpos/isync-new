@@ -67,4 +67,9 @@ class PurchaseOrder extends Model
     {
         return $this->belongsTo(SupplierTerm::class);
     }
+
+    public function actionBy()
+    {
+        return $this->belongsTo(User::class, 'action_by');
+    }
 }

@@ -162,6 +162,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('product-disposals', CompanyProductDisposalController::class, ['as' => 'company']);
         Route::resource('product-physical-counts', CompanyProductPhysicalCountController::class, ['as' => 'company']);
 
+        Route::get('/purchase-requests/{id}/print', [CompanyPurchaseRequestController::class, 'print'])->name('company.purchase-requests.print');
+        Route::get('/purchase-orders/{id}/print', [CompanyPurchaseOrderController::class, 'print'])->name('company.purchase-orders.print');
+        Route::get('/purchase-deliveries/{id}/print', [CompanyPurchaseDeliveryController::class, 'print'])->name('company.purchase-deliveries.print');
+
         Route::resource('roles', CompanyRoleController::class, ['as' => 'company']);
         Route::resource('item-locations', CompanyItemLocationController::class, ['as' => 'company']);
         Route::resource('change-price-reasons', CompanyChangePriceReasonController::class, ['as' => 'company']);
@@ -196,6 +200,10 @@ Route::middleware('auth')->group(function () {
             Route::resource('stock-transfer-deliveries', BranchStockTransferDeliveryController::class, ['as' => 'branch']);
             Route::resource('product-physical-counts', BranchProductPhysicalCountController::class, ['as' => 'branch']);
             Route::resource('product-disposals', BranchProductDisposalController::class, ['as' => 'branch']);
+
+            Route::get('/purchase-requests/{id}/print', [BranchPurchaseRequestController::class, 'print'])->name('branch.purchase-requests.print');
+            Route::get('/purchase-orders/{id}/print', [BranchPurchaseOrderController::class, 'print'])->name('branch.purchase-orders.print');
+            Route::get('/purchase-deliveries/{id}/print', [BranchPurchaseDeliveryController::class, 'print'])->name('branch.purchase-deliveries.print');
 
             Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');
 
