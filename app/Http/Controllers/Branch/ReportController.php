@@ -296,7 +296,7 @@ class ReportController extends Controller
         $dateParam = $request->input('date_range', null);
 
         //startDate = 29 days ago
-        $startDate = Carbon::now()->subDays(29)->format('Y-m-d 00:00:00');
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
         $endDate = Carbon::now()->format('Y-m-d 23:59:59');
         if ($dateParam) {
             list($startDate, $endDate) = explode(" - ", $dateParam);
@@ -364,7 +364,7 @@ class ReportController extends Controller
         $dateParam = $request->input('date_range', null);
 
         //startDate = 29 days ago
-        $startDate = Carbon::now()->subDays(29)->format('Y-m-d 00:00:00');
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
         $endDate = Carbon::now()->format('Y-m-d 23:59:59');
         if ($dateParam) {
             list($startDate, $endDate) = explode(" - ", $dateParam);
