@@ -101,7 +101,7 @@ class StockTransferRequestController extends Controller
             'destination_branch_id' => $branch->id
         ])->count();
 
-        $branchCode = strtoupper($branch->branch_code);
+        $branchCode = strtoupper($branch->code);
         $date = date('Ymd');
         $counter = str_pad($strCount+1, 4, '0', STR_PAD_LEFT);
         $strNumber = "STR$branchCode$date$counter";
@@ -174,7 +174,7 @@ class StockTransferRequestController extends Controller
                     'source_branch_id' => $branch->id
                 ])->count();
 
-                $branchCode = strtoupper($branch->branch_code);
+                $branchCode = strtoupper($branch->code);
                 $date = date('Ymd');
                 $counter = str_pad($poCount+1, 4, '0', STR_PAD_LEFT);
                 $stoNumber = "STO$branchCode$date$counter";

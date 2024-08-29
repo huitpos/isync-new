@@ -26,7 +26,7 @@ class ProductPhysicalCountsDataTable extends DataTable
                     return '<a href="' . route('company.product-physical-counts.show', [
                         'companySlug' => $companySlug,
                         'product_physical_count' => $data->id
-                    ]) . '">' . $data->id . '</a>';
+                    ]) . '">' . $data->pcount_number . '</a>';
                 } else {
                     return $data->id;
                 }
@@ -87,7 +87,7 @@ class ProductPhysicalCountsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('sto_number')->title('ID'),
+            Column::make('pcount_number')->title('pcount number'),
             Column::make('branch.name')->title('Branch'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
