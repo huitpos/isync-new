@@ -9,6 +9,8 @@ use App\DataTables\Company\PurchaseOrdersDataTable;
 
 use App\Models\PurchaseOrder;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
 class PurchaseOrderController extends Controller
 {
     /**
@@ -87,5 +89,23 @@ class PurchaseOrderController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function print(Request $request, string $slug, string $id)
+    {
+        $pr = PurchaseOrder::with([
+            'items',
+            'createdBy'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+
+        $pdf = Pdf::loadView('company.purchaseOrders.print', [
+            'pr' => $pr,
+            'company' => $company,
+            'branch' => $pr->branch
+        ]);
+
+        return $pdf->download("PO-$pr->po_number.pdf");
     }
 }

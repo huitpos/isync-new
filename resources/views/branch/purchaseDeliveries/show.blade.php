@@ -107,19 +107,28 @@
 
                     <div class="row mb-5">
                         <div class="col-md-6">
-                            @if($pd->status == 'pending')
-                                <div class="form-group">
-                                    <input type="hidden" name="status" id="status">
-                                    <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
-                                    <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
-                                </div>
-                            @endif
+                            <div class="form-group">
+                                <a href="{{ route('branch.purchase-deliveries.print', ['companySlug' => $company->slug, 'id' => $pd->id, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">Print</a>
+                            </div>
                         </div>
+
                         <div class="col-md-6">
                             <div class="form-group float-end">
                                 <h2>TOTAL: <span class="total">{{ number_format($pd->total_amount, 2) }}</span></h2>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        @if($pd->status == 'pending')
+                            <div class="form-group">
+                                <input type="hidden" name="status" id="status">
+                                <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
+                                <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

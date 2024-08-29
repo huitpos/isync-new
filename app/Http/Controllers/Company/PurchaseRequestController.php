@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
 use App\Models\PurchaseRequest;
-
 use App\DataTables\Company\PurchaseRequestsDataTable;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PurchaseRequestController extends Controller
 {
@@ -98,5 +97,23 @@ class PurchaseRequestController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function print(Request $request, string $slug, string $id)
+    {
+        $pr = PurchaseRequest::with([
+            'items',
+            'createdBy'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+
+        $pdf = Pdf::loadView('company.purchaseRequests.print', [
+            'pr' => $pr,
+            'company' => $company,
+            'branch' => $pr->branch
+        ]);
+
+        return $pdf->download("PR-$pr->pr_number.pdf");
     }
 }

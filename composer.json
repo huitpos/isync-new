@@ -6,6 +6,7 @@
     "version": "8.2.3",
     "require": {
         "php": "^8.0.2",
+        "barryvdh/laravel-dompdf": "^3.0",
         "diglactic/laravel-breadcrumbs": "^8.1",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.0",
