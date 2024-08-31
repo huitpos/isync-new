@@ -204,7 +204,7 @@
                             <tr class="fw-semibold fs-6 text-muted">
                                 <th>Date Count</th>
                                 <th>Pcount Number</th>
-                                <th>Qty</th>
+                                <th>Pcount</th>
                                 <th>UOM</th>
                                 <th>System Count</th>
                                 <th>Variance</th>
