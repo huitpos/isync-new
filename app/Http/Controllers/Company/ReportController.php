@@ -77,12 +77,16 @@ class ReportController extends Controller
         
         $branchId = $request->query('branch_id', $branches->first()->id);
 
-        $dateParam = $request->query('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
@@ -94,7 +98,11 @@ class ReportController extends Controller
             ->whereBetween('completed_at', [$startDate, $endDate])
             ->get();
 
-        return view('company.reports.salesInvoicesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.salesInvoicesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function salesTransactionReport(Request $request)
@@ -105,12 +113,26 @@ class ReportController extends Controller
 
         $branchId = $request->query('branch_id', $branches->first()->id);
 
-        $dateParam = $request->query('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post') && !$request->input('search')) {
+            $branch = Branch::find($branchId);
+            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
+        }
+
+        if ($request->isMethod('post') && !$request->input('search')) {
+            $branch = Branch::find($branchId);
+            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
+        }
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
@@ -123,7 +145,11 @@ class ReportController extends Controller
             ->whereBetween('completed_at', [$startDate, $endDate])
             ->get();
 
-        return view('company.reports.salesTransactionReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.salesTransactionReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function voidTransactionsReport(Request $request)
@@ -134,12 +160,21 @@ class ReportController extends Controller
 
         $branchId = $request->query('branch_id', $branches->first()->id);
 
-        $dateParam = $request->query('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post') && !$request->input('search')) {
+            $branch = Branch::find($branchId);
+            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
+        }
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
@@ -153,7 +188,11 @@ class ReportController extends Controller
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
-        return view('company.reports.voidTransactionsReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.voidTransactionsReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function vatSalesReport(Request $request)
@@ -164,12 +203,16 @@ class ReportController extends Controller
 
         $branchId = $request->query('branch_id', $branches->first()->id);
 
-        $dateParam = $request->query('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
@@ -181,7 +224,11 @@ class ReportController extends Controller
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
-        return view('company.reports.vatSalesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam'));
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.vatSalesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function xReadingReport(Request $request)
@@ -192,12 +239,16 @@ class ReportController extends Controller
 
         $branchId = $request->query('branch_id', $branches->first()->id);
 
-        $dateParam = $request->query('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
@@ -218,7 +269,11 @@ class ReportController extends Controller
             ->orderBy('id')
             ->get();
 
-        return view('company.reports.xReadingReport', compact('company', 'branches', 'cutoffs', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes'));
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.xReadingReport', compact('company', 'branches', 'cutoffs', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function zReadingReport(Request $request)
@@ -229,12 +284,16 @@ class ReportController extends Controller
 
         $branchId = $request->query('branch_id', $branches->first()->id);
 
-        $dateParam = $request->query('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
@@ -255,7 +314,11 @@ class ReportController extends Controller
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
-        return view('company.reports.zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays'));
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function discountsReport(Request $request)
@@ -265,12 +328,16 @@ class ReportController extends Controller
 
         $branchId = $request->input('branch_id', $branches->first()->id);
 
-        $dateParam = $request->input('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
 
         $discountTypes = DiscountType::where('company_id', $company->id)
             ->orWhere('company_id', null)
@@ -309,7 +376,11 @@ class ReportController extends Controller
             ->where('discounts.branch_id', $branchId)
             ->get();
 
-        return view('company.reports.discountsReport', compact('company', 'branches', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes'));
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.discountsReport', compact('company', 'branches', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function itemSales(Request $request)
@@ -321,7 +392,6 @@ class ReportController extends Controller
 
         $dateParam = $request->input('date_range', null);
 
-        //startDate = 29 days ago
         $startDate = Carbon::now()->format('Y-m-d 00:00:00');
         $endDate = Carbon::now()->format('Y-m-d 23:59:59');
         if ($dateParam) {

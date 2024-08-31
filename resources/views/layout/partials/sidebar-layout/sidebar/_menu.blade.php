@@ -578,7 +578,15 @@
 					</span>
 
 					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+						<div class="menu-item menu-accordion {{ request()->routeIs(
+							'company.reports.sales-invoices-report',
+							'company.reports.sales-transaction-report',
+							'company.reports.void-transactions-report',
+							'company.reports.vat-sales-report',
+							'company.reports.x-reading-report',
+							'company.reports.z-reading-report',
+							'company.reports.discounts-report',
+						) ? 'here show' : '' }}" data-kt-menu-trigger="click">
 							<span class="menu-link">
 								<span class="menu-title">Sales Reports</span>
 								<span class="menu-arrow"></span>
