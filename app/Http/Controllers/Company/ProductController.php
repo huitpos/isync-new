@@ -77,12 +77,14 @@ class ProductController extends Controller
         }
 
         $departments = $company->departments()->where('status', 'active')->get();
+        $itemTypes = $company->itemTypes()->where('status', 'active')->get();
 
         return view('company.products.create', [
             'company' => $company,
             'categories' => $categories,
             'subcategories' => $subcategories,
-            'departments' => $departments
+            'departments' => $departments,
+            'itemTypes' => $itemTypes,
         ]);
     }
 
@@ -247,12 +249,15 @@ class ProductController extends Controller
             'category_id' => $product->category_id
         ])->get();
 
+        $itemTypes = $company->itemTypes()->where('status', 'active')->get();
+
         return view('company.products.edit', [
             'company' => $company,
             'product' => $product,
             'departments' => $departments,
             'categories' => $categories,
             'subcategories' => $subcategories,
+            'itemTypes' => $itemTypes,
         ]);
     }
 
