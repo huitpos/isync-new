@@ -117,7 +117,7 @@
                     @if($product && $product->image)
                     <div class="pb-1 fs-6">
                         <div class="text-gray-600">
-                            <div class="image-input-wrapper w-250px h-250px" style="border: 1px dashed #92A0B3; background-size:contain; background-repeat: no-repeat; background-image: url('{{ Storage::disk('s3')->url($product->image) }}'); background-position: center;"></div>
+                            <div class="image-input-wrapper h-250px" style="border: 1px dashed #92A0B3; background-size:contain; background-repeat: no-repeat; background-image: url('{{ Storage::disk('s3')->url($product->image) }}'); background-position: center;"></div>
                         </div>
                     </div>
                     @endif
