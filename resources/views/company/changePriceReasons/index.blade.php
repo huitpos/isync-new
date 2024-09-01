@@ -15,7 +15,7 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                    <a href="{{ route('company.product-disposal-reasons.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
+                    <a href="{{ route('company.change-price-reasons.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
                         Add Reason
                     </a>

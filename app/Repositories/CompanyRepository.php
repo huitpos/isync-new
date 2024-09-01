@@ -54,6 +54,40 @@ class CompanyRepository implements CompanyRepositoryInterface
         return $amount;
     }
 
+    public function getTransactionNetSales(String $id, String $startDate = '', String $endDate = '', String $branchId = null): Float
+    {
+        $company = Company::findOrFail($id);
+
+        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+            ->when($branchId, function ($query, $branchId) {
+                return $query->where('branch_id', $branchId);
+            })
+            ->where('is_complete', true)
+            ->where('is_void', false)
+            ->where('is_back_out', false)
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->sum('net_sales');
+
+        return $amount;
+    }
+
+    public function getTransactionGrossSales(String $id, String $startDate = '', String $endDate = '', String $branchId = null): Float
+    {
+        $company = Company::findOrFail($id);
+
+        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+            ->when($branchId, function ($query, $branchId) {
+                return $query->where('branch_id', $branchId);
+            })
+            ->where('is_complete', true)
+            ->where('is_void', false)
+            ->where('is_back_out', false)
+            ->whereBetween('completed_at', [$startDate, $endDate])
+            ->sum('gross_sales');
+
+        return $amount;
+    }
+
     public function getTransactionCostAmount(String $id): Float
     {
         $company = Company::findOrFail($id);
@@ -65,12 +99,18 @@ class CompanyRepository implements CompanyRepositoryInterface
         return $amount;
     }
 
-    public function getTransactionCount(String $id): Int
+    public function getTransactionCount(String $id, String $startDate = '', String $endDate = '', String $branchId = null): Int
     {
         $company = Company::findOrFail($id);
 
         $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+            ->when($branchId, function ($query, $branchId) {
+                return $query->where('branch_id', $branchId);
+            })
             ->where('is_complete', true)
+            ->where('is_void', false)
+            ->where('is_back_out', false)
+            ->whereBetween('completed_at', [$startDate, $endDate])
             ->count();
 
         return $amount;

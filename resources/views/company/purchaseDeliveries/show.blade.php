@@ -102,13 +102,15 @@
                     @endforeach
 
                     <div class="row mb-5">
+                        @if ($pd->status == 'approved')
                         <div class="col-md-6">
                             <div class="form-group">
                                 <a href="{{ route('company.purchase-deliveries.print', ['companySlug' => $company->slug, 'id' => $pd->id]) }}" class="btn btn-primary">Print</a>
                             </div>
                         </div>
+                        @endif
 
-                        <div class="col-md-6">
+                        <div class="col-md-<?= $pd->status != 'approved' ? '12' : '6' ?>">
                             <div class="form-group float-end">
                                 <h2>TOTAL: <span class="total">{{ number_format($pd->total_amount, 2) }}</span></h2>
                             </div>

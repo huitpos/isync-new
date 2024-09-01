@@ -109,7 +109,7 @@ class PurchaseRequestController extends Controller
             'branch_id' => $branch->id
         ])->count();
 
-        $branchCode = strtoupper($branch->branch_code);
+        $branchCode = strtoupper($branch->code);
         $date = date('Ymd');
         $counter = str_pad($prCount+1, 4, '0', STR_PAD_LEFT);
         $prNumber = "PR$branchCode$date$counter";
@@ -202,7 +202,7 @@ class PurchaseRequestController extends Controller
                     'branch_id' => $branch->id
                 ])->count();
 
-                $branchCode = strtoupper($branch->branch_code);
+                $branchCode = strtoupper($branch->code);
                 $date = date('Ymd');
                 $counter = str_pad($poCount+1, 4, '0', STR_PAD_LEFT);
                 $poNumber = "PO$branchCode$date$counter";

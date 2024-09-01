@@ -18,6 +18,13 @@
                     <div class="image-input-wrapper w-125px h-125px" style="border: 1px dashed #92A0B3; background-size:contain; background-repeat: no-repeat; background-image: url('{{ Storage::disk('s3')->url($product->image) }}');"></div>
                 </div>
             </div>
+            @else
+            <div class="pb-1 fs-6">
+                <div class="fw-bold mt-5">Image</div>
+                <div class="text-gray-600">
+                    <div class="image-input-wrapper w-125px h-125px" style="border: 1px dashed #92A0B3; background-size:contain; background-repeat: no-repeat; background-image: url('https://isync-bucket.s3.ap-southeast-1.amazonaws.com/images/no-image.png');"></div>
+                </div>
+            </div>
             @endif
 
             <div class="pb-1 fs-6 mt-7">

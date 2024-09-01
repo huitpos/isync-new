@@ -27,7 +27,7 @@ class ProductPhysicalCountsDataTable extends DataTable
                     'companySlug' => $companySlug,
                     'branchSlug' => $branchSlug,
                     'product_physical_count' => $data->id
-                ]) . '">' . $data->id . '</a>';
+                ]) . '">' . $data->pcount_number . '</a>';
             })
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;
@@ -82,7 +82,7 @@ class ProductPhysicalCountsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('sto_number')->title('ID'),
+            Column::make('pcount_number')->title('pcount number'),
             Column::make('branch.name')->title('Destination Branch'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\ProductPhysicalCount;
 
 use App\DataTables\Branch\ProductPhysicalCountsDataTable;
-
+use App\Models\PurchaseOrder;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 
 class ProductPhysicalCountController extends Controller
@@ -87,6 +87,17 @@ class ProductPhysicalCountController extends Controller
         $physicalCountData['action_by'] = auth()->user()->id;
         unset($physicalCountData['pr_items']);
         unset($physicalCountData['pr_selected_product_text']);
+
+        $pcountCount = PurchaseOrder::where([
+            'branch_id' => $branch->id
+        ])->count();
+
+        $branchCode = strtoupper($branch->code);
+        $date = date('Ymd');
+        $counter = str_pad($pcountCount+1, 4, '0', STR_PAD_LEFT);
+        $pcountNumber = "PCOUNT$branchCode$date$counter";
+
+        $physicalCountData['pcount_number'] = $pcountNumber;
 
         //save the purchase request and its items using model
         $physicalCount = new ProductPhysicalCount();
