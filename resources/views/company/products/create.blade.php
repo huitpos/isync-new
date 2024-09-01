@@ -433,7 +433,7 @@
                     <label class="form-label">Item Type</label>
                     <select id="item_type_id" name="item_type_id" data-control="select2" data-placeholder="Select Item Type" class="form-select @error('item_type_id') is-invalid @enderror" required>
                         <option value=""></option>
-                        @foreach ($company->itemTypes as $itemType)
+                        @foreach ($itemTypes as $itemType)
                         <option value="{{ $itemType->id }}" {{ $itemType->id == old('item_type_id') ? 'selected' : '' }}>{{ $itemType->name }}</option>
                         @endforeach
                     </select>

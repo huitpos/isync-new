@@ -11,14 +11,20 @@
 
                 <div class="row mb-5">
 
-                    <div class="col-md-2">
+                    <div class="col-md-4">
                         <label class="form-label">Date</label>
-                        <input id="start_date" data-month-select-only="true" value="{{ old('start_date') ?? $dateParam }}" name="start_date" type="text" class="form-control @error('start_date') is-invalid @enderror flatpack-picker" placeholder="Date From" required/>
-
-                        @error('start_date')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
+                        <input id="date_range" 
+                            data-selected-range="{{ $selectedRangeParam }}" 
+                            data-kt-daterangepicker="true" 
+                            data-start-date="{{ $startDateParam }}" 
+                            data-end-date="{{ $endDateParam }}" 
+                            name="date_range" 
+                            type="text" 
+                            class="form-control"
+                            data-kt-daterangepicker-opens="right"
+                        />
                     </div>
+
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary mt-8">Export</button>
                     </div>
@@ -125,23 +131,35 @@
             $("#kt_datatable_zero_configuration").DataTable();
 
             document.addEventListener('DOMContentLoaded', (event) => {
-                const startDate = document.getElementById('start_date');
+                const dateRange = document.getElementById('date_range');
 
                 function updateURLAndRefresh() {
-                    const dateValue = startDate.value;
+                    const dateValue = dateRange.value;
+
+                    const selectedRange = $("#date_range").attr("data-selected-range");
+                    const startDate = $("#date_range").attr("data-start-date");
+                    const endDate = $("#date_range").attr("data-end-date");
 
                     const url = new URL(window.location.href);
                     if (dateValue) {
-                        url.searchParams.set('start_date', dateValue);
+                        url.searchParams.set('date_range', dateValue);
                     } else {
-                        url.searchParams.delete('start_date');
+                        url.searchParams.delete('date_range');
                     }
+
+                    //use selectedRange, startDate, endDate in searchParams
+                    url.searchParams.set('selectedRange', selectedRange);
+                    url.searchParams.set('startDate', startDate);
+                    url.searchParams.set('endDate', endDate);   
 
                     window.location.href = url.toString();
                 }
 
-                startDate.addEventListener('change', updateURLAndRefresh);
-                branchId.addEventListener('change', updateURLAndRefresh);
+                dateRange.addEventListener('change', updateURLAndRefresh);
+
+                $("#date_range").on("change.datetimepicker", ({date, oldDate}) => {
+                    updateURLAndRefresh()
+                });
             });
         </script>
     @endpush

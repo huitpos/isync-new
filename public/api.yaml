@@ -709,6 +709,12 @@ paths:
                 company_id:
                   type: integer
                   default: null
+                is_account_receivable_redeem:
+                  type: boolean
+                  default: false
+                account_receivable_redeem_at:
+                  type: string
+                  default: null
       responses:
         '200':
           content:
@@ -1136,6 +1142,9 @@ paths:
                 company_id:
                   type: integer
                   default: null
+                is_account_receivable:
+                  type: boolean
+                  default: false
       responses:
         '200':
           content:
@@ -2407,6 +2416,8 @@ paths:
                   type: boolean
                 company_id:
                   type: integer
+                is_zero_rated:
+                  type: boolean
       responses:
         '200':
           content:
@@ -2557,6 +2568,8 @@ paths:
                   type: string
                 company_id:
                   type: integer
+                is_zero_rated:
+                  type: boolean
       responses:
         '200':
           content:
@@ -2628,8 +2641,6 @@ paths:
                 branch_id:
                   type: integer
                 end_of_day_id:
-                  type: integer
-                discount_type_id:
                   type: integer
                 name:
                   type: string

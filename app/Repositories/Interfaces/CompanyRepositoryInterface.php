@@ -15,7 +15,9 @@ interface CompanyRepositoryInterface
     function delete(String $id): Bool;
     function getTransactionAmount(String $id): float;
     function getTransactionCostAmount(String $id): float;
-    function getTransactionCount(String $id): int;
+    function getTransactionCount(String $id, string $startDate, string $endDate, string $branchId): int;
     function getCompletedTransactions(String $id): ?Collection;
     function getPendingTransactions(String $id): ?Collection;
+    function getTransactionNetSales(String $id, string $startDate, string $endDate, string $branchId): ?float;
+    function getTransactionGrossSales(String $id, string $startDate, string $endDate, string $branchId): ?float;
 }

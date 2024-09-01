@@ -27,7 +27,7 @@ class ProductDisposalsDataTable extends DataTable
                     return '<a href="' . route('company.product-disposals.show', [
                         'companySlug' => $companySlug,
                         'product_disposal' => $data->id
-                    ]) . '">' . $data->id . '</a>';
+                    ]) . '">' . $data->pdis_number . '</a>';
                 } else {
                     return $data->id;
                 }
@@ -88,7 +88,7 @@ class ProductDisposalsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('sto_number')->title('ID'),
+            Column::make('sto_number')->title('pdis number'),
             Column::make('branch.name')->title('Branch'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
