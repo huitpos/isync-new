@@ -410,6 +410,8 @@ class MiscController extends BaseController
             'customer_name' => $request->customer_name,
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
             'company_id' => $request->company_id,
+            'is_account_receivable_redeem' => $request->is_account_receivable_redeem,
+            'account_receivable_redeem_at' => $request->account_receivable_redeem_at,
         ];
 
         //check if existing. update if yes
@@ -811,6 +813,7 @@ class MiscController extends BaseController
             'void_by' => $request->void_by ?? null,
             'void_by_id' => $request->void_by_id ?? null,
             'company_id' => $request->company_id,
+            'is_account_receivable' => $request->is_account_receivable,
         ];
 
         $payment = Payment::where([
@@ -2068,6 +2071,7 @@ class MiscController extends BaseController
             'treg' => $request->treg,
             'is_cut_off' => $request->is_cut_off,
             'company_id' => $request->company_id,
+            'is_zero_rated' => $request->is_zero_rated,
         ];
 
         $message = 'cut off discount created successfully.';
@@ -2238,6 +2242,7 @@ class MiscController extends BaseController
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
             'company_id' => $request->company_id,
+            'is_zero_rated' => $request->is_zero_rated,
         ];
 
         $message = 'end of day discount created successfully.';
@@ -2312,7 +2317,6 @@ class MiscController extends BaseController
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
             'end_of_day_id' => 'required',
-            'discount_type_id' => 'required',
             'name' => 'required',
             'transaction_count' => 'required',
             'amount' => 'required',
@@ -2329,7 +2333,6 @@ class MiscController extends BaseController
             'pos_machine_id' => $request->pos_machine_id,
             'branch_id' => $request->branch_id,
             'end_of_day_id' => $request->end_of_day_id,
-            'discount_type_id' => $request->discount_type_id,
             'name' => $request->name,
             'transaction_count' => $request->transaction_count,
             'amount' => $request->amount,
