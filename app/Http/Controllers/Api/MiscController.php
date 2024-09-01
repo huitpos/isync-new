@@ -2339,6 +2339,7 @@ class MiscController extends BaseController
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
             'company_id' => $request->company_id,
+            'department_id' => $request->department_id,
         ];
 
         $message = 'end of day department created successfully.';
