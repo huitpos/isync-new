@@ -2654,6 +2654,8 @@ paths:
                   type: string
                 company_id:
                   type: integer
+                department_id:
+                  type: integer
       responses:
         '200':
           content:
