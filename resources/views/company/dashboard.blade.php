@@ -142,7 +142,9 @@
 
             var options = {
                 title: 'Department Sales',
-                pieHole: 0
+                pieHole: 0,
+                pieSliceText: 'percentage',
+                sliceVisibilityThreshold : 0
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie'));
@@ -155,7 +157,9 @@
 
             var options = {
                 title: 'Top Sold Items',
-                pieHole: 0
+                pieHole: 0,
+                pieSliceText: 'percentage',
+                sliceVisibilityThreshold : 0
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie2'));
@@ -168,7 +172,9 @@
 
             var options = {
                 title: 'Top Payment Type',
-                pieHole: 0
+                pieHole: 0,
+                pieSliceText: 'percentage',
+                sliceVisibilityThreshold : 0
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie3'));
