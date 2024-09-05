@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
@@ -50,7 +51,7 @@ class PageController extends Controller
             ->select(
                 DB::raw('DATE_FORMAT(transactions.completed_at, "%Y-%m") as `year_month`'),
                 DB::raw('branches.name as branch'),
-                DB::raw('SUM(net_sales) as total_sales')
+                DB::raw('SUM(gross_sales) as total_sales')
             )
             ->join('branches', function ($join) use ($company, $branchId) {
                 $join->on('transactions.branch_id', '=', 'branches.id')
@@ -132,6 +133,40 @@ class PageController extends Controller
             ->groupBy('departments.id', 'products.id')
             ->get();
 
+        $payments = DB::table('transactional_db.transactions')
+            ->select(
+                DB::raw('payments.payment_type_name as payment_type'),
+                DB::raw('count(*) as qty')
+            )
+            ->join('branches', function ($join) use ($company, $branchId) {
+                $join->on('transactions.branch_id', '=', 'branches.id')
+                     ->where('branches.company_id', '=', $company->id);
+
+                if ($branchId) {
+                    $join->where('branches.id', '=', $branchId);
+                }
+            })
+            ->join('transactional_db.payments', function ($join) use ($company, $branchId) {
+                $join->on('transactions.transaction_id', '=', 'payments.transaction_id')
+                    ->on('transactions.branch_id', '=', 'payments.branch_id')
+                    ->on('transactions.pos_machine_id', '=', 'payments.pos_machine_id')
+                    ->where('branches.company_id', '=', $company->id);
+
+                if ($branchId) {
+                    $join->where('branches.id', '=', $branchId);
+                }
+            })
+            ->where('transactions.is_complete', true)
+            ->where('transactions.is_void', false)
+            ->whereBetween('transactions.completed_at', [$startDate, $endDate])
+            ->groupBy('payments.payment_type_name')
+            ->get();
+
+        $paymentTypeSales = [];
+        foreach ($payments as $payment) {
+            $paymentTypeSales[] = [$payment->payment_type, $payment->qty];
+        }
+
         foreach ($orders as $order) {
             if (!isset($departmentSales[$order->department_name])) {
                 $departmentSales[$order->department_name] = 0;
@@ -176,8 +211,6 @@ class PageController extends Controller
         foreach ($top20 as $item => $value) {
             $itemSales[] = [$item, $value];
         }
-
-        $paymentTypeSales[] = ['Cash', 100];
 
         return view('company.dashboard', [
             'company' => $company,

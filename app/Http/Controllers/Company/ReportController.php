@@ -90,7 +90,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new SalesInvoicesReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Invoices Report - $dateParam.xlsx");
+            return Excel::download(new SalesInvoicesReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Invoices Report.xlsx");
         }
 
         $transactions = Transaction::where('branch_id', $branchId)
@@ -136,7 +136,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new SalesTransactionReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Transaction Report - $dateParam.xlsx");
+            return Excel::download(new SalesTransactionReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Transaction Report.xlsx");
         }
 
         $transactions = Transaction::where('branch_id', $branchId)
@@ -178,7 +178,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new VoidTransactionsReportExport($branchId, $startDate, $endDate), "$branch->name - Void Transactions Report - $dateParam.xlsx");
+            return Excel::download(new VoidTransactionsReportExport($branchId, $startDate, $endDate), "$branch->name - Void Transactions Report.xlsx");
         }
 
         $transactions = Transaction::where([
@@ -216,7 +216,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new VatSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Vat Sales Report - $dateParam.xlsx");
+            return Excel::download(new VatSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Vat Sales Report.xlsx");
         }
 
         $transactions = Transaction::where('branch_id', $branchId)
@@ -252,7 +252,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new XReadingReportExport($branchId, $startDate, $endDate), "$branch->name - X Reading Report - $dateParam.xlsx");
+            return Excel::download(new XReadingReportExport($branchId, $startDate, $endDate), "$branch->name - X Reading Report.xlsx");
         }
 
         $cutoffs = CutOff::where('branch_id', $branchId)
@@ -297,7 +297,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new ZReadingReportExport($branchId, $startDate, $endDate), "$branch->name - Z Reading Report - $dateParam.xlsx");
+            return Excel::download(new ZReadingReportExport($branchId, $startDate, $endDate), "$branch->name - Z Reading Report.xlsx");
         }
 
         $paymentTypes = PaymentType::where('company_id', $company->id)
@@ -348,7 +348,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post') && !$request->input('search')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new DiscountsReportExport($branchId, $startDate, $endDate, $filterDiscountTypes), "$branch->name - Discounts Report - $dateParam.xlsx");
+            return Excel::download(new DiscountsReportExport($branchId, $startDate, $endDate, $filterDiscountTypes), "$branch->name - Discounts Report.xlsx");
         }
 
         $discounts = Discount::select([
