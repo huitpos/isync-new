@@ -3258,4 +3258,23 @@ class MiscController extends BaseController
 
         return $this->sendResponse($response, 'product retrieved successfully.');
     }
+
+    public function getUnredeemedArTransactions(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $transactions = Transaction::where([
+                'is_account_receivable' => true,
+                'is_account_receivable_redeem' => false,
+            ])
+            ->get();
+
+        return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
+    }
 }

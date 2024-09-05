@@ -167,6 +167,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/end-of-day-products', [MiscController::class, 'saveEndOfDayProducts']);
 
         Route::get('/branch-product-soh', [MiscController::class, 'getProductSoh']);
+        Route::get('/unredeemed-ar-transactions', [MiscController::class, 'getUnredeemedArTransactions']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
