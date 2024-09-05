@@ -160,7 +160,7 @@
                     @endforeach
 
                     <div class="row mb-5">
-                        @if ($pd->status == 'approved')
+                        @if ($pr->status == 'approved')
                         <div class="col-md-6">
                             <div class="form-group">
                                 <a href="{{ route('branch.purchase-requests.print', ['companySlug' => $company->slug, 'id' => $pr->id, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">Print</a>

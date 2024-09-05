@@ -141,7 +141,7 @@
                     @endforeach
 
                     <div class="row mb-5">
-                        @if ($pd->status == 'approved')
+                        @if ($po->status == 'approved')
                         <div class="col-md-6">
                             <div class="form-group">
                                 <a href="{{ route('company.purchase-orders.print', ['companySlug' => $company->slug, 'id' => $po->id]) }}" class="btn btn-primary">Print</a>
