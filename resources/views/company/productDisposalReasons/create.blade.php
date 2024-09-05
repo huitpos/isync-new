@@ -14,6 +14,18 @@
                 @csrf
 
                 <div class="mb-4">
+                    <label class="form-label">Status</label>
+                    <select id="status" name="status" class="form-select @error('status') is-invalid @enderror" required>
+                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
                     <label class="form-label">Reason</label>
                     <input value="{{ old('name') }}" name="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="Reason" required/>
 
