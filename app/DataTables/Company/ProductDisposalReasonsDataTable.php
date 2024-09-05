@@ -64,6 +64,7 @@ class ProductDisposalReasonsDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('name'),
+            Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),

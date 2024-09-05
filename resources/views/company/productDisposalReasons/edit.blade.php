@@ -15,6 +15,18 @@
                 @method('PUT')
 
                 <div class="mb-4">
+                    <label class="form-label">Status</label>
+                    <select id="status" name="status" class="form-control @error('status') is-invalid @enderror" required>
+                        <option value="active" {{ old('status') == 'active' || $reason->status == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status') == 'inactive' || $reason->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
                     <label class="form-label">Reason</label>
                     <input value="{{ old('name') ?? $reason->name }}" name="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="Reason" required/>
 
