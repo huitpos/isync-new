@@ -69,7 +69,7 @@
                                 <th>{{ $transaction->machine->machine_number }}</th>
                                 <th>{{ number_format($transaction->discount_amount, 2) }}</th>
                                 <th>{{ number_format($transaction->gross_sales, 2) }}</th>
-                                <th>{{ number_format($transaction->net_sales, 2) }}</th>
+                                <th>{{ number_format($transaction->net_sales - $transaction->vat_amount, 2) }}</th>
                                 <th>{{ $transaction->void_remarks }}</th>
                                 <th>{{ $transaction->cashier_name }}</th>
                                 <th></th>

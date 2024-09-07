@@ -51,7 +51,9 @@ class ValidateCompanySlug
 
         if ($companySlug) {
             // Check if the company with this slug exists
-            $company = Company::where('slug', $companySlug)->first();
+            $company = Company::where('slug', $companySlug)
+                ->where('id', $user->company_id)
+                ->first();
 
             if (!$company) {
                 return abort(404, 'Company not found');

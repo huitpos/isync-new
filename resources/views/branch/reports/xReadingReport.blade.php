@@ -82,7 +82,7 @@
                                 <th>{{ $cutoff->ending_or }}</th>
                                 <th>{{ $cutoff->treg }}</th>
                                 <th>{{ number_format($cutoff->gross_sales, 2) }}</th>
-                                <th>{{ number_format($cutoff->net_sales, 2) }}</th>
+                                <th>{{ number_format($cutoff->net_sales - $cutoff->vat_amount, 2) }}</th>
                                 <th>{{ number_format($cutoff->vatable_sales, 2) }}</th>
                                 <th>{{ number_format($cutoff->vat_exempt_sales, 2) }}</th>
                                 <th>{{ number_format($cutoff->vat_amount, 2) }}</th>

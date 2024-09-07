@@ -85,7 +85,7 @@ class VoidTransactionsReportExport implements FromCollection, WithHeadings, With
             $transaction->machine->machine_number,
             $transaction->discount_amount ?: 0,
             $transaction->gross_sales ?: 0,
-            $transaction->net_sales ?: 0,
+            $transaction->net_sales - $transaction->vat_amount,
             $transaction->void_remarks,
             $transaction->cashier_name,
             ''

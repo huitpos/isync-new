@@ -3,10 +3,6 @@
         {{ $chargeAccount->name }}
     @endsection
 
-    @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.chargeAccounts.show', $company, $chargeAccount) }}
-    @endsection
-
     <div class="card">
         <div class="card-body">
             <div class="pb-1 fs-6 mb-2">

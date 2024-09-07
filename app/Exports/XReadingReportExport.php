@@ -127,7 +127,7 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             $cutoff->ending_or, //Ending OR #
             $cutoff->treg, //Cut Off Date
             number_format($cutoff->gross_sales ?: 0, 2), //Gross Sales
-            number_format($cutoff->net_sales ?: 0, 2), //Net Sales
+            number_format($cutoff->net_sales - $cutoff->vat_amount, 2), //Net Sales
             number_format($cutoff->vatable_sales ?: 0, 2), //Vatable Sales
             number_format($cutoff->vat_exempt_sales ?: 0, 2), //Vat Exempt Sales
             number_format($cutoff->vat_amount ?: 0, 2), //Vat Amount,

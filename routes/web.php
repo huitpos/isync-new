@@ -17,7 +17,6 @@ use App\Http\Controllers\Company\CategoryController as CompanyCategoryController
 use App\Http\Controllers\Company\SubcategoryController as CompanySubcategoryController;
 use App\Http\Controllers\Company\UnitOfMeasurementController as CompanyUnitOfMeasurementController;
 use App\Http\Controllers\Company\PaymentTypeController as CompanyPaymentTypeController;
-use App\Http\Controllers\Company\ChargeAccountController as CompanyChargeAccountController;
 use App\Http\Controllers\Company\BankController as CompanyBankController;
 use App\Http\Controllers\Company\DiscountTypeController as CompanyDiscountTypeController;
 use App\Http\Controllers\Company\ItemTypeController as CompanyItemTypeController;
@@ -59,6 +58,7 @@ use App\Http\Controllers\Branch\StockTransferOrderController as BranchStockTrans
 use App\Http\Controllers\Branch\StockTransferDeliveryController as BranchStockTransferDeliveryController;
 use App\Http\Controllers\Branch\ProductPhysicalCountController as BranchProductPhysicalCountController;
 use App\Http\Controllers\Branch\ProductDisposalController as BranchProductDisposalController;
+use App\Http\Controllers\Branch\ChargeAccountController as BranchChargeAccountController;
 
 use Illuminate\Support\Facades\Response;
 
@@ -140,7 +140,6 @@ Route::middleware('auth')->group(function () {
         Route::resource('unit-of-measurements', CompanyUnitOfMeasurementController::class, ['as' => 'company']);
         Route::post('/unit-of-measurements/save-conversion', [CompanyUnitOfMeasurementController::class, 'saveConversion'])->name('company.unit-of-measurements.save-conversion');
         Route::resource('payment-types', CompanyPaymentTypeController::class, ['as' => 'company']);
-        Route::resource('charge-accounts', CompanyChargeAccountController::class, ['as' => 'company']);
         Route::resource('banks', CompanyBankController::class, ['as' => 'company']);
         Route::resource('discount-types', CompanyDiscountTypeController::class, ['as' => 'company']);
         Route::resource('item-types', CompanyItemTypeController::class, ['as' => 'company']);
@@ -208,6 +207,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/purchase-deliveries/{id}/print', [BranchPurchaseDeliveryController::class, 'print'])->name('branch.purchase-deliveries.print');
 
             Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');
+
+            Route::resource('charge-accounts', BranchChargeAccountController::class, ['as' => 'branch']);
 
             Route::prefix('reports')->group(function () {
                 Route::get('/transactions', [BranchReportController::class, 'transactions'])->name('branch.reports.transactions');

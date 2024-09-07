@@ -6,6 +6,8 @@ use App\Models\Company;
 use App\Models\Transaction;
 use Illuminate\Support\Collection;
 
+use Illuminate\Support\Facades\DB;
+
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 
 class CompanyRepository implements CompanyRepositoryInterface
@@ -66,9 +68,12 @@ class CompanyRepository implements CompanyRepositoryInterface
             ->where('is_void', false)
             ->where('is_back_out', false)
             ->whereBetween('completed_at', [$startDate, $endDate])
-            ->sum('net_sales');
+            ->select(
+                DB::raw('SUM(net_sales - discount_amount) as total_sales')
+            )
+            ->get();
 
-        return $amount;
+        return $amount[0]->total_sales;
     }
 
     public function getTransactionGrossSales(String $id, String $startDate = '', String $endDate = '', String $branchId = null): Float

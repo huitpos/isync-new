@@ -71,7 +71,7 @@
                                 <th>{{ $transaction->cashier_name }}</th>
                                 <th>{{ $transaction->shift_number }}</th>
                                 <th>{{ number_format($transaction->gross_sales, 2) }}</th>
-                                <th>{{ number_format($transaction->net_sales, 2) }}</th>
+                                <th>{{ number_format($transaction->net_sales - $transaction->vat_amount, 2) }}</th>
                                 <th>{{ number_format($transaction->vatable_sales, 2) }}</th>
                                 <th>{{ number_format($transaction->vat_amount, 2) }}</th>
                                 <th>{{ number_format($transaction->vat_exempt_sales, 2) }}</th>

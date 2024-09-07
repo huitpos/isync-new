@@ -84,7 +84,7 @@
                                 <td>{{ number_format($data->beginning_amount, 2) }}</td>
                                 <td>{{ number_format($data->ending_amount, 2) }}</td>
                                 <td>{{ number_format($data->gross_sales, 2) }}</td>
-                                <td>{{ number_format($data->net_sales, 2) }}</td>
+                                <td>{{ number_format($data->net_sales - $data->vat_amount, 2) }}</td>
                                 <td>{{ number_format($data->vatable_sales, 2) }}</td>
                                 <td>{{ number_format($data->vat_exempt_sales, 2) }}</td>
                                 <td>{{ number_format($data->vat_amount, 2) }}</td>

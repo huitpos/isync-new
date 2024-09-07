@@ -132,7 +132,7 @@ class MiscController extends BaseController
     {
         $branch = Branch::with('company')->find($branchId);
 
-        $chargeAccounts = $branch->company->chargeAccounts;
+        $chargeAccounts = $branch->chargeAccounts;
 
         return $this->sendResponse($chargeAccounts, 'Charge Accounts retrieved successfully.');
     }

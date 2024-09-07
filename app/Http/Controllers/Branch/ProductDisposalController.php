@@ -52,7 +52,9 @@ class ProductDisposalController extends Controller
             'status' => 'active'
         ])->get();
 
-        $reasons = $company->productDisposalReasons;
+        $reasons = $company->productDisposalReasons()->where([
+            'status' => 'active'
+        ])->get();
 
         return view('branch.productDisposals.create', [
             'company' => $company,

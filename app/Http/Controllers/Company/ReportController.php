@@ -124,16 +124,6 @@ class ReportController extends Controller
             $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
         }
 
-        if ($request->isMethod('post') && !$request->input('search')) {
-            $branch = Branch::find($branchId);
-            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
-        }
-
-        if ($request->isMethod('post') && !$request->input('search')) {
-            $branch = Branch::find($branchId);
-            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
-        }
-
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
             return Excel::download(new SalesTransactionReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Transaction Report.xlsx");
@@ -171,10 +161,6 @@ class ReportController extends Controller
             $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
         }
 
-        if ($request->isMethod('post') && !$request->input('search')) {
-            $branch = Branch::find($branchId);
-            return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
-        }
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);

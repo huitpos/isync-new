@@ -284,6 +284,12 @@
 					</div>
 				</div>
 
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('branch.charge-accounts.*') ? 'active' : '' }}" href="{{ route('branch.charge-accounts.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+						<span class="menu-title">Charge Accounts</span>
+					</a>
+				</div>
+
 			@elseif (request()->attributes->get('company'))
 				@if (in_array('Main Dashboard', $permissions))
 				<div class="menu-item">
@@ -515,14 +521,6 @@
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.suppliers.*') ? 'active' : '' }}" href="{{ route('company.suppliers.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 								<span class="menu-title">Suppliers</span>
-							</a>
-						</div>
-						@endif
-
-						@if (in_array('Settings/Charge Accounts', $permissions))
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.charge-accounts.*') ? 'active' : '' }}" href="{{ route('company.charge-accounts.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Charge Accounts</span>
 							</a>
 						</div>
 						@endif

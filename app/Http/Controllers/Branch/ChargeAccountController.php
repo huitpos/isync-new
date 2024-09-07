@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Company;
+namespace App\Http\Controllers\Branch;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\ChargeAccountRepositoryInterface;
 
-use App\DataTables\Company\ChargeAccountsDataTable;
+use App\DataTables\Branch\ChargeAccountsDataTable;
 
 class ChargeAccountController extends Controller
 {
@@ -24,13 +24,14 @@ class ChargeAccountController extends Controller
     public function index(Request $request, ChargeAccountsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
-        $permissions = $request->attributes->get('permissionNames');
+        $branch = $request->attributes->get('branch');
 
         return $dataTable->with([
-                'company_id' => $company->id,
-                'permissions' => $permissions
+                'branch_id' => $branch->id,
+                'company_slug' => $company->slug,
+                'branch_slug' => $branch->slug,
             ])
-            ->render('company.chargeAccounts.index', compact('company', 'permissions'));
+            ->render('branch.chargeAccounts.index', compact('company', 'branch'));
     }
 
     /**
@@ -39,9 +40,11 @@ class ChargeAccountController extends Controller
     public function create(Request $request)
     {
         $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
 
-        return view('company.chargeAccounts.create', [
+        return view('branch.chargeAccounts.create', [
             'company' => $company,
+            'branch' => $branch,
         ]);
     }
 
@@ -60,12 +63,14 @@ class ChargeAccountController extends Controller
         ]);
 
         $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
 
         $postData = $request->all();
         $postData['company_id'] = $company->id;
+        $postData['branch_id'] = $branch->id;
 
         if ($this->chargeAccountRepository->create($postData)) {
-            return redirect()->route('company.charge-accounts.index', ['companySlug' => $company->slug])->with('success', 'Data has been stored successfully!');
+            return redirect()->route('branch.charge-accounts.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Data has been stored successfully!');
         }
 
         return redirect()->back()->with('error', 'Data failed to store!');
@@ -74,12 +79,12 @@ class ChargeAccountController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, string $companySlug, string $id)
+    public function show(Request $request, string $companySlug, string $branchSlug, string $id)
     {
         $company = $request->attributes->get('company');
         $chargeAccount = $this->chargeAccountRepository->find($id);
 
-        return view('company.chargeAccounts.show', [
+        return view('branch.chargeAccounts.show', [
             'company' => $company,
             'chargeAccount' => $chargeAccount,
         ]);
@@ -88,13 +93,15 @@ class ChargeAccountController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, string $companySlug, string $id)
+    public function edit(Request $request, string $companySlug, string $branchSlug, string $id)
     {
         $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
         $chargeAccount = $this->chargeAccountRepository->find($id);
 
-        return view('company.chargeAccounts.edit', [
+        return view('branch.chargeAccounts.edit', [
             'company' => $company,
+            'branch' => $branch,
             'chargeAccount' => $chargeAccount,
         ]);
     }
@@ -102,7 +109,7 @@ class ChargeAccountController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $companySlug, string $id)
+    public function update(Request $request, string $companySlug, string $branchSlug, string $id)
     {
         $request->validate([
             'name' => 'required',
@@ -114,12 +121,14 @@ class ChargeAccountController extends Controller
         ]);
 
         $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
 
         $postData = $request->all();
         $postData['company_id'] = $company->id;
+        $postData['branch_id'] = $branch->id;
 
         if ($this->chargeAccountRepository->update($id, $postData)) {
-            return redirect()->route('company.charge-accounts.index', ['companySlug' => $company->slug])->with('success', 'Data has been updated successfully!');
+            return redirect()->route('branch.charge-accounts.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Data has been updated successfully!');
         }
 
         return redirect()->back()->with('error', 'Data failed to update!');

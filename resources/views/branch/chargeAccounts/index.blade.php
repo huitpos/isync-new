@@ -4,10 +4,6 @@
         Charge Accounts
     @endsection
 
-    @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.chargeAccounts.index', $company) }}
-    @endsection
-
     <div class="card">
         <div class="card-header border-0 pt-6">
             <div class="card-title">
@@ -19,12 +15,10 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                    @if (in_array('Settings/Charge Accounts/Add', $permissions)) 
-                    <a href="{{ route('company.charge-accounts.create', ['companySlug' => $company->slug]) }}" class="btn btn-primary">
+                    <a href="{{ route('branch.charge-accounts.create', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
                         Add Charge Account
                     </a>
-                    @endif
                 </div>
             </div>
         </div>
