@@ -132,7 +132,7 @@ class ZReadingReportExport implements FromCollection, WithHeadings, WithMapping,
             number_format($endOfDays->beginning_amount ?: 0, 2), //Beginning Balance
             number_format($endOfDays->ending_amount ?: 0, 2), //Ending Balance
             number_format($endOfDays->gross_sales ?: 0, 2), //Gross Sales
-            number_format($endOfDays->net_sales ?: 0, 2), //Net Sales
+            number_format($endOfDays->net_sales -> $endOfDays->vat_amount, 2), //Net Sales
             number_format($endOfDays->vatable_sales ?: 0, 2), //Vatable Sales
             number_format($endOfDays->vat_exempt_sales ?: 0, 2), //Vat Exempt Sales
             number_format($endOfDays->vat_expense ?: 0, 2), //Vat Discount

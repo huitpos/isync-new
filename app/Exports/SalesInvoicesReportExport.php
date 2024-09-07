@@ -107,7 +107,7 @@ class SalesInvoicesReportExport implements FromCollection, WithHeadings, WithMap
             $transaction->cashier_name,
             $transaction->shift_number,
             $transaction->gross_sales,
-            $transaction->net_sales,
+            $transaction->net_sales - $transaction->vat_amount,
             $transaction->vatable_sales ?: 0,
             $transaction->vat_amount ?: 0,
             $transaction->vat_exempt_sales ?: 0,

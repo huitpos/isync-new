@@ -46,32 +46,26 @@
 </form>
 
     <div class="row g-1 g-xl-5 mb-1 mb-xl-5">
-        @if (in_array('Main Dashboard/Transaction Count', $permissions))
         <div class="col-4">
             @include('partials/widgets/small_card', [
                 'text' => $transactionCount,
                 'subText' => 'Transaction Count',
             ])
         </div>
-        @endif
 
-        @if (in_array('Main Dashboard/Total Net Amount', $permissions))
-        <div class="col-4">
-            @include('partials/widgets/small_card', [
-                'text' => number_format($netAmount, 2),
-                'subText' => 'Total Net Amount',
-            ])
-        </div>
-        @endif
-
-        @if (in_array('Main Dashboard/Total Cost Amount', $permissions))
         <div class="col-4">
             @include('partials/widgets/small_card', [
                 'text' => number_format($grossAmount, 2),
-                'subText' => 'Total Gross Amount',
+                'subText' => 'Gross sales',
             ])
         </div>
-        @endif
+
+        <div class="col-4">
+            @include('partials/widgets/small_card', [
+                'text' => number_format($netAmount, 2),
+                'subText' => 'Net Sales',
+            ])
+        </div>
 
         <div class="col-12 border ">
             <div id="kt_docs_google_chart_column" style="height: 300px;"></div>
