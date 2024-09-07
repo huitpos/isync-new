@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Create a new charge account
+        Create a new customer information
     @endsection
 
     <div class="card">
