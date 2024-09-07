@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\ChargeAccountRepositoryInterface;
 
-use App\DataTables\Company\ChargeAccountsDataTable;
+use App\DataTables\Branch\ChargeAccountsDataTable;
 
 class ChargeAccountController extends Controller
 {

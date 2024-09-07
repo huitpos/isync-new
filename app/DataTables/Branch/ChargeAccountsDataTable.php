@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataTables\Company;
+namespace App\DataTables\Branch;
 
 use App\Models\ChargeAccount as Model;
 use Yajra\DataTables\Html\Column;
