@@ -75,4 +75,9 @@ class Branch extends Model
     {
         return $this->belongsToMany(Product::class)->withPivot('price', 'stock');
     }
+
+    public function chargeAccounts()
+    {
+        return $this->hasMany(ChargeAccount::class);
+    }
 }

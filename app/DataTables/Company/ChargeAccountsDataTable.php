@@ -20,24 +20,16 @@ class ChargeAccountsDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (Model $data) {
-                if (in_array('Settings/Charge Accounts/View', $this->permissions)) {
-                    return view('company.datatables._link', [
-                        'url' => route('company.charge-accounts.show', ['companySlug' => $data->company->slug, 'charge_account' => $data->id]),
-                        'text' => $data->name,
-                    ]);
-                } else {
-                    return $data->name;
-                }
+                return view('company.datatables._link', [
+                    'url' => route('branch.charge-accounts.show', ['companySlug' => $this->company_slug, 'branchSlug' => $this->branch_slug, 'charge_account' => $data->id]),
+                    'text' => $data->name,
+                ]);
             })
             ->addColumn('actions', function (Model $data) {
-                if (in_array('Settings/Charge Accounts/Edit', $this->permissions)) {
-                    return view('company.datatables._actions', [
-                        'param' => ['charge_account' => $data->id, 'companySlug' => $data->company->slug],
-                        'route' => 'company.charge-accounts',
-                    ]);
-                } else {
-                    return '';
-                }
+                return view('company.datatables._actions', [
+                    'param' => ['charge_account' => $data->id, 'companySlug' => $this->company_slug, 'branchSlug' => $this->branch_slug],
+                    'route' => 'branch.charge-accounts',
+                ]);
             });
     }
 
@@ -48,9 +40,8 @@ class ChargeAccountsDataTable extends DataTable
     public function query(Model $model): QueryBuilder
     {
         return $model->newQuery()
-            ->where('company_id', $this->company_id)
+            ->where('branch_id', $this->branch_id)
             ->with([
-                'company',
                 'createdBy',
             ]);
     }
