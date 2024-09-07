@@ -286,7 +286,7 @@
 
 				<div class="menu-item">
 					<a class="menu-link {{ request()->routeIs('branch.charge-accounts.*') ? 'active' : '' }}" href="{{ route('branch.charge-accounts.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-						<span class="menu-title">Charge Accounts</span>
+						<span class="menu-title">Customer Informations</span>
 					</a>
 				</div>
 

@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Edit charge account
+        Edit customer information
     @endsection
 
     <div class="card">

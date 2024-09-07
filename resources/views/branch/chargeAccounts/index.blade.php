@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Charge Accounts
+        Customer Informations
     @endsection
 
     <div class="card">
@@ -17,7 +17,7 @@
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
                     <a href="{{ route('branch.charge-accounts.create', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
-                        Add Charge Account
+                        Add Customer Information
                     </a>
                 </div>
             </div>
