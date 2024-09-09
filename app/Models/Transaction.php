@@ -40,9 +40,41 @@ class Transaction extends Model
         });
     }
 
+    public function discounts()
+    {
+        return $this->hasMany(Discount::class, 'transaction_id', 'transaction_id')->where(function ($query) {
+            $query->where('branch_id', $this->branch_id)
+                  ->where('pos_machine_id', $this->pos_machine_id);
+        });
+    }
+
+    public function discountDetails()
+    {
+        return $this->hasMany(DiscountDetail::class, 'transaction_id', 'transaction_id')->where(function ($query) {
+            $query->where('branch_id', $this->branch_id)
+                  ->where('pos_machine_id', $this->pos_machine_id);
+        });
+    }
+
     public function payments()
     {
         return $this->hasMany(Payment::class, 'transaction_id', 'transaction_id')->where(function ($query) {
+            $query->where('branch_id', $this->branch_id)
+                  ->where('pos_machine_id', $this->pos_machine_id);
+        });
+    }
+
+    public function paymentOtherInformations()
+    {
+        return $this->hasMany(PaymentOtherInformation::class, 'transaction_id', 'transaction_id')->where(function ($query) {
+            $query->where('branch_id', $this->branch_id)
+                  ->where('pos_machine_id', $this->pos_machine_id);
+        });
+    }
+
+    public function officialReceiptInformations()
+    {
+        return $this->hasMany(OfficialReceiptInformation::class, 'transaction_id', 'transaction_id')->where(function ($query) {
             $query->where('branch_id', $this->branch_id)
                   ->where('pos_machine_id', $this->pos_machine_id);
         });

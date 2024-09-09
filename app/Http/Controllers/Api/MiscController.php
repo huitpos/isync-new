@@ -3275,6 +3275,15 @@ class MiscController extends BaseController
             ])
             ->get();
 
+        foreach ($transactions as $transaction) {
+            $transaction->items;
+            $transaction->discounts;
+            $transaction->discountDetails;
+            $transaction->payments;
+            $transaction->paymentOtherInformations;
+            $transaction->officialReceiptInformations;
+        }
+
         return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
     }
 }
