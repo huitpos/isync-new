@@ -3270,6 +3270,7 @@ class MiscController extends BaseController
         }
 
         $transactions = Transaction::where([
+                'branch_id' => $request->branch_id,
                 'is_account_receivable' => true,
                 'is_account_receivable_redeem' => false,
             ])
