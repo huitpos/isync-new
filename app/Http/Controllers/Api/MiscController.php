@@ -3284,6 +3284,7 @@ class MiscController extends BaseController
             $transaction->payments;
             $transaction->paymentOtherInformations;
             $transaction->officialReceiptInformations;
+            $transaction->discountOtherInformation;
         }
 
         return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
