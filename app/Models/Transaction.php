@@ -79,4 +79,12 @@ class Transaction extends Model
                   ->where('pos_machine_id', $this->pos_machine_id);
         });
     }
+
+    public function discountOtherInformation()
+    {
+        return $this->hasMany(DiscountOtherInformation::class, 'transaction_id', 'transaction_id')->where(function ($query) {
+            $query->where('branch_id', $this->branch_id)
+                  ->where('pos_machine_id', $this->pos_machine_id);
+        });
+    }
 }
