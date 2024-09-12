@@ -3527,7 +3527,7 @@ paths:
                   type: string
 
 
-    /api/ar-transactions:
+  /api/ar-transactions:
     post:
       tags:
         - Sync To Server
