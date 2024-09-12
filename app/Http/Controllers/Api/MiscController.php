@@ -3288,4 +3288,39 @@ class MiscController extends BaseController
 
         return $this->sendResponse($transactions, 'Transactions retrieved successfully.');
     }
+
+    public function updateArTransaction(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'transaction_id' => 'required',
+            'pos_machine_id' => 'required',
+            'is_void' => 'required',
+            'void_by' => 'required',
+            'void_at' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        $transaction = Transaction::where([
+            'branch_id' => $request->branch_id,
+            'transaction_id' => $request->transaction_id,
+            'pos_machine_id' => $request->pos_machine_id,
+        ])
+        ->first();
+
+        if (!$transaction) {
+            return $this->sendError('Transaction not found.', [], 404);
+        }
+
+        $transaction->update([
+            'is_void' => $request->is_void,
+            'void_by' => $request->void_by,
+            'void_at' => $request->void_at,
+        ]);
+
+        return $this->sendResponse($transaction, 'Transaction updated successfully.');
+    }
 }

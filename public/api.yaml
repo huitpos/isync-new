@@ -3525,3 +3525,38 @@ paths:
                 type: array
                 items:
                   type: string
+
+
+    /api/ar-transactions:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: integer
+                pos_machine_id:
+                  type: integer
+                transaction_id:
+                  type: integer
+                is_void:
+                  type: boolean
+                  default: false
+                void_by_id:
+                  type: integer
+                  default: null
+                void_at:
+                  type: string
+                  default: null
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
