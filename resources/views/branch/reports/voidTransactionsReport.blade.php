@@ -25,6 +25,21 @@
                     </div>
 
                     <div class="col-md-4">
+                        <label class="form-label">Payment Type</label>
+
+                        <select id="payment_type" name="payment_type" class="form-select @error('branch') is-invalid @enderror" required>
+                            <option value="">All</option>
+                            @foreach ($paymentTypes as $paymentType)
+                                <option value="{{ $paymentType->id }}" {{ $paymentType->id == $paymentTypeId ? 'selected' : '' }}>{{ $paymentType->name }}</option>
+                            @endforeach
+                        </select>
+
+                        @error('branch')
+                            <div class="invalid-feedback"> {{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
                         <button type="submit" class="btn btn-primary mt-8">Export</button>
                     </div>
                 </div>
@@ -44,10 +59,17 @@
                             <th>Remarks</th>
                             <th>Cashier</th>
                             <th>Approved By</th>
+                            <th>Payment Type</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($transactions as $transaction)
+                            @php
+                                $uniquePaymentTypes = $transaction->payments
+                                    ->pluck('payment_type_name')  // Extract payment_type_name
+                                    ->unique()                    // Get unique values
+                                    ->implode(','); 
+                            @endphp
                             <tr>
                                 <th>{{ $transaction->void_counter }}</th>
                                 <th>{{ $transaction->treg }}</th>
@@ -59,6 +81,7 @@
                                 <th>{{ $transaction->void_remarks }}</th>
                                 <th>{{ $transaction->cashier_name }}</th>
                                 <th></th>
+                                <th>{{ $uniquePaymentTypes }}</th>
                             </tr>
                         @endforeach
                     </tbody>
@@ -73,9 +96,11 @@
 
             document.addEventListener('DOMContentLoaded', (event) => {
                 const dateRange = document.getElementById('date_range');
+                const paymentType = document.getElementById('payment_type');
 
                 function updateURLAndRefresh() {
                     const dateValue = dateRange.value;
+                    const paymentTypeValue = paymentType.value;
 
                     const selectedRange = $("#date_range").attr("data-selected-range");
                     const startDate = $("#date_range").attr("data-start-date");
@@ -88,6 +113,12 @@
                         url.searchParams.delete('date_range');
                     }
 
+                    if (paymentTypeValue) {
+                        url.searchParams.set('payment_type_id', paymentTypeValue);
+                    } else {
+                        url.searchParams.delete('payment_type_id');
+                    }
+
                     //use selectedRange, startDate, endDate in searchParams
                     url.searchParams.set('selectedRange', selectedRange);
                     url.searchParams.set('startDate', startDate);
@@ -97,6 +128,7 @@
                 }
 
                 dateRange.addEventListener('change', updateURLAndRefresh);
+                paymentType.addEventListener('change', updateURLAndRefresh);
 
                 $("#date_range").on("change.datetimepicker", ({date, oldDate}) => {
                     updateURLAndRefresh()

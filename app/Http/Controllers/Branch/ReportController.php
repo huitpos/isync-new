@@ -138,18 +138,41 @@ class ReportController extends Controller
             return Excel::download(new VoidTransactionsReportExport($branchId, $startDate, $endDate), "$branch->name - Void Transactions Report.xlsx");
         }
 
-        $transactions = Transaction::where([
-                'branch_id' => $branchId,
-                'is_void' => true,
-            ])
-            ->whereBetween('treg', [$startDate, $endDate])
-            ->get();
+        $query = Transaction::where([
+            'transactions.branch_id' => $branchId,
+            'transactions.is_void' => true,
+        ])
+        ->whereBetween('transactions.treg', [$startDate, $endDate]);
+
+        $paymentTypeId = $request->query('payment_type_id', null);
+        if ($paymentTypeId) {
+            // Join payments if paymentTypeId is provided
+            $query->join('payments', function($join) {
+                $join->on('transactions.transaction_id', '=', 'payments.transaction_id');
+                $join->on('transactions.branch_id', '=', 'payments.branch_id');
+                $join->on('transactions.pos_machine_id', '=', 'payments.pos_machine_id');
+            });
+
+            $query->where('payments.payment_type_id', $paymentTypeId);
+
+            $query->groupBy('transactions.id');
+        }
+
+        // Fetch the results
+        $transactions = $query->select('transactions.*')->get(); // Ensure you're selecting valid columns
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('branch.reports.voidTransactionsReport', compact('transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        $paymentTypes = PaymentType::where('company_id', $company->id)
+            ->orWhereNull('company_id')
+            ->where('status', 'active')
+            ->with('fields')
+            ->orderBy('name')
+            ->get();
+
+        return view('branch.reports.voidTransactionsReport', compact('transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam', 'paymentTypes', 'paymentTypeId'));
     }
 
     public function vatSalesReport(Request $request)
