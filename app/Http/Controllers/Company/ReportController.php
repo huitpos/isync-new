@@ -95,6 +95,7 @@ class ReportController extends Controller
 
         $transactions = Transaction::where('branch_id', $branchId)
             ->where('is_complete', true)
+            ->where('is_account_receivable', false)
             ->whereBetween('completed_at', [$startDate, $endDate])
             ->get();
 
@@ -207,6 +208,7 @@ class ReportController extends Controller
 
         $transactions = Transaction::where('branch_id', $branchId)
             ->where('is_complete', true)
+            ->where('is_account_receivable', false)
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
