@@ -73,7 +73,7 @@ class CompanyRepository implements CompanyRepositoryInterface
             )
             ->get();
 
-        return $amount[0]->total_sales;
+        return $amount[0]?->total_sales ?? 0;
     }
 
     public function getTransactionGrossSales(String $id, String $startDate = '', String $endDate = '', String $branchId = null): Float
