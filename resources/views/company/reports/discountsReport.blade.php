@@ -57,6 +57,7 @@
                     <thead>
                         <tr class="fw-semibold fs-6 text-muted">
                             <td>Date</td>
+                            <td>Machine NUmber</td>
                             <td>Sales Invoice No.</td>
                             <td>Name</td>
                             <td>OSCA/SC/PWD ID</td>
@@ -70,6 +71,7 @@
                         @foreach($discounts as $discount)
                             <tr>
                                 <td>{{ $discount->date }}</td>
+                                <td>{{ $discount->machine_number }}</td>
                                 <td>{{ $discount->receipt_number }}</td>
                                 <td>{{ $discount->discount_name }}</td>
                                 <td>

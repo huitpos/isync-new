@@ -314,13 +314,15 @@ class ReportController extends Controller
                 'discounts.discount_id',
                 'discounts.pos_machine_id',
                 'discounts.branch_id',
-                'transactions.cashier_name'
+                'transactions.cashier_name',
+                'pos_machines.machine_number'
             ])
             ->join('transactions', function($join) {
                     $join->on('transactions.transaction_id', '=', 'discounts.transaction_id');
                     $join->on('transactions.branch_id', '=', 'discounts.branch_id');
                     $join->on('transactions.pos_machine_id', '=', 'discounts.pos_machine_id');
             })
+            ->join('isync.pos_machines', 'transactions.pos_machine_id', '=', 'pos_machines.id')
             ->whereBetween('discounts.treg', [$startDate, $endDate])
             ->where('discounts.is_void', false)
             ->where('transactions.is_void', false)
