@@ -184,6 +184,7 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'item-sales', [CompanyReportController::class, 'itemSales'])->name('company.reports.item-sales-report');
 
             Route::get('stock-card', [CompanyReportController::class, 'stockCard'])->name('company.reports.stock-card');
+            Route::match(['get', 'post'], 'audit-trail', [CompanyReportController::class, 'auditTrail'])->name('company.reports.audit-trail');
         });
 
         //branch
@@ -224,6 +225,9 @@ Route::middleware('auth')->group(function () {
                 Route::match(['get', 'post'], 'item-sales', [BranchReportController::class, 'itemSales'])->name('branch.reports.item-sales-report');
 
                 Route::get('stock-card', [BranchReportController::class, 'stockCard'])->name('branch.reports.stock-card');
+                Route::match(['get', 'post'], 'audit-trail', [BranchReportController::class, 'auditTrail'])->name('branch.reports.audit-trail');
+
+                Route::get('backup', [BranchReportController::class, 'backup'])->name('branch.reports.backup');
             });
         });
     });
