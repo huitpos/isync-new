@@ -37,7 +37,7 @@
                     <thead>
                         <tr class="fw-semibold fs-6 text-muted">
                             <td>Date</td>
-                            <td>Machine NUmber</td>
+                            <td>Machine Number</td>
                             <td>Sales Invoice No.</td>
                             <td>Name</td>
                             <td>OSCA/SC/PWD ID</td>
