@@ -25,7 +25,9 @@ use App\Exports\ZReadingReportExport;
 use App\Exports\SalesInvoicesReportExport;
 use App\Exports\DiscountsReportExport;
 use App\Exports\ItemSalesReportExport;
-
+use App\Exports\AuditTrailReportExport;
+use App\Models\AuditTrail;
+use App\Models\PosMachine;
 use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
@@ -678,6 +680,57 @@ class ReportController extends Controller
             'selectedRangeParam',
             'startDateParam',
             'endDateParam',
+        ));
+    }
+
+    public function auditTrail(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+
+        $machineIds = [];
+        $machines = [];
+        foreach($branches as $branch) {
+            foreach($branch->machines as $machine) {
+                $machineIds[] = $machine->id;
+
+                $machines[$machine->id] = $machine;
+            }
+        }
+
+        $dateParam = $request->input('date_range', null);
+        $machineId = $request->input('machine_id', $machineIds[0]);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post') && !$request->input('search')) {
+            $machine = PosMachine::find($machineId);
+            return Excel::download(new AuditTrailReportExport($machineId, $startDate, $endDate), "$machine->name - Audit Trail.xlsx");
+        }
+
+        $trails = AuditTrail::where('pos_machine_id', $machineId)
+            ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.auditTrail', compact(
+            'company',
+            'trails',
+            'machines',
+            'selectedRangeParam',
+            'startDateParam',
+            'endDateParam',
+            'machineId'
         ));
     }
 }

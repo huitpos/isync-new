@@ -281,12 +281,24 @@
 								<span class="menu-title">Stock Card</span>
 							</a>
 						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.reports.audit-trail') ? 'active' : '' }}" href="{{ route('branch.reports.audit-trail', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Audit Trail</span>
+							</a>
+						</div>
 					</div>
 				</div>
 
 				<div class="menu-item">
 					<a class="menu-link {{ request()->routeIs('branch.charge-accounts.*') ? 'active' : '' }}" href="{{ route('branch.charge-accounts.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 						<span class="menu-title">Customer Informations</span>
+					</a>
+				</div>
+
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('branch.reports.backup') ? 'active' : '' }}" href="{{ route('branch.reports.backup', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+						<span class="menu-title">Back Up</span>
 					</a>
 				</div>
 
@@ -654,6 +666,12 @@
 									</a>
 								</div>
 							</div>
+						</div>
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.audit-trail') ? 'active' : '' }}" href="{{ route('company.reports.audit-trail', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Audit Trail</span>
+							</a>
 						</div>
 					</div>
 				</div>
