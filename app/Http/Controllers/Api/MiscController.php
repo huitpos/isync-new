@@ -1647,6 +1647,7 @@ class MiscController extends BaseController
             'treg' => $request->treg,
             'vat_expense' => $request->vat_expense,
             'is_zero_rated' => $request->is_zero_rated,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'Discount Details created successfully.';
@@ -1872,6 +1873,7 @@ class MiscController extends BaseController
             'is_void' => $request->is_void,
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'discount other informations created successfully.';
