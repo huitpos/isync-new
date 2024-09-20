@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Void Transactions Report
+        Audit Trail Report
     @endsection
 
     <div class="card">
