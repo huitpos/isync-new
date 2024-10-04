@@ -69,7 +69,7 @@
 
             <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">SRP</div>
-                <div class="text-gray-600">{{ $pivotData->price }}</div>
+                <div class="text-gray-600">{{ $pivotData?->price ?? $product->srp }}</div>
             </div>
 
             <div class="pb-1 fs-6 mt-2">
@@ -136,7 +136,7 @@
 
             <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">Running Stock Level</div>
-                <div class="text-gray-600">{{ $pivotData->stock }}</div>
+                <div class="text-gray-600">{{ $pivotData?->stock ?? 0 }}</div>
             </div>
 
             <h3>Bundled Items</h3>
