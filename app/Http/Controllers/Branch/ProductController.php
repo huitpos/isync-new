@@ -52,7 +52,7 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
+        $pivotData = $product->branches->where('id', $branch->id)->first()?->pivot;
 
         return view('branch.products.show', compact('company', 'branch','product', 'pivotData'));
     }
@@ -67,7 +67,7 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
 
-        $pivotData = $product->branches->where('id', $branch->id)->first()->pivot;
+        $pivotData = $product->branches->where('id', $branch->id)->first()?->pivot;
 
         return view('branch.products.edit', compact('company', 'branch','product', 'pivotData'));
     }
