@@ -228,6 +228,10 @@ Route::middleware('auth')->group(function () {
                 Route::match(['get', 'post'], 'audit-trail', [BranchReportController::class, 'auditTrail'])->name('branch.reports.audit-trail');
 
                 Route::get('backup', [BranchReportController::class, 'backup'])->name('branch.reports.backup');
+
+                Route::get('account-receivables', [BranchReportController::class, 'accountReceivables'])->name('branch.reports.account-receivables');
+                Route::get('account-receivables/{customerId}', [BranchReportController::class, 'accountReceivableDetails'])->name('branch.reports.account-receivable-details');
+                
             });
         });
     });
