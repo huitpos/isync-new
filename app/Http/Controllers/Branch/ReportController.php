@@ -708,4 +708,94 @@ class ReportController extends Controller
 
         return Excel::download(new BackupExport($branch->id), "$company->name - $branch->name - ".Carbon::now()->format('Y-m-d 23:59:59')." - Backup.xlsx");
     }
+
+    public function accountReceivables(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
+        $query = "
+                SELECT
+                    transactions.charge_account_id,
+                    isync.charge_accounts.`name`,
+                    isync.charge_accounts.address,
+                    SUM(transactions.gross_sales) AS `total_sales`,
+                    SUM(CASE WHEN transactions.is_account_receivable_redeem = TRUE THEN transactions.gross_sales ELSE 0 END) AS `redeemed_sales`,
+                    SUM(CASE WHEN transactions.is_account_receivable_redeem = FALSE THEN transactions.gross_sales ELSE 0 END) AS `not_redeemed_sales`
+                FROM transactional_db.transactions
+                INNER JOIN isync.charge_accounts ON transactions.charge_account_id = charge_accounts.id
+                WHERE transactions.is_account_receivable = TRUE
+                AND transactions.is_void = FALSE
+                AND transactions.is_back_out = FALSE
+                AND transactions.is_complete = TRUE
+                GROUP BY transactions.charge_account_id;
+            ";
+
+        $accountReceivables = DB::select($query);
+
+        return view('branch.reports.ar', compact(
+            'accountReceivables',
+            'company',
+            'branch'
+        ));
+    }
+
+    public function accountReceivableDetails(Request $request, $companySlug, $branchSlug, $customerId)
+    {
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
+        $query = "
+                SELECT
+                    transactions.charge_account_id,
+                    isync.charge_accounts.`name`,
+                    isync.charge_accounts.address,
+                    SUM(transactions.gross_sales) AS `total_sales`,
+                    SUM(CASE WHEN transactions.is_account_receivable_redeem = TRUE THEN transactions.gross_sales ELSE 0 END) AS `redeemed_sales`,
+                    SUM(CASE WHEN transactions.is_account_receivable_redeem = FALSE THEN transactions.gross_sales ELSE 0 END) AS `not_redeemed_sales`
+                FROM transactional_db.transactions
+                INNER JOIN isync.charge_accounts ON transactions.charge_account_id = charge_accounts.id
+                WHERE transactions.is_account_receivable = TRUE
+                AND transactions.is_void = FALSE
+                AND transactions.is_back_out = FALSE
+                AND transactions.is_complete = TRUE
+                AND transactions.charge_account_id = $customerId;
+            ";
+
+        $accountReceivables = DB::select($query);
+
+        $transactionsQuery = "
+                SELECT
+	                transactions.id,
+                    transactions.receipt_number,
+                    transactions.completed_at,
+                    orders.`description` AS `item_description`,
+                    orders.qty,
+                    unit_of_measurements.name AS `uom`,
+                    orders.gross,
+                    orders.discount_amount,
+                    transactions.cashier_name
+                FROM
+                    transactional_db.transactions
+                    INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                    AND orders.branch_id = transactions.branch_id
+                    AND transactions.pos_machine_id = orders.pos_machine_id
+                    LEFT JOIN isync.unit_of_measurements ON orders.unit_id = unit_of_measurements.id
+                WHERE
+                    transactions.is_account_receivable = TRUE
+                    AND transactions.is_void = FALSE
+                    AND transactions.is_back_out = FALSE
+                    AND transactions.is_complete = TRUE
+                    AND transactions.charge_account_id = $customerId
+            ";
+
+        $transactions = DB::select($transactionsQuery);
+
+        return view('branch.reports.arDetails', compact(
+            'accountReceivables',
+            'company',
+            'branch',
+            'transactions'
+        ));
+    }
 }
