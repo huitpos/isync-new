@@ -69,7 +69,7 @@ class CompanyRepository implements CompanyRepositoryInterface
             ->where('is_back_out', false)
             ->whereBetween('completed_at', [$startDate, $endDate])
             ->select(
-                DB::raw('SUM(net_sales - discount_amount) as total_sales')
+                DB::raw('SUM(net_sales) as total_sales')
             )
             ->get();
 
