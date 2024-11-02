@@ -35,4 +35,11 @@ class DiscountType extends Model
     {
         return $this->hasMany(DiscountTypeFields::class);
     }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'discount_product')
+            ->withPivot('type', 'discount')
+            ->withTimestamps();
+    }
 }

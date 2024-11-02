@@ -192,7 +192,35 @@ class ProductController extends Controller
             }
         }
 
+        $discounts = [];
+        if (!empty($request->input('discounts'))) {
+            foreach ($request->input('discounts') as $discount) {
+                if (empty($discount['discount_type_id'])) {
+                    continue;
+                }
+
+                $data = [
+                    'discount_type_id' => $discount['discount_type_id'],
+                    'type' => $discount['type'],
+                    'discount' => $discount['discount'],
+                ];
+
+                $discounts[] = $data;
+            }
+        }
+
         if ($product = $this->productRepository->create($productData, $bundledItems, $rawItems)) {
+            if (!empty($discounts)) {
+                $product->discounts()->detach();
+    
+                foreach ($discounts as $discount) {
+                    $product->discounts()->attach($discount['discount_type_id'], [
+                        'type' => $discount['type'],
+                        'discount' => $discount['discount']
+                    ]);
+                }
+            }
+
             $path = '';
             if ($file = $request->file('image')) {
                 $customFileName = 'product_' . $product->id . '.' . $file->extension();
@@ -267,6 +295,7 @@ class ProductController extends Controller
     public function update(Request $request, string $companySlug, string $productId)
     {
         $company = $request->attributes->get('company');
+        
         $request->validate([
             'name' => 'required|unique:products,name,' . $productId . ',id,company_id,' . $company->id,
             'description' => 'required',
@@ -371,8 +400,36 @@ class ProductController extends Controller
                 $rawItems[] = $data;
             }
         }
+        
+        $discounts = [];
+        if (!empty($request->input('discounts'))) {
+            foreach ($request->input('discounts') as $discount) {
+                if (empty($discount['discount_type_id'])) {
+                    continue;
+                }
 
-        if ($this->productRepository->update($productId, $productData, $bundledItems, $rawItems)) {
+                $data = [
+                    'discount_type_id' => $discount['discount_type_id'],
+                    'type' => $discount['type'],
+                    'discount' => $discount['discount'],
+                ];
+
+                $discounts[] = $data;
+            }
+        }
+
+        if ($product = $this->productRepository->update($productId, $productData, $bundledItems, $rawItems)) {
+            if (!empty($discounts)) {
+                $product->discounts()->detach();
+    
+                foreach ($discounts as $discount) {
+                    $product->discounts()->attach($discount['discount_type_id'], [
+                        'type' => $discount['type'],
+                        'discount' => $discount['discount']
+                    ]);
+                }
+            }
+
             return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Product updated successfully');
         }

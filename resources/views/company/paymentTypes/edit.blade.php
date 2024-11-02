@@ -105,12 +105,12 @@
                                 @if (empty(old('raw_items')) && count($paymentType->fields) == 0)
                                     <div data-repeater-item>
                                         <div class="form-group row mb-5">
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="form-label">Field Name:</label>
                                                 <input name="name" class="form-control mb-2 mb-md-0" placeholder="Field Name"/>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-2">
                                                 <label class="form-label">Field Type:</label>
                                                 <select name="field_type" class="form-control">
                                                     <option value=""></option>
@@ -160,12 +160,12 @@
                                     @foreach ($fields as $key => $field)
                                         <div data-repeater-item>
                                             <div class="form-group row mb-5">
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label class="form-label">Field Name:</label>
                                                     <input value="{{ $field['name'] }}" name="name" class="form-control mb-2 mb-md-0" placeholder="Field Name"/>
                                                 </div>
 
-                                                <div class="col-md-3">
+                                                <div class="col-md-2">
                                                     <label class="form-label">Field Type:</label>
                                                     <select name="field_type" class="form-control @error('payment_type_fields.' . $key . '.field_type') is-invalid @enderror">
                                                         <option value=""></option>
@@ -210,6 +210,20 @@
                                                             Add Option
                                                         </button>
                                                     </div>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <div class="">
+                                                        <label>
+                                                            Mask
+                                                        </label>
+                                                        <br/><br/>
+                                                        <input {{ $field['mask'] ? 'checked="checked"' : '' }} class="form-check-input" name="mask" type="checkbox" value="1">                                                        
+                                                    </div>
+                                
+                                                    @error('mask')
+                                                        <div class="invalid-feedback"> {{ $message }}</div>
+                                                    @enderror
                                                 </div>
 
                                                 <div class="col-md-3">

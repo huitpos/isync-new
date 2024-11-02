@@ -98,8 +98,6 @@ class RoleController extends Controller
             ->with([
                 'permissions'
             ]);
-
-        dd($role);
     }
 
     /**
