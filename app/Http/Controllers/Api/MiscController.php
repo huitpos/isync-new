@@ -169,7 +169,8 @@ class MiscController extends BaseController
                 ->with(
                     'itemType',
                     'uom',
-                    'itemLocations'
+                    'itemLocations',
+                    'discounts'
                 )
                 ->where(function ($query) use ($request) {
                     $query->where('updated_at', '>=', $request->from_date)
@@ -182,7 +183,8 @@ class MiscController extends BaseController
                 ->with(
                     'itemType',
                     'uom',
-                    'itemLocations'
+                    'itemLocations',
+                    'discounts'
                 )
                 ->where('uom_id', '>', 0)
                 ->get();

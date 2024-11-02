@@ -514,6 +514,100 @@
                     @enderror
                 </div>
 
+                <div class="mt-7">
+                    <label class="form-label">Discounts</label>
+                    <div class="repeater">
+                        <div class="form-group">
+                            <div data-repeater-list="discounts" class="d-flex flex-column gap-3">
+                                @if (empty(old('discounts')) && count($product->discounts) == 0)
+                                    <div data-repeater-item="" class="form-group d-flex flex-wrap align-items-center gap-5">
+                                        <div class="w-100 w-md-200px">
+                                            <select class="form-select" name="discount_type_id" data-placeholder="Select discount">
+                                                <option value="">Discount</option>
+                                                @foreach($company->discountTypes as $discountType)
+                                                    <option value="{{ $discountType->id }}">{{ $discountType->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+
+                                        <div class="w-100 w-md-200px">
+                                            <select class="form-select" name="type" data-placeholder="Select a variation">
+                                                <option value="">Type</option>
+                                                <option value="percentage">Percentage</option>
+                                                <option value="amount">Amount</option>
+                                            </select>
+                                        </div>
+
+                                        <input type="text" class="form-control mw-100 w-200px" name="discount" placeholder="Discount" />
+
+                                        <button type="button" data-repeater-delete="" class="btn btn-sm btn-icon btn-light-danger">
+                                            <i class="fa-solid fa-xmark fs-1"></i>
+                                        </button>
+                                    </div>
+                                @else
+                                    @php
+                                        $fromOld = !empty(old('discounts'));
+                                        $discounts = old('discounts') ?? [];
+
+                                        if (!$fromOld) {
+                                            $discounts = $product->discounts->toArray();
+                                        }
+                                    @endphp
+
+                                    @foreach ($discounts as $key => $discount)
+                                        @php
+                                            $discountId = $fromOld ? $discount['discount_type_id'] : $discount['pivot']['discount_type_id'];
+                                            $type = $fromOld ? $discount['type'] : $discount['pivot']['type'];
+                                            $discount = $fromOld ? $discount['discount'] : $discount['pivot']['discount'];
+                                        @endphp
+
+                                        <div data-repeater-item="" class="form-group d-flex flex-wrap align-items-center gap-5">
+                                            <div class="w-100 w-md-200px">
+                                                <select class="form-select" name="discount_type_id" data-placeholder="Select Discount">
+                                                    <option value="">Discount</option>
+
+                                                    @foreach($company->discountTypes as $discountType)
+                                                        <option value="{{ $discountType->id }}" {{ $discountType->id == $discountId ? 'selected' : '' }}>{{ $discountType->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <div class="w-100 w-md-200px">
+                                                <select class="form-select" name="type" data-placeholder="Select a variation">
+                                                    <option value="">Type</option>
+                                                    <option {{ $type == 'percentage' ? 'selected="selected"' : '' }} value="percentage">Percentage</option>
+                                                    <option {{ $type == 'amount' ? 'selected="selected"' : '' }} value="amount">Amount</option>
+                                                </select>
+                                            </div>
+    
+                                            <input value="{{ $discount }}" type="text" class="form-control mw-100 w-200px" name="discount" placeholder="Discount" />
+
+                                            <button type="button" data-repeater-delete="" class="btn btn-sm btn-icon btn-light-danger">
+                                                <i class="fa-solid fa-xmark fs-1"></i>
+                                            </button>
+
+                                            <div class="invalid-feedback">
+                                                @error('raw_items.' . $key . '.quantity')
+                                                    <p>{{ $message }}</p>
+                                                @enderror
+
+                                                @error('raw_items.' . $key . '.uom_id')
+                                                    <p>{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-5">
+                            <button type="button" data-repeater-create="" class="btn btn-sm btn-light-primary">
+                            <i class="fa-solid fa-plus fs-2"></i>Add another variation</button>
+                        </div>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary mt-5 disable-on-click">Submit</button>
                 <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
             </form>

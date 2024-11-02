@@ -75,4 +75,11 @@ class Product extends Model
     {
         return $this->belongsToMany(ItemLocation::class, 'item_location_product');
     }
+
+    public function discounts()
+    {
+        return $this->belongsToMany(DiscountType::class, 'discount_product')
+            ->withPivot('type', 'discount')
+            ->withTimestamps();
+    }
 }
