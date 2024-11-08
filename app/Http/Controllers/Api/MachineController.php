@@ -92,6 +92,8 @@ class MachineController extends BaseController
             'x_reading_counter' => $request->x_reading_counter,
             'z_reading_counter' => $request->z_reading_counter,
             'void_counter' => $request->void_counter,
+            'or_reset_counter' => $request->or_reset_counter,
+            'gt_counter' => $request->gt_counter,
         ]);
 
         return $this->sendResponse($machine, 'Machine updated successfully');
