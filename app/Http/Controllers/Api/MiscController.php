@@ -1128,6 +1128,11 @@ class MiscController extends BaseController
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
             'print_string' => $request->print_string,
             'company_id' => $request->company_id,
+            'beginning_counter_amount' => $request->beginning_counter_amount,
+            'ending_counter_amount' => $request->ending_counter_amount,
+            'total_cash_fund' => $request->total_cash_fund,
+            'beginning_gt_counter' => $request->beginning_gt_counter,
+            'ending_gt_counter' => $request->ending_gt_counter,
         ];
 
         if ($request['products']) {
@@ -1272,6 +1277,11 @@ class MiscController extends BaseController
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
             'print_string' => $request->print_string,
             'company_id' => $request->company_id,
+            'beginning_counter_amount' => $request->beginning_counter_amount,
+            'ending_counter_amount' => $request->ending_counter_amount,
+            'total_cash_fund' => $request->total_cash_fund,
+            'beginning_gt_counter' => $request->beginning_gt_counter,
+            'ending_gt_counter' => $request->ending_gt_counter,
         ];
 
         $cutOff = CutOff::where([
@@ -1736,6 +1746,7 @@ class MiscController extends BaseController
             'is_sent_to_server' => $request->is_sent_to_server,
             'treg' => $request->treg,
             'company_id' => $request->company_id,
+            'is_mask' => $request->is_mask,
         ];
 
         $message = 'payment other informations created successfully.';

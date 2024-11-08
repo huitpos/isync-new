@@ -171,7 +171,7 @@
 
             <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">Item Type</div>
-                <div class="text-gray-600">{{ $product->itemType->name }}</div>
+                <div class="text-gray-600">{{ $product->itemType?->name }}</div>
             </div>
 
             <div class="pb-1 fs-6 mt-2">
