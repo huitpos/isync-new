@@ -20,6 +20,10 @@ class DiscountTypesDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('name', function (DiscountType $data) {
+                if (empty($data->company_id)) {
+                    return $data->name;
+                }
+
                 if (in_array('Settings/Discount Types/View', $this->permissions)) {
                     return view('company.datatables._link', [
                         'url' => route('company.discount-types.show', ['companySlug' => $data->company->slug, 'discount_type' => $data->id]),
@@ -30,6 +34,10 @@ class DiscountTypesDataTable extends DataTable
                 }
             })
             ->addColumn('actions', function (DiscountType $data) {
+                if (empty($data->company_id)) {
+                    return '';
+                }
+
                 if (in_array('Settings/Discount Types/Edit', $this->permissions)) {
                     return view('company.datatables._actions', [
                         'param' => ['discount_type' => $data->id, 'companySlug' => $data->company->slug],
@@ -48,7 +56,10 @@ class DiscountTypesDataTable extends DataTable
     public function query(DiscountType $model): QueryBuilder
     {
         return $model->newQuery()
-            ->where('company_id', $this->company_id)
+            ->where(function ($query) {
+                $query->where('company_id', $this->company_id)
+                    ->orWhereNull('company_id');
+            })
             ->with([
                 'company',
                 'createdBy'
