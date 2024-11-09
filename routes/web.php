@@ -185,6 +185,7 @@ Route::middleware('auth')->group(function () {
 
             Route::get('stock-card', [CompanyReportController::class, 'stockCard'])->name('company.reports.stock-card');
             Route::match(['get', 'post'], 'audit-trail', [CompanyReportController::class, 'auditTrail'])->name('company.reports.audit-trail');
+            Route::match(['get', 'post'], 'bir-sales-summary-report', [CompanyReportController::class, 'birSalesSummaryReport'])->name('company.reports.bir-sales-summary-report');
         });
 
         //branch

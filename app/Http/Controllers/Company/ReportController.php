@@ -26,6 +26,7 @@ use App\Exports\SalesInvoicesReportExport;
 use App\Exports\DiscountsReportExport;
 use App\Exports\ItemSalesReportExport;
 use App\Exports\AuditTrailReportExport;
+use App\Exports\BirSalesSummaryReportExport;
 use App\Models\AuditTrail;
 use App\Models\PosMachine;
 use Illuminate\Support\Facades\DB;
@@ -691,8 +692,8 @@ class ReportController extends Controller
 
         $machineIds = [];
         $machines = [];
-        foreach($branches as $branch) {
-            foreach($branch->machines as $machine) {
+        foreach ($branches as $branch) {
+            foreach ($branch->machines as $machine) {
                 $machineIds[] = $machine->id;
 
                 $machines[$machine->id] = $machine;
@@ -732,6 +733,47 @@ class ReportController extends Controller
             'startDateParam',
             'endDateParam',
             'machineId'
+        ));
+    }
+
+    public function birSalesSummaryReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+
+        $branches = $company->activeBranches;
+
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post') && !$request->input('search')) {
+            $branch = Branch::find($branchId);
+            return Excel::download(new BirSalesSummaryReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
+        }
+
+        $endOfDays = EndOfDay::whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.birSalesSummaryReport', compact(
+            'endOfDays',
+            'branches',
+            'branchId',
+            'selectedRangeParam',
+            'startDateParam',
+            'endDateParam',
         ));
     }
 }
