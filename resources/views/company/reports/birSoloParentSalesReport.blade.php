@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Persons with Disability Sales Book/Report
+        Solo Parent Sales Book/Report
     @endsection
 
     <div class="card">
