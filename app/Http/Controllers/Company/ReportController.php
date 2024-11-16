@@ -776,4 +776,148 @@ class ReportController extends Controller
             'endDateParam',
         ));
     }
+
+    public function birSeniorCitizenSalesReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        $branchId = $request->query('branch_id', $branches->first()->id);
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        $discounts = Discount::where('discount_type_id', 4)
+            // ->where('branch_id', $branchId)
+            // ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.birSeniorCitizenSalesReport', compact(
+            'company',
+            'branches',
+            'branchId',
+            'selectedRangeParam',
+            'startDateParam',
+            'endDateParam',
+            'discounts'
+        ));
+    }
+
+    public function birPwdSalesReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        $branchId = $request->query('branch_id', $branches->first()->id);
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        $discounts = Discount::where('discount_type_id', 5)
+            // ->where('branch_id', $branchId)
+            // ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.birPwdSalesReport', compact(
+            'company',
+            'branches',
+            'branchId',
+            'selectedRangeParam',
+            'startDateParam',
+            'endDateParam',
+            'discounts'
+        ));
+    }
+
+    public function birNaacSalesReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        $branchId = $request->query('branch_id', $branches->first()->id);
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        $discounts = Discount::where('discount_type_id', 52)
+            // ->where('branch_id', $branchId)
+            // ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.birNaacSalesReport', compact(
+            'company',
+            'branches',
+            'branchId',
+            'selectedRangeParam',
+            'startDateParam',
+            'endDateParam',
+            'discounts'
+        ));
+    }
+
+    public function birSoloParentSalesReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        $branchId = $request->query('branch_id', $branches->first()->id);
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        $discounts = Discount::where('discount_type_id', 11)
+            // ->where('branch_id', $branchId)
+            // ->whereBetween('treg', [$startDate, $endDate])
+            ->get();
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.birSoloParentSalesReport', compact(
+            'company',
+            'branches',
+            'branchId',
+            'selectedRangeParam',
+            'startDateParam',
+            'endDateParam',
+            'discounts'
+        ));
+    } 
 }
