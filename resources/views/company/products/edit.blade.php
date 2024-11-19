@@ -524,7 +524,7 @@
                                         <div class="w-100 w-md-200px">
                                             <select class="form-select" name="discount_type_id" data-placeholder="Select discount">
                                                 <option value="">Discount</option>
-                                                @foreach($company->discountTypes as $discountType)
+                                                @foreach($discountTypes as $discountType)
                                                     <option value="{{ $discountType->id }}">{{ $discountType->name }}</option>
                                                 @endforeach
                                             </select>
@@ -566,7 +566,7 @@
                                                 <select class="form-select" name="discount_type_id" data-placeholder="Select Discount">
                                                     <option value="">Discount</option>
 
-                                                    @foreach($company->discountTypes as $discountType)
+                                                    @foreach($discountTypes as $discountType)
                                                         <option value="{{ $discountType->id }}" {{ $discountType->id == $discountId ? 'selected' : '' }}>{{ $discountType->name }}</option>
                                                     @endforeach
                                                 </select>
