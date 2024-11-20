@@ -65,8 +65,8 @@ class BirNaacSalesReportExport implements FromCollection, WithHeadings, WithMapp
      */
     public function collection()
     {
-        $discounts = Discount::where('discount_type_id', 52)
-            // ->where('branch_id', $branchId)
+        $discounts = Discount::where('discount_type_id', 29)
+            ->where('branch_id', $this->branchId)
             // ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
