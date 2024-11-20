@@ -19,6 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 use App\Models\Product;
 use App\Models\Branch;
+use App\Models\DiscountType;
 
 class ProductController extends Controller
 {
@@ -79,12 +80,18 @@ class ProductController extends Controller
         $departments = $company->departments()->where('status', 'active')->get();
         $itemTypes = $company->itemTypes()->where('status', 'active')->get();
 
+        $discountTypes = DiscountType::where('company_id', $company->id)
+            ->orWhere('company_id', null)
+            ->orderBy('id')
+            ->get();
+
         return view('company.products.create', [
             'company' => $company,
             'categories' => $categories,
             'subcategories' => $subcategories,
             'departments' => $departments,
             'itemTypes' => $itemTypes,
+            'discountTypes' => $discountTypes,
         ]);
     }
 
@@ -279,6 +286,11 @@ class ProductController extends Controller
 
         $itemTypes = $company->itemTypes()->where('status', 'active')->get();
 
+        $discountTypes = DiscountType::where('company_id', $company->id)
+            ->orWhere('company_id', null)
+            ->orderBy('id')
+            ->get();
+
         return view('company.products.edit', [
             'company' => $company,
             'product' => $product,
@@ -286,6 +298,7 @@ class ProductController extends Controller
             'categories' => $categories,
             'subcategories' => $subcategories,
             'itemTypes' => $itemTypes,
+            'discountTypes' => $discountTypes,
         ]);
     }
 

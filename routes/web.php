@@ -186,6 +186,10 @@ Route::middleware('auth')->group(function () {
             Route::get('stock-card', [CompanyReportController::class, 'stockCard'])->name('company.reports.stock-card');
             Route::match(['get', 'post'], 'audit-trail', [CompanyReportController::class, 'auditTrail'])->name('company.reports.audit-trail');
             Route::match(['get', 'post'], 'bir-sales-summary-report', [CompanyReportController::class, 'birSalesSummaryReport'])->name('company.reports.bir-sales-summary-report');
+            Route::match(['get', 'post'], 'bir-senior-citizen-sales-report', [CompanyReportController::class, 'birSeniorCitizenSalesReport'])->name('company.reports.bir-senior-citizen-sales-report');
+            Route::match(['get', 'post'], 'bir-pwd-sales-report', [CompanyReportController::class, 'birPwdSalesReport'])->name('company.reports.bir-pwd-sales-report');
+            Route::match(['get', 'post'], 'bir-naac-sales-report', [CompanyReportController::class, 'birNaacSalesReport'])->name('company.reports.bir-naac-sales-report');
+            Route::match(['get', 'post'], 'bir-solo-parent-sales-report', [CompanyReportController::class, 'birSoloParentSalesReport'])->name('company.reports.bir-solo-parent-sales-report');
         });
 
         //branch
