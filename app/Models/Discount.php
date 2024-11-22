@@ -26,8 +26,7 @@ class Discount extends Model
     {
         return $this->belongsTo(Transaction::class, 'transaction_id', 'transaction_id')->where(function ($query) {
             $query->where('branch_id', $this->branch_id)
-                  ->where('pos_machine_id', $this->pos_machine_id)
-                  ->where('is_void', 0);
+                  ->where('pos_machine_id', $this->pos_machine_id);
         });
     }
 }

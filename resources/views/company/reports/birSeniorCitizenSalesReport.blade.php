@@ -91,11 +91,11 @@
                                 <td>{{ $scId }}</td>
                                 <td>{{ $tin }}</td>
                                 <td>{{ $transaction->receipt_number }}</td>
-                                <td>{{ $transaction->gross_sales }}</td>
-                                <td>{{ $transaction->vat_amount }}</td>
-                                <td>{{ $transaction->vat_exempt_sales }}</td>
+                                <td>{{ number_format($transaction->gross_sales, 2) }}</td>
+                                <td>{{ number_format($transaction->vat_amount, 2) }}</td>
+                                <td>{{ number_format($transaction->vat_exempt_sales, 2) }}</td>
                                 <td>5%</td>
-                                <td>{{ $transaction->net_sales }}</td>
+                                <td>{{ number_format($transaction->net_sales, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>

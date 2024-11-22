@@ -103,9 +103,9 @@
                                 <td>{{ $dobOfChild }}</td>
                                 <td>{{ $age }}</td>
                                 <td>{{ $transaction?->receipt_number }}</td>
-                                <td>{{ $transaction?->gross_sales }}</td>
-                                <td>{{ $transaction?->discount_amount }}</td>
-                                <td>{{ $transaction?->net_sales }}</td>
+                                <td>{{ number_format($transaction?->gross_sales, 2) }}</td>
+                                <td>{{ number_format($transaction?->discount_amount, 2) }}</td>
+                                <td>{{ number_format($transaction?->net_sales, 2) }}</td>
                             </tr>
                         @endforeach
                     </tbody>
