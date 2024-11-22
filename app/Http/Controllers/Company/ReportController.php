@@ -764,7 +764,8 @@ class ReportController extends Controller
             return Excel::download(new BirSalesSummaryReportExport($branchId, $startDate, $endDate), "$branch->name - BIR SALES SUMMARY  REPORT - $startDate - $endDate.xlsx");
         }
 
-        $endOfDays = EndOfDay::whereBetween('treg', [$startDate, $endDate])
+        $endOfDays = EndOfDay::where('branch_id', $branchId)
+            ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');
@@ -803,8 +804,8 @@ class ReportController extends Controller
         }
 
         $discounts = Discount::where('discount_type_id', 4)
-            // ->where('branch_id', $branchId)
-            // ->whereBetween('treg', [$startDate, $endDate])
+            ->where('branch_id', $branchId)
+            ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');
@@ -844,8 +845,8 @@ class ReportController extends Controller
         }
 
         $discounts = Discount::where('discount_type_id', 5)
-            // ->where('branch_id', $branchId)
-            // ->whereBetween('treg', [$startDate, $endDate])
+            ->where('branch_id', $branchId)
+            ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');
@@ -885,8 +886,8 @@ class ReportController extends Controller
         }
 
         $discounts = Discount::where('discount_type_id', 29)
-            // ->where('branch_id', $branchId)
-            // ->whereBetween('treg', [$startDate, $endDate])
+            ->where('branch_id', $branchId)
+            ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');
@@ -906,6 +907,8 @@ class ReportController extends Controller
 
     public function birSoloParentSalesReport(Request $request)
     {
+        $discountTypeId = 11;
+
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         $branchId = $request->query('branch_id', $branches->first()->id);
@@ -925,9 +928,9 @@ class ReportController extends Controller
             return Excel::download(new BirSoloParentSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Solo Parent Sales Book Report - $startDate - $endDate.xlsx");
         }
 
-        $discounts = Discount::where('discount_type_id', 11)
-            // ->where('branch_id', $branchId)
-            // ->whereBetween('treg', [$startDate, $endDate])
+        $discounts = Discount::where('discount_type_id', $discountTypeId)
+            ->where('branch_id', $branchId)
+            ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');

@@ -71,23 +71,25 @@
 
                                 $otherInfos = $discount->otherInfo;
                                 foreach ($otherInfos as $otherInfo) {
-                                    if ($otherInfo->name == 'Name of Solo Parent:') {
+
+                                    if ($otherInfo->name == 'NAME OF SOLO PARENT:' || $otherInfo->name == 'NAME:') {
                                         $name = $otherInfo->value;
                                     }
 
-                                    if ($otherInfo->name == 'SPIC No.:') {
+                                    if ($otherInfo->name == 'SPIC NO.:' || $otherInfo->name == 'ID NO.:') {
+
                                         $spicNo = $otherInfo->value;
                                     }
 
-                                    if ($otherInfo->name == 'Name of child:') {
+                                    if ($otherInfo->name == 'NAME OF CHILD:') {
                                         $nameOfChild = $otherInfo->value;
                                     }
                                     
-                                    if ($otherInfo->name == 'Birthdate of child:') {
+                                    if ($otherInfo->name == 'BIRTH DATE OF CHILD:') {
                                         $dobOfChild = $otherInfo->value;
                                     }
                                     
-                                    if ($otherInfo->name == 'Age of child:') {
+                                    if ($otherInfo->name == 'AGE OF CHILD:') {
                                         $age = $otherInfo->value;
                                     }
                                 }
