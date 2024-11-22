@@ -69,7 +69,8 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
      */
     public function collection()
     {
-        $endOfDays = EndOfDay::whereBetween('treg', [$this->startDate, $this->endDate])
+        $endOfDays = EndOfDay::where('branch_id', $this->branchId)
+            ->whereBetween('treg', [$this->startDate, $this->endDate])
             ->get();
 
         return new Collection($endOfDays);
