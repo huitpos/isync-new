@@ -884,7 +884,7 @@ class ReportController extends Controller
             return Excel::download(new BirNaacSalesReportExport($branchId, $startDate, $endDate), "$branch->name - NAAC Sales Book Report - $startDate - $endDate.xlsx");
         }
 
-        $discounts = Discount::where('discount_type_id', 52)
+        $discounts = Discount::where('discount_type_id', 29)
             // ->where('branch_id', $branchId)
             // ->whereBetween('treg', [$startDate, $endDate])
             ->get();

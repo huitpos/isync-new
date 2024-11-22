@@ -97,12 +97,12 @@
                                 <td>{{ $endOfDay->treg }}</td>
                                 <td>{{ $endOfDay->beginning_or }}</td>
                                 <td>{{ $endOfDay->ending_or }}</td>
-                                <td>{{ $endOfDay->ending_amount }}</td>
-                                <td>{{ $endOfDay->beginning_amount }}</td>
+                                <td>{{ number_format($endOfDay->ending_amount, 2) }}</td>
+                                <td>{{ number_format($endOfDay->beginning_amount, 2) }}</td>
                                 <td>0</td>
-                                <td>{{ $endOfDay->vatable_sales }}</td>
-                                <td>{{ $endOfDay->vat_amount }}</td>
-                                <td>{{ $endOfDay->vat_exempt_sales }}</td>
+                                <td>{{ number_format($endOfDay->vatable_sales, 2) }}</td>
+                                <td>{{ number_format($endOfDay->vat_amount, 2) }}</td>
+                                <td>{{ number_format($endOfDay->vat_exempt_sales, 2) }}</td>
                                 <td>{{ number_format($endOfDay->total_zero_rated_amount, 2) }}</td>
                                 <td>
                                     @php
