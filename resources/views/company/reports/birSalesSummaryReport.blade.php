@@ -91,6 +91,8 @@
                                     ->get();
 
                                 $cutOffIds = $cutOffs->pluck('cut_off_id')->unique()->toArray();
+
+                                $resetCounter = intval(explode('-', $endOfDay->ending_or)[0]);
                             @endphp
                             
                             <tr>
@@ -182,7 +184,7 @@
                                 <td>{{ $endOfDay->net_sales }}</td>
                                 <td>{{ $endOfDay->total_short_over }}</td>
                                 <td>0.00</td>
-                                <td>0.00</td>
+                                <td>{{ $resetCounter }}</td>
                                 <td>{{ $endOfDay->reading_number }}</td>
                                 <td></td>
                             </tr>
