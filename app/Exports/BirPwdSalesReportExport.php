@@ -126,7 +126,7 @@ class BirPwdSalesReportExport implements FromCollection, WithHeadings, WithMappi
             $transaction->gross_sales,
             $transaction->vat_amount,
             $transaction->vat_exempt_sales,
-            '5%',
+            number_format($discounts->discount_amount),
             $transaction->net_sales,
         ];
 

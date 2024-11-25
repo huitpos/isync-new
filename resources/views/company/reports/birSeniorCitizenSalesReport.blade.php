@@ -95,7 +95,7 @@
                                 <td>{{ number_format($transaction->gross_sales, 2) }}</td>
                                 <td>{{ number_format($transaction->vat_amount, 2) }}</td>
                                 <td>{{ number_format($transaction->vat_exempt_sales, 2) }}</td>
-                                <td>5%</td>
+                                <td>{{ number_format($discount->discount_amount) }}</td>
                                 <td>{{ number_format($transaction->net_sales, 2) }}</td>
                             </tr>
                         @endforeach
