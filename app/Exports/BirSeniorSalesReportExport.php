@@ -127,7 +127,7 @@ class BirSeniorSalesReportExport implements FromCollection, WithHeadings, WithMa
             $transaction->gross_sales,
             $transaction->vat_amount,
             $transaction->vat_exempt_sales,
-            number_format($discounts->discount_amount),
+            number_format($discounts->discount_amount, 2),
             $transaction->net_sales,
         ];
 
