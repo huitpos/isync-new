@@ -172,8 +172,8 @@
                                     {{ number_format($discounts->sum('discount_amount'), 2) }}
                                 </td>
                                 <td>0.00</td>
-                                <td>0.00</td>
-                                <td>0.00</td>
+                                <td>{{ $endOfDay->void_qty }}</td>
+                                <td>{{ number_format($endOfDay->total_discount_amount, 2) }}</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
