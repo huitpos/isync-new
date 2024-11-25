@@ -171,7 +171,18 @@
 
                                     {{ number_format($discounts->sum('discount_amount'), 2) }}
                                 </td>
-                                <td>0.00</td>
+                                <td>
+                                    @php
+                                        $transactions = App\Models\Transaction::where([
+                                            'branch_id' => $branchId,
+                                            'is_void' => false
+                                        ])
+                                        ->whereIn('cut_off_id', $cutOffIds)
+                                        ->get();
+                                    @endphp    
+                                    
+                                    {{ number_format($transactions->sum('total_return_amount'), 2) }}
+                                </td>
                                 <td>{{ $endOfDay->void_qty }}</td>
                                 <td>{{ number_format($endOfDay->total_discount_amount, 2) }}</td>
                                 <td>0.00</td>

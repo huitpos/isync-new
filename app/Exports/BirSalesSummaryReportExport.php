@@ -173,6 +173,13 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
 
         $resetCounter = intval(explode('-', $endOfDays->ending_or)[0]);
 
+        $transactions = Transaction::where([
+            'branch_id' => $endOfDays->branch_id,
+            'is_void' => false
+        ])
+        ->whereIn('cut_off_id', $cutOffIds)
+        ->get(); 
+
         $data = [
             $endOfDays->treg,
             $endOfDays->beginning_or,
@@ -190,9 +197,9 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
             number_format($naac->sum('discount_amount'), 2),
             number_format($soloParent->sum('discount_amount'), 2),
             number_format($otherDiscounts->sum('discount_amount'), 2),
-            number_format(0, 2),
-            $endOfDays->void_qty,
             number_format($endOfDays->total_discount_amount, 2),
+            $endOfDays->void_qty,
+            number_format($transactions->sum('total_return_amount'), 2),
             number_format(0, 2),
             number_format(0, 2),
             number_format(0, 2),
