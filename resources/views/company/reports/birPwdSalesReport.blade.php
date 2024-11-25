@@ -68,8 +68,9 @@
                                 $tin = '';
 
                                 $otherInfos = $discount->otherInfo;
+
                                 foreach ($otherInfos as $otherInfo) {
-                                    if ($otherInfo->name == 'CUSTOMER NAME:') {
+                                    if ($otherInfo->name == 'NAME:') {
                                         $name = $otherInfo->value;
                                     }
 

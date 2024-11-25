@@ -66,11 +66,11 @@
 
                                 $otherInfos = $discount->otherInfo;
                                 foreach ($otherInfos as $otherInfo) {
-                                    if ($otherInfo->name == 'NAME:') {
+                                    if ($otherInfo->name == 'NAME OF NATIONAL ATHELETE/COACH:') {
                                         $name = $otherInfo->value;
                                     }
 
-                                    if ($otherInfo->name == 'NAAC ID:') {
+                                    if ($otherInfo->name == 'PNSTM ID No.') {
                                         $naacId = $otherInfo->value;
                                     }
 

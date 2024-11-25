@@ -181,9 +181,9 @@
                                 <td>0.00</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
-                                <td>{{ $endOfDay->net_sales }}</td>
-                                <td>{{ $endOfDay->total_short_over }}</td>
-                                <td>0.00</td>
+                                <td>{{ number_format($endOfDay->net_sales - $endOfDay->vat_amount, 2) }}</td>
+                                <td>{{ number_format($endOfDay->total_short_over, 2) }}</td>
+                                <td>{{ number_format($endOfDay->net_sales - $endOfDay->vat_amount, 2) }}</td>
                                 <td>{{ str_pad($resetCounter, 2, '0', STR_PAD_LEFT) }}</td>
                                 <td>{{ $endOfDay->reading_number }}</td>
                                 <td></td>

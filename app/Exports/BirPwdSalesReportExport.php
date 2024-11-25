@@ -102,7 +102,7 @@ class BirPwdSalesReportExport implements FromCollection, WithHeadings, WithMappi
 
         $otherInfos = $discounts->otherInfo;
         foreach ($otherInfos as $otherInfo) {
-            if ($otherInfo->name == 'CUSTOMER NAME:') {
+            if ($otherInfo->name == 'NAME:') {
                 $name = $otherInfo->value;
             }
 
@@ -179,8 +179,8 @@ class BirPwdSalesReportExport implements FromCollection, WithHeadings, WithMappi
                 $event->sheet->getStyle('A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $event->sheet->mergeCells('A5:'.$columnLetter.'5');
-                $event->sheet->setCellValue('A5', '<Software Name and Version No. plus Release No./Release Date>');
-                
+                $event->sheet->setCellValue('A5', 'iSync POS Version 1.0 November 25, 2024');
+
                 $event->sheet->mergeCells('A6:'.$columnLetter.'6');
                 $event->sheet->setCellValue('A6', $this->machine->serial_number."   ");
 
@@ -188,13 +188,13 @@ class BirPwdSalesReportExport implements FromCollection, WithHeadings, WithMappi
                 $event->sheet->setCellValue('A7', $this->machine->min."   ");
 
                 $event->sheet->mergeCells('A8:'.$columnLetter.'8');
-                $event->sheet->setCellValue('A8', "<POS Terminal No.>");
+                $event->sheet->setCellValue('A8', "Machine 1");
 
                 $event->sheet->mergeCells('A9:'.$columnLetter.'9');
                 $event->sheet->setCellValue('A9', now()->format('Y-m-d H:i:s'));
 
                 $event->sheet->mergeCells('A10:'.$columnLetter.'10');
-                $event->sheet->setCellValue('A10', auth()->user()->id." ");
+                $event->sheet->setCellValue('A10', auth()->user()->name);
             },
         ];
     }
