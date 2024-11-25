@@ -184,7 +184,7 @@
                                 <td>{{ $endOfDay->net_sales }}</td>
                                 <td>{{ $endOfDay->total_short_over }}</td>
                                 <td>0.00</td>
-                                <td>{{ $resetCounter }}</td>
+                                <td>{{ str_pad($resetCounter, 2, '0', STR_PAD_LEFT) }}</td>
                                 <td>{{ $endOfDay->reading_number }}</td>
                                 <td></td>
                             </tr>
