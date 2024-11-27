@@ -171,7 +171,7 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
         ->whereIn('cut_off_id', $cutOffIds)
         ->get();
 
-        $resetCounter = intval(explode('-', $endOfDays->ending_or)[0]);
+        $resetCounter = $endOfDays->ending_gt_counter;
 
         $transactions = Transaction::where([
             'branch_id' => $endOfDays->branch_id,
@@ -206,7 +206,7 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
             number_format(0, 2),
             number_format(0, 2),
             number_format(0, 2),
-            number_format(0, 2),
+            number_format($endOfDays->vat_amount, 2),
             number_format($endOfDays->net_sales - $endOfDays->vat_amount, 2),
             number_format($endOfDays->total_short_over, 2),
             number_format($endOfDays->net_sales - $endOfDays->vat_amount, 2),

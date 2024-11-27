@@ -92,7 +92,7 @@
 
                                 $cutOffIds = $cutOffs->pluck('cut_off_id')->unique()->toArray();
 
-                                $resetCounter = intval(explode('-', $endOfDay->ending_or)[0]);
+                                $resetCounter = $endOfDay->ending_gt_counter;
                             @endphp
                             
                             <tr>
@@ -191,7 +191,7 @@
                                 <td>0.00</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
-                                <td>0.00</td>
+                                <td>{{ number_format($endOfDay->vat_amount, 2) }}</td>
                                 <td>{{ number_format($endOfDay->net_sales - $endOfDay->vat_amount, 2) }}</td>
                                 <td>{{ number_format($endOfDay->total_short_over, 2) }}</td>
                                 <td>{{ number_format($endOfDay->net_sales - $endOfDay->vat_amount, 2) }}</td>
