@@ -68,8 +68,9 @@
                                 $tin = '';
 
                                 $otherInfos = $discount->otherInfo;
+
                                 foreach ($otherInfos as $otherInfo) {
-                                    if ($otherInfo->name == 'CUSTOMER NAME:') {
+                                    if ($otherInfo->name == 'NAME:') {
                                         $name = $otherInfo->value;
                                     }
 
@@ -94,7 +95,7 @@
                                 <td>{{ number_format($transaction->gross_sales) }}</td>
                                 <td>{{ number_format($transaction->vat_amount, 2) }}</td>
                                 <td>{{ number_format($transaction->vat_exempt_sales, 2) }}</td>
-                                <td>5%</td>
+                                <td>{{ number_format($discount->discount_amount, 2) }}</td>
                                 <td>{{ number_format($transaction->net_sales, 2) }}</td>
                             </tr>
                         @endforeach

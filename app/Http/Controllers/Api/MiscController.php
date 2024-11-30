@@ -291,6 +291,7 @@ class MiscController extends BaseController
             'void_counter' => $request->void_counter,
             'void_remarks' => $request->void_remarks,
             'customer_name' => $request->customer_name,
+            'company_id' => $request->company_id,
         ];
 
         //check if existing. update if yes
@@ -641,6 +642,7 @@ class MiscController extends BaseController
             'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'with_serial' => 'required|boolean',
             'is_return' => 'required|boolean',
+            'company_id' => $request->company_id,
         ]);
 
         if ($validator->fails()) {

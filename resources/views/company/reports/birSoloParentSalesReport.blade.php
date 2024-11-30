@@ -71,7 +71,6 @@
 
                                 $otherInfos = $discount->otherInfo;
                                 foreach ($otherInfos as $otherInfo) {
-
                                     if ($otherInfo->name == 'NAME OF SOLO PARENT:' || $otherInfo->name == 'NAME:') {
                                         $name = $otherInfo->value;
                                     }

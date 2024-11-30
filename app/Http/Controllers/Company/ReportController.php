@@ -805,6 +805,7 @@ class ReportController extends Controller
 
         $discounts = Discount::where('discount_type_id', 4)
             ->where('branch_id', $branchId)
+            ->where('is_void', false)
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
@@ -846,6 +847,7 @@ class ReportController extends Controller
 
         $discounts = Discount::where('discount_type_id', 5)
             ->where('branch_id', $branchId)
+            ->where('is_void', false)
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
@@ -887,6 +889,7 @@ class ReportController extends Controller
 
         $discounts = Discount::where('discount_type_id', 29)
             ->where('branch_id', $branchId)
+            ->where('is_void', false)
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
@@ -930,6 +933,7 @@ class ReportController extends Controller
 
         $discounts = Discount::where('discount_type_id', $discountTypeId)
             ->where('branch_id', $branchId)
+            ->where('is_void', false)
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 

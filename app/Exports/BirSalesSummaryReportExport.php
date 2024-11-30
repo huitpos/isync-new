@@ -171,6 +171,15 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
         ->whereIn('cut_off_id', $cutOffIds)
         ->get();
 
+        $resetCounter = $endOfDays->ending_gt_counter;
+
+        $transactions = Transaction::where([
+            'branch_id' => $endOfDays->branch_id,
+            'is_void' => false
+        ])
+        ->whereIn('cut_off_id', $cutOffIds)
+        ->get(); 
+
         $data = [
             $endOfDays->treg,
             $endOfDays->beginning_or,
@@ -188,22 +197,22 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
             number_format($naac->sum('discount_amount'), 2),
             number_format($soloParent->sum('discount_amount'), 2),
             number_format($otherDiscounts->sum('discount_amount'), 2),
+            number_format($endOfDays->total_discount_amount, 2),
+            $endOfDays->void_qty,
+            number_format($transactions->sum('total_return_amount'), 2),
             number_format(0, 2),
             number_format(0, 2),
             number_format(0, 2),
             number_format(0, 2),
             number_format(0, 2),
             number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
-            number_format(0, 2),
+            number_format($endOfDays->vat_amount, 2),
+            number_format($endOfDays->net_sales - $endOfDays->vat_amount, 2),
+            number_format($endOfDays->total_short_over, 2),
+            number_format($endOfDays->net_sales - $endOfDays->vat_amount, 2),
+            str_pad($resetCounter, 2, '0', STR_PAD_LEFT),
+            $endOfDays->reading_number,
+            '',
             
         ];
 
@@ -256,7 +265,7 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
                 $event->sheet->getStyle('A3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $event->sheet->mergeCells('A5:'.$columnLetter.'5');
-                $event->sheet->setCellValue('A5', '<Software Name and Version No. plus Release No./Release Date>');
+                $event->sheet->setCellValue('A5', 'iSync POS Version 1.0 November 25, 2024');
                 
                 $event->sheet->mergeCells('A6:'.$columnLetter.'6');
                 $event->sheet->setCellValue('A6', $this->machine->serial_number."   ");
@@ -265,13 +274,13 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
                 $event->sheet->setCellValue('A7', $this->machine->min."   ");
 
                 $event->sheet->mergeCells('A8:'.$columnLetter.'8');
-                $event->sheet->setCellValue('A8', "<POS Terminal No.>");
+                $event->sheet->setCellValue('A8', "Machine 1");
 
                 $event->sheet->mergeCells('A9:'.$columnLetter.'9');
                 $event->sheet->setCellValue('A9', now()->format('Y-m-d H:i:s'));
 
                 $event->sheet->mergeCells('A10:'.$columnLetter.'10');
-                $event->sheet->setCellValue('A10', auth()->user()->id." ");
+                $event->sheet->setCellValue('A10', auth()->user()->name);
 
                 $sheet = $event->sheet;
                 $sheet->mergeCells('A14:A16');

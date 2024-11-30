@@ -92,7 +92,7 @@
 
                                 $cutOffIds = $cutOffs->pluck('cut_off_id')->unique()->toArray();
 
-                                $resetCounter = intval(explode('-', $endOfDay->ending_or)[0]);
+                                $resetCounter = $endOfDay->ending_gt_counter;
                             @endphp
                             
                             <tr>
@@ -171,19 +171,30 @@
 
                                     {{ number_format($discounts->sum('discount_amount'), 2) }}
                                 </td>
+                                <td>
+                                    @php
+                                        $transactions = App\Models\Transaction::where([
+                                            'branch_id' => $branchId,
+                                            'is_void' => false
+                                        ])
+                                        ->whereIn('cut_off_id', $cutOffIds)
+                                        ->get();
+                                    @endphp    
+                                    
+                                    {{ number_format($transactions->sum('total_return_amount'), 2) }}
+                                </td>
+                                <td>{{ $endOfDay->void_qty }}</td>
+                                <td>{{ number_format($endOfDay->total_discount_amount, 2) }}</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
                                 <td>0.00</td>
-                                <td>0.00</td>
-                                <td>0.00</td>
-                                <td>0.00</td>
-                                <td>0.00</td>
-                                <td>{{ $endOfDay->net_sales }}</td>
-                                <td>{{ $endOfDay->total_short_over }}</td>
-                                <td>0.00</td>
+                                <td>{{ number_format($endOfDay->vat_amount, 2) }}</td>
+                                <td>{{ number_format($endOfDay->net_sales - $endOfDay->vat_amount, 2) }}</td>
+                                <td>{{ number_format($endOfDay->total_short_over, 2) }}</td>
+                                <td>{{ number_format($endOfDay->net_sales - $endOfDay->vat_amount, 2) }}</td>
                                 <td>{{ str_pad($resetCounter, 2, '0', STR_PAD_LEFT) }}</td>
                                 <td>{{ $endOfDay->reading_number }}</td>
                                 <td></td>
