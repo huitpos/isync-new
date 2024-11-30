@@ -544,6 +544,16 @@ paths:
                   type: number
                 void_remarks:
                   type: string
+                account_receivable_redeem_at:
+                  type: string
+                  default: null
+                is_account_receivable_redeem:
+                  type: boolean
+                  default: false
+                total_zero_rated_amount:
+                  type: number
+                remarks:
+                  type: string
       responses:
         '200':
           content:
@@ -715,6 +725,8 @@ paths:
                 account_receivable_redeem_at:
                   type: string
                   default: null
+                remarks:
+                  type: string
       responses:
         '200':
           content:
@@ -886,6 +898,9 @@ paths:
                 company_id:
                   type: integer
                   default: null
+                is_free:
+                  type: boolean
+                  default: false
       responses:
         '200':
           content:
@@ -1046,6 +1061,14 @@ paths:
                   type: boolean
                 serial_number:
                   type: string
+                price_change_reason_id:
+                  type: integer
+                  default: null
+                zero_rated_amount:
+                  type: number
+                is_free:
+                  type: boolean
+                  default: false
       responses:
         '200':
           content:
@@ -1145,6 +1168,12 @@ paths:
                 is_account_receivable:
                   type: boolean
                   default: false
+                is_completed:
+                  type: boolean
+                  default: false
+                completed_at:
+                  type: string
+                  default: null
       responses:
         '200':
           content:
@@ -1454,6 +1483,15 @@ paths:
                 company_id:
                   type: integer
                   default: null
+                beginning_cut_off_counter:
+                  type: number
+                ending_cut_off_counter:
+                  type: number
+                total_return:
+                  type: number
+                is_complete: 
+                  type: boolean
+                  default: false
       responses:
         '200':
           content:
@@ -1581,6 +1619,11 @@ paths:
                 company_id:
                   type: integer
                   default: null
+                total_return:
+                  type: number
+                is_complete:
+                  type: boolean
+                  default: false
       responses:
         '200':
           content:
@@ -1660,6 +1703,12 @@ paths:
                   type: number
                 net_amount:
                   type: number
+                is_completed:
+                  type: boolean
+                  default: false
+                completed_at:
+                  type: string
+                  default: null
       responses:
         '200':
           content:
@@ -1771,6 +1820,12 @@ paths:
                 company_id:
                   type: integer
                   default: null
+                is_completed:
+                  type: boolean
+                  default: false
+                completed_at:
+                  type: string
+                  default: null
       responses:
         '200':
           content:
@@ -1871,6 +1926,12 @@ paths:
                   type: number
                 is_zero_rated:
                   type: boolean
+                is_completed:
+                  type: boolean
+                  default: false
+                completed_at:
+                  type: string
+                  default: null
 
       responses:
         '200':
@@ -1973,6 +2034,12 @@ paths:
                   type: boolean
                 company_id:
                   type: integer
+                  default: null
+                is_completed:
+                  type: boolean
+                  default: false
+                completed_at:
+                  type: string
                   default: null
 
       responses:
