@@ -292,6 +292,10 @@ class MiscController extends BaseController
             'void_remarks' => $request->void_remarks,
             'customer_name' => $request->customer_name,
             'company_id' => $request->company_id,
+            'account_receivable_redeem_at' => $request->account_receivable_redeem_at,
+            'is_account_receivable_redeem' => $request->is_account_receivable_redeem,
+            'total_zero_rated_amount' => $request->total_zero_rated_amount,
+            'remarks' => $request->remarks,
         ];
 
         //check if existing. update if yes
@@ -415,6 +419,7 @@ class MiscController extends BaseController
             'company_id' => $request->company_id,
             'is_account_receivable_redeem' => $request->is_account_receivable_redeem,
             'account_receivable_redeem_at' => $request->account_receivable_redeem_at,
+            'remarks' => $request->remarks,
         ];
 
         //check if existing. update if yes
@@ -588,6 +593,7 @@ class MiscController extends BaseController
             'zero_rated_amount' => $request->zero_rated_amount,
             'price_change_reason_id' => $request->price_change_reason_id,
             'company_id' => $request->company_id,
+            'is_free' => $request->is_free,
         ];
 
         $order = Order::where([
@@ -704,6 +710,9 @@ class MiscController extends BaseController
             'is_return' => $request->is_return,
             'serial_number' => $request->serial_number,
             'company_id' => $request->company_id,
+            'price_change_reason_id' => $request->price_change_reason_id,
+            'zero_rated_amount' => $request->zero_rated_amount,
+            'is_free' => $request->is_free,
         ];
 
         $order = TakeOrderOrder::where([
@@ -819,6 +828,8 @@ class MiscController extends BaseController
             'void_by_id' => $request->void_by_id ?? null,
             'company_id' => $request->company_id,
             'is_account_receivable' => $request->is_account_receivable,
+            'is_completed' => $request->is_completed,
+            'completed_at' => $request->completed_at,
         ];
 
         $payment = Payment::where([
@@ -1136,6 +1147,10 @@ class MiscController extends BaseController
             'total_cash_fund' => $request->total_cash_fund,
             'beginning_gt_counter' => $request->beginning_gt_counter,
             'ending_gt_counter' => $request->ending_gt_counter,
+            'beginning_cut_off_counter' => $request->beginning_cut_off_counter,
+            'ending_cut_off_counter' => $request->ending_cut_off_counter,
+            'total_return' => $request->total_return,
+            'is_complete' => $request->is_complete,
         ];
 
         if ($request['products']) {
@@ -1285,6 +1300,8 @@ class MiscController extends BaseController
             'total_cash_fund' => $request->total_cash_fund,
             'beginning_gt_counter' => $request->beginning_gt_counter,
             'ending_gt_counter' => $request->ending_gt_counter,
+            'total_return' => $request->total_return,
+            'is_complete' => $request->is_complete,
         ];
 
         $cutOff = CutOff::where([
@@ -1390,6 +1407,8 @@ class MiscController extends BaseController
             'gross_amount' => $request->gross_amount,
             'net_amount' => $request->net_amount,
             'company_id' => $request->company_id,
+            'is_completed' => $request->is_completed,
+            'completed_at' => $request->completed_at,
         ];
 
         $message = 'Discount created successfully.';
@@ -1484,6 +1503,8 @@ class MiscController extends BaseController
             'gross_amount' => $request->gross_amount,
             'net_amount' => $request->net_amount,
             'company_id' => $request->company_id,
+            'is_completed' => $request->is_completed,
+            'completed_at' => $request->completed_at,
         ];
 
         $message = 'Discount created successfully.';
@@ -1572,6 +1593,8 @@ class MiscController extends BaseController
             'vat_expense' => $request->vat_expense,
             'is_zero_rated' => $request->is_zero_rated,
             'company_id' => $request->company_id,
+            'is_completed' => $request->is_completed,
+            'completed_at' => $request->completed_at,
         ];
 
         $message = 'Discount Details created successfully.';
@@ -1664,6 +1687,8 @@ class MiscController extends BaseController
             'vat_expense' => $request->vat_expense,
             'is_zero_rated' => $request->is_zero_rated,
             'company_id' => $request->company_id,
+            'is_completed' => $request->is_completed,
+            'completed_at' => $request->completed_at,
         ];
 
         $message = 'Discount Details created successfully.';
