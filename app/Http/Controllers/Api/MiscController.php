@@ -608,6 +608,7 @@ class MiscController extends BaseController
 
     public function saveTakeOrderOrders(Request $request)
     {
+        
         $validator = validator($request->all(), [
             'order_id' => 'required|numeric|min:1',
             'pos_machine_id' => 'required',
@@ -641,8 +642,7 @@ class MiscController extends BaseController
             'is_open_price' => 'required|boolean',
             'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'with_serial' => 'required|boolean',
-            'is_return' => 'required|boolean',
-            'company_id' => $request->company_id,
+            'is_return' => 'required|boolean'
         ]);
 
         if ($validator->fails()) {
@@ -703,6 +703,7 @@ class MiscController extends BaseController
             'with_serial' => $request->with_serial,
             'is_return' => $request->is_return,
             'serial_number' => $request->serial_number,
+            'company_id' => $request->company_id,
         ];
 
         $order = TakeOrderOrder::where([
@@ -1388,6 +1389,7 @@ class MiscController extends BaseController
             'is_zero_rated' => $request->is_zero_rated,
             'gross_amount' => $request->gross_amount,
             'net_amount' => $request->net_amount,
+            'company_id' => $request->company_id,
         ];
 
         $message = 'Discount created successfully.';
