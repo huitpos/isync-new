@@ -25,9 +25,6 @@ class SalesInvoicesReportExport implements FromCollection, WithHeadings, WithMap
 
     public function __construct($branchId, $startDate, $endDate)
     {
-        ini_set('max_execution_time', 300);
-        ini_set('memory_limit', '512M');
-
         $this->branchId = $branchId;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
