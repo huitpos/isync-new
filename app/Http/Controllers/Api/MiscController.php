@@ -713,6 +713,7 @@ class MiscController extends BaseController
             'price_change_reason_id' => $request->price_change_reason_id,
             'zero_rated_amount' => $request->zero_rated_amount,
             'is_free' => $request->is_free,
+            'is_zero_rated' => $request->is_zero_rated,
         ];
 
         $order = TakeOrderOrder::where([

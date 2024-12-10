@@ -97,6 +97,9 @@ class ReportController extends Controller
 
         if ($request->isMethod('post')) {
             $branch = Branch::find($branchId);
+            
+            ini_set('max_execution_time', 0);
+
             return Excel::download(new SalesInvoicesReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Invoices Report.xlsx");
         }
 
