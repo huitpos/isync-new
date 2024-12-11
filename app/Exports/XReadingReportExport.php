@@ -94,6 +94,7 @@ class XReadingReportExport implements FromCollection, WithHeadings, WithMapping,
     public function collection()
     {
         $cutoffs = CutOff::where('branch_id', $this->branchId)
+            ->whereBetween('treg', [$this->startDate, $this->endDate])
             ->get();
 
         return new Collection($cutoffs);
