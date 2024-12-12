@@ -271,6 +271,6 @@ class ProductsImport implements ToCollection,
 
     public function chunkSize(): int
     {
-        return 1000; // Process 1000 rows per chunk
+        return 300;
     }
 }
