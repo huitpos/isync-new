@@ -58,7 +58,7 @@ class ProductsImport implements ToCollection,
 
     public function endColumn(): string
     {
-        return 'Q';
+        return 'S';
     }
 
     public function collection(Collection $rows)
