@@ -106,6 +106,15 @@
                 </div>
 
                 <div class="mb-4">
+                    <label class="form-label">Part No.</label>
+                    <input value="{{ old('part_number') ?? $product->part_number }}" name="part_number" type="text" class="form-control @error('part_number') is-invalid @enderror" placeholder="Part No." required/>
+
+                    @error('part_number')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
                     <label class="form-label">Department</label>
                     <select id="department_id" name="department_id" data-control="select2" data-placeholder="Select Department" class="form-select @error('department_id') is-invalid @enderror department-category-selector" required>
                         <option value=""></option>
