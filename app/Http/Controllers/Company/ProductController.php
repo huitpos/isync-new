@@ -473,24 +473,8 @@ class ProductController extends Controller
 
         Excel::import($import, $path);
 
-        foreach ($import->getData() as $product) {
-            $itemLocations = $product['item_locations'];
-            unset($product['item_locations']);
-            $_product = Product::updateOrCreate(
-                [
-                    'name' => $product['name'],
-                    'company_id' => $product['company_id']
-                ],
-                $product
-            );
-
-            if ($itemLocations) {
-                $_product->itemLocations()->sync([$itemLocations]);
-            }
-        }
-
         return redirect()->route('company.products.index', ['companySlug' => $company->slug])
-                ->with('success', 'Products imported successfully');
+                ->with('success', 'Products import started');
     }
 
     public function showForm(Request $request)

@@ -11,6 +11,9 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Maatwebsite\Excel\Concerns\WithLimit;
 use Maatwebsite\Excel\Concerns\WithColumnLimit;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use App\Jobs\UpdateOrCreateProductJob;
 
 use App\Models\UnitOfMeasurement;
 use App\Models\Department;
@@ -20,7 +23,14 @@ use App\Models\Subcategory;
 use App\Models\ItemType;
 use App\Models\Product;
 
-class ProductsImport implements ToCollection, WithValidation, WithStartRow, WithCalculatedFormulas, WithLimit, WithColumnLimit
+class ProductsImport implements ToCollection,
+    WithValidation,
+    WithStartRow,
+    WithCalculatedFormulas,
+    // WithLimit,
+    WithColumnLimit,
+    ShouldQueue,
+    WithChunkReading
 {
     protected $companyId;
     protected $data = [];
@@ -75,31 +85,37 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow, With
 
         foreach ($rows as $key => $row) {
             $lastNumber++;
-            $this->data[] = [
-                'status' => $row[0],
-                'name' => $row[1],
-                'description' => $row[2],
-                'sku' => $row[3],
-                'abbreviation' => $row[4],
-                'uom_id' => array_search(strtolower($row[5]), $units),
-                'barcode' => $row[6],
-                'department_id' => array_search(strtolower($row[7]), $departments) ?? null,
-                'category_id' => array_search(strtolower($row[8]), $categories) ?? null,
-                'subcategory_id' => array_search(strtolower($row[9]), $subcategories) ?? null,
-                'markup_type' => $row[10],
-                'markup' => $row[11],
-                'cost' => $row[12],
-                'item_type_id' => array_search(strtolower($row[13]), $itemTypes),
-                // 'srp' => $row[10] == 'percentage' ? $row[12] + ($row[12] * ($row[11] / 100)) : $row[12] + $row[11],
-                'srp' => $row[14],
+            $productData = [
+                'status' => $row[0], //A
+                'name' => $row[1], //B
+                'description' => $row[2], //C
+                'sku' => $row[3], //D
+                'abbreviation' => $row[4], //E
+                'uom_id' => array_search(strtolower($row[5]), $units), //F
+                'barcode' => $row[6], //G
+                'department_id' => array_search(strtolower($row[7]), $departments) ?? null, //H
+                'category_id' => array_search(strtolower($row[8]), $categories) ?? null, //I
+                'subcategory_id' => array_search(strtolower($row[9]), $subcategories) ?? null, //J
+                'markup_type' => $row[10], //K
+                'markup' => $row[11], //L
+                'cost' => $row[12], //M
+                'item_type_id' => array_search(strtolower($row[13]), $itemTypes), //N
+                'srp' => $row[14], //O
+                'item_locations' => array_search(strtolower($row[15]), $itemLocations), //P
+                'max_discount' => $row[16] ?? 0, //Q
+                'minimum_stock_level' => $row[17] ?? 0, //R
+                'maximum_stock_level' => $row[18] ?? 0, //S
+
                 'company_id' => $this->companyId,
                 'code' => $lastNumber,
-                'minimum_stock_level' => 0,
-                'maximum_stock_level' => 0,
-                'subcategory_id' => array_search(strtolower($row[9]), $subcategories) ?? null,
-                'item_locations' => array_search(strtolower($row[15]), $itemLocations),
-                'max_discount' => $row[16] ?? 0,
             ];
+
+            $this->data[] = $productData;
+
+            $importItemLocations = $productData['item_locations'];
+            unset($productData['item_locations']);
+
+            UpdateOrCreateProductJob::dispatch($productData, $importItemLocations);
         }
     }
 
@@ -251,5 +267,10 @@ class ProductsImport implements ToCollection, WithValidation, WithStartRow, With
     public function getData()
     {
         return $this->data;
+    }
+
+    public function chunkSize(): int
+    {
+        return 1000; // Process 1000 rows per chunk
     }
 }
