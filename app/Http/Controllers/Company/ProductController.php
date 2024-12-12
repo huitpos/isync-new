@@ -15,6 +15,7 @@ use App\DataTables\Company\InventoryProductsDataTable;
 use App\DataTables\Company\ProductCountHistoryDataTable;
 
 use App\Imports\ProductsImport;
+use App\Jobs\ProcessExcelJob;
 use Maatwebsite\Excel\Facades\Excel;
 
 use App\Models\Product;
@@ -467,9 +468,7 @@ class ProductController extends Controller
         $file = $request->file('file');
         $path = $file->store('uploads');
 
-        $import = new ProductsImport($request->attributes->get('company')->id);
-
-        Excel::import($import, $path);
+        ProcessExcelJob::dispatch($path, $company->id);
 
         return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Products import started');
