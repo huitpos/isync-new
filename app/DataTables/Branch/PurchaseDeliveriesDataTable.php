@@ -84,6 +84,8 @@ class PurchaseDeliveriesDataTable extends DataTable
             Column::make('id')->visible(false),
             Column::make('pd_number'),
             Column::make('purchase_order.po_number', 'purchaseOrder.po_number')->title('po_number'),
+            Column::make('sales_invoice_number')->title('Sales Invoice'),
+            Column::make('delivery_number')->title('Delivery Number'),
             Column::make('branch.name', 'branch.name'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),

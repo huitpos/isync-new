@@ -65,6 +65,8 @@
                     { data: 'id' },
                     { data: 'pd_number' },
                     { data: 'purchase_order.po_number' },
+                    { data: 'purchase_order.po_number' },
+                    { data: 'sales_invoice_number' },
                     { data: 'branch.name' },
                     { data: 'created_by.name' },
                     { data: 'status' },

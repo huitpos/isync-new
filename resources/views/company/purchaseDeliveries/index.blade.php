@@ -81,6 +81,8 @@
                         }
                     },
                     { data: 'purchase_order.po_number' },
+                    { data: 'sales_invoice_number' },
+                    { data: 'delivery_number' },
                     { data: 'branch.name' },
                     { data: 'created_by.name' },
                     { data: 'status' },
