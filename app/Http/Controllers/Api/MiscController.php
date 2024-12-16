@@ -594,6 +594,7 @@ class MiscController extends BaseController
             'price_change_reason_id' => $request->price_change_reason_id,
             'company_id' => $request->company_id,
             'is_free' => $request->is_free,
+            'part_number' => $request->part_number,
         ];
 
         $order = Order::where([
@@ -714,6 +715,7 @@ class MiscController extends BaseController
             'zero_rated_amount' => $request->zero_rated_amount,
             'is_free' => $request->is_free,
             'is_zero_rated' => $request->is_zero_rated,
+            'part_number' => $request->part_number,
         ];
 
         $order = TakeOrderOrder::where([
