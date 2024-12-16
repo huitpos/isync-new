@@ -901,6 +901,8 @@ paths:
                 is_free:
                   type: boolean
                   default: false
+                part_number:
+                  type: string
       responses:
         '200':
           content:
@@ -1069,6 +1071,8 @@ paths:
                 is_free:
                   type: boolean
                   default: false
+                part_number:
+                  type: string
       responses:
         '200':
           content:
@@ -2129,6 +2133,14 @@ paths:
                 x_reading_counter:
                   type: integer
                 z_reading_counter:
+                  type: integer
+                void_counter:
+                  type: integer
+                or_reset_counter:
+                  type: integer
+                gt_counter:
+                  type: integer
+                payout_counter:
                   type: integer
 
       responses:
