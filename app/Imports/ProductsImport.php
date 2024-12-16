@@ -58,7 +58,7 @@ class ProductsImport implements ToCollection,
 
     public function endColumn(): string
     {
-        return 'S';
+        return 'T';
     }
 
     public function collection(Collection $rows)
@@ -105,6 +105,7 @@ class ProductsImport implements ToCollection,
                 'max_discount' => $row[16] ?? 0, //Q
                 'minimum_stock_level' => $row[17] ?? 0, //R
                 'maximum_stock_level' => $row[18] ?? 0, //S
+                'part_number' => $row[19] ?? null, //T
 
                 'company_id' => $this->companyId,
                 'code' => $lastNumber,
@@ -271,6 +272,6 @@ class ProductsImport implements ToCollection,
 
     public function chunkSize(): int
     {
-        return 300;
+        return 500;
     }
 }
