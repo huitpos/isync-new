@@ -56,6 +56,18 @@ class PurchaseDeliveriesDataTable extends DataTable
             $query->where('status', $this->status);
         }
 
+        if ($this->search) {
+            //wrap all in a or group
+            $query->where(function ($query) {
+                $query->where('pd_number', 'like', '%' . $this->search . '%')
+                    ->orWhere('sales_invoice_number', 'like', '%' . $this->search . '%')
+                    ->orWhere('delivery_number', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('purchaseOrder', function ($query) {
+                        $query->where('po_number', 'like', '%' . $this->search . '%');
+                    });
+            });
+        }
+
         return $query;
     }
 

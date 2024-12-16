@@ -52,6 +52,7 @@
                     url: '{!! route('branch.purchase-deliveries.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) !!}',
                     data: function (d) {
                         d.status = $('#status').val();
+                        d.search = $('#searchBar').val();
                     }
                 },
                 columnDefs: [
@@ -65,8 +66,8 @@
                     { data: 'id' },
                     { data: 'pd_number' },
                     { data: 'purchase_order.po_number' },
-                    { data: 'purchase_order.po_number' },
                     { data: 'sales_invoice_number' },
+                    { data: 'delivery_number' },
                     { data: 'branch.name' },
                     { data: 'created_by.name' },
                     { data: 'status' },
@@ -84,6 +85,10 @@
             }
 
             $('#date_from, #date_to, #status').on('change', function() {
+                reloadDataTable(); // Reload DataTable when either date input changes
+            });
+
+            $('#searchBar').on('keyup', function() {
                 reloadDataTable(); // Reload DataTable when either date input changes
             });
         </script>
