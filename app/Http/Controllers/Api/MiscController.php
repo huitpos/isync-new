@@ -2810,7 +2810,6 @@ class MiscController extends BaseController
             'cashier_id' => 'required',
             'cashier_name' => 'required',
             'authorize_id' => 'required',
-            'authorize_name' => 'required',
             'is_sent_to_server' => 'required',
             'is_cut_off' => 'required',
             'cut_off_id' => 'required',
@@ -2838,6 +2837,7 @@ class MiscController extends BaseController
             'cut_off_id' => $request->cut_off_id,
             'cut_off_at' => $request->cut_off_at,
             'treg' => $request->treg,
+            'safekeeping_id' => $request->safekeeping_id,
         ];
 
         $message = 'Payout created successfully.';
