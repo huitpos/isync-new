@@ -47,10 +47,6 @@
     @push('scripts')
         {{-- {{ $dataTable->scripts() }} --}}
         <script>
-            document.getElementById('searchBar').addEventListener('keyup', function () {
-                window.LaravelDataTables['clusters-table'].search(this.value).draw();
-            });
-
             var table = $('#clusters-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -59,6 +55,7 @@
                     data: function (d) {
                         d.status = $('#status').val();
                         d.branch_id = $('#branch_id').val();
+                        d.search = $('#searchBar').val();
                     }
                 },
                 columnDefs: [
@@ -100,6 +97,10 @@
             }
 
             $('#date_from, #branch_id, #status').on('change', function() {
+                reloadDataTable(); // Reload DataTable when either date input changes
+            });
+
+            $('#searchBar').on('keyup', function() {
                 reloadDataTable(); // Reload DataTable when either date input changes
             });
         </script>

@@ -32,12 +32,14 @@ class PurchaseDeliveryController extends Controller
     {
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
+        $search = $request->query('search', null);
 
         return $dataTable->with([
             'branch_id' => $branch->id,
             'branch_slug' => $branch->slug,
             'company_slug' => $company->slug,
             'status' => $request->query('status', null),
+            'search' => $search,
         ])->render('branch.purchaseDeliveries.index', [
             'company' => $company,
             'branch' => $branch,
