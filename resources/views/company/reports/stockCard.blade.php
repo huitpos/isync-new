@@ -118,7 +118,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <span class="fw-bold">Actual Stock:</span> {{ $pivotData ? $pivotData->stock : 0 }}
+                            <span class="fw-bold">Actual Stock:</span> {{ $pivotData ? number_format($pivotData->stock, 2) : 0 }}
                         </div>
                     </div>
                 </div>
