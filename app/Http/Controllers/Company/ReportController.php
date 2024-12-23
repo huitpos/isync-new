@@ -513,7 +513,7 @@ class ReportController extends Controller
                     unit_of_measurements.name as `unit`,
                     orders.gross,
                     orders.cost,
-                    orders.gross - orders.total_cost as `profit`
+                    orders.gross - (orders.cost * orders.qty) as `profit`
                 FROM transactional_db.transactions
                 INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
                     AND transactions.branch_id = orders.branch_id
