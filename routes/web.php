@@ -89,7 +89,6 @@ Route::get('/download-product-import-template', function () {
 });
 
 Route::get('/map-data', [TestController::class, 'mapData']);
-Route::get('/map-uom-data', [TestController::class, 'mapUomData']);
 
 require __DIR__ . '/auth.php';
 
