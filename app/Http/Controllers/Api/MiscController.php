@@ -635,6 +635,8 @@ class MiscController extends BaseController
             'company_id' => $request->company_id,
             'is_free' => $request->is_free,
             'part_number' => $request->part_number,
+            'is_bundle' => $request->is_bundle,
+            'bundle_order_id' => $request->bundle_order_id,
         ];
 
         $order = Order::where([
@@ -756,6 +758,8 @@ class MiscController extends BaseController
             'is_free' => $request->is_free,
             'is_zero_rated' => $request->is_zero_rated,
             'part_number' => $request->part_number,
+            'is_bundle' => $request->is_bundle,
+            'bundle_order_id' => $request->bundle_order_id,
         ];
 
         $order = TakeOrderOrder::where([
