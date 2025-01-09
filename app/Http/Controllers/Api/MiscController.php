@@ -175,8 +175,7 @@ class MiscController extends BaseController
                         $query->where('updated_at', '>=', $request->from_date)
                               ->orWhere('created_at', '>=', $request->from_date);
                     });
-                })
-                ->limit(10);
+                });
             },
         ])->find($branchId);
         
