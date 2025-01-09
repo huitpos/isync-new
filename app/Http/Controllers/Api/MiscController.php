@@ -432,40 +432,41 @@ class MiscController extends BaseController
             $transaction->is_complete = $isCompleteNewValue;
             $transaction->is_void = $isVoidNewValue;
 
-            $branch = Branch::findOrFail($request->branch_id);
-            
-            $orders = Order::where([
-                'transaction_id' => $request->transaction_id,
-                'pos_machine_id' => $request->pos_machine_id,
-                'branch_id' => $request->branch_id,
-                'is_void' => false,
-                'is_completed' => true,
-                'is_back_out' => false,
-            ])->get();
+            if ($request->order_ids) {
+                $branch = Branch::findOrFail($request->branch_id);
+                
+                $orders = Order::where([
+                    'transaction_id' => $request->transaction_id,
+                    'pos_machine_id' => $request->pos_machine_id,
+                    'branch_id' => $request->branch_id,
+                ])
+                ->whereIn('order_id', $request->order_ids)
+                ->get();
 
-            if ($transaction->isDirty('is_complete')) {
-                $isCompleteOldValue = $transaction->getOriginal('is_complete'); // Old value before changes
+                if ($transaction->isDirty('is_complete')) {
+                    $isCompleteOldValue = $transaction->getOriginal('is_complete'); // Old value before changes
 
-                if ($isCompleteOldValue == 0 && $isCompleteNewValue == 1) {
-                    foreach ($orders as $order) {
-                        $product = Product::find($order['product_id']);
+                    if ($isCompleteOldValue == 0 && $isCompleteNewValue == 1) {
+                        foreach ($orders as $order) {
+                            $product = Product::find($order['product_id']);
 
-                        if ($product) {
-                            $this->productRepository->updateBranchQuantity($product, $branch, $order->order_id, 'orders', $order->qty, null, 'subtract', $order->unit_id);
+                            if ($product) {
+                                $this->productRepository->updateBranchQuantity($product, $branch, $order->order_id, 'orders', $order->qty, null, 'subtract', $order->unit_id);
+                            }
                         }
                     }
                 }
-            }
 
-            if ($transaction->isDirty('is_void')) {
-                $isVoidValue = $transaction->getOriginal('is_void');
+                if ($transaction->isDirty('is_void')) {
+                    $isVoidValue = $transaction->getOriginal('is_void');
 
-                if ($isVoidValue == 0 && $isVoidNewValue == 1) {
-                    foreach ($orders as $order) {
-                        $product = Product::find($order['product_id']);
+                    if ($isVoidValue == 0 && $isVoidNewValue == 1) {
+                        foreach ($orders as $order) {
+                            $product = Product::find($order['product_id']);
 
-                        if ($product) {
-                            $this->productRepository->updateBranchQuantity($product, $branch, $order->order_id, 'orders', $order->qty, null, 'add', $order->unit_id);
+                            if ($product) {
+                                $this->productRepository->updateBranchQuantity($product, $branch, $order->order_id, 'orders', $order->qty, null, 'add', $order->unit_id);
+                            }
                         }
                     }
                 }
