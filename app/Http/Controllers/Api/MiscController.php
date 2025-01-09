@@ -157,40 +157,33 @@ class MiscController extends BaseController
     {
         $branch = Branch::with([
             'company',
-            'company.products' => function ($query) {
+            'company.products' => function ($query) use ($request) {
                 $query->whereHas('itemType', function ($subQuery) {
                     $subQuery->where('show_in_cashier', true);
-                })->with('bundledItems', 'rawItems');
+                })
+                ->with(
+                    'itemType',
+                    'uom',
+                    'itemLocations',
+                    'discounts',
+                    'bundledItems',
+                    'rawItems'
+                )
+                ->where('uom_id', '>', 0)
+                ->when($request->from_date, function ($q) use ($request) {
+                    $q->where(function ($query) use ($request) {
+                        $query->where('updated_at', '>=', $request->from_date)
+                              ->orWhere('created_at', '>=', $request->from_date);
+                    });
+                })
+                ->limit(10);
             },
         ])->find($branchId);
-
-        if ($request->from_date) {
-            $products = $branch->company->products()
-                ->with(
-                    'itemType',
-                    'uom',
-                    'itemLocations',
-                    'discounts'
-                )
-                ->where(function ($query) use ($request) {
-                    $query->where('updated_at', '>=', $request->from_date)
-                          ->orWhere('created_at', '>=', $request->from_date);
-                })
-                ->where('uom_id', '>', 0)
-                ->get();
-        } else {
-            $products = $branch->company->products()
-                ->with(
-                    'itemType',
-                    'uom',
-                    'itemLocations',
-                    'discounts'
-                )
-                ->where('uom_id', '>', 0)
-                ->get();
-        }
-
+        
+        $products = $branch->company->products; // No additional query
+        
         return $this->sendResponse($products, 'Products retrieved successfully.');
+        
     }
 
     public function saveTakeOrderTransactions(Request $request)
