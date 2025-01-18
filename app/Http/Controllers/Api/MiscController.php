@@ -213,7 +213,7 @@ class MiscController extends BaseController
             });
 
         // Paginate the products
-        $perPage = $request->get('per_page', 2); // Default to 15 per page if not specified
+        $perPage = $request->get('per_page', 500); // Default to 15 per page if not specified
         $products = $productsQuery->paginate($perPage);
 
         return $this->sendResponse($products, 'Products retrieved successfully.');
