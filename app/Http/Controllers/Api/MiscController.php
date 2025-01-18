@@ -192,6 +192,8 @@ class MiscController extends BaseController
             return $this->sendError('Branch not found.', 404);
         }
 
+        $request->merge(['return_data' => filter_var($request->return_data ?? true, FILTER_VALIDATE_BOOLEAN)]);
+        
         $productsQuery = $branch->company->products()
             ->whereHas('itemType', function ($subQuery) {
                 $subQuery->where('show_in_cashier', true);
@@ -215,6 +217,21 @@ class MiscController extends BaseController
         // Paginate the products
         $perPage = $request->get('per_page', 500); // Default to 15 per page if not specified
         $products = $productsQuery->paginate($perPage);
+
+        if (!$request->return_data) {
+            // Return the pagination information without the 'data'
+            return $this->sendResponse([
+                'current_page' => $products->currentPage(),
+                'from' => $products->firstItem(),
+                'last_page' => $products->lastPage(),
+                'links' => $products->links(),
+                'next_page_url' => $products->nextPageUrl(),
+                'per_page' => $products->perPage(),
+                'prev_page_url' => $products->previousPageUrl(),
+                'to' => $products->lastItem(),
+                'total' => $products->total(),
+            ], 'Data not returned because return_data is false.');
+        }
 
         return $this->sendResponse($products, 'Products retrieved successfully.');
     }
