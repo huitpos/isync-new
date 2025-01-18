@@ -65,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/discount-types/{branchId}', [MiscController::class, 'discountTypes']);
         Route::get('/charge-accounts/{branchId}', [MiscController::class, 'chargeAccounts']);
         Route::get('/branch-products/{branchId}', [MiscController::class, 'products']);
+        Route::get('/branch-products-paginated/{branchId}', [MiscController::class, 'productsPaginated']);
         Route::get('/price-change-reasons/{branchId}', [MiscController::class, 'priceChangeReasons']);
 
         Route::get('/branch-transactions', [MiscController::class, 'getTransactions']);
