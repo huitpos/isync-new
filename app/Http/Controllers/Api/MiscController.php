@@ -182,7 +182,41 @@ class MiscController extends BaseController
         $products = $branch->company->products; // No additional query
         
         return $this->sendResponse($products, 'Products retrieved successfully.');
-        
+    }
+
+    public function productsPaginated(Request $request, $branchId)
+    {
+        $branch = Branch::with(['company'])->find($branchId);
+
+        if (!$branch) {
+            return $this->sendError('Branch not found.', 404);
+        }
+
+        $productsQuery = $branch->company->products()
+            ->whereHas('itemType', function ($subQuery) {
+                $subQuery->where('show_in_cashier', true);
+            })
+            ->with(
+                'itemType',
+                'uom',
+                'itemLocations',
+                'discounts',
+                'bundledItems',
+                'rawItems'
+            )
+            ->where('uom_id', '>', 0)
+            ->when($request->from_date, function ($q) use ($request) {
+                $q->where(function ($query) use ($request) {
+                    $query->where('updated_at', '>=', $request->from_date)
+                        ->orWhere('created_at', '>=', $request->from_date);
+                });
+            });
+
+        // Paginate the products
+        $perPage = $request->get('per_page', 2); // Default to 15 per page if not specified
+        $products = $productsQuery->paginate($perPage);
+
+        return $this->sendResponse($products, 'Products retrieved successfully.');
     }
 
     public function saveTakeOrderTransactions(Request $request)
@@ -589,6 +623,7 @@ class MiscController extends BaseController
             'part_number' => $request->part_number,
             'is_bundle' => $request->is_bundle,
             'bundle_order_id' => $request->bundle_order_id,
+            'is_posted' => $request->is_posted,
         ];
 
         $order = Order::where([
@@ -609,7 +644,6 @@ class MiscController extends BaseController
 
     public function saveTakeOrderOrders(Request $request)
     {
-        
         $validator = validator($request->all(), [
             'order_id' => 'required|numeric|min:1',
             'pos_machine_id' => 'required',
@@ -712,6 +746,7 @@ class MiscController extends BaseController
             'part_number' => $request->part_number,
             'is_bundle' => $request->is_bundle,
             'bundle_order_id' => $request->bundle_order_id,
+            'is_posted' => $request->is_posted,
         ];
 
         $order = TakeOrderOrder::where([
