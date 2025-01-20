@@ -688,6 +688,7 @@ class MiscController extends BaseController
             'part_number' => $request->part_number,
             'is_bundle' => $request->is_bundle,
             'bundle_order_id' => $request->bundle_order_id,
+            'is_posted' => $request->is_posted,
         ];
 
         $order = Order::where([
@@ -708,7 +709,6 @@ class MiscController extends BaseController
 
     public function saveTakeOrderOrders(Request $request)
     {
-        
         $validator = validator($request->all(), [
             'order_id' => 'required|numeric|min:1',
             'pos_machine_id' => 'required',
@@ -811,6 +811,7 @@ class MiscController extends BaseController
             'part_number' => $request->part_number,
             'is_bundle' => $request->is_bundle,
             'bundle_order_id' => $request->bundle_order_id,
+            'is_posted' => $request->is_posted,
         ];
 
         $order = TakeOrderOrder::where([
