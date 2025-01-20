@@ -307,6 +307,7 @@
 						'branch.table-locations.*',
 						'branch.tables.*',
 						'branch.table-statuses.*',
+						'branch.printers.*',
 					) ? 'here show' : '' }}"
 				>
 					<span class="menu-link">
@@ -327,6 +328,10 @@
 
 							<a class="menu-link {{ request()->routeIs('branch.table-statuses.*') ? 'active' : '' }}" href="{{ route('branch.table-statuses.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 								<span class="menu-title">Statuses</span>
+							</a>
+
+							<a class="menu-link {{ request()->routeIs('branch.printers.*') ? 'active' : '' }}" href="{{ route('branch.printers.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Printers</span>
 							</a>
 						</div>
 					</div>

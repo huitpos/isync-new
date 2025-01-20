@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Tables
+        Printers
     @endsection
 
     <div class="card">
@@ -15,9 +15,9 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
-                    <a href="{{ route('branch.tables.create', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">
+                    <a href="{{ route('branch.printers.create', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
-                        Add Table
+                        Add Printer
                     </a>
                 </div>
             </div>
@@ -29,19 +29,17 @@
                     <thead>
                         <tr class="fw-semibold fs-6 text-muted">
                             <th>Name</th>
-                            <th>Capacity</th>
-                            <th>Location</th>
-                            <th>Action</th>
+                            <th>Departments</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($tables as $table)
+                        @foreach($printers as $printer)
                             <tr>
-                                <td>{{ $table->name }}</td>
-                                <td>{{ $table->capacity }}</td>
-                                <td>{{ $table->tableLocation->name }}</td>
+                                <td>{{ $printer->name }}</td>
+                                <td>{{ $printer->departments->pluck('name')->implode(', ') }}</td>
                                 <td>
-                                    <a href="{{ route('branch.tables.edit', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'table' => $table->id]) }}" class="">
+                                    <a href="{{ route('branch.printers.edit', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'printer' => $printer->id]) }}" class="">
                                         <i class="fa-regular fa-pen-to-square fs-2" title="Edit"></i>
                                     </a>
                                 </td>
