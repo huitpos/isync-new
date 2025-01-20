@@ -1,12 +1,12 @@
 <x-default-layout>
 
     @section('title')
-        Create a new table status
+        Create a new printer
     @endsection
 
     <div class="card">
         <div class="card-body py-4">
-            <form class="mt-3" action="{{ route('branch.table-statuses.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
+            <form class="mt-3" action="{{ route('branch.printers.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-4">
@@ -19,10 +19,14 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Color</label>
-                    <input value="{{ old('color') }}" autocomplete="off" name="color" type="color" class="form-control @error('color') is-invalid @enderror" placeholder="Color" required/>
+                    <label class="form-label">Departments</label>
+                    <select class="form-select" name="departments[]" data-control="select2" data-close-on-select="false" data-placeholder="Select department" data-allow-clear="true" multiple="multiple">
+                        @foreach ($departments as $department)
+                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                        @endforeach
+                    </select>
 
-                    @error('color')
+                    @error('description')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>

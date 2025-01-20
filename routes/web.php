@@ -62,6 +62,7 @@ use App\Http\Controllers\Branch\ChargeAccountController as BranchChargeAccountCo
 use App\Http\Controllers\Branch\TableLocationController as BranchTableLocationController;
 use App\Http\Controllers\Branch\TableController as BranchTableController;
 use App\Http\Controllers\Branch\TableStatusController as BranchTableStatusController;
+use App\Http\Controllers\Branch\PrinterController as BranchPrinterController;
 
 use Illuminate\Support\Facades\Response;
 
@@ -220,6 +221,7 @@ Route::middleware('auth')->group(function () {
             Route::resource('table-locations', BranchTableLocationController::class, ['as' => 'branch']);
             Route::resource('tables', BranchTableController::class, ['as' => 'branch']);
             Route::resource('table-statuses', BranchTableStatusController::class, ['as' => 'branch']);
+            Route::resource('printers', BranchPrinterController::class, ['as' => 'branch']);
 
             Route::prefix('reports')->group(function () {
                 Route::get('/transactions', [BranchReportController::class, 'transactions'])->name('branch.reports.transactions');

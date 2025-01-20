@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Branch;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\TableStatus;
+use App\Models\Printer;
 
-class TableStatusController extends Controller
+class PrinterController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,13 +17,13 @@ class TableStatusController extends Controller
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        //get TableLocation by branch_id or branch_id is null
-        $statuses = TableStatus::where('branch_id', $branch->id)->orWhereNull('branch_id')->get();
+        //get TableLocation by branch_id
+        $printers = Printer::where('branch_id', $branch->id)->get();
         
-        return view('branch.tableStatuses.index', [
+        return view('branch.printers.index', [
             'company' => $company,
             'branch' => $branch,
-            'statuses' => $statuses,
+            'printers' => $printers,
         ]);
     }
 
@@ -35,9 +35,12 @@ class TableStatusController extends Controller
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        return view('branch.tableStatuses.create', [
+        $departments = $company->departments;
+
+        return view('branch.printers.create', [
             'company' => $company,
             'branch' => $branch,
+            'departments' => $departments,
         ]);
     }
 
@@ -47,31 +50,35 @@ class TableStatusController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'color' => 'required',
+            'name' => 'required'
         ]);
 
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
         $tableData = $request->only([
-            'name',
-            'color',
+            'name'
+        ]);
+
+        $departmentData = $request->only([
+            'departments'
         ]);
 
         $tableData['branch_id'] = $branch->id;
 
-        if (TableStatus::create($tableData)) {
-            return redirect()->route('branch.table-statuses.index', [
+        if ($printer = Printer::create($tableData)) {
+            $printer->departments()->sync($request->departments);
+
+            return redirect()->route('branch.printers.index', [
                     'companySlug' => $request->attributes->get('company')->slug,
                     'branchSlug' => $request->attributes->get('branch')->slug
-                ])->with('success', 'Table status created successfully.');
+                ])->with('success', 'Printer created successfully.');
         }
 
-        return redirect()->route('branch.table-statuses.index', [
+        return redirect()->route('branch.printers.index', [
                 'companySlug' => $request->attributes->get('company')->slug,
                 'branchSlug' => $request->attributes->get('branch')->slug
-            ])->with('error', 'Table status failed to create.');
+            ])->with('error', 'Printer failed to create.');
     }
 
     /**
@@ -87,15 +94,18 @@ class TableStatusController extends Controller
      */
     public function edit(Request $request, string $companySlug, string $branchSlug, string $id)
     {
-        $status = TableStatus::findOrFail($id);
+        $printer = Printer::findOrFail($id);
 
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        return view('branch.tableStatuses.edit', [
+        $departments = $company->departments;
+
+        return view('branch.printers.edit', [
             'company' => $company,
             'branch' => $branch,
-            'status' => $status,
+            'printer' => $printer,
+            'departments' => $departments,
         ]);
     }
 
@@ -104,32 +114,38 @@ class TableStatusController extends Controller
      */
     public function update(Request $request, string $companySlug, string $branchSlug, string $id)
     {
-        $status = TableStatus::findOrFail($id);
+        $printer = Printer::findOrFail($id);
 
         $request->validate([
-            'name' => 'required',
-            'color' => 'required',
+            'name' => 'required'
         ]);
 
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
         $tableData = $request->only([
-            'name',
-            'color',
+            'name'
         ]);
 
-        if ($status->update($tableData)) {
-            return redirect()->route('branch.table-statuses.index', [
+        $departmentData = $request->only([
+            'departments'
+        ]);
+
+        $tableData['branch_id'] = $branch->id;
+
+        if ($printer->update($tableData)) {
+            $printer->departments()->sync($request->departments);
+
+            return redirect()->route('branch.printers.index', [
                     'companySlug' => $request->attributes->get('company')->slug,
                     'branchSlug' => $request->attributes->get('branch')->slug
-                ])->with('success', 'Table status updated successfully.');
+                ])->with('success', 'Printer updated successfully.');
         }
 
-        return redirect()->route('branch.table-statuses.index', [
+        return redirect()->route('branch.printers.index', [
                 'companySlug' => $request->attributes->get('company')->slug,
                 'branchSlug' => $request->attributes->get('branch')->slug
-            ])->with('error', 'Table status failed to update.');
+            ])->with('error', 'Printer failed to update.');
     }
 
     /**

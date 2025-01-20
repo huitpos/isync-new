@@ -30,6 +30,7 @@
                         <tr class="fw-semibold fs-6 text-muted">
                             <th>Name</th>
                             <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,6 +38,11 @@
                             <tr>
                                 <td>{{ $tableLocation->name }}</td>
                                 <td>{{ $tableLocation->status }}</td>
+                                <td>
+                                    <a href="{{ route('branch.table-locations.edit', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'table_location' => $tableLocation->id]) }}" class="">
+                                        <i class="fa-regular fa-pen-to-square fs-2" title="Edit"></i>
+                                    </a>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

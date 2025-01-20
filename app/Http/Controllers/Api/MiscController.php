@@ -48,6 +48,7 @@ use App\Models\TakeOrderOrder;
 use App\Models\Table;
 use App\Models\TableLocation;
 use App\Models\TableStatus;
+use App\Models\Printer;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 
@@ -3423,6 +3424,13 @@ class MiscController extends BaseController
     public function getBranchTableStatuses(Request $request, $branchId)
     {
         $data = TableStatus::where('branch_id', $branchId)->orWhereNull('branch_id')->get();
+
+        return $this->sendResponse($data, 'data retrieved successfully.');
+    }
+
+    public function getBranchPrinters(Request $request, $branchId)
+    {
+        $data = Printer::where('branch_id', $branchId)->with('departments')->get();
 
         return $this->sendResponse($data, 'data retrieved successfully.');
     }
