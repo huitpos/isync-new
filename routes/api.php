@@ -170,6 +170,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/unredeemed-ar-transactions', [MiscController::class, 'getUnredeemedArTransactions']);
 
         Route::post('/ar-transactions', [MiscController::class, 'updateArTransaction']);
+
+        Route::get('/branch-tables/{branchId}', [MiscController::class, 'getBranchTables']);
+        Route::get('/branch-table-locations/{branchId}', [MiscController::class, 'getBranchTableLocations']);
+        Route::get('/branch-table-statuses/{branchId}', [MiscController::class, 'getBranchTableStatuses']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
