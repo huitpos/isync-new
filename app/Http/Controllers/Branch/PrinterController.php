@@ -57,7 +57,8 @@ class PrinterController extends Controller
         $branch = $request->attributes->get('branch');
 
         $tableData = $request->only([
-            'name'
+            'name',
+            'status'
         ]);
 
         $departmentData = $request->only([
@@ -124,7 +125,8 @@ class PrinterController extends Controller
         $branch = $request->attributes->get('branch');
 
         $tableData = $request->only([
-            'name'
+            'name',
+            'status'
         ]);
 
         $departmentData = $request->only([

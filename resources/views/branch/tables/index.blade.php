@@ -31,6 +31,7 @@
                             <th>Name</th>
                             <th>Capacity</th>
                             <th>Location</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -40,6 +41,7 @@
                                 <td>{{ $table->name }}</td>
                                 <td>{{ $table->capacity }}</td>
                                 <td>{{ $table->tableLocation->name }}</td>
+                                <td>{{ $table->status }}</td>
                                 <td>
                                     <a href="{{ route('branch.tables.edit', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'table' => $table->id]) }}" class="">
                                         <i class="fa-regular fa-pen-to-square fs-2" title="Edit"></i>

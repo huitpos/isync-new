@@ -30,6 +30,7 @@
                         <tr class="fw-semibold fs-6 text-muted">
                             <th>Name</th>
                             <th>Color</th>
+                            <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -41,6 +42,7 @@
                                     {{ $status->name }}
                                 </td>
                                 <td>{{ $status->color }}</td>
+                                <td>{{ $status->status }}</td>
                                 <td>
                                     @if($status->branch_id)
                                     <a href="{{ route('branch.table-statuses.edit', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'table_status' => $status->id]) }}" class="">
