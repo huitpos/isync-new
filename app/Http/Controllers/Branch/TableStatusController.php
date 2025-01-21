@@ -57,6 +57,7 @@ class TableStatusController extends Controller
         $tableData = $request->only([
             'name',
             'color',
+            'status'
         ]);
 
         $tableData['branch_id'] = $branch->id;
@@ -117,6 +118,7 @@ class TableStatusController extends Controller
         $tableData = $request->only([
             'name',
             'color',
+            'status'
         ]);
 
         if ($status->update($tableData)) {

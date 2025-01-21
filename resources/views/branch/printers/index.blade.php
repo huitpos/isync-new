@@ -30,6 +30,7 @@
                         <tr class="fw-semibold fs-6 text-muted">
                             <th>Name</th>
                             <th>Departments</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -38,6 +39,7 @@
                             <tr>
                                 <td>{{ $printer->name }}</td>
                                 <td>{{ $printer->departments->pluck('name')->implode(', ') }}</td>
+                                <td>{{ $printer->status }}</td>
                                 <td>
                                     <a href="{{ route('branch.printers.edit', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'printer' => $printer->id]) }}" class="">
                                         <i class="fa-regular fa-pen-to-square fs-2" title="Edit"></i>

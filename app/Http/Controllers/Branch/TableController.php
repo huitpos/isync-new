@@ -36,7 +36,9 @@ class TableController extends Controller
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        $tableLocations = TableLocation::where('branch_id', $branch->id)->get();
+        $tableLocations = TableLocation::where('branch_id', $branch->id)
+            ->where('status', 'active')
+            ->get();
 
         return view('branch.tables.create', [
             'company' => $company,
@@ -63,6 +65,7 @@ class TableController extends Controller
             'name',
             'capacity',
             'table_location_id',
+            'status'
         ]);
 
         $tableData['branch_id'] = $branch->id;
@@ -98,7 +101,9 @@ class TableController extends Controller
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        $tableLocations = TableLocation::where('branch_id', $branch->id)->get();
+        $tableLocations = TableLocation::where('branch_id', $branch->id)
+            ->where('status', 'active')
+            ->get();
 
         return view('branch.tables.edit', [
             'company' => $company,
@@ -128,6 +133,7 @@ class TableController extends Controller
             'name',
             'capacity',
             'table_location_id',
+            'status'
         ]);
 
         if ($table->update($tableData)) {
