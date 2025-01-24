@@ -38,6 +38,19 @@
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
+
+                <div class="mb-4 mt-6">
+                    <div class="form-check">
+                        <input class="form-check-input" name="is_blinking" type="checkbox" value="1"/>
+                        <label>
+                            Blinking
+                        </label>
+                    </div>
+
+                    @error('is_blinking')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
                     
 
                 <button type="submit" class="btn btn-primary mt-5 disable-on-click">Submit</button>
