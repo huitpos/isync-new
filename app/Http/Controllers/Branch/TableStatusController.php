@@ -57,7 +57,8 @@ class TableStatusController extends Controller
         $tableData = $request->only([
             'name',
             'color',
-            'status'
+            'status',
+            'is_blinking'
         ]);
 
         $tableData['branch_id'] = $branch->id;
@@ -118,8 +119,11 @@ class TableStatusController extends Controller
         $tableData = $request->only([
             'name',
             'color',
-            'status'
+            'status',
+            'is_blinking'
         ]);
+
+        $tableData['is_blinking'] = $request->is_blinking ? 1 : 0;
 
         if ($status->update($tableData)) {
             return redirect()->route('branch.table-statuses.index', [
