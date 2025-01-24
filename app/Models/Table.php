@@ -16,4 +16,10 @@ class Table extends Model
     {
         return $this->belongsTo(TableLocation::class);
     }
+
+    //table_status
+    public function tableStatus()
+    {
+        return $this->belongsTo(TableStatus::class);
+    }
 }

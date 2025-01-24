@@ -173,9 +173,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/ar-transactions', [MiscController::class, 'updateArTransaction']);
 
         Route::get('/branch-tables/{branchId}', [MiscController::class, 'getBranchTables']);
+        Route::post('/update-branch-table', [MiscController::class, 'saveBranchTables']);
         Route::get('/branch-table-locations/{branchId}', [MiscController::class, 'getBranchTableLocations']);
         Route::get('/branch-table-statuses/{branchId}', [MiscController::class, 'getBranchTableStatuses']);
         Route::get('/branch-printers/{branchId}', [MiscController::class, 'getBranchPrinters']);
+        
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);

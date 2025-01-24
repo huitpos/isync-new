@@ -3743,3 +3743,42 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /api/update-branch-table:
+    post:
+      tags:
+        - Sync To Server
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: number
+                branch_id:
+                  type: number
+                table_id:
+                  type: number
+                table_status_id:
+                  type: string
+                dine_in_time:
+                  type: string
+                transaction_id:
+                  type: number
+              required:
+                - device_id
+                - branch_id
+                - table_id
+                - table_status_id
+                - dine_in_time
+                - transaction_id
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
