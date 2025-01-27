@@ -3446,7 +3446,6 @@ class MiscController extends BaseController
             'branch_id' => 'required',
             'table_id' => 'required',
             'table_status_id' => 'required',
-            'dine_in_time' => 'required',
             'transaction_id' => 'required'
         ]);
 
