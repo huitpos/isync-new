@@ -124,7 +124,8 @@ class ClientController extends Controller
             'barangay_id' => $request['barangay_id'],
             'slug' => Str::slug($request['trade_name']),
             'street' => $request['street'],
-            'company_registered_name' => ''
+            'company_registered_name' => '',
+            'pos_type' => $request['pos_type'],
         ]);
 
         $path = '';
