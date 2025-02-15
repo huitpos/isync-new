@@ -162,7 +162,7 @@
                         </div>
                         @endif
 
-                        <div class="col-md-<?= $po->status != 'approved' ? '12' : '6' ?>">
+                        <div class="col-md-<?= $pr->status != 'approved' ? '12' : '6' ?>">
                             <div class="form-group float-end">
                                 <h2>TOTAL: <span class="grandtotal"> {{ $pr->total }}</span></h2>
                             </div>
