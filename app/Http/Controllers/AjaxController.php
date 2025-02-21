@@ -10,6 +10,9 @@ use App\Models\Cluster;
 use App\Models\Product;
 use App\Models\Department;
 use App\Models\UnitOfMeasurement;
+use App\Models\Supplier;
+
+use Illuminate\Support\Facades\Auth;
 
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\Interfaces\SubcategoryRepositoryInterface;
@@ -61,6 +64,17 @@ class AjaxController extends Controller
 
     public function getDepartmentSuppliers(Request $request)
     {
+        $user = Auth::user();
+
+        if ($request->department_id == "all") {
+            $suppliers = Supplier::where([
+                'status' => 'active',
+                'company_id' => $user->company_id
+            ])->get();
+
+            return response()->json($suppliers);
+        }
+
         $department = Department::find($request->department_id);
 
         $suppliers = $department->suppliers()->where([
@@ -84,8 +98,16 @@ class AjaxController extends Controller
     {
         $productsQuery = Product::query();
 
+        $user = Auth::user();
+
         if ($request->has('department_id')) {
-            $productsQuery->where('department_id', $request->department_id);
+            $departmentId = $request->department_id;
+
+            if ($departmentId == 'all') {
+                $productsQuery->where('company_id', $user->company_id);
+            } else {
+                $productsQuery->where('department_id', $departmentId);
+            }
         }
 
         if ($request->has('company_id')) {
