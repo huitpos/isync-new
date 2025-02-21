@@ -93,12 +93,15 @@ class CompanyRepository implements CompanyRepositoryInterface
         return $amount;
     }
 
-    public function getTransactionCostAmount(String $id): Float
+    public function getTransactionCostAmount(String $id, String $startDate = '', String $endDate = '', String $branchId = null): Float
     {
         $company = Company::findOrFail($id);
 
         $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
             ->where('is_complete', true)
+            ->where('is_void', false)
+            ->where('is_back_out', false)
+            ->whereBetween('completed_at', [$startDate, $endDate])
             ->sum('total_unit_cost');
 
         return $amount;

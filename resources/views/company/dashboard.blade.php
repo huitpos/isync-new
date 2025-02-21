@@ -46,24 +46,31 @@
 </form>
 
     <div class="row g-1 g-xl-5 mb-1 mb-xl-5">
-        <div class="col-4">
+        <div class="col-3">
             @include('partials/widgets/small_card', [
                 'text' => $transactionCount,
                 'subText' => 'Transaction Count',
             ])
         </div>
 
-        <div class="col-4">
+        <div class="col-3">
             @include('partials/widgets/small_card', [
                 'text' => number_format($grossAmount, 2),
                 'subText' => 'Gross sales',
             ])
         </div>
 
-        <div class="col-4">
+        <div class="col-3">
             @include('partials/widgets/small_card', [
                 'text' => number_format($netAmount, 2),
                 'subText' => 'Net Sales',
+            ])
+        </div>
+
+        <div class="col-3">
+            @include('partials/widgets/small_card', [
+                'text' => number_format($grossAmount - $costAmount, 2),
+                'subText' => 'Profit',
             ])
         </div>
 
