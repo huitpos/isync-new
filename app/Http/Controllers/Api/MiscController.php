@@ -378,7 +378,7 @@ class MiscController extends BaseController
         ]);
 
         $log = new ApiRequestLog();
-        $log->type = 'trasaction_request';
+        $log->type = 'transaction_request';
         $log->method = $request->method();
         $log->request = json_encode($requestData);
         $log->control_number = $request->control_number;
