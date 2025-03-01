@@ -178,9 +178,9 @@ class MiscController extends BaseController
                 });
             },
         ])->find($branchId);
-        
+
         $products = $branch->company->products; // No additional query
-        
+
         return $this->sendResponse($products, 'Products retrieved successfully.');
     }
 
@@ -377,8 +377,16 @@ class MiscController extends BaseController
             'void_counter' => 'required|numeric',
         ]);
 
+        $log = new ApiRequestLog();
+        $log->type = 'trasaction_request';
+        $log->method = $request->method();
+        $log->request = json_encode($requestData);
+        $log->control_number = $request->control_number;
+        $log->receipt_number = $request->receipt_number;
+        $log->branch_id = $request->branch_id;
+        $log->save();
+
         if ($validator->fails()) {
-            //log request
             $log = new ApiRequestLog();
             $log->type = 'saveTransactions';
             $log->method = $request->method();
