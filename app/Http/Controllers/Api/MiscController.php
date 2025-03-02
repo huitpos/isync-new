@@ -381,7 +381,6 @@ class MiscController extends BaseController
         $log->type = 'transaction_request';
         $log->method = $request->method();
         $log->request = json_encode($requestData);
-        $log->response = json_encode($requestData);
         $log->control_number = $request->control_number;
         $log->receipt_number = $request->receipt_number;
         $log->branch_id = $request->branch_id;
