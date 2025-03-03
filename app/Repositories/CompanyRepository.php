@@ -97,7 +97,13 @@ class CompanyRepository implements CompanyRepositoryInterface
     {
         $company = Company::findOrFail($id);
 
-        $amount = Transaction::whereIn('branch_id', $company->branches->pluck('id')->toArray())
+        if ($branchId) {
+            $branches = [$branchId];
+        } else {
+            $branches = $company->branches->pluck('id')->toArray();
+        }
+        
+        $amount = Transaction::whereIn('branch_id', $branches)
             ->where('is_complete', true)
             ->where('is_void', false)
             ->where('is_back_out', false)

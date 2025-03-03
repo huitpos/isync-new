@@ -46,6 +46,7 @@ class PageController extends Controller
         $netAmount = $this->companyRepository->getTransactionNetSales($company->id, $startDate, $endDate, $branchId);
         $grossAmount = $this->companyRepository->getTransactionGrossSales($company->id, $startDate, $endDate, $branchId);
         $transactionCount = $this->companyRepository->getTransactionCount($company->id, $startDate, $endDate, $branchId);
+        $costAmount = $this->companyRepository->getTransactionCostAmount($company->id, $startDate, $endDate, $branchId);
 
         $transactions = DB::table('transactional_db.transactions')
             ->select(
@@ -226,7 +227,8 @@ class PageController extends Controller
             'selectedRangeParam' => $selectedRangeParam,
             'startDateParam' => $startDateParam,
             'endDateParam' => $endDateParam,
-            'dateParam' => $dateParam
+            'dateParam' => $dateParam,
+            'costAmount' => $costAmount
         ]);
     }
 }
