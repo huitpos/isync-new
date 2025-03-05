@@ -59,6 +59,9 @@ class AuthController extends BaseController
             $user = Auth::user();
             $success['token'] =  $user->createToken('api')->plainTextToken;
             $success['name'] =  $user->name;
+            $success['company_id'] =  $user->company_id;
+            $success['role'] =  $user->getRoleNames()->toArray()[0] ?? null;
+            $success['braches'] =  auth()->user()->activeBranches;;
 
             return $this->sendResponse($success, 'User login successfully.');
         } else {
