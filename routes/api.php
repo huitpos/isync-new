@@ -158,13 +158,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/branch-product-soh', [MiscController::class, 'getProductSoh']);
         Route::get('/unredeemed-ar-transactions', [MiscController::class, 'getUnredeemedArTransactions']);
-
-        Route::post('/sb-cutoff', [SbController::class, 'updateCutoff']);
-        Route::post('/sb-endofday', [SbController::class, 'updateEndOfDay']);
-
-        Route::get('/sb-cutoff', [SbController::class, 'getCutoff']);
-        Route::get('/sb-endofday', [SbController::class, 'getEndOfDay']);
     });
+
+    Route::post('/sb-cutoff', [SbController::class, 'updateCutoff']);
+    Route::post('/sb-endofday', [SbController::class, 'updateEndOfDay']);
+
+    Route::get('/sb-cutoff', [SbController::class, 'getCutoff']);
+    Route::get('/sb-endofday', [SbController::class, 'getEndOfDay']);
 
     Route::get('/logout', [AuthController::class, 'logout']);
 });
