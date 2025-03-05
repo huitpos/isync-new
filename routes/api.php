@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\BarangayController;
 use App\Http\Controllers\Api\MachineController;
 use App\Http\Controllers\Api\MiscController;
+use App\Http\Controllers\Api\SbController;
 
 use App\Http\Middleware\MachineValidationMiddleware;
 
@@ -36,18 +37,6 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    // Route::apiResource('users', UsersController::class);
-
-    // Route::apiResource('clusters', ClustersController::class);
-    // Route::apiResource('regions', RegionController::class);
-    // Route::apiResource('region/{regionId}/provinces', ProvinceController::class);
-    // Route::apiResource('provinces', ProvinceController::class);
-    // Route::apiResource('province/{provinceId}/cities', CityController::class);
-    // Route::apiResource('cities', CityController::class);
-    // Route::apiResource('city/{cityId}/barangays', BarangayController::class);
-    // Route::apiResource('barangays', BarangayController::class);
-
-    //sync
     Route::post('/activate-machine', [MachineController::class, 'activate']);
     Route::get('/test-connection', [MiscController::class, 'testConnection']);
 
@@ -170,7 +159,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/branch-product-soh', [MiscController::class, 'getProductSoh']);
         Route::get('/unredeemed-ar-transactions', [MiscController::class, 'getUnredeemedArTransactions']);
 
-        Route::post('/ar-transactions', [MiscController::class, 'updateArTransaction']);
+        Route::post('/sb-cutoff', [SbController::class, 'updateCutoff']);
+        Route::post('/sb-endofday', [SbController::class, 'updateEndOfDay']);
+
+        Route::get('/sb-cutoff', [SbController::class, 'getCutoff']);
+        Route::get('/sb-endofday', [SbController::class, 'getEndOfDay']);
     });
 
     Route::get('/logout', [AuthController::class, 'logout']);
