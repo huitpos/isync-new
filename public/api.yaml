@@ -3641,36 +3641,6 @@ paths:
                   type: string
 
   /api/sb-cutoff:
-    post:
-      tags:
-        - SB
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                machine_id:
-                  type: integer
-                  required: true
-                branch_id:
-                  type: integer
-                  required: true
-                percentage:
-                  type: number
-                  required: true
-                date:
-                  type: string
-                  required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-
     get:
       tags:
         - SB
@@ -3703,35 +3673,6 @@ paths:
                   type: string
 
   /api/sb-endofday:
-    post:
-      tags:
-        - SB
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                machine_id:
-                  type: integer
-                  required: true
-                branch_id:
-                  type: integer
-                  required: true
-                percentage:
-                  type: number
-                  required: true
-                date:
-                  type: string
-                  required: true
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
 
     get:
       tags:
@@ -3763,3 +3704,26 @@ paths:
                 type: array
                 items:
                   type: string
+  
+  /api/sb-update:
+    post:
+      tags:
+        - SB
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                machine_id:
+                  type: integer
+                  required: true
+                branch_id:
+                  type: integer
+                  required: true
+                percentage:
+                  type: number
+                  required: true
+                date:
+                  type: string
+                  required: true

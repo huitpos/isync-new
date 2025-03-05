@@ -28,7 +28,8 @@ use App\Models\Sb\EndOfDayPayment as SbEndOfDayPayment;
 
 class SbController extends BaseController
 {
-    public function updateCutoff(Request $request)
+
+    public function updateReadings(Request $request)
     {
         $requestData = $request->all();
         $validator = validator($request->all(), [
@@ -40,7 +41,7 @@ class SbController extends BaseController
 
         if ($validator->fails()) {
             $log = new ApiRequestLog();
-            $log->type = 'updateCutoff';
+            $log->type = 'updateReadings';
             $log->method = $request->method();
             $log->request = json_encode($requestData);
             $log->response = json_encode($validator->errors());
@@ -49,139 +50,7 @@ class SbController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
-        //fetch real cut off
-        $cutOff = CutOff::where([
-                'branch_id' => $request->branch_id,
-                'pos_machine_id' => $request->machine_id
-            ])
-            ->whereDate('treg', $request->date)
-            ->first();
-
-        if (!$cutOff) {
-            return $this->sendError('No Cut Off for that day', $validator->errors(), 422);
-        }
-
-        //fetch latest sb cut off
-        $sbLatestCutoff = SbCutOff::where([
-                'branch_id' => $request->branch_id,
-                'pos_machine_id' => $request->machine_id
-            ])
-            ->orderBy('treg', 'desc')
-            ->first();
-
-        //check if the latest sb cut off is the same as the cut off
-        if ($sbLatestCutoff && $sbLatestCutoff->id != $cutOff->id) {
-            return $this->sendError('SB Cut Off is not the latest', $validator->errors(), 422);
-        }
-
-        $cutOffData = $cutOff->toArray();
-        
-        if ($sbLatestCutoff) {
-            $cutOffData['beginning_amount'] = $sbLatestCutoff->ending_amount;
-        }
-
-        $cutOffDeductibleFields = [
-            'ending_amount',
-            'gross_sales',
-            'net_sales',
-            'vatable_sales',
-            'vat_exempt_sales',
-            'vat_amount'
-        ];
-
-        foreach ($cutOffDeductibleFields as $field) {
-            $cutOffData[$field] = $cutOffData[$field] - ($cutOffData[$field] * ($request->percentage / 100));
-        }
-
-        $sbCutOff = SbCutOff::updateOrCreate(['id' => $cutOff->id], $cutOffData);
-
-        //cut_off_departments
-        $cutOffDepartmentsDeductibleFields = [
-            'amount'
-        ];
-
-        $cutOffDepartments = CutOffDepartment::where([
-            'cut_off_id' => $cutOff->cut_off_id,
-            'branch_id' => $cutOff->branch_id,
-            'pos_machine_id' => $request->machine_id
-        ])->get();
-        
-        foreach ($cutOffDepartments as $cutOffDepartment) {
-            $cutOffDepartmentData = $cutOffDepartment->toArray();
-
-            foreach ($cutOffDepartmentsDeductibleFields as $field) {
-                $cutOffDepartmentData[$field] = $cutOffDepartmentData[$field] - ($cutOffDepartmentData[$field] * ($request->percentage / 100));
-            }
-
-            SbCutOffDepartment::updateOrCreate(['id' => $cutOffDepartment->id], $cutOffDepartmentData);
-        }
-
-        //cut_off_payments
-        $cutOffPaymentsDeductibleFields = [
-            'amount'
-        ];
-
-        $cutOffPayments = CutOffPayment::where([
-            'cut_off_id' => $cutOff->cut_off_id,
-            'branch_id' => $cutOff->branch_id,
-            'pos_machine_id' => $request->machine_id
-        ])->get();
-
-        foreach ($cutOffPayments as $cutOffPayment) {
-            $cutOffPaymentData = $cutOffPayment->toArray();
-
-            foreach ($cutOffPaymentsDeductibleFields as $field) {
-                $cutOffPaymentData[$field] = $cutOffPaymentData[$field] - ($cutOffPaymentData[$field] * ($request->percentage / 100));
-            }
-
-            SbCutOffPayment::updateOrCreate(['id' => $cutOffPayment->id], $cutOffPaymentData);
-        }
-
-        //cut_off_discount
-        $cutOffDiscountsDeductibleFields = [
-            'amount'
-        ];
-
-        $cutOffDiscounts = CutOffDiscount::where([
-            'cut_off_id' => $cutOff->cut_off_id,
-            'branch_id' => $cutOff->branch_id,
-            'pos_machine_id' => $request->machine_id
-        ])->get();
-
-        foreach ($cutOffDiscounts as $cutOffDiscount) {
-            $cutOffDiscountData = $cutOffDiscount->toArray();
-
-            foreach ($cutOffDiscountsDeductibleFields as $field) {
-                $cutOffDiscountData[$field] = $cutOffDiscountData[$field] - ($cutOffDiscountData[$field] * ($request->percentage / 100));
-            }
-
-            SbCutOffDiscount::updateOrCreate(['id' => $cutOffDiscount->id], $cutOffDiscountData);
-        }
-
-        return $this->sendResponse($sbCutOff, 'SB Cut Off updated successfully.');
-    }
-
-    public function updateEndOfDay(Request $request)
-    {
-        $requestData = $request->all();
-        $validator = validator($request->all(), [
-            'branch_id' => 'required',
-            'percentage' => 'required',
-            'date' => 'required|date_format:Y-m-d',
-            'machine_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            $log = new ApiRequestLog();
-            $log->type = 'updateEndOfDay';
-            $log->method = $request->method();
-            $log->request = json_encode($requestData);
-            $log->response = json_encode($validator->errors());
-            $log->save();
-
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
+        //end of day
         $endOfDay = EndOfDay::where([
                 'branch_id' => $request->branch_id,
                 'pos_machine_id' => $request->machine_id
@@ -195,16 +64,19 @@ class SbController extends BaseController
 
         $sbLatestEndOfDay = SbEndOfDay::where([
                 'branch_id' => $request->branch_id,
-                'pos_machine_id' => $request->machine_id
+                'pos_machine_id' => $request->machine_id,
             ])
+            ->whereNot('id', $endOfDay->id)
             ->orderBy('treg', 'desc')
             ->first();
 
-        if ($sbLatestEndOfDay && $sbLatestEndOfDay->id != $endOfDay->id) {
+        if ($sbLatestEndOfDay && $sbLatestEndOfDay->id > $endOfDay->id) {
             return $this->sendError('SB Cut Off is not the latest', $validator->errors(), 422);
         }
 
         $endOfDayData = $endOfDay->toArray();
+
+        $endOfDayData['beginning_amount'] = 0;
         
         if ($sbLatestEndOfDay) {
             $endOfDayData['beginning_amount'] = $sbLatestEndOfDay->ending_amount;
@@ -288,7 +160,115 @@ class SbController extends BaseController
             SbEndOfDayPayment::updateOrCreate(['id' => $endOfDayPayment->id], $endOfDayPaymentData);
         }
 
-        return $this->sendResponse($sbEndOfDay, 'SB End Of Day updated successfully.');
+        $sbLatestCutoff = SbCutOff::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->machine_id
+            ])
+            ->whereNot('end_of_day_id', $endOfDay->end_of_day_id)
+            ->orderBy('treg', 'desc')
+            ->first();
+
+        $cutOffBeginningAmount = 0;
+        if ($sbLatestCutoff) {
+            $cutOffBeginningAmount = $sbLatestCutoff->ending_amount;
+        }
+
+        $cutOffs = CutOff::where([
+                'branch_id' => $request->branch_id,
+                'end_of_day_id' => $endOfDay->end_of_day_id,
+                'pos_machine_id' => $request->machine_id
+            ])
+            ->get();
+
+        foreach ($cutOffs as $cutOff) {
+            $cutOffData = $cutOff->toArray();
+
+            $cutOffData['beginning_amount'] = $cutOffBeginningAmount;
+
+            $cutOffDeductibleFields = [
+                'ending_amount',
+                'gross_sales',
+                'net_sales',
+                'vatable_sales',
+                'vat_exempt_sales',
+                'vat_amount'
+            ];
+    
+            foreach ($cutOffDeductibleFields as $field) {
+                $cutOffData[$field] = $cutOffData[$field] - ($cutOffData[$field] * ($request->percentage / 100));
+
+                if ($field == 'ending_amount') {
+                    $cutOffBeginningAmount = $cutOffData[$field];
+                }
+            }
+    
+            $sbCutOff = SbCutOff::updateOrCreate(['id' => $cutOff->id], $cutOffData);
+    
+            //cut_off_departments
+            $cutOffDepartmentsDeductibleFields = [
+                'amount'
+            ];
+    
+            $cutOffDepartments = CutOffDepartment::where([
+                'cut_off_id' => $cutOff->cut_off_id,
+                'branch_id' => $cutOff->branch_id,
+                'pos_machine_id' => $request->machine_id
+            ])->get();
+            
+            foreach ($cutOffDepartments as $cutOffDepartment) {
+                $cutOffDepartmentData = $cutOffDepartment->toArray();
+    
+                foreach ($cutOffDepartmentsDeductibleFields as $field) {
+                    $cutOffDepartmentData[$field] = $cutOffDepartmentData[$field] - ($cutOffDepartmentData[$field] * ($request->percentage / 100));
+                }
+    
+                SbCutOffDepartment::updateOrCreate(['id' => $cutOffDepartment->id], $cutOffDepartmentData);
+            }
+    
+            //cut_off_payments
+            $cutOffPaymentsDeductibleFields = [
+                'amount'
+            ];
+    
+            $cutOffPayments = CutOffPayment::where([
+                'cut_off_id' => $cutOff->cut_off_id,
+                'branch_id' => $cutOff->branch_id,
+                'pos_machine_id' => $request->machine_id
+            ])->get();
+    
+            foreach ($cutOffPayments as $cutOffPayment) {
+                $cutOffPaymentData = $cutOffPayment->toArray();
+    
+                foreach ($cutOffPaymentsDeductibleFields as $field) {
+                    $cutOffPaymentData[$field] = $cutOffPaymentData[$field] - ($cutOffPaymentData[$field] * ($request->percentage / 100));
+                }
+    
+                SbCutOffPayment::updateOrCreate(['id' => $cutOffPayment->id], $cutOffPaymentData);
+            }
+    
+            //cut_off_discount
+            $cutOffDiscountsDeductibleFields = [
+                'amount'
+            ];
+    
+            $cutOffDiscounts = CutOffDiscount::where([
+                'cut_off_id' => $cutOff->cut_off_id,
+                'branch_id' => $cutOff->branch_id,
+                'pos_machine_id' => $request->machine_id
+            ])->get();
+    
+            foreach ($cutOffDiscounts as $cutOffDiscount) {
+                $cutOffDiscountData = $cutOffDiscount->toArray();
+    
+                foreach ($cutOffDiscountsDeductibleFields as $field) {
+                    $cutOffDiscountData[$field] = $cutOffDiscountData[$field] - ($cutOffDiscountData[$field] * ($request->percentage / 100));
+                }
+    
+                SbCutOffDiscount::updateOrCreate(['id' => $cutOffDiscount->id], $cutOffDiscountData);
+            }
+        }
+
+        return $this->sendResponse($sbEndOfDay, 'SB readings updated successfully.');
     }
 
     public function getCutoff(Request $request)
