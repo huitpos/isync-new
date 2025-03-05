@@ -81,7 +81,6 @@ class SbController extends BaseController
         }
 
         $deductibleFields = [
-            'ending_amount',
             'gross_sales',
             'net_sales',
             'vatable_sales',
@@ -92,6 +91,8 @@ class SbController extends BaseController
         foreach ($deductibleFields as $field) {
             $endOfDayData[$field] = $endOfDayData[$field] - ($endOfDayData[$field] * ($request->percentage / 100));
         }
+
+        $endOfDayData['ending_amount'] = $endOfDayData['beginning_amount'] + $endOfDayData['net_sales'];
 
         $sbEndOfDay = SbEndOfDay::updateOrCreate(['id' => $endOfDay->id], $endOfDayData);
 
@@ -184,7 +185,6 @@ class SbController extends BaseController
             $cutOffData['beginning_amount'] = $cutOffBeginningAmount;
 
             $cutOffDeductibleFields = [
-                'ending_amount',
                 'gross_sales',
                 'net_sales',
                 'vatable_sales',
@@ -194,11 +194,9 @@ class SbController extends BaseController
     
             foreach ($cutOffDeductibleFields as $field) {
                 $cutOffData[$field] = $cutOffData[$field] - ($cutOffData[$field] * ($request->percentage / 100));
-
-                if ($field == 'ending_amount') {
-                    $cutOffBeginningAmount = $cutOffData[$field];
-                }
             }
+
+            $cutOffData['ending_amount'] = $cutOffBeginningAmount = $cutOffData['beginning_amount'] + $cutOffData['net_sales'];
     
             $sbCutOff = SbCutOff::updateOrCreate(['id' => $cutOff->id], $cutOffData);
     
