@@ -75,8 +75,6 @@ class SbController extends BaseController
         }
 
         $endOfDayData = $endOfDay->toArray();
-
-        $endOfDayData['beginning_amount'] = 0;
         
         if ($sbLatestEndOfDay) {
             $endOfDayData['beginning_amount'] = $sbLatestEndOfDay->ending_amount;
@@ -168,7 +166,7 @@ class SbController extends BaseController
             ->orderBy('treg', 'desc')
             ->first();
 
-        $cutOffBeginningAmount = 0;
+        $cutOffBeginningAmount = $endOfDay->beginning_amount;
         if ($sbLatestCutoff) {
             $cutOffBeginningAmount = $sbLatestCutoff->ending_amount;
         }
