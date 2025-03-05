@@ -97,6 +97,9 @@ class SbController extends BaseController
         $sbEndOfDay = SbEndOfDay::updateOrCreate(['id' => $endOfDay->id], $endOfDayData);
 
         $sbEndOfDayResponse = $sbEndOfDay->toArray();
+        $sbEndOfDayResponse['end_of_day_departments'] = [];
+        $sbEndOfDayResponse['end_of_day_discounts'] = [];
+        $sbEndOfDayResponse['end_of_day_payments'] = [];
 
         //end_of_day_departments
         $endOfDayDepartmentsDeductibleFields = [
