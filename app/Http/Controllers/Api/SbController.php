@@ -96,6 +96,8 @@ class SbController extends BaseController
 
         $sbEndOfDay = SbEndOfDay::updateOrCreate(['id' => $endOfDay->id], $endOfDayData);
 
+        $sbEndOfDayResponse = $sbEndOfDay->toArray();
+
         //end_of_day_departments
         $endOfDayDepartmentsDeductibleFields = [
             'amount'
@@ -114,7 +116,9 @@ class SbController extends BaseController
                 $endOfDayDepartmentData[$field] = $endOfDayDepartmentData[$field] - ($endOfDayDepartmentData[$field] * ($request->percentage / 100));
             }
 
-            SbEndOfDayDepartment::updateOrCreate(['id' => $endOfDayDepartment->id], $endOfDayDepartmentData);
+            $sbEndOfDayDepartment =  SbEndOfDayDepartment::updateOrCreate(['id' => $endOfDayDepartment->id], $endOfDayDepartmentData);
+
+            $sbEndOfDayResponse['end_of_day_departments'][] = $sbEndOfDayDepartment;
         }
 
         //end_of_day_discounts
@@ -135,7 +139,9 @@ class SbController extends BaseController
                 $endOfDayDiscountData[$field] = $endOfDayDiscountData[$field] - ($endOfDayDiscountData[$field] * ($request->percentage / 100));
             }
 
-            SbEndOfDayDiscount::updateOrCreate(['id' => $endOfDayDiscount->id], $endOfDayDiscountData);
+            $sbEndOfDayDiscount = SbEndOfDayDiscount::updateOrCreate(['id' => $endOfDayDiscount->id], $endOfDayDiscountData);
+
+            $sbEndOfDayResponse['end_of_day_discounts'][] = $sbEndOfDayDiscount;
         }
 
         //end_of_day_payments
@@ -156,7 +162,9 @@ class SbController extends BaseController
                 $endOfDayPaymentData[$field] = $endOfDayPaymentData[$field] - ($endOfDayPaymentData[$field] * ($request->percentage / 100));
             }
 
-            SbEndOfDayPayment::updateOrCreate(['id' => $endOfDayPayment->id], $endOfDayPaymentData);
+            $sbEndOfDayPayment = SbEndOfDayPayment::updateOrCreate(['id' => $endOfDayPayment->id], $endOfDayPaymentData);
+
+            $sbEndOfDayResponse['end_of_day_payments'][] = $sbEndOfDayPayment;
         }
 
         $sbLatestCutoff = SbCutOff::where([
@@ -264,7 +272,7 @@ class SbController extends BaseController
             }
         }
 
-        return $this->sendResponse($sbEndOfDay, 'SB readings updated successfully.');
+        return $this->sendResponse($sbEndOfDayResponse, 'SB readings updated successfully.');
     }
 
     public function getCutoff(Request $request)
