@@ -34,6 +34,7 @@ class SbController extends BaseController
         $validator = validator($request->all(), [
             'branch_id' => 'required',
             'percentage' => 'required',
+            'machine_id' => 'required',
             'date' => 'required|date_format:Y-m-d'
         ]);
 
@@ -50,7 +51,8 @@ class SbController extends BaseController
 
         //fetch real cut off
         $cutOff = CutOff::where([
-                'branch_id' => $request->branch_id
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->machine_id
             ])
             ->whereDate('treg', $request->date)
             ->first();
@@ -60,7 +62,10 @@ class SbController extends BaseController
         }
 
         //fetch latest sb cut off
-        $sbLatestCutoff = SbCutOff::where('branch_id', $request->branch_id)
+        $sbLatestCutoff = SbCutOff::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->machine_id
+            ])
             ->orderBy('treg', 'desc')
             ->first();
 
@@ -97,7 +102,8 @@ class SbController extends BaseController
 
         $cutOffDepartments = CutOffDepartment::where([
             'cut_off_id' => $cutOff->cut_off_id,
-            'branch_id' => $cutOff->branch_id
+            'branch_id' => $cutOff->branch_id,
+            'pos_machine_id' => $request->machine_id
         ])->get();
         
         foreach ($cutOffDepartments as $cutOffDepartment) {
@@ -117,7 +123,8 @@ class SbController extends BaseController
 
         $cutOffPayments = CutOffPayment::where([
             'cut_off_id' => $cutOff->cut_off_id,
-            'branch_id' => $cutOff->branch_id
+            'branch_id' => $cutOff->branch_id,
+            'pos_machine_id' => $request->machine_id
         ])->get();
 
         foreach ($cutOffPayments as $cutOffPayment) {
@@ -137,7 +144,8 @@ class SbController extends BaseController
 
         $cutOffDiscounts = CutOffDiscount::where([
             'cut_off_id' => $cutOff->cut_off_id,
-            'branch_id' => $cutOff->branch_id
+            'branch_id' => $cutOff->branch_id,
+            'pos_machine_id' => $request->machine_id
         ])->get();
 
         foreach ($cutOffDiscounts as $cutOffDiscount) {
@@ -159,7 +167,8 @@ class SbController extends BaseController
         $validator = validator($request->all(), [
             'branch_id' => 'required',
             'percentage' => 'required',
-            'date' => 'required|date_format:Y-m-d'
+            'date' => 'required|date_format:Y-m-d',
+            'machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -174,7 +183,8 @@ class SbController extends BaseController
         }
 
         $endOfDay = EndOfDay::where([
-                'branch_id' => $request->branch_id
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->machine_id
             ])
             ->whereDate('treg', $request->date)
             ->first();
@@ -183,7 +193,10 @@ class SbController extends BaseController
             return $this->sendError('No End Of Day for that day', $validator->errors(), 422);
         }
 
-        $sbLatestEndOfDay = SbEndOfDay::where('branch_id', $request->branch_id)
+        $sbLatestEndOfDay = SbEndOfDay::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->machine_id
+            ])
             ->orderBy('treg', 'desc')
             ->first();
 
@@ -219,7 +232,8 @@ class SbController extends BaseController
 
         $endOfDayDepartments = EndOfDayDepartment::where([
             'end_of_day_id' => $endOfDay->end_of_day_id,
-            'branch_id' => $endOfDay->branch_id
+            'branch_id' => $endOfDay->branch_id,
+            'pos_machine_id' => $request->machine_id
         ])->get();
 
         foreach ($endOfDayDepartments as $endOfDayDepartment) {
@@ -239,7 +253,8 @@ class SbController extends BaseController
 
         $endOfDayDiscounts = EndOfDayDiscount::where([
             'end_of_day_id' => $endOfDay->end_of_day_id,
-            'branch_id' => $endOfDay->branch_id
+            'branch_id' => $endOfDay->branch_id,
+            'pos_machine_id' => $request->machine_id
         ])->get();
 
         foreach ($endOfDayDiscounts as $endOfDayDiscount) {
@@ -259,7 +274,8 @@ class SbController extends BaseController
 
         $endOfDayPayments = EndOfDayPayment::where([
             'end_of_day_id' => $endOfDay->end_of_day_id,
-            'branch_id' => $endOfDay->branch_id
+            'branch_id' => $endOfDay->branch_id,
+            'pos_machine_id' => $request->machine_id
         ])->get();
 
         foreach ($endOfDayPayments as $endOfDayPayment) {
@@ -280,7 +296,8 @@ class SbController extends BaseController
         $requestData = $request->all();
         $validator = validator($request->all(), [
             'branch_id' => 'required',
-            'date' => 'required|date_format:Y-m-d'
+            'machine_id' => 'required',
+            'date' => 'required|date_format:Y-m-d',
         ]);
 
         if ($validator->fails()) {
@@ -295,7 +312,8 @@ class SbController extends BaseController
         }
 
         $cutOff = SbCutOff::where([
-            'branch_id' => $request->branch_id
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->machine_id
         ])
         ->whereDate('treg', $request->date)
         ->first();
@@ -312,7 +330,8 @@ class SbController extends BaseController
         $requestData = $request->all();
         $validator = validator($request->all(), [
             'branch_id' => 'required',
-            'date' => 'required|date_format:Y-m-d'
+            'date' => 'required|date_format:Y-m-d',
+            'machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -327,7 +346,8 @@ class SbController extends BaseController
         }
 
         $endOfDay = SbEndOfDay::where([
-            'branch_id' => $request->branch_id
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->machine_id
         ])
         ->whereDate('treg', $request->date)
         ->first();

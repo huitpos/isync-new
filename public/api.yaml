@@ -3650,7 +3650,7 @@ paths:
             schema:
               type: object
               properties:
-                device_id:
+                machine_id:
                   type: integer
                   required: true
                 branch_id:
@@ -3682,11 +3682,11 @@ paths:
           required: true
           description: Numeric ID of the branch to get
         - in: query
-          name: device_id
+          name: machine_id
           schema:
             type: integer
           required: true
-          description: Numeric ID of the device
+          description: Numeric ID of the machine
         - in: query
           name: date
           schema:
@@ -3712,7 +3712,7 @@ paths:
             schema:
               type: object
               properties:
-                device_id:
+                machine_id:
                   type: integer
                   required: true
                 branch_id:
@@ -3744,11 +3744,11 @@ paths:
           required: true
           description: Numeric ID of the branch to get
         - in: query
-          name: device_id
+          name: machine_id
           schema:
             type: integer
           required: true
-          description: Numeric ID of the device
+          description: Numeric ID of the machine
         - in: query
           name: date
           schema:
