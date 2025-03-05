@@ -61,7 +61,12 @@ class AuthController extends BaseController
             $success['name'] =  $user->name;
             $success['company_id'] =  $user->company_id;
             $success['role'] =  $user->getRoleNames()->toArray()[0] ?? null;
-            $success['braches'] =  auth()->user()->activeBranches;;
+
+            $branches = auth()->user()->activeBranches()
+                ->with(['machines'])
+                ->get();
+
+            $success['braches'] = $branches;
 
             return $this->sendResponse($success, 'User login successfully.');
         } else {
