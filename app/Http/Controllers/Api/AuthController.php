@@ -63,7 +63,13 @@ class AuthController extends BaseController
             $success['role'] =  $user->getRoleNames()->toArray()[0] ?? null;
 
             $branches = auth()->user()->activeBranches()
-                ->with(['machines'])
+                ->with([
+                    'machines',
+                    'region',
+                    'province',
+                    'city',
+                    'barangay',
+                ])
                 ->get();
 
             $success['braches'] = $branches;
