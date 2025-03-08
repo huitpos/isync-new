@@ -330,6 +330,10 @@ class SbController extends BaseController
             return $this->sendError('No Cut Off for that day', [], 404);
         }
 
+        $cutOff->departments = $cutOff->departments;
+        $cutOff->payments = $cutOff->payments;
+        $cutOff->discounts = $cutOff->discounts;
+
         return $this->sendResponse($cutOff, 'SB Cut Off retrieved successfully.');
     }
 
@@ -363,6 +367,10 @@ class SbController extends BaseController
         if (!$endOfDay) {
             return $this->sendError('No End Of Day for that day', [], 404);
         }
+
+        $endOfDay->departments = $endOfDay->departments;
+        $endOfDay->payments = $endOfDay->payments;
+        $endOfDay->discounts = $endOfDay->discounts;
 
         return $this->sendResponse($endOfDay, 'SB End Of Day retrieved successfully.');
     }
