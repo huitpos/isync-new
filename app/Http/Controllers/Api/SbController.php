@@ -81,18 +81,20 @@ class SbController extends BaseController
             ->orderBy('treg', 'desc')
             ->first();
 
-        $nextEndOfDay = EndOfDay::where([
-                'branch_id' => $request->branch_id,
-                'pos_machine_id' => $request->machine_id,
-            ])
-            ->where('treg', '>', $sbLatestEndOfDay->treg)
-            ->orderBy('treg', 'asc')
-            ->first();
+        if ($sbLatestEndOfDay) {
+            $nextEndOfDay = EndOfDay::where([
+                    'branch_id' => $request->branch_id,
+                    'pos_machine_id' => $request->machine_id,
+                ])
+                ->where('treg', '>', $sbLatestEndOfDay->treg)
+                ->orderBy('treg', 'asc')
+                ->first();
 
-        if ($nextEndOfDay && $nextEndOfDay->id != $endOfDay->id) {
-            $nextEndOfDay->treg = date('Y-m-d', strtotime($nextEndOfDay->treg));
+            if ($nextEndOfDay && $nextEndOfDay->id != $endOfDay->id) {
+                $nextEndOfDay->treg = date('Y-m-d', strtotime($nextEndOfDay->treg));
 
-            return $this->sendError("SB date must be $nextEndOfDay->treg", $validator->errors(), 422);
+                return $this->sendError("SB date must be $nextEndOfDay->treg", $validator->errors(), 422);
+            }
         }
 
         $endOfDayData = $endOfDay->toArray();
