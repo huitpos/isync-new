@@ -61,6 +61,7 @@ class AuthController extends BaseController
             $success['name'] =  $user->name;
             $success['company_id'] =  $user->company_id;
             $success['role'] =  $user->getRoleNames()->toArray()[0] ?? null;
+            $success['company'] =  $user->company;
 
             $branches = auth()->user()->activeBranches()
                 ->with([

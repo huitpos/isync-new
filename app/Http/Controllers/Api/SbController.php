@@ -62,16 +62,37 @@ class SbController extends BaseController
             return $this->sendError('No End Of Day for that day', $validator->errors(), 422);
         }
 
+        //check if sb end of day already exists
+        $SbEndOfDay = SbEndOfDay::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->machine_id
+            ])
+            ->whereDate('treg', $request->date)
+            ->first();
+
+        if ($SbEndOfDay) {
+            return $this->sendError('SB End Of Day already exists', $validator->errors(), 422);
+        }
+
         $sbLatestEndOfDay = SbEndOfDay::where([
                 'branch_id' => $request->branch_id,
                 'pos_machine_id' => $request->machine_id,
             ])
-            ->whereNot('id', $endOfDay->id)
             ->orderBy('treg', 'desc')
             ->first();
 
-        if ($sbLatestEndOfDay && $sbLatestEndOfDay->id > $endOfDay->id) {
-            return $this->sendError('SB Cut Off is not the latest', $validator->errors(), 422);
+        $nextEndOfDay = EndOfDay::where([
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->machine_id,
+            ])
+            ->where('treg', '>', $sbLatestEndOfDay->treg)
+            ->orderBy('treg', 'asc')
+            ->first();
+
+        if ($nextEndOfDay && $nextEndOfDay->id != $endOfDay->id) {
+            $nextEndOfDay->treg = date('Y-m-d', strtotime($nextEndOfDay->treg));
+
+            return $this->sendError("SB date must be $nextEndOfDay->treg", $validator->errors(), 422);
         }
 
         $endOfDayData = $endOfDay->toArray();
