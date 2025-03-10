@@ -101,6 +101,7 @@ class SbController extends BaseController
         
         if ($sbLatestEndOfDay) {
             $endOfDayData['beginning_amount'] = $sbLatestEndOfDay->ending_amount;
+            $endOfDayData['beginning_counter_amount'] = $sbLatestEndOfDay->ending_counter_amount;
         }
 
         $deductibleFields = [
@@ -116,6 +117,7 @@ class SbController extends BaseController
         }
 
         $endOfDayData['ending_amount'] = $endOfDayData['beginning_amount'] + $endOfDayData['net_sales'];
+        $endOfDayData['ending_counter_amount'] = $endOfDayData['beginning_counter_amount'] + $endOfDayData['gross_sales'];
 
         $sbEndOfDay = SbEndOfDay::updateOrCreate(['id' => $endOfDay->id], $endOfDayData);
 
