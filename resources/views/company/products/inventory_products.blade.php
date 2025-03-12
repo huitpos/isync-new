@@ -33,8 +33,9 @@
                 <div id="kt_ecommerce_report_returns_export" class="d-none"></div>
                 <!--end::Export buttons-->
             </div>
-            <!--end::Card title-->
-            <!--begin::Card toolbar-->
+            
+            
+            
             <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
                 <input class="form-control form-control-solid w-100 mw-250px flatpack-picker d-none" placeholder="Date From" id="date_from" />
                 <input class="form-control form-control-solid w-100 mw-250px flatpack-picker d-none" placeholder="Date To" id="date_to" />
@@ -44,6 +45,17 @@
                         <option value="{{ $branch->id }}" {{ $branchId == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
                     @endforeach
                 </select>
+            </div>
+
+            <div class="card-toolbar">
+                <div class="d-flex justify-content-end">
+                    <a href="{{ route('company.branch-inventory.download', [
+                        'companySlug' => request()->attributes->get('company')->slug,
+                        'branchId' => $branchId
+                    ]) }}" class="btn btn-primary">
+                        Export Inventory
+                    </a>
+                </div>
             </div>
         </div>
 
