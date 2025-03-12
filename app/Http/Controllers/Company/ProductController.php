@@ -22,6 +22,10 @@ use App\Models\Product;
 use App\Models\Branch;
 use App\Models\DiscountType;
 
+use Carbon\Carbon;
+
+use App\Exports\InventoryExport;
+
 class ProductController extends Controller
 {
     protected $productRepository;
@@ -516,5 +520,13 @@ class ProductController extends Controller
                 'branchId' => $branchId,
                 'branch' => $branch
             ]);
+    }
+
+    public function inventoryDownload (Request $request, $companySlug, $branchId)
+    {
+        $company = $request->attributes->get('company');
+        $branch = Branch::find($branchId);
+
+        return Excel::download(new InventoryExport($branch->id), "$company->name - $branch->name - ".Carbon::now()->format('Y-m-d 23:59:59')." - Inventory.xlsx");
     }
 }

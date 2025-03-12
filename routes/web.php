@@ -147,6 +147,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('products', CompanyProductController::class, ['as' => 'company']);
         Route::get('/branch/{branchId}/inventory', [CompanyProductController::class, 'inventory'])->name('company.branch-inventory.index');
         Route::get('/branch/{branchId}/inventory/{productId}', [CompanyProductController::class, 'inventoryProduct'])->name('company.branch-inventory.show');
+        Route::get('/branch/{branchId}/inventory-download', [CompanyProductController::class, 'inventoryDownload'])->name('company.branch-inventory.download');
 
         Route::get('/import-product', [CompanyProductController::class, 'showForm']);
         Route::post('/import-product', [CompanyProductController::class, 'import'])->name('company.products.import');
