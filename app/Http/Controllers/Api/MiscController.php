@@ -45,6 +45,7 @@ use App\Models\SpotAudit;
 use App\Models\SpotAuditDenomination;
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
+use App\Models\BranchProduct;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 
@@ -157,10 +158,16 @@ class MiscController extends BaseController
     {
         $branch = Branch::with([
             'company',
-            'company.products' => function ($query) use ($request) {
+            'company.products' => function ($query) use ($request, $branchId) {
                 $query->whereHas('itemType', function ($subQuery) {
                     $subQuery->where('show_in_cashier', true);
                 })
+                ->addSelect([
+                    'price' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.price, 0), products.srp)')
+                        ->whereColumn('branch_product.product_id', 'products.id')
+                        ->where('branch_product.branch_id', $branchId)
+                        ->limit(1)
+                ])
                 ->with(
                     'itemType',
                     'uom',
@@ -170,6 +177,7 @@ class MiscController extends BaseController
                     'rawItems'
                 )
                 ->where('uom_id', '>', 0)
+                ->where('id', '=', 85)
                 ->when($request->from_date, function ($q) use ($request) {
                     $q->where(function ($query) use ($request) {
                         $query->where('updated_at', '>=', $request->from_date)
@@ -177,9 +185,10 @@ class MiscController extends BaseController
                     });
                 });
             },
-        ])->find($branchId);
+        ])
+        ->find($branchId);
 
-        $products = $branch->company->products; // No additional query
+        $products = $branch->company->products;
 
         return $this->sendResponse($products, 'Products retrieved successfully.');
     }
