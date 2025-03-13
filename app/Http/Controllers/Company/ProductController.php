@@ -90,6 +90,8 @@ class ProductController extends Controller
             ->orderBy('id')
             ->get();
 
+        $srpBranches = $company->branches()->where('status', 'active')->get();
+
         return view('company.products.create', [
             'company' => $company,
             'categories' => $categories,
@@ -97,6 +99,7 @@ class ProductController extends Controller
             'departments' => $departments,
             'itemTypes' => $itemTypes,
             'discountTypes' => $discountTypes,
+            'srpBranches' => $srpBranches,
         ]);
     }
 
@@ -242,6 +245,13 @@ class ProductController extends Controller
                 $product->image = $path;
                 $product->save();
             }
+
+            if ($branchSrps = $request->input('branch_srps')) {
+                foreach ($branchSrps as $branchId => $srp) {
+                    $product->branches()->syncWithoutDetaching([$branchId => ['price' => $srp]]);
+                }
+            }
+
             return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Product created successfully');
         }
@@ -297,6 +307,14 @@ class ProductController extends Controller
             ->orderBy('id')
             ->get();
 
+        $srpBranches = $company->branches()
+            ->with([
+                'products' => function ($query) use ($product) {
+                    $query->where('product_id', '=', $product->id);
+                },
+            ])
+            ->where('status', 'active')->get();
+
         return view('company.products.edit', [
             'company' => $company,
             'product' => $product,
@@ -305,6 +323,7 @@ class ProductController extends Controller
             'subcategories' => $subcategories,
             'itemTypes' => $itemTypes,
             'discountTypes' => $discountTypes,
+            'srpBranches' => $srpBranches,
         ]);
     }
 
@@ -447,6 +466,12 @@ class ProductController extends Controller
                         'type' => $discount['type'],
                         'discount' => $discount['discount']
                     ]);
+                }
+            }
+
+            if ($branchSrps = $request->input('branch_srps')) {
+                foreach ($branchSrps as $branchId => $srp) {
+                    $product->branches()->syncWithoutDetaching([$branchId => ['price' => $srp]]);
                 }
             }
 
