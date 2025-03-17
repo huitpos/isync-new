@@ -63,6 +63,8 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
             'Description',
             'Barcode',
             'Stock',
+            'Unit Cost',
+            'Branch SRP',
         ];
     }
 
@@ -72,7 +74,9 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
             $product->name,
             $product->description,
             $product->code,
-            $product['branches'][0]['pivot']['stock'] ?? 0
+            $product['branches'][0]['pivot']['stock'] ?? 0,
+            $product->cost,
+            $product['branches'][0]['pivot']['price'] ?? 0
         ];
     }
 
