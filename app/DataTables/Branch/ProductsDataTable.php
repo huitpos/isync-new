@@ -36,7 +36,7 @@ class ProductsDataTable extends DataTable
                 return number_format($data->cost, 2);
             })
             ->editColumn('srp', function (Product $data) {
-                return number_format($data->srp, 2);
+                return number_format($data['branches'][0]['pivot']['price'] ?? $data->srp, 2);
             })
             ->addColumn('actions', function (Product $data) use ($companySlug, $branchSlug) {
                 return view('branch.datatables._actions', [
@@ -56,12 +56,17 @@ class ProductsDataTable extends DataTable
      */
     public function query(Product $model): QueryBuilder
     {
+        $branchId = $this->branch_id;
+
         return $model->newQuery()
             ->where('company_id', $this->company_id)
             ->with([
                 'itemType',
                 'uom',
-                'createdBy'
+                'createdBy',
+                'branches' => function ($query) use ($branchId) {
+                    $query->where('branches.id', $branchId);
+                }
             ]);
     }
 

@@ -21,6 +21,7 @@ class ProductController extends Controller
 
         return $dataTable
             ->with('company_id', $company->id)
+            ->with('branch_id', $branch->id)
             ->with('company_slug', $company->slug)
             ->with('branch_slug', $branch->slug)
             ->render('branch.products.index');
