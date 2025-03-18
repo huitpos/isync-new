@@ -76,7 +76,7 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
             $product->code,
             $product['branches'][0]['pivot']['stock'] ?? 0,
             $product->cost,
-            $product['branches'][0]['pivot']['price'] ?? 0
+            $product['branches'][0]['pivot']['price'] ?? $product->srp
         ];
     }
 
