@@ -270,9 +270,12 @@ class ProductController extends Controller
 
         $company = $request->attributes->get('company');
 
+        $srpBranches = $company->branches()->where('status', 'active')->get();
+
         return view('company.products.show', [
             'product' => $product,
             'company' => $company,
+            'srpBranches' => $srpBranches
         ]);
     }
 
