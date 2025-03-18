@@ -642,7 +642,7 @@
                                         <tr>
                                             <td>{{ $branch->name }}</td>
                                             <td>
-                                                <input type="number" class="form-control" name="branch_srps[{{ $branch->id }}]" value="{{ number_format(isset($branch->products[0]) ? $branch->products[0]->pivot?->price : 0, 2) }}" />
+                                                <input type="number" class="form-control" name="branch_srps[{{ $branch->id }}]" value="{{ number_format(isset($branch->products[0]) ? $branch->products[0]->pivot?->price : $product->srp, 2) }}" />
                                             </td>
                                         </tr>
                                     @endforeach
