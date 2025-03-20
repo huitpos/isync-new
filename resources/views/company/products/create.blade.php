@@ -8,6 +8,11 @@
         {{ Breadcrumbs::render('company.products.create', $company) }}
     @endsection
 
+    @php 
+        $branchSrpsErrors = $errors->get('branch_srps.*', []);
+        $oldBranchSrps = old('branch_srps', []);
+    @endphp
+
     <div class="card">
         <div class="card-body py-4">
             <form class="mt-3" action="{{ route('company.products.store', ['companySlug' => $company->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
@@ -15,15 +20,15 @@
 
                 <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
                     <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#kt_tab_pane_1">Product Settings</a>
+                        <a class="nav-link {{ empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_1">Product Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch SRP</a>
+                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch SRP</a>
                     </li>
                 </ul>
 
                 <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="kt_tab_pane_1" role="tabpanel">
+                    <div class="tab-pane fade {{ empty($branchSrpsErrors) ? 'show active' : '' }}" id="kt_tab_pane_1" role="tabpanel">
                         <div class="mb-4">
                             <label class="form-label">Status</label>
                             <select id="status" name="status" class="form-control @error('status') is-invalid @enderror" required>
@@ -575,7 +580,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="kt_tab_pane_2" role="tabpanel">
+                    <div class="tab-pane fade {{ !empty($branchSrpsErrors) ? 'show active' : '' }}" id="kt_tab_pane_2" role="tabpanel">
                         <div class="table-responsive">
                             <table class="table table-row-dashed table-row-gray-500 gy-7">
                                 <thead>
@@ -586,10 +591,19 @@
                                 </thead>
                                 <tbody>
                                     @foreach($srpBranches as $branch)
+                                        @php
+                                            $branchSrpsError = $branchSrpsErrors['branch_srps.' . $branch->id] ?? null;
+
+                                            $value = $oldBranchSrps[$branch->id] ?? ($branch->products[0]->pivot?->price ?? $product->srp);
+                                        @endphp
                                         <tr>
                                             <td>{{ $branch->name }}</td>
                                             <td>
-                                                <input type="number" class="form-control" name="branch_srps[{{ $branch->id }}]" value="" />
+                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_srps[{{ $branch->id }}]" value="{{ $value }}" />
+
+                                                @if($branchSrpsError)
+                                                    <div class="invalid-feedback"> {{ $branchSrpsError[0] }}</div>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach

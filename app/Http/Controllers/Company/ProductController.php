@@ -139,7 +139,16 @@ class ProductController extends Controller
                         $fail('The ' . $attribute . ' must be greater than cost.');
                     }
                 },
-            ]
+            ],
+            'branch_srps' => 'nullable|array',
+            'branch_srps.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value > 0 && $value < $request->input('cost')) {
+                        $fail("Must be greater than or equal to cost.");
+                    }
+                },
+            ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -365,7 +374,16 @@ class ProductController extends Controller
                         $fail('The ' . $attribute . ' must be greater than cost.');
                     }
                 },
-            ]
+            ],
+            'branch_srps' => 'nullable|array',
+            'branch_srps.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value > 0 && $value < $request->input('cost')) {
+                        $fail("Must be greater than or equal to cost.");
+                    }
+                },
+            ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
