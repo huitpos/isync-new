@@ -149,6 +149,10 @@ class ProductController extends Controller
                     }
                 },
             ],
+            'branch_costs' => 'nullable|array',
+            'branch_costs.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -257,7 +261,12 @@ class ProductController extends Controller
 
             if ($branchSrps = $request->input('branch_srps')) {
                 foreach ($branchSrps as $branchId => $srp) {
-                    $product->branches()->syncWithoutDetaching([$branchId => ['price' => $srp]]);
+                    $product->branches()->syncWithoutDetaching([
+                        $branchId => [
+                            'price' => $srp,
+                            'cost' => $branchCosts[$branchId] ?? null
+                        ]
+                    ]);
                 }
             }
 
@@ -384,6 +393,10 @@ class ProductController extends Controller
                     }
                 },
             ],
+            'branch_costs' => 'nullable|array',
+            'branch_costs.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -491,8 +504,15 @@ class ProductController extends Controller
             }
 
             if ($branchSrps = $request->input('branch_srps')) {
+                $branchCosts = $request->input('branch_costs');
+
                 foreach ($branchSrps as $branchId => $srp) {
-                    $product->branches()->syncWithoutDetaching([$branchId => ['price' => $srp]]);
+                    $product->branches()->syncWithoutDetaching([
+                        $branchId => [
+                            'price' => $srp,
+                            'cost' => $branchCosts[$branchId] ?? null
+                        ]
+                    ]);
                 }
             }
 
