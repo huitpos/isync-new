@@ -7,6 +7,8 @@
     @php 
         $branchSrpsErrors = $errors->get('branch_srps.*', []);
         $oldBranchSrps = old('branch_srps', []);
+
+        $branchCostsErrors = $errors->get('branch_costs.*', []);
     @endphp
 
     <div class="card">
@@ -20,10 +22,7 @@
                         <a class="nav-link {{ empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_1">Product Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch SRP</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_3">Branch Cost</a>
+                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch SRP & Cost</a>
                     </li>
                 </ul>
 
@@ -639,6 +638,7 @@
 
                     <div class="tab-pane fade {{ !empty($branchSrpsErrors) ? 'show active' : '' }}" id="kt_tab_pane_2" role="tabpanel">
                         <div class="table-responsive">
+                            <h2>SRP</h2>
                             <table class="table table-row-dashed table-row-gray-500 gy-7">
                                 <thead>
                                     <tr class="fw-bold fs-6 text-gray-800">
@@ -669,10 +669,9 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
 
-                    <div class="tab-pane fade {{ !empty($branchCostsErrors) ? 'show active' : '' }}" id="kt_tab_pane_3" role="tabpanel">
                         <div class="table-responsive">
+                            <h2>Cost</h2>
                             <table class="table table-row-dashed table-row-gray-500 gy-7">
                                 <thead>
                                     <tr class="fw-bold fs-6 text-gray-800">
