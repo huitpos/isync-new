@@ -23,12 +23,43 @@ class TestController extends Controller
 
     public function mapData(Request $request)
     {
-        // $products = DB::select('SELECT * FROM branch_product where stock != 0');
-        $products = DB::select('SELECT * FROM branch_product where branch_id = 19 and product_id = 8923');
+        $branchId = $request->input('branch_id');
+        $productId = $request->input('product_id');
+        $query = 'SELECT * FROM branch_product';
+
+        $conditions = [];
+        if ($branchId) {
+            $conditions[] = 'branch_id = ' . $branchId;
+        }
+        if ($productId) {
+            $conditions[] = 'product_id = ' . $productId;
+        }
+
+        if (!empty($conditions)) {
+            $query .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $products = DB::select($query);
 
         foreach ($products as $product) {
             $_product = Product::find($product->product_id);
             $branch = Branch::find($product->branch_id);
+
+            // Check for duplicate end_of_days logs
+            $duplicateLogs = DB::select('
+                SELECT object_id, COUNT(*) as count
+                FROM product_count_logs
+                WHERE branch_id = ?
+                AND product_id = ?
+                AND object_type = "end_of_days"
+                GROUP BY object_id
+                HAVING count > 1
+            ', [$product->branch_id, $product->product_id]);
+
+            // Skip if no duplicates found
+            if (empty($duplicateLogs)) {
+                continue;
+            }
 
             $incoming = DB::select('SELECT SUM(purchase_delivery_items.qty) `total` FROM purchase_deliveries
                 INNER JOIN purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
@@ -61,7 +92,10 @@ class TestController extends Controller
 
             $soh = $incomingTotal - $transactionTotal;
 
-            $this->productRepository->updateBranchQuantity($_product, $branch, 0, 'manual_edit', $soh, null, 'replace', $_product->uom_id);
+            // Only update if the current stock doesn't match the calculated SOH
+            if ($product->stock != $soh) {
+                $this->productRepository->updateBranchQuantity($_product, $branch, 0, 'manual_edit', $soh, null, 'replace', $_product->uom_id);
+            }
         }
     }
 }
