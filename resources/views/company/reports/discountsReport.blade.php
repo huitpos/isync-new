@@ -72,7 +72,17 @@
                             <tr>
                                 <td>{{ $discount->date }}</td>
                                 <td>{{ $discount->machine_number }}</td>
-                                <td>{{ $discount->receipt_number }}</td>
+                                <td>
+                                    <a href="{{ route('company.reports.view-transaction', [
+                                            'transactionId' => $discount->transaction_id,
+                                            'companySlug' => $company->slug,
+                                        ]) }}"
+                                        target="_blank"
+                                    >
+                                        {{ $discount->transaction_id }}
+                                        {{ $discount->receipt_number }}
+                                    </a>
+                                </td>
                                 <td>{{ $discount->discount_name }}</td>
                                 <td>
                                     @foreach ($discount->otherInfo as $otherInfo)
