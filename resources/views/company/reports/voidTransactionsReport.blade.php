@@ -87,7 +87,17 @@
                             <tr>
                                 <th>{{ $transaction->void_counter }}</th>
                                 <th>{{ $transaction->treg }}</th>
-                                <th>{{ $transaction->receipt_number }}</th>
+                                <th>
+                                    <a href="{{ route('company.reports.view-transaction', [
+                                            'transactionId' => $transaction->id,
+                                            'companySlug' => $company->slug,
+                                        ]) }}"
+                                        target="_blank"
+                                    >
+                                        {{ $transaction->transaction_number }}
+                                        {{ $transaction->receipt_number }}
+                                    </a>
+                                </th>
                                 <th>{{ $transaction->machine->machine_number }}</th>
                                 <th>{{ number_format($transaction->discount_amount, 2) }}</th>
                                 <th>{{ number_format($transaction->gross_sales, 2) }}</th>
