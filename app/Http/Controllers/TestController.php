@@ -61,11 +61,33 @@ class TestController extends Controller
                 continue;
             }
 
-            $incoming = DB::select('SELECT SUM(purchase_delivery_items.qty) `total` FROM purchase_deliveries
+            $latestPPC = DB::table('product_count_logs')
+                ->where('object_type', 'product_physical_counts')
+                ->where('branch_id', $product->branch_id)
+                ->where('product_id', $product->product_id)
+                ->orderByDesc('created_at')
+                ->first();
+
+            $baseQty = 0;
+            $baseDate = null;
+            if ($latestPPC) {
+                $baseQty = $latestPPC->new_quantity;
+                $baseDate = $latestPPC->created_at;
+            }
+
+             // Get incoming after the latest PPC
+            $incomingQuery = 'SELECT SUM(purchase_delivery_items.qty) as total
+                FROM purchase_deliveries
                 INNER JOIN purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
                 WHERE purchase_delivery_items.product_id = ?
                 AND purchase_deliveries.branch_id = ?
-                AND purchase_deliveries.`status` = ?', [$product->product_id, $product->branch_id, 'approved']);
+                AND purchase_deliveries.status = ?';
+            $incomingParams = [$product->product_id, $product->branch_id, 'approved'];
+            if ($baseDate) {
+                $incomingQuery .= ' AND purchase_deliveries.created_at > ?';
+                $incomingParams[] = $baseDate;
+            }
+            $incoming = DB::select($incomingQuery, $incomingParams);
 
             $incomingTotal = $incoming[0]->total ?? 0;
 
@@ -90,7 +112,7 @@ class TestController extends Controller
 
             $transactionTotal = $transactions[0]->total ?? 0;
 
-            $soh = $incomingTotal - $transactionTotal;
+            $soh = $baseQty + $incomingTotal - $transactionTotal;
 
             // Only update if the current stock doesn't match the calculated SOH
             if ($product->stock != $soh) {
