@@ -22,6 +22,9 @@ class ProductCountHistoryDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->editColumn('object_type', function (Model $data) {
                 return Str::title(str_replace('_', ' ', $data['object_type']));
+            })
+            ->editColumn('created_at', function (Model $data) {
+                return $data->created_at ? $data->created_at->format('Y-m-d') : '';
             });
     }
 
@@ -36,8 +39,7 @@ class ProductCountHistoryDataTable extends DataTable
             ->where('product_id', $this->product_id)
             ->with([
                 'product'
-            ])
-            ->orderBy('id', 'desc');
+            ]);
     }
 
     /**
@@ -52,7 +54,7 @@ class ProductCountHistoryDataTable extends DataTable
             ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>i>",)
             ->addTableClass('table align-middle table-striped table-row-bordered fs-6 gy-5 gs-7 dataTable no-footer text-gray-600 fw-semibold')
             ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(0, 'asc')
+            ->orderBy(4, 'desc')
             ->drawCallback("function() {" . file_get_contents(resource_path('views/datatables/_common-scripts.js')) . "}");
     }
 
@@ -66,6 +68,7 @@ class ProductCountHistoryDataTable extends DataTable
             Column::make('object_type'),
             Column::make('old_quantity'),
             Column::make('new_quantity'),
+            Column::make('created_at')->title('Date'),
         ];
     }
 
