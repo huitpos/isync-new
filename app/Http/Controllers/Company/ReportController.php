@@ -383,7 +383,8 @@ class ReportController extends Controller
                 'discounts.pos_machine_id',
                 'discounts.branch_id',
                 'transactions.cashier_name',
-                'pos_machines.machine_number'
+                'pos_machines.machine_number',
+                'transactions.id as transaction_id'
             ])
             ->join('transactions', function($join) {
                 $join->on('transactions.transaction_id', '=', 'discounts.transaction_id');

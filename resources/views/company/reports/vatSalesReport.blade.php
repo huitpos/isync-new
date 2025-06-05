@@ -68,7 +68,17 @@
                             <tr>
                                 <th>{{ $transaction->treg }}</th>
                                 <th>{{ $transaction->machine->machine_number }}</th>
-                                <th>{{ $transaction->receipt_number }}</th>
+                                <th>
+                                    <a href="{{ route('company.reports.view-transaction', [
+                                            'transactionId' => $transaction->id,
+                                            'companySlug' => $company->slug,
+                                        ]) }}"
+                                        target="_blank"
+                                    >
+                                        {{ $transaction->transaction_number }}
+                                        {{ $transaction->receipt_number }}
+                                    </a>
+                                </th>
                                 <th>{{ number_format($amountDue, 2) }}</th>
                                 <th>{{ number_format($amountDue, 2) }}</th>
                                 <th>{{ number_format($vatAmount, 2) }}</th>

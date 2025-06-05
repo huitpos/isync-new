@@ -23,26 +23,81 @@ class TestController extends Controller
 
     public function mapData(Request $request)
     {
-        // $products = DB::select('SELECT * FROM branch_product where stock != 0');
-        $products = DB::select('SELECT * FROM branch_product where branch_id = 19 and product_id = 8923');
+        $transactionalDbName = config('database.connections.transactional_db.database');
+
+        $branchId = $request->input('branch_id');
+        $productId = $request->input('product_id');
+        $query = 'SELECT * FROM branch_product';
+
+        $conditions = [];
+        if ($branchId) {
+            $conditions[] = 'branch_id = ' . $branchId;
+        }
+        if ($productId) {
+            $conditions[] = 'product_id = ' . $productId;
+        }
+
+        if (!empty($conditions)) {
+            $query .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $products = DB::select($query);
 
         foreach ($products as $product) {
             $_product = Product::find($product->product_id);
             $branch = Branch::find($product->branch_id);
 
-            $incoming = DB::select('SELECT SUM(purchase_delivery_items.qty) `total` FROM purchase_deliveries
+            // Check for duplicate end_of_days logs
+            $duplicateLogs = DB::select('
+                SELECT object_id, COUNT(*) as count
+                FROM product_count_logs
+                WHERE branch_id = ?
+                AND product_id = ?
+                AND object_type = "end_of_days"
+                GROUP BY object_id
+                HAVING count > 1
+            ', [$product->branch_id, $product->product_id]);
+
+            // Skip if no duplicates found
+            if (empty($duplicateLogs)) {
+                continue;
+            }
+
+            $latestPPC = DB::table('product_count_logs')
+                ->where('object_type', 'product_physical_counts')
+                ->where('branch_id', $product->branch_id)
+                ->where('product_id', $product->product_id)
+                ->orderByDesc('created_at')
+                ->first();
+
+            $baseQty = 0;
+            $baseDate = null;
+            if ($latestPPC) {
+                $baseQty = $latestPPC->new_quantity;
+                $baseDate = $latestPPC->created_at;
+            }
+
+             // Get incoming after the latest PPC
+            $incomingQuery = 'SELECT SUM(purchase_delivery_items.qty) as total
+                FROM purchase_deliveries
                 INNER JOIN purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
                 WHERE purchase_delivery_items.product_id = ?
                 AND purchase_deliveries.branch_id = ?
-                AND purchase_deliveries.`status` = ?', [$product->product_id, $product->branch_id, 'approved']);
+                AND purchase_deliveries.status = ?';
+            $incomingParams = [$product->product_id, $product->branch_id, 'approved'];
+            if ($baseDate) {
+                $incomingQuery .= ' AND purchase_deliveries.created_at > ?';
+                $incomingParams[] = $baseDate;
+            }
+            $incoming = DB::select($incomingQuery, $incomingParams);
 
             $incomingTotal = $incoming[0]->total ?? 0;
 
             $transactionQuery = "
                 SELECT
                     sum(orders.qty) as total
-                FROM transactional_db.transactions
-                INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                FROM $transactionalDbName.transactions
+                INNER JOIN $transactionalDbName.orders ON transactions.transaction_id = orders.transaction_id
                     AND transactions.branch_id = orders.branch_id
                     AND transactions.pos_machine_id = orders.pos_machine_id
                     AND orders.is_void = FALSE
@@ -59,9 +114,12 @@ class TestController extends Controller
 
             $transactionTotal = $transactions[0]->total ?? 0;
 
-            $soh = $incomingTotal - $transactionTotal;
+            $soh = $baseQty + $incomingTotal - $transactionTotal;
 
-            $this->productRepository->updateBranchQuantity($_product, $branch, 0, 'manual_edit', $soh, null, 'replace', $_product->uom_id);
+            // Only update if the current stock doesn't match the calculated SOH
+            if ($product->stock != $soh) {
+                $this->productRepository->updateBranchQuantity($_product, $branch, 0, 'manual_edit', $soh, null, 'replace', $_product->uom_id);
+            }
         }
     }
 }
