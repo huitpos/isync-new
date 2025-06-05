@@ -113,11 +113,11 @@ class TestController extends Controller
             $transactionTotal = $transactions[0]->total ?? 0;
 
             $soh = $baseQty + $incomingTotal - $transactionTotal;
-
+            dd($soh);
             // Only update if the current stock doesn't match the calculated SOH
-            if ($product->stock != $soh) {
+            // if ($product->stock != $soh) {
                 $this->productRepository->updateBranchQuantity($_product, $branch, 0, 'manual_edit', $soh, null, 'replace', $_product->uom_id);
-            }
+            // }
         }
     }
 }
