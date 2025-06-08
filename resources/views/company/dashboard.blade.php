@@ -59,6 +59,7 @@
                         @include('partials/widgets/small_card', [
                             'text' => $todayTransactionCount,
                             'subText' => 'Transaction Count',
+                            'class' => 'border-primary border-2 shadow'
                         ])
                     </div>
 
@@ -66,6 +67,7 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($todayGrossAmount, 2),
                             'subText' => 'Gross sales',
+                            'class' => 'border-success border-2 shadow'
                         ])
                     </div>
 
@@ -73,6 +75,7 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($todayNetAmount, 2),
                             'subText' => 'Net Sales',
+                            'class' => 'border-info border-2'
                         ])
                     </div>
 
@@ -80,6 +83,7 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($todayGrossAmount - $todayCostAmount, 2),
                             'subText' => 'Profit',
+                            'class' => 'border-warning border-2'
                         ])
                     </div>
                 </div>
@@ -98,6 +102,7 @@
                         @include('partials/widgets/small_card', [
                             'text' => $transactionCount,
                             'subText' => 'Transaction Count',
+                            'class' => 'border-primary border-2'
                         ])
                     </div>
 
@@ -105,6 +110,7 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($grossAmount, 2),
                             'subText' => 'Gross sales',
+                            'class' => 'border-success border-2'
                         ])
                     </div>
 
@@ -112,6 +118,7 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($netAmount, 2),
                             'subText' => 'Net Sales',
+                            'class' => 'border-info border-2'
                         ])
                     </div>
 
@@ -119,6 +126,7 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($grossAmount - $costAmount, 2),
                             'subText' => 'Profit',
+                            'class' => 'border-warning border-2'
                         ])
                     </div>
                 </div>
@@ -133,11 +141,11 @@
             <div id="kt_docs_google_chart_line" style="height: 300px;"></div>
         </div>
 
-        <div class="col-6 mt-10  ">
+        <div class="col-12 mt-10  ">
             <div id="kt_docs_google_chart_pie" style="height: 300px;"></div>
         </div>
 
-        <div class="col-6 mt-10">
+        <div class="col-12 mt-10">
             <div class="table-responsive">
                 <table id="kt_datatable_zero_configuration" class="table table-striped table-row-bordered gy-5">
                     <thead>
@@ -211,9 +219,10 @@
 
             var departmentOptions = {
                 title: 'Department Sales',
-                pieHole: 0,
+                pieHole: 0.5,
                 pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0
+                sliceVisibilityThreshold : 0,
+                is3D : true,
             };
 
             var departmentChart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie'));

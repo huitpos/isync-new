@@ -193,7 +193,8 @@ class PageController extends Controller
 
         arsort($departmentSales);
 
-        $top20 = array_slice($departmentSales, 0, 20, true);
+        // $top20 = array_slice($departmentSales, 0, 20, true);
+        $top20 = $departmentSales;
 
         $total = array_sum($departmentSales);
         $top20Total = array_sum($top20);

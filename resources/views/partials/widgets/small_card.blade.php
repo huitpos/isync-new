@@ -1,4 +1,4 @@
-<div class="card card-flush">
+<div class="card card-flush {{ $class ?? '' }} mb-5 mb-xl-10">
 	<div class="card-header pt-5">
 		<div class="card-title d-flex flex-column">
 			<span class="fs-1 fw-bold text-gray-900 me-2 lh-1 ls-n2">
