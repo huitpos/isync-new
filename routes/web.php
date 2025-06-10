@@ -241,3 +241,5 @@ Route::middleware('auth')->group(function () {
         });
     });
 });
+
+Route::get('/company/{company}/dashboard/department-products', [CompanyPageController::class, 'getDepartmentProducts'])->name('company.dashboard.department-products');
