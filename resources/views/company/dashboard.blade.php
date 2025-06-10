@@ -59,7 +59,8 @@
                         @include('partials/widgets/small_card', [
                             'text' => $todayTransactionCount,
                             'subText' => 'Transaction Count',
-                            'class' => 'border-primary border-2 shadow'
+                            'class' => 'border-primary border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-primary-rgb), var(--bs-border-opacity)) !important;'
                         ])
                     </div>
 
@@ -67,7 +68,8 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($todayGrossAmount, 2),
                             'subText' => 'Gross sales',
-                            'class' => 'border-success border-2 shadow'
+                            'class' => 'border-success border-2 shadow',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;'
                         ])
                     </div>
 
@@ -75,7 +77,8 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($todayNetAmount, 2),
                             'subText' => 'Net Sales',
-                            'class' => 'border-info border-2'
+                            'class' => 'border-info border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-info-rgb), var(--bs-border-opacity)) !important;'
                         ])
                     </div>
 
@@ -83,7 +86,8 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($todayGrossAmount - $todayCostAmount, 2),
                             'subText' => 'Profit',
-                            'class' => 'border-warning border-2'
+                            'class' => 'border-warning border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-warning-rgb), var(--bs-border-opacity)) !important;'
                         ])
                     </div>
                 </div>
@@ -102,7 +106,8 @@
                         @include('partials/widgets/small_card', [
                             'text' => $transactionCount,
                             'subText' => 'Transaction Count',
-                            'class' => 'border-primary border-2'
+                            'class' => 'border-primary border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-primary-rgb), var(--bs-border-opacity)) !important;'
                         ])
                     </div>
 
@@ -110,7 +115,8 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($grossAmount, 2),
                             'subText' => 'Gross sales',
-                            'class' => 'border-success border-2'
+                            'class' => 'border-success border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;'
                         ])
                     </div>
 
@@ -118,7 +124,8 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($netAmount, 2),
                             'subText' => 'Net Sales',
-                            'class' => 'border-info border-2'
+                            'class' => 'border-info border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-info-rgb), var(--bs-border-opacity)) !important;'
                         ])
                     </div>
 
@@ -126,7 +133,8 @@
                         @include('partials/widgets/small_card', [
                             'text' => number_format($grossAmount - $costAmount, 2),
                             'subText' => 'Profit',
-                            'class' => 'border-warning border-2'
+                            'class' => 'border-warning border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-warning-rgb), var(--bs-border-opacity)) !important;'
                         ])
                     </div>
                 </div>
@@ -147,6 +155,7 @@
 
         <div class="col-12 mt-10">
             <div class="table-responsive">
+                <h2 id="sales_breakdown_title"></h2>
                 <table id="kt_datatable_zero_configuration" class="table table-striped table-row-bordered gy-5">
                     <thead>
                         <tr class="fw-semibold fs-6 text-muted">
@@ -219,10 +228,10 @@
 
             var departmentOptions = {
                 title: 'Department Sales',
-                pieHole: 0.5,
                 pieSliceText: 'percentage',
                 sliceVisibilityThreshold : 0,
                 is3D : true,
+                chartArea: {width:'100%',height:'85%'},
             };
 
             var departmentChart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie'));
@@ -263,6 +272,7 @@
                             }
                             datatable.draw();
                             $("#kt_datatable_zero_configuration").removeClass("opacity-50");
+                            $("#sales_breakdown_title").text(`Sales Breakdown for ${item}`);
                         },
                         error: function(xhr) {
                             console.error("Error loading department products:", xhr);
@@ -285,7 +295,9 @@
                 title: 'Top Sold Items',
                 pieHole: 0,
                 pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0
+                sliceVisibilityThreshold : 0,
+                is3D : true,
+                chartArea: {width:'100%',height:'85%'},
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie2'));
@@ -300,7 +312,9 @@
                 title: 'Top Payment Type',
                 pieHole: 0,
                 pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0
+                sliceVisibilityThreshold : 0,
+                is3D : true,
+                chartArea: {width:'100%',height:'85%'},
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie3'));
