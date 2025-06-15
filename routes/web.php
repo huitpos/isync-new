@@ -163,6 +163,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/purchase-requests/{id}/print', [CompanyPurchaseRequestController::class, 'print'])->name('company.purchase-requests.print');
         Route::get('/purchase-orders/{id}/print', [CompanyPurchaseOrderController::class, 'print'])->name('company.purchase-orders.print');
+        Route::get('/product-disposals/{id}/print', [CompanyProductDisposalController::class, 'print'])->name('company.product-disposals.print');
+        Route::get('/stock-transfer-requests/{id}/print', [CompanyStockTransferRequestController::class, 'print'])->name('company.stock-transfer-requests.print');
         Route::get('/purchase-deliveries/{id}/print', [CompanyPurchaseDeliveryController::class, 'print'])->name('company.purchase-deliveries.print');
 
         Route::resource('roles', CompanyRoleController::class, ['as' => 'company']);
@@ -190,6 +192,8 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'bir-pwd-sales-report', [CompanyReportController::class, 'birPwdSalesReport'])->name('company.reports.bir-pwd-sales-report');
             Route::match(['get', 'post'], 'bir-naac-sales-report', [CompanyReportController::class, 'birNaacSalesReport'])->name('company.reports.bir-naac-sales-report');
             Route::match(['get', 'post'], 'bir-solo-parent-sales-report', [CompanyReportController::class, 'birSoloParentSalesReport'])->name('company.reports.bir-solo-parent-sales-report');
+            Route::match(['get', 'post'], 'category-sales-report', [CompanyReportController::class, 'categorySalesReport'])->name('company.reports.category-sales-report');
+            Route::match(['get', 'post'], 'department-sales-report', [CompanyReportController::class, 'departmentSalesReport'])->name('company.reports.department-sales-report');
         });
 
         //branch

@@ -9,6 +9,7 @@ use App\DataTables\Company\StockTransferRequestsDataTable;
 
 use App\Models\StockTransferRequest;
 use App\Models\StockTransferOrder;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StockTransferRequestController extends Controller
 {
@@ -90,5 +91,32 @@ class StockTransferRequestController extends Controller
     public function destroy(string $id)
     {
         
+    }
+
+    public function print(Request $request, string $slug, string $id)
+    {
+        $str = StockTransferRequest::with([
+            'items',
+            'items.product',
+            'items.uom',
+            'createdBy',
+            'department',
+            'deliveryLocation',
+            'deliveryLocation.barangay',
+            'deliveryLocation.city',
+            'deliveryLocation.province',
+            'deliveryLocation.region',
+            'sourceBranch',
+            'actionBy'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+
+        $pdf = Pdf::loadView('company.stockTransferRequests.print', [
+            'str' => $str,
+            'company' => $company
+        ]);
+
+        return $pdf->download("STR-$str->str_number.pdf");
     }
 }
