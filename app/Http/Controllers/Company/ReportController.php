@@ -31,6 +31,8 @@ use App\Exports\BirSeniorSalesReportExport;
 use App\Exports\BirPwdSalesReportExport;
 use App\Exports\BirNaacSalesReportExport;
 use App\Exports\BirSoloParentSalesReportExport;
+use App\Exports\CategorySalesReportExport;
+use App\Exports\DepartmentSalesReportExport;
 use App\Models\AuditTrail;
 use App\Models\PosMachine;
 use Illuminate\Support\Facades\DB;
@@ -955,4 +957,169 @@ class ReportController extends Controller
             'discounts'
         ));
     } 
+    
+    public function categorySalesReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post')) {
+            $branch = Branch::find($branchId);
+            
+            return Excel::download(
+                new CategorySalesReportExport($branchId, $startDate, $endDate),
+                'Category_Sales_Report_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
+            );
+        }
+
+        // Get category sales data for the view using raw SQL
+        $categorySalesQuery = "
+            SELECT 
+                isync.categories.name as category, 
+                SUM(transactional_db.orders.qty) as quantity_sold,
+                SUM(CASE WHEN transactional_db.orders.discount_amount > 0 THEN transactional_db.orders.discount_amount ELSE 0 END) as discount_sales,
+                SUM(transactional_db.orders.gross) as regular_sales
+            FROM transactional_db.transactions
+            INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                AND transactions.branch_id = orders.branch_id
+                AND transactions.pos_machine_id = orders.pos_machine_id
+                AND orders.is_void = FALSE
+                AND orders.is_completed = TRUE
+                AND orders.is_back_out = FALSE
+            INNER JOIN isync.products ON orders.product_id = products.id
+            INNER JOIN isync.categories ON products.category_id = categories.id
+            WHERE transactions.is_complete = TRUE
+                AND transactions.branch_id = $branchId
+                AND transactions.is_void = FALSE
+                AND transactions.is_back_out = FALSE
+                AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+            GROUP BY isync.categories.name
+            ORDER BY regular_sales DESC
+        ";
+
+        $categoryData = collect(DB::select($categorySalesQuery));
+
+        // Calculate totals
+        $totalRegularSales = $categoryData->sum('regular_sales');
+        $totalDiscountSales = $categoryData->sum('discount_sales');
+        
+        // Add percentage to each category
+        $categoryData->transform(function($item) use ($totalRegularSales) {
+            $item->percentage = $totalRegularSales > 0 ? round(($item->regular_sales / $totalRegularSales) * 100) : 0;
+            return $item;
+        });
+
+        $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
+        $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
+        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+
+        return view('company.reports.categorySales', compact(
+            'company', 
+            'branches', 
+            'branchId',
+            'categoryData',
+            'totalRegularSales',
+            'totalDiscountSales',
+            'startDateParam',
+            'endDateParam',
+            'selectedRangeParam'
+        ));
+    }
+
+    public function departmentSalesReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post')) {
+            $branch = Branch::find($branchId);
+            
+            return Excel::download(
+                new DepartmentSalesReportExport($branchId, $startDate, $endDate),
+                'Department_Sales_Report_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
+            );
+        }
+
+        // Get department sales data for the view using raw SQL
+        $departmentSalesQuery = "
+            SELECT 
+                isync.departments.name as department, 
+                SUM(transactional_db.orders.qty) as quantity_sold,
+                SUM(transactional_db.orders.gross) as gross_sales,
+                SUM(CASE WHEN transactional_db.orders.discount_amount > 0 THEN transactional_db.orders.discount_amount ELSE 0 END) as discount_sales,
+                SUM(transactional_db.orders.gross - CASE WHEN transactional_db.orders.discount_amount > 0 THEN transactional_db.orders.discount_amount ELSE 0 END) as net_sales
+            FROM transactional_db.transactions
+            INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                AND transactions.branch_id = orders.branch_id
+                AND transactions.pos_machine_id = orders.pos_machine_id
+                AND orders.is_void = FALSE
+                AND orders.is_completed = TRUE
+                AND orders.is_back_out = FALSE
+            INNER JOIN isync.products ON orders.product_id = products.id
+            INNER JOIN isync.departments ON products.department_id = departments.id
+            WHERE transactions.is_complete = TRUE
+                AND transactions.branch_id = $branchId
+                AND transactions.is_void = FALSE
+                AND transactions.is_back_out = FALSE
+                AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+            GROUP BY isync.departments.name
+            ORDER BY gross_sales DESC
+        ";
+
+        $departmentData = collect(DB::select($departmentSalesQuery));
+
+        // Calculate totals
+        $totalGrossSales = $departmentData->sum('gross_sales');
+        $totalDiscountSales = $departmentData->sum('discount_sales');
+        $totalNetSales = $departmentData->sum('net_sales');
+        
+        // Add percentage to each department
+        $departmentData->transform(function($item) use ($totalNetSales) {
+            $item->percentage = $totalNetSales > 0 ? round(($item->net_sales / $totalNetSales) * 100) : 0;
+            return $item;
+        });
+
+        $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
+        $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
+        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+
+        return view('company.reports.departmentSales', compact(
+            'company', 
+            'branches', 
+            'branchId',
+            'departmentData',
+            'totalGrossSales',
+            'totalDiscountSales',
+            'totalNetSales',
+            'startDateParam',
+            'endDateParam',
+            'selectedRangeParam'
+        ));
+    }
 }
