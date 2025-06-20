@@ -197,6 +197,8 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'sales-return-report', [CompanyReportController::class, 'salesReturnReport'])->name('company.reports.sales-return-report');
             Route::match(['get', 'post'], 'subcategory-sales-report', [CompanyReportController::class, 'subCategorySalesReport'])->name('company.reports.subcategory-sales-report');
             Route::match(['get', 'post'], 'hourly-sales-report', [CompanyReportController::class, 'hourlySalesReport'])->name('company.reports.hourly-sales-report');
+            Route::match(['get', 'post'], 'hourly-transaction-report', [CompanyReportController::class, 'hourlyTransactionReport'])->name('company.reports.hourly-transaction-report');
+            Route::match(['get', 'post'], 'safekeeping-report', [CompanyReportController::class, 'safekeepingReport'])->name('company.reports.safekeeping-report');
         });
 
         //branch
