@@ -598,6 +598,9 @@
 							'company.reports.discounts-report',
 							'company.reports.category-sales-report',
 							'company.reports.department-sales-report',
+							'company.reports.sales-return-report',
+							'company.reports.subcategory-sales-report',
+							'company.reports.hourly-sales-report',
 						) ? 'here show' : '' }}" data-kt-menu-trigger="click">
 							<span class="menu-link">
 								<span class="menu-title">Sales Reports</span>
@@ -662,6 +665,24 @@
 								<div class="menu-item">
 									<a class="menu-link {{ request()->routeIs('company.reports.department-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.department-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 										<span class="menu-title">Department Sales Report</span>
+									</a>
+								</div>
+
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.sales-return-report') ? 'active' : '' }}" href="{{ route('company.reports.sales-return-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Sales Return Report</span>
+									</a>
+								</div>
+
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.subcategory-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.subcategory-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Sub Category Sales Report</span>
+									</a>
+								</div>
+
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.hourly-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.hourly-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Hourly Sales Report</span>
 									</a>
 								</div>
 							</div>

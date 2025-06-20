@@ -33,6 +33,9 @@ use App\Exports\BirNaacSalesReportExport;
 use App\Exports\BirSoloParentSalesReportExport;
 use App\Exports\CategorySalesReportExport;
 use App\Exports\DepartmentSalesReportExport;
+use App\Exports\SalesReturnReportExport;
+use App\Exports\SubCategorySalesReportExport;
+use App\Exports\HourlySalesReportExport;
 use App\Models\AuditTrail;
 use App\Models\PosMachine;
 use Illuminate\Support\Facades\DB;
@@ -1117,6 +1120,249 @@ class ReportController extends Controller
             'totalGrossSales',
             'totalDiscountSales',
             'totalNetSales',
+            'startDateParam',
+            'endDateParam',
+            'selectedRangeParam'
+        ));
+    }
+
+    public function salesReturnReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post')) {
+            $branch = Branch::find($branchId);
+            
+            return Excel::download(
+                new SalesReturnReportExport($branchId, $startDate, $endDate),
+                'Sales_Return_Report_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
+            );
+        }
+
+        // Get sales return data for the view using raw SQL
+        $salesReturnQuery = "
+            SELECT 
+                isync.products.name, 
+                transactional_db.transactions.pos_machine_id as machine_number,
+                SUM(ABS(transactional_db.orders.qty)) as quantity,
+                SUM(ABS(transactional_db.orders.gross)) as total_amount
+            FROM transactional_db.transactions
+            INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                AND transactions.branch_id = orders.branch_id
+                AND transactions.pos_machine_id = orders.pos_machine_id
+                AND orders.is_void = FALSE
+                AND orders.is_completed = TRUE
+                AND orders.is_back_out = FALSE
+                AND orders.qty < 0  -- This is the key filter for returns
+            INNER JOIN isync.products ON orders.product_id = products.id
+            WHERE transactions.is_complete = TRUE
+                AND transactions.branch_id = $branchId
+                AND transactions.is_void = FALSE
+                AND transactions.is_back_out = FALSE
+                AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+            GROUP BY isync.products.name, transactional_db.transactions.pos_machine_id
+            ORDER BY total_amount DESC
+        ";
+
+        $returnData = collect(DB::select($salesReturnQuery));
+
+        // Calculate total
+        $totalReturnAmount = $returnData->sum('total_amount');
+        
+        $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
+        $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
+        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+
+        return view('company.reports.salesReturn', compact(
+            'company', 
+            'branches', 
+            'branchId',
+            'returnData',
+            'totalReturnAmount',
+            'startDateParam',
+            'endDateParam',
+            'selectedRangeParam'
+        ));
+    }
+
+    public function subCategorySalesReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post')) {
+            $branch = Branch::find($branchId);
+            
+            return Excel::download(
+                new SubCategorySalesReportExport($branchId, $startDate, $endDate),
+                'Sub_Category_Sales_Report_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
+            );
+        }
+
+        // Get subcategory sales data for the view using raw SQL
+        $subCategorySalesQuery = "
+            SELECT 
+                isync.subcategories.name as subcategory, 
+                SUM(transactional_db.orders.qty) as quantity_sold,
+                SUM(CASE WHEN transactional_db.orders.discount_amount > 0 THEN transactional_db.orders.discount_amount ELSE 0 END) as discount_sales,
+                SUM(transactional_db.orders.gross) as regular_sales
+            FROM transactional_db.transactions
+            INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                AND transactions.branch_id = orders.branch_id
+                AND transactions.pos_machine_id = orders.pos_machine_id
+                AND orders.is_void = FALSE
+                AND orders.is_completed = TRUE
+                AND orders.is_back_out = FALSE
+                AND orders.qty > 0  -- Exclude returns
+            INNER JOIN isync.products ON orders.product_id = products.id
+            INNER JOIN isync.subcategories ON products.subcategory_id = subcategories.id
+            WHERE transactions.is_complete = TRUE
+                AND transactions.branch_id = $branchId
+                AND transactions.is_void = FALSE
+                AND transactions.is_back_out = FALSE
+                AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+            GROUP BY isync.subcategories.name
+            ORDER BY regular_sales DESC
+        ";
+
+        $subcategoryData = collect(DB::select($subCategorySalesQuery));
+
+        // Calculate totals
+        $totalRegularSales = $subcategoryData->sum('regular_sales');
+        $totalDiscountSales = $subcategoryData->sum('discount_sales');
+        
+        // Add percentage to each subcategory
+        $subcategoryData->transform(function($item) use ($totalRegularSales) {
+            $item->percentage = $totalRegularSales > 0 ? round(($item->regular_sales / $totalRegularSales) * 100) : 0;
+            return $item;
+        });
+
+        $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
+        $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
+        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+
+        return view('company.reports.subCategorySales', compact(
+            'company', 
+            'branches', 
+            'branchId',
+            'subcategoryData',
+            'totalRegularSales',
+            'totalDiscountSales',
+            'startDateParam',
+            'endDateParam',
+            'selectedRangeParam'
+        ));
+    }
+    
+    public function hourlySalesReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d');
+        $endDate = Carbon::now()->format('Y-m-d');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d');
+        }
+
+        if ($request->isMethod('post')) {
+            $branch = Branch::find($branchId);
+            
+            return Excel::download(
+                new HourlySalesReportExport($branchId, $startDate, $endDate),
+                'Hourly_Sales_Report_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
+            );
+        }
+
+        // Get hourly sales data for the view using raw SQL
+        $hourlySalesQuery = "
+            SELECT 
+                DATE(transactions.treg) as sale_date,
+                HOUR(transactions.treg) as sale_hour,
+                SUM(transactions.gross_sales) as total_sales
+            FROM transactional_db.transactions
+            WHERE transactions.is_complete = TRUE
+                AND transactions.branch_id = $branchId
+                AND transactions.is_void = FALSE
+                AND transactions.is_back_out = FALSE
+                AND transactions.treg BETWEEN '$startDate 00:00:00' AND '$endDate 23:59:59'
+            GROUP BY DATE(transactions.treg), HOUR(transactions.treg)
+            ORDER BY sale_date, sale_hour
+        ";
+
+        $salesData = collect(DB::select($hourlySalesQuery));
+        
+        // Organize data by date and hour
+        $salesByHour = [];
+        $timeSlots = [
+            '00:00-01:00', '01:00-02:00', '02:00-3:00', '3:00-4:00', '4:00-5:00',
+            '5:00-6:00', '6:00-7:00', '7:00-08:00', '8:00-9:00', '9:00-10:00',
+            '10:00-11:00', '11:00-12:00', '12:00-13:00', '13:00-14:00', '14:00-15:00',
+            '15:00-16:00', '16:00-17:00', '17:00-18:00', '18:00-19:00', '19:00-20:00',
+            '20:00-21:00', '21:00-22:00', '22:00-23:00', '23:00-24:00'
+        ];
+        
+        foreach ($salesData as $sale) {
+            $salesByHour[$sale->sale_date][intval($sale->sale_hour)] = $sale->total_sales;
+        }
+        
+        // Create date range for the view
+        $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
+        $days = [];
+        
+        foreach ($period as $date) {
+            $days[] = [
+                'date' => $date->format('Y-m-d'),
+                'formatted_date' => $date->format('M j, Y'),
+                'day_name' => $date->format('l')
+            ];
+        }
+
+        $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
+        $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
+        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+
+        return view('company.reports.hourlySales', compact(
+            'company', 
+            'branches', 
+            'branchId',
+            'salesByHour',
+            'timeSlots',
+            'days',
             'startDateParam',
             'endDateParam',
             'selectedRangeParam'
