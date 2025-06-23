@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Branch;
 use App\Models\Product;
+use App\Models\Transaction;
 use App\Models\ProductDisposal;
 use App\Models\ProductPhysicalCount;
 use Illuminate\Support\Facades\DB;
@@ -121,5 +122,45 @@ class TestController extends Controller
                 $this->productRepository->updateBranchQuantity($_product, $branch, 0, 'manual_edit', $soh, null, 'replace', $_product->uom_id);
             }
         }
+    }
+
+    public function fixGsmarine()
+    {
+        $branch = Branch::where('id', 19)->first();
+        $branch = Branch::findOrFail(19);
+
+        $transactions = Transaction::where('branch_id', $branch->id)
+            ->where('is_void', false)
+            ->where('is_back_out', false)
+            ->where('is_complete', true)
+            ->where('cut_off_id', 212)
+            ->get();
+
+        foreach ($transactions as $transaction) {
+            $orders = $transaction->nonVoiditems()
+                ->where('is_void', false)
+                ->where('is_completed', true)
+                ->where('is_back_out', false)
+                ->get();
+
+            foreach ($orders as $order) {
+                $product = Product::find($order->product_id);
+
+                if ($product) {
+                    $this->productRepository->updateBranchQuantity(
+                        $product,
+                        $branch,
+                        0,
+                        'manual_edit',
+                        $order->qty,
+                        null,
+                        'subtract',
+                        $product->uom_id
+                    );
+                }
+            }
+        }
+
+        dd("Branch {$branch->name} transactions have been processed successfully.");
     }
 }
