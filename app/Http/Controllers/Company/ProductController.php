@@ -580,6 +580,8 @@ class ProductController extends Controller
         $company = $request->attributes->get('company');
         $branches = auth()->user()->activeBranches;
 
+        $product = $this->productRepository->find($productId);
+
         $branch = Branch::find($branchId);
         return $dataTable->with('company_id', $company->id)
             ->with('branch_id', $branchId)
@@ -588,7 +590,8 @@ class ProductController extends Controller
                 'company' => $company,
                 'branches' => $branches,
                 'branchId' => $branchId,
-                'branch' => $branch
+                'branch' => $branch,
+                'product' => $product
             ]);
     }
 

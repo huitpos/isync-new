@@ -540,6 +540,13 @@ class MiscController extends BaseController
                 }
             }
 
+            // fill receipt_number if receipt_number is empty. exclude if already set
+            if (empty($transaction->receipt_number) && !empty($request->receipt_number)) {
+                $postData['receipt_number'] = $request->receipt_number;
+            } else {
+                unset($postData['receipt_number']);
+            }
+
             $transaction->update($postData);
 
             return $this->sendResponse($transaction, $message);
