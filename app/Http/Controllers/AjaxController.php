@@ -98,6 +98,8 @@ class AjaxController extends Controller
     {
         $productsQuery = Product::query();
 
+        $productsQuery->where('status', 'active');
+
         $user = Auth::user();
 
         if ($request->has('department_id')) {
