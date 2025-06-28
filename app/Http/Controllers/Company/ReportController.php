@@ -542,7 +542,8 @@ class ReportController extends Controller
                         product_count_logs.new_quantity,
                         CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
                         CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
-                        unit_of_measurements.`name` AS `uom`
+                        unit_of_measurements.`name` AS `uom`,
+                        product_physical_counts.pcount_number
                     FROM product_physical_counts
                     INNER JOIN product_physical_count_items ON product_physical_counts.id = product_physical_count_items.product_physical_count_id
                     INNER JOIN users createdBy ON product_physical_counts.created_by = createdBy.id
