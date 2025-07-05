@@ -25,6 +25,7 @@ use App\Models\DiscountType;
 use Carbon\Carbon;
 
 use App\Exports\InventoryExport;
+use App\Exports\ProductsExport;
 
 class ProductController extends Controller
 {
@@ -601,5 +602,17 @@ class ProductController extends Controller
         $branch = Branch::find($branchId);
 
         return Excel::download(new InventoryExport($branch->id), "$company->name - $branch->name - ".Carbon::now()->format('Y-m-d 23:59:59')." - Inventory.xlsx");
+    }
+
+    /**
+     * Export products listing to Excel
+     */
+    public function export(Request $request, $companySlug)
+    {
+        $company = $request->attributes->get('company');
+        return Excel::download(
+            new ProductsExport($company->id),
+            "$company->name - Products - ".Carbon::now()->format('Y-m-d')." - List.xlsx"
+        );
     }
 }
