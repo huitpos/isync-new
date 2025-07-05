@@ -151,6 +151,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/import-product', [CompanyProductController::class, 'showForm']);
         Route::post('/import-product', [CompanyProductController::class, 'import'])->name('company.products.import');
+        Route::get('/products-export', [CompanyProductController::class, 'export'])->name('company.products.export');
         Route::resource('users', CompanyUserController::class, ['as' => 'company']);
         Route::resource('payment-terms', CompanyPaymentTermController::class, ['as' => 'company']);
         Route::resource('supplier-terms', CompanySupplierTermController::class, ['as' => 'company']);
