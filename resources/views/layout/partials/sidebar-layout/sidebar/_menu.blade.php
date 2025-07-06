@@ -633,6 +633,12 @@
 										<span class="menu-title">Sub Category Sales Report</span>
 									</a>
 								</div>
+
+								<div class="menu-item">
+									<a class="menu-link {{ request()->routeIs('company.reports.company.reports.top-performing-products-report') ? 'active' : '' }}" href="{{ route('company.reports.top-performing-products-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Top Performing Products Report</span>
+									</a>
+								</div>
 							</div>
 						</div>
 
@@ -717,6 +723,10 @@
 
 									<a class="menu-link {{ request()->routeIs('company.reports.safekeeping-report') ? 'active' : '' }}" href="{{ route('company.reports.safekeeping-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 										<span class="menu-title">Safekeeping Report</span>
+									</a>
+
+									<a class="menu-link {{ request()->routeIs('company.reports.monthly-sales-summary-report') ? 'active' : '' }}" href="{{ route('company.reports.monthly-sales-summary-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Monthly Sales Report</span>
 									</a>
 								</div>
 							</div>

@@ -36,7 +36,9 @@ use App\Exports\DepartmentSalesReportExport;
 use App\Exports\SalesReturnReportExport;
 use App\Exports\SubCategorySalesReportExport;
 use App\Exports\HourlySalesReportExport;
-use App\Exports\HourlyTransactionReportExport;
+use App\Exports\HourlySalesSummaryExport;
+use App\Exports\MonthlySalesSummaryExport;
+use App\Exports\TopPerformingProductsExport;
 use App\Exports\SafekeepingReportExport;
 use App\Models\AuditTrail;
 use App\Models\PosMachine;
@@ -1368,13 +1370,15 @@ class ReportController extends Controller
             'selectedRangeParam'
         ));
     }
-
-    public function hourlyTransactionReport(Request $request)
+    
+    public function hourlySalesSummaryReport(Request $request)
     {
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
         $branchId = $request->query('branch_id', $branches->first()->id);
+        $branch = Branch::find($branchId);
+        $branchName = $branch->name;
 
         $dateParam = $request->input('date_range', null);
 
@@ -1388,20 +1392,18 @@ class ReportController extends Controller
         }
 
         if ($request->isMethod('post')) {
-            $branch = Branch::find($branchId);
-            
             return Excel::download(
-                new HourlyTransactionReportExport($branchId, $startDate, $endDate),
-                'Hourly_Transaction_Report_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
+                new HourlySalesSummaryExport($branchId, $startDate, $endDate),
+                'Hourly_Sales_Summary_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
             );
         }
 
-        // Get hourly transaction data for the view using raw SQL
-        $hourlyTransactionQuery = "
+        // Get hourly sales data
+        $hourlySalesQuery = "
             SELECT 
-                DATE(transactions.treg) as transaction_date,
-                HOUR(transactions.treg) as transaction_hour,
-                COUNT(transactions.id) as transaction_count
+                DATE(transactions.treg) as sale_date,
+                HOUR(transactions.treg) as sale_hour,
+                SUM(transactions.gross_sales) as total_sales
             FROM transactional_db.transactions
             WHERE transactions.is_complete = TRUE
                 AND transactions.branch_id = $branchId
@@ -1409,13 +1411,120 @@ class ReportController extends Controller
                 AND transactions.is_back_out = FALSE
                 AND transactions.treg BETWEEN '$startDate 00:00:00' AND '$endDate 23:59:59'
             GROUP BY DATE(transactions.treg), HOUR(transactions.treg)
-            ORDER BY transaction_date, transaction_hour
+            ORDER BY sale_date, sale_hour
         ";
 
-        $transactionsData = collect(DB::select($hourlyTransactionQuery));
+        $salesData = collect(DB::select($hourlySalesQuery));
+        
+        // Get daily summary data
+        $daySummaryQuery = "
+            SELECT 
+                DATE(t.treg) as sale_date,
+                COUNT(*) as transactions,
+                SUM(t.gross_sales) as gross_sales,
+                SUM(t.net_sales) as net_sales,
+                SUM(t.discount_amount) as discounts,
+                SUM(t.vatable_sales) as vat_sales,
+                SUM(t.vat_exempt_sales) as vat_exempt_sales,
+                SUM(t.vat_amount) as vat_amount,
+                SUM(CASE WHEN p.payment_type_name = 'cash' THEN p.amount ELSE 0 END) as cash_sales,
+                SUM(CASE WHEN p.payment_type_name = 'card' THEN p.amount ELSE 0 END) as card_sales,
+                SUM(CASE WHEN p.payment_type_name = 'mobile' THEN p.amount ELSE 0 END) as mobile_sales,
+                SUM(CASE WHEN p.payment_type_name = 'ar' THEN p.amount ELSE 0 END) as ar_sales,
+                SUM(CASE WHEN p.payment_type_name = 'online' THEN p.amount ELSE 0 END) as online_sales,
+                SUM(t.total_unit_cost) as unit_cost,
+                SUM(t.service_charge) as service_charge,
+                SUM(t.net_sales - t.total_unit_cost) as gross_profit,
+                CASE 
+                    WHEN SUM(t.net_sales) > 0 THEN (SUM(t.net_sales - t.total_unit_cost) / SUM(t.net_sales)) * 100
+                    ELSE 0
+                END as gross_profit_percentage
+            FROM transactional_db.transactions t
+            LEFT JOIN transactional_db.payments p ON p.transaction_id = t.id
+            WHERE t.is_complete = TRUE
+                AND t.branch_id = $branchId
+                AND t.is_void = FALSE
+                AND t.is_back_out = FALSE
+                AND t.treg BETWEEN '$startDate 00:00:00' AND '$endDate 23:59:59'
+            GROUP BY DATE(t.treg)
+            ORDER BY sale_date
+        ";
+        
+        $summaryData = collect(DB::select($daySummaryQuery));
         
         // Organize data by date and hour
-        $transactionsByHour = [];
+        $salesByHour = [];
+        $daySummary = [];
+        $totals = [
+            'transactions' => 0,
+            'gross_sales' => 0,
+            'net_sales' => 0,
+            'discounts' => 0,
+            'vat_sales' => 0,
+            'vat_exempt_sales' => 0,
+            'vat_amount' => 0,
+            'cash_sales' => 0,
+            'card_sales' => 0,
+            'mobile_sales' => 0,
+            'ar_sales' => 0,
+            'online_sales' => 0,
+            'unit_cost' => 0,
+            'service_charge' => 0,
+            'gross_profit' => 0
+        ];
+        
+        $hourlyTotals = array_fill(0, 24, 0);
+        
+        foreach ($salesData as $sale) {
+            $salesByHour[$sale->sale_date][intval($sale->sale_hour)] = $sale->total_sales;
+            $hourlyTotals[intval($sale->sale_hour)] += $sale->total_sales;
+        }
+        
+        foreach ($summaryData as $summary) {
+            $daySummary[$summary->sale_date] = [
+                'transactions' => $summary->transactions,
+                'gross_sales' => $summary->gross_sales,
+                'net_sales' => $summary->net_sales,
+                'discounts' => $summary->discounts,
+                'vat_sales' => $summary->vat_sales,
+                'vat_exempt_sales' => $summary->vat_exempt_sales,
+                'vat_amount' => $summary->vat_amount,
+                'cash_sales' => $summary->cash_sales,
+                'card_sales' => $summary->card_sales,
+                'mobile_sales' => $summary->mobile_sales,
+                'ar_sales' => $summary->ar_sales,
+                'online_sales' => $summary->online_sales,
+                'unit_cost' => $summary->unit_cost,
+                'service_charge' => $summary->service_charge,
+                'gross_profit' => $summary->gross_profit,
+                'gross_profit_percentage' => $summary->gross_profit_percentage
+            ];
+            
+            // Calculate totals
+            $totals['transactions'] += $summary->transactions;
+            $totals['gross_sales'] += $summary->gross_sales;
+            $totals['net_sales'] += $summary->net_sales;
+            $totals['discounts'] += $summary->discounts;
+            $totals['vat_sales'] += $summary->vat_sales;
+            $totals['vat_exempt_sales'] += $summary->vat_exempt_sales;
+            $totals['vat_amount'] += $summary->vat_amount;
+            $totals['cash_sales'] += $summary->cash_sales;
+            $totals['card_sales'] += $summary->card_sales;
+            $totals['mobile_sales'] += $summary->mobile_sales;
+            $totals['ar_sales'] += $summary->ar_sales;
+            $totals['online_sales'] += $summary->online_sales;
+            $totals['unit_cost'] += $summary->unit_cost;
+            $totals['service_charge'] += $summary->service_charge;
+            $totals['gross_profit'] += $summary->gross_profit;
+        }
+        
+        // Calculate overall gross profit percentage
+        if ($totals['net_sales'] > 0) {
+            $totals['gross_profit_percentage'] = ($totals['gross_profit'] / $totals['net_sales']) * 100;
+        } else {
+            $totals['gross_profit_percentage'] = 0;
+        }
+        
         $timeSlots = [
             '00:00-01:00', '01:00-02:00', '02:00-3:00', '3:00-4:00', '4:00-5:00',
             '5:00-6:00', '6:00-7:00', '7:00-08:00', '8:00-9:00', '9:00-10:00',
@@ -1423,10 +1532,6 @@ class ReportController extends Controller
             '15:00-16:00', '16:00-17:00', '17:00-18:00', '18:00-19:00', '19:00-20:00',
             '20:00-21:00', '21:00-22:00', '22:00-23:00', '23:00-24:00'
         ];
-        
-        foreach ($transactionsData as $transaction) {
-            $transactionsByHour[$transaction->transaction_date][intval($transaction->transaction_hour)] = $transaction->transaction_count;
-        }
         
         // Create date range for the view
         $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
@@ -1444,16 +1549,20 @@ class ReportController extends Controller
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
         $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
 
-        return view('company.reports.hourlyTransaction', compact(
+        return view('company.reports.hourlySalesSummary', compact(
             'company', 
             'branches', 
             'branchId',
-            'transactionsByHour',
+            'branchName',
+            'salesByHour',
+            'daySummary',
             'timeSlots',
             'days',
             'startDateParam',
             'endDateParam',
-            'selectedRangeParam'
+            'selectedRangeParam',
+            'totals',
+            'hourlyTotals'
         ));
     }
 
@@ -1512,6 +1621,244 @@ class ReportController extends Controller
             'branchId',
             'safekeepingData',
             'totalAmount',
+            'startDateParam',
+            'endDateParam',
+            'endDateParam',
+            'selectedRangeParam'
+        ));
+    }
+
+    public function topPerformingProducts(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+
+        $branchId = $request->input('branch_id', $branches->first()->id);
+        $branch = Branch::find($branchId);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->isMethod('post')) {
+            return Excel::download(
+                new TopPerformingProductsExport($branchId, $startDate, $endDate),
+                "Top Performing Products Report - $startDate to $endDate.xlsx"
+            );
+        }
+
+        $query = "SELECT
+                    products.name AS `description`,
+                    products.sku,
+                    departments.name AS `department`,
+                    categories.name AS `category`,
+                    subcategories.name AS `sub_category`,
+                    SUM(transactional_db.orders.qty) AS `quantity_sold`,
+                    0 AS `ar_unpaid_quantity`,
+                    SUM(transactional_db.orders.qty * products.cost) AS `total_unit_cost`,
+                    SUM(transactional_db.discount_details.discount_amount) AS `discount_sales`,
+                    SUM(transactional_db.orders.total) AS `regular_sales`,
+                    (SUM(transactional_db.orders.total) / (SELECT SUM(total) FROM transactional_db.orders WHERE branch_id = $branchId) * 100) AS `sales_percentage`
+                FROM transactional_db.transactions
+                INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                    AND transactions.branch_id = orders.branch_id
+                    AND transactions.pos_machine_id = orders.pos_machine_id
+                    AND orders.is_void = FALSE
+                    AND orders.is_completed = TRUE
+                    AND orders.is_back_out = FALSE
+                    AND orders.is_return = FALSE
+                LEFT JOIN transactional_db.discount_details ON orders.order_id = discount_details.order_id
+                    AND orders.branch_id = discount_details.branch_id
+                    AND orders.pos_machine_id = discount_details.pos_machine_id
+                INNER JOIN isync.products ON orders.product_id = products.id
+                INNER JOIN isync.departments ON products.department_id = departments.id
+                LEFT JOIN isync.categories ON products.category_id = categories.id
+                LEFT JOIN isync.subcategories ON products.subcategory_id = subcategories.id
+                WHERE transactions.is_complete = TRUE
+                    AND transactions.branch_id = $branchId
+                    AND transactions.is_void = FALSE
+                    AND transactions.is_back_out = FALSE
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+                GROUP BY orders.product_id
+                ORDER BY `regular_sales` DESC
+                LIMIT 100";
+
+        $topProducts = DB::select($query);
+
+        // Convert the array of objects into a collection
+        $topProducts = collect($topProducts);
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.topPerformingProducts', compact(
+            'company', 
+            'branches', 
+            'branch',
+            'branchId', 
+            'dateParam', 
+            'topProducts', 
+            'selectedRangeParam', 
+            'startDateParam', 
+            'endDateParam'
+        ));
+    }
+
+    public function monthlySalesSummaryReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        
+        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branch = Branch::find($branchId);
+        $branchName = $branch->name;
+
+        $dateParam = $request->input('date_range', null);
+
+        // Default to the last 12 months if no date range provided
+        $endDate = Carbon::now()->format('Y-m-d');
+        $startDate = Carbon::now()->subMonths(11)->startOfMonth()->format('Y-m-d');
+        
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d');
+        }
+
+        if ($request->isMethod('post')) {
+            return Excel::download(
+                new MonthlySalesSummaryExport($branchId, $startDate, $endDate),
+                'Monthly_Sales_Summary_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
+            );
+        }
+
+        // Get monthly sales data
+        $monthlySalesQuery = "
+            SELECT 
+                YEAR(t.treg) as year,
+                MONTH(t.treg) as month,
+                MAX(MONTHNAME(t.treg)) as month_name,
+                COUNT(*) as transactions,
+                SUM(t.gross_sales) as gross_sales,
+                SUM(t.net_sales) as net_sales,
+                SUM(t.discount_amount) as discounts,
+                SUM(t.vatable_sales) as vat_sales,
+                SUM(t.vat_exempt_sales) as vat_exempt_sales,
+                SUM(t.vat_amount) as vat_amount,
+                SUM(CASE WHEN p.payment_type_name = 'cash' THEN p.amount ELSE 0 END) as cash_sales,
+                SUM(CASE WHEN p.payment_type_name = 'card' THEN p.amount ELSE 0 END) as card_sales,
+                SUM(CASE WHEN p.payment_type_name = 'mobile' THEN p.amount ELSE 0 END) as mobile_sales,
+                SUM(CASE WHEN p.payment_type_name = 'ar' THEN p.amount ELSE 0 END) as ar_sales,
+                SUM(CASE WHEN p.payment_type_name = 'online' THEN p.amount ELSE 0 END) as online_sales,
+                SUM(t.total_unit_cost) as unit_cost,
+                SUM(t.service_charge) as service_charge,
+                SUM(t.net_sales - t.total_unit_cost) as gross_profit,
+                CASE 
+                    WHEN SUM(t.net_sales) > 0 THEN (SUM(t.net_sales - t.total_unit_cost) / SUM(t.net_sales)) * 100
+                    ELSE 0
+                END as gross_profit_percentage
+            FROM transactional_db.transactions t
+            LEFT JOIN transactional_db.payments p ON p.transaction_id = t.id
+            WHERE t.is_complete = TRUE
+                AND t.branch_id = {$branchId}
+                AND t.is_void = FALSE
+                AND t.is_back_out = FALSE
+                AND t.treg BETWEEN '{$startDate} 00:00:00' AND '{$endDate} 23:59:59'
+            GROUP BY YEAR(t.treg), MONTH(t.treg)
+            ORDER BY YEAR(t.treg), MONTH(t.treg)
+        ";
+        
+        $summaryData = collect(DB::select($monthlySalesQuery));
+        
+        // Process data and calculate totals
+        $monthlySales = [];
+        $totals = [
+            'transactions' => 0,
+            'gross_sales' => 0,
+            'net_sales' => 0,
+            'discounts' => 0,
+            'vat_sales' => 0,
+            'vat_exempt_sales' => 0,
+            'vat_amount' => 0,
+            'cash_sales' => 0,
+            'card_sales' => 0,
+            'mobile_sales' => 0,
+            'ar_sales' => 0,
+            'online_sales' => 0,
+            'unit_cost' => 0,
+            'service_charge' => 0,
+            'gross_profit' => 0,
+            'gross_profit_percentage' => 0
+        ];
+        
+        foreach ($summaryData as $summary) {
+            $monthlySales[] = [
+                'year' => $summary->year,
+                'month' => $summary->month,
+                'month_name' => $summary->month_name,
+                'transactions' => $summary->transactions,
+                'gross_sales' => $summary->gross_sales,
+                'net_sales' => $summary->net_sales,
+                'discounts' => $summary->discounts,
+                'vat_sales' => $summary->vat_sales,
+                'vat_exempt_sales' => $summary->vat_exempt_sales,
+                'vat_amount' => $summary->vat_amount,
+                'cash_sales' => $summary->cash_sales,
+                'card_sales' => $summary->card_sales,
+                'mobile_sales' => $summary->mobile_sales,
+                'ar_sales' => $summary->ar_sales,
+                'online_sales' => $summary->online_sales,
+                'unit_cost' => $summary->unit_cost,
+                'service_charge' => $summary->service_charge,
+                'gross_profit' => $summary->gross_profit,
+                'gross_profit_percentage' => $summary->gross_profit_percentage
+            ];
+            
+            // Calculate totals
+            $totals['transactions'] += $summary->transactions;
+            $totals['gross_sales'] += $summary->gross_sales;
+            $totals['net_sales'] += $summary->net_sales;
+            $totals['discounts'] += $summary->discounts;
+            $totals['vat_sales'] += $summary->vat_sales;
+            $totals['vat_exempt_sales'] += $summary->vat_exempt_sales;
+            $totals['vat_amount'] += $summary->vat_amount;
+            $totals['cash_sales'] += $summary->cash_sales;
+            $totals['card_sales'] += $summary->card_sales;
+            $totals['mobile_sales'] += $summary->mobile_sales;
+            $totals['ar_sales'] += $summary->ar_sales;
+            $totals['online_sales'] += $summary->online_sales;
+            $totals['unit_cost'] += $summary->unit_cost;
+            $totals['service_charge'] += $summary->service_charge;
+            $totals['gross_profit'] += $summary->gross_profit;
+        }
+        
+        // Calculate overall gross profit percentage
+        if ($totals['net_sales'] > 0) {
+            $totals['gross_profit_percentage'] = ($totals['gross_profit'] / $totals['net_sales']) * 100;
+        } else {
+            $totals['gross_profit_percentage'] = 0;
+        }
+
+        $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
+        $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
+        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+
+        return view('company.reports.monthlySalesSummary', compact(
+            'company', 
+            'branches', 
+            'branchId',
+            'branchName',
+            'monthlySales',
+            'totals',
             'startDateParam',
             'endDateParam',
             'selectedRangeParam'

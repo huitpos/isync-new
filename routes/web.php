@@ -186,6 +186,7 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'z-reading-report', [CompanyReportController::class, 'zReadingReport'])->name('company.reports.z-reading-report');
             Route::match(['get', 'post'], 'discounts-report', [CompanyReportController::class, 'discountsReport'])->name('company.reports.discounts-report');
             Route::match(['get', 'post'], 'item-sales', [CompanyReportController::class, 'itemSales'])->name('company.reports.item-sales-report');
+            Route::match(['get', 'post'], 'top-performing-products', [CompanyReportController::class, 'topPerformingProducts'])->name('company.reports.top-performing-products-report');
 
             Route::get('stock-card', [CompanyReportController::class, 'stockCard'])->name('company.reports.stock-card');
             Route::match(['get', 'post'], 'audit-trail', [CompanyReportController::class, 'auditTrail'])->name('company.reports.audit-trail');
@@ -199,6 +200,7 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'sales-return-report', [CompanyReportController::class, 'salesReturnReport'])->name('company.reports.sales-return-report');
             Route::match(['get', 'post'], 'subcategory-sales-report', [CompanyReportController::class, 'subCategorySalesReport'])->name('company.reports.subcategory-sales-report');
             Route::match(['get', 'post'], 'hourly-sales-report', [CompanyReportController::class, 'hourlySalesReport'])->name('company.reports.hourly-sales-report');
+            Route::match(['get', 'post'], 'monthly-sales-summary-report', [CompanyReportController::class, 'monthlySalesSummaryReport'])->name('company.reports.monthly-sales-summary-report');
             Route::match(['get', 'post'], 'hourly-transaction-report', [CompanyReportController::class, 'hourlyTransactionReport'])->name('company.reports.hourly-transaction-report');
             Route::match(['get', 'post'], 'safekeeping-report', [CompanyReportController::class, 'safekeepingReport'])->name('company.reports.safekeeping-report');
         });
