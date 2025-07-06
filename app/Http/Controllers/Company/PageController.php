@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
+use App\Models\Company;
+use App\Models\Department;
 use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
@@ -47,6 +49,14 @@ class PageController extends Controller
         $grossAmount = $this->companyRepository->getTransactionGrossSales($company->id, $startDate, $endDate, $branchId);
         $transactionCount = $this->companyRepository->getTransactionCount($company->id, $startDate, $endDate, $branchId);
         $costAmount = $this->companyRepository->getTransactionCostAmount($company->id, $startDate, $endDate, $branchId);
+
+        // today
+        $todayStart = Carbon::now()->startOfDay()->format('Y-m-d 00:00:00');
+        $todayEnd = Carbon::now()->endOfDay()->format('Y-m-d 23:59:59');
+        $todayNetAmount = $this->companyRepository->getTransactionNetSales($company->id, $todayStart, $todayEnd, $branchId);
+        $todayGrossAmount = $this->companyRepository->getTransactionGrossSales($company->id, $todayStart, $todayEnd, $branchId);
+        $todayTransactionCount = $this->companyRepository->getTransactionCount($company->id, $todayStart, $todayEnd, $branchId);
+        $todayCostAmount = $this->companyRepository->getTransactionCostAmount($company->id, $todayStart, $todayEnd, $branchId);
 
         $transactions = DB::table('transactional_db.transactions')
             ->select(
@@ -183,7 +193,8 @@ class PageController extends Controller
 
         arsort($departmentSales);
 
-        $top20 = array_slice($departmentSales, 0, 20, true);
+        // $top20 = array_slice($departmentSales, 0, 20, true);
+        $top20 = $departmentSales;
 
         $total = array_sum($departmentSales);
         $top20Total = array_sum($top20);
@@ -229,7 +240,68 @@ class PageController extends Controller
             'startDateParam' => $startDateParam,
             'endDateParam' => $endDateParam,
             'dateParam' => $dateParam,
-            'costAmount' => $costAmount
+            'costAmount' => $costAmount,
+            'todayNetAmount' => $todayNetAmount,
+            'todayGrossAmount' => $todayGrossAmount,
+            'todayTransactionCount' => $todayTransactionCount,
+            'todayCostAmount' => $todayCostAmount,
         ]);
+    }
+
+    public function getDepartmentProducts(Request $request, $companyId)
+    {
+        $departmentName = $request->input('department');
+        $branchId = $request->input('branch_id');
+        $startDate = $request->input('startDate'); 
+        $endDate = $request->input('endDate');
+
+        $company = Company::findOrFail($companyId);
+        $department = Department::where('company_id', $company->id)
+            ->where('name', $departmentName)
+            ->firstOrFail();
+
+        $orders = DB::table('transactional_db.orders')
+            ->select(
+                DB::raw('products.name as product_name'),
+                DB::raw('SUM(orders.qty) as qty'),
+                DB::raw('SUM(vatable_sales) as sales')
+            )
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->join('departments', 'products.department_id', '=', 'departments.id')
+            ->join('branches', function ($join) use ($company, $branchId) {
+                $join->on('orders.branch_id', '=', 'branches.id')
+                     ->where('branches.company_id', '=', $company->id);
+
+                if ($branchId) {
+                    $join->where('branches.id', '=', $branchId);
+                }
+            })
+            ->where('departments.id', $department->id)
+            ->where('orders.is_completed', true)
+            ->where('orders.is_void', false)
+            ->whereBetween('orders.completed_at', [$startDate, $endDate])
+            ->groupBy('departments.id', 'products.id')
+            ->orderBy(DB::raw('SUM(vatable_sales)'), 'desc')
+            ->get();
+        
+        // Calculate total sales for percentage calculation
+        $totalSales = $orders->sum('sales');
+        
+        // Format data for DataTables with percentage calculation
+        $totalPercentage = 0;
+        $data = $orders->map(function ($product) use ($totalSales, &$totalPercentage) {
+            $percentage = $totalSales > 0 ? ($product->sales / $totalSales) * 100 : 0;
+
+            $totalPercentage += $percentage;
+            
+            return [
+                $product->product_name,
+                $product->qty,
+                number_format($product->sales, 2),
+                number_format($percentage, 2) . '%'
+            ];
+        });
+
+        return response()->json(['data' => $data->toArray()]);
     }
 }

@@ -95,6 +95,7 @@ class MachineController extends BaseController
             'or_reset_counter' => $request->or_reset_counter,
             'gt_counter' => $request->gt_counter,
             'payout_counter' => $request->payout_counter,
+            'shift_counter' => $request->shift_counter,
         ]);
 
         return $this->sendResponse($machine, 'Machine updated successfully');
