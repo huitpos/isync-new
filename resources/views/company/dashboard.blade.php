@@ -2,88 +2,180 @@
     @php
         $permissions = request()->attributes->get('permissionNames');
     @endphp
+ 
+    <div class="row g-1 g-xl-5 mb-1 mb-xl-5">
+        <div class="col-3">
+            <h1>{{ $company->trade_name }}</h1>
+        </div>
 
-    @section('title')
-        Dashboard
-    @endsection
+        <div class="col-9 d-flex justify-content-end">
+            <form method="POST" novalidate>
+                @csrf
+                <div class="row mb-5">
+                    <div class="col-md-4">
+                        <label class="form-label">Branch</label>
 
-    @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.dashboard', $company) }}
-    @endsection
+                        <select id="branch_id" name="branch_id" class="form-select @error('branch') is-invalid @enderror" required>
+                            <option value="">All</option>
+                            @foreach ($activebranches as $branch)
+                                <option value="{{ $branch->id }}" {{ $branch->id == $branchId ? 'selected' : '' }}>{{ $branch->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-    <form method="POST" novalidate>
-        @csrf
-        <div class="row mb-5">
-            <div class="col-md-2">
-                <label class="form-label">Branch</label>
+                    <div class="col-md-6">
+                        <label class="form-label">Date</label>
+                        <input id="date_range" 
+                            data-selected-range="{{ $selectedRangeParam }}" 
+                            data-kt-daterangepicker="true" 
+                            data-start-date="{{ $startDateParam }}" 
+                            data-end-date="{{ $endDateParam }}" 
+                            name="date_range" 
+                            type="text" 
+                            class="form-control"
+                            data-kt-daterangepicker-opens="right"
+                        />
+                    </div>
 
-                <select id="branch_id" name="branch_id" class="form-select @error('branch') is-invalid @enderror" required>
-                    <option value="">All</option>
-                    @foreach ($activebranches as $branch)
-                        <option value="{{ $branch->id }}" {{ $branch->id == $branchId ? 'selected' : '' }}>{{ $branch->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="col-md-2">
-                <label class="form-label">Date</label>
-                <input id="date_range" 
-                    data-selected-range="{{ $selectedRangeParam }}" 
-                    data-kt-daterangepicker="true" 
-                    data-start-date="{{ $startDateParam }}" 
-                    data-end-date="{{ $endDateParam }}" 
-                    name="date_range" 
-                    type="text" 
-                    class="form-control"
-                    data-kt-daterangepicker-opens="right"
-                />
-            </div>
-
-            <div class="col-md-2">
-                <button type="button" id="search-btn" class="btn btn-primary mt-8">Search</button>
-            </div>
+                    <div class="col-md-2">
+                        <button type="button" id="search-btn" class="btn btn-primary mt-8">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</form>
+
 
     <div class="row g-1 g-xl-5 mb-1 mb-xl-5">
-        <div class="col-4">
-            @include('partials/widgets/small_card', [
-                'text' => $transactionCount,
-                'subText' => 'Transaction Count',
-            ])
+        <div class="card">
+            <div class="border-0 p-1">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-gray-800">Today Sales Summary</span>
+                </h3>
+            </div>
+            <div class="card-body p-1">
+                <div class="row g-1 g-xl-5">
+                    <div class="col-3">
+                        @include('partials/widgets/small_card', [
+                            'text' => $todayTransactionCount,
+                            'subText' => 'Transaction Count',
+                            'class' => 'border-primary border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-primary-rgb), var(--bs-border-opacity)) !important;'
+                        ])
+                    </div>
+
+                    <div class="col-3">
+                        @include('partials/widgets/small_card', [
+                            'text' => number_format($todayGrossAmount, 2),
+                            'subText' => 'Gross sales',
+                            'class' => 'border-success border-2 shadow',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;'
+                        ])
+                    </div>
+
+                    <div class="col-3">
+                        @include('partials/widgets/small_card', [
+                            'text' => number_format($todayNetAmount, 2),
+                            'subText' => 'Net Sales',
+                            'class' => 'border-info border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-info-rgb), var(--bs-border-opacity)) !important;'
+                        ])
+                    </div>
+
+                    <div class="col-3">
+                        @include('partials/widgets/small_card', [
+                            'text' => number_format($todayGrossAmount - $todayCostAmount, 2),
+                            'subText' => 'Profit',
+                            'class' => 'border-warning border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-warning-rgb), var(--bs-border-opacity)) !important;'
+                        ])
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="col-4">
-            @include('partials/widgets/small_card', [
-                'text' => number_format($grossAmount, 2),
-                'subText' => 'Gross sales',
-            ])
-        </div>
+        <div class="card">
+            <div class="border-0 p-1">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-gray-800">{{ $selectedRangeParam }} Sales Summary</span>
+                </h3>
+            </div>
+            <div class="card-body p-1">
+                <div class="row g-1 g-xl-5">
+                    <div class="col-3">
+                        @include('partials/widgets/small_card', [
+                            'text' => $transactionCount,
+                            'subText' => 'Transaction Count',
+                            'class' => 'border-primary border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-primary-rgb), var(--bs-border-opacity)) !important;'
+                        ])
+                    </div>
 
-        <div class="col-4">
-            @include('partials/widgets/small_card', [
-                'text' => number_format($netAmount, 2),
-                'subText' => 'Net Sales',
-            ])
-        </div>
+                    <div class="col-3">
+                        @include('partials/widgets/small_card', [
+                            'text' => number_format($grossAmount, 2),
+                            'subText' => 'Gross sales',
+                            'class' => 'border-success border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;'
+                        ])
+                    </div>
 
-        <div class="col-12 border ">
+                    <div class="col-3">
+                        @include('partials/widgets/small_card', [
+                            'text' => number_format($netAmount, 2),
+                            'subText' => 'Net Sales',
+                            'class' => 'border-info border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-info-rgb), var(--bs-border-opacity)) !important;'
+                        ])
+                    </div>
+
+                    <div class="col-3">
+                        @include('partials/widgets/small_card', [
+                            'text' => number_format($grossAmount - $costAmount, 2),
+                            'subText' => 'Profit',
+                            'class' => 'border-warning border-2',
+                            'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-warning-rgb), var(--bs-border-opacity)) !important;'
+                        ])
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-12">
             <div id="kt_docs_google_chart_column" style="height: 300px;"></div>
         </div>
 
-        <div class="col-12 mt-10 border ">
+        <div class="col-12 mt-10  ">
             <div id="kt_docs_google_chart_line" style="height: 300px;"></div>
         </div>
 
-        <div class="col-4 mt-10 border ">
+        <div class="col-12 mt-10  ">
             <div id="kt_docs_google_chart_pie" style="height: 300px;"></div>
         </div>
 
-        <div class="col-4 mt-10">
+        <div class="col-12 mt-10">
+            <div class="table-responsive">
+                <h2 id="sales_breakdown_title"></h2>
+                <table id="kt_datatable_zero_configuration" class="table table-striped table-row-bordered gy-5">
+                    <thead>
+                        <tr class="fw-semibold fs-6 text-muted">
+                            <td>Product</td>
+                            <td>Qty</td>
+                            <td>Net Sales</td>
+                            <td>%</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-6 mt-10">
             <div id="kt_docs_google_chart_pie2" style="height: 300px;"></div>
         </div>
 
-        <div class="col-4 mt-10">
+        <div class="col-6 mt-10">
             <div id="kt_docs_google_chart_pie3" style="height: 300px;"></div>
         </div>
     </div>
@@ -129,20 +221,70 @@
             var line = new google.visualization.LineChart(document.getElementById('kt_docs_google_chart_line'));
             line.draw(data, options);
 
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Item');
-            data.addColumn('number', 'Value');
-            data.addRows(@json($departmentSales));
+            var departmentData = new google.visualization.DataTable();
+            departmentData.addColumn('string', 'Item');
+            departmentData.addColumn('number', 'Value');
+            departmentData.addRows(@json($departmentSales));
 
-            var options = {
+            var departmentOptions = {
                 title: 'Department Sales',
-                pieHole: 0,
                 pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0
+                sliceVisibilityThreshold : 0,
+                is3D : true,
+                chartArea: {width:'100%',height:'85%'},
             };
 
-            var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie'));
-            chart.draw(data, options);
+            var departmentChart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie'));
+            departmentChart.draw(departmentData, departmentOptions);
+
+            google.visualization.events.addListener(departmentChart, 'select', function () {
+                var selection = departmentChart.getSelection();
+                if (selection.length > 0) {
+                    var row = selection[0].row;
+                    var item = departmentData.getValue(row, 0);
+                    
+                    // Get current filters
+                    const branchValue = document.getElementById('branch_id').value;
+                    const selectedRange = $("#date_range").attr("data-selected-range");
+                    const startDate = $("#date_range").attr("data-start-date");
+                    const endDate = $("#date_range").attr("data-end-date");
+                    
+                    // Show loading indicator
+                    const datatable = $("#kt_datatable_zero_configuration").DataTable();
+                    datatable.clear().draw();
+                    $("#kt_datatable_zero_configuration").addClass("opacity-50");
+                    
+                    // Make AJAX request
+                    $.ajax({
+                        url: "{{ route('company.dashboard.department-products', ['company' => $company->id]) }}",
+                        type: "GET",
+                        data: {
+                            department: item,
+                            branch_id: branchValue,
+                            selectedRange: selectedRange,
+                            startDate: startDate,
+                            endDate: endDate
+                        },
+                        success: function(response) {
+                            datatable.clear();
+                            if (response.data && response.data.length > 0) {
+                                datatable.rows.add(response.data);
+                            }
+                            datatable.draw();
+                            $("#kt_datatable_zero_configuration").removeClass("opacity-50");
+                            $("#sales_breakdown_title").text(`Sales Breakdown for ${item}`);
+                        },
+                        error: function(xhr) {
+                            console.error("Error loading department products:", xhr);
+                            $("#kt_datatable_zero_configuration").removeClass("opacity-50");
+                        }
+                    });
+                }
+            });
+
+            $("#kt_datatable_zero_configuration").DataTable({
+                order: []  // No default sorting
+            });
 
             var data = new google.visualization.DataTable();
             data.addColumn('string', 'Item');
@@ -153,7 +295,9 @@
                 title: 'Top Sold Items',
                 pieHole: 0,
                 pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0
+                sliceVisibilityThreshold : 0,
+                is3D : true,
+                chartArea: {width:'100%',height:'85%'},
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie2'));
@@ -168,7 +312,9 @@
                 title: 'Top Payment Type',
                 pieHole: 0,
                 pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0
+                sliceVisibilityThreshold : 0,
+                is3D : true,
+                chartArea: {width:'100%',height:'85%'},
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie3'));

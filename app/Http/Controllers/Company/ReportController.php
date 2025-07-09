@@ -384,7 +384,8 @@ class ReportController extends Controller
                 'discounts.pos_machine_id',
                 'discounts.branch_id',
                 'transactions.cashier_name',
-                'pos_machines.machine_number'
+                'pos_machines.machine_number',
+                'transactions.id as transaction_id'
             ])
             ->join('transactions', function($join) {
                 $join->on('transactions.transaction_id', '=', 'discounts.transaction_id');
@@ -529,7 +530,7 @@ class ReportController extends Controller
                     AND transactions.is_void = FALSE
                     AND transactions.is_back_out = FALSE
                     AND orders.product_id = $productId
-                    -- AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
                 ";
 
             $transactions = DB::select($transactionQuery);
@@ -665,8 +666,6 @@ class ReportController extends Controller
                     AND product_disposals.created_at BETWEEN '$startDate' AND '$endDate'
             ";
 
-            // echo($disposalQuery);
-            // die();
             $disposals = DB::select($disposalQuery);
         }
 

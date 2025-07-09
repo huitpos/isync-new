@@ -621,6 +621,7 @@ class ReportController extends Controller
                 LEFT JOIN users actionBy ON product_disposals.action_by = actionBy.id
                 WHERE product_disposals.status = 'approved'
                     AND product_disposal_items.product_id = $productId
+                    AND product_disposals.branch_id = $branchId
                     AND product_disposals.created_at BETWEEN '$startDate' AND '$endDate'
             ";
 

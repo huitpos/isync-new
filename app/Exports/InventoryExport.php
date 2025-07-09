@@ -18,7 +18,7 @@ use App\Models\Branch;
 use App\Models\PosMachine;
 use App\Models\Product;
 
-class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCustomStartCell, WithEvents, ShouldAutoSize
+class InventoryExport implements FromCollection, WithHeadings, WithMapping, WithCustomStartCell, ShouldAutoSize
 {
     protected $branchId;
 
@@ -36,7 +36,16 @@ class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCus
     {
         $branch = Branch::find($this->branchId);
 
-        $products = Product::where('company_id', $branch->company->id)
+        $branchId = $branch->id;
+        $companyId = $branch->company_id;
+
+        $products = Product::where('company_id', $companyId)
+            ->with([
+                'branches' => function ($query) use ($branchId) {
+                    $query->where('branches.id', $branchId);
+                }
+            ])
+            ->where('company_id', $companyId)
             ->get();
 
         return new Collection($products);
@@ -53,7 +62,9 @@ class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCus
             'Product Name',
             'Description',
             'Barcode',
-            'SRP',
+            'Stock',
+            'Unit Cost',
+            'Branch SRP',
         ];
     }
 
@@ -62,8 +73,10 @@ class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCus
         return [
             $product->name,
             $product->description,
-            $product->barcode,
-            $product->srp,
+            $product->code,
+            $product['branches'][0]['pivot']['stock'] ?? 0,
+            $product->cost,
+            $product['branches'][0]['pivot']['price'] ?? $product->srp
         ];
     }
 
@@ -74,31 +87,6 @@ class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCus
      */
     public function startCell(): string
     {
-        return 'A6'; // Data will start from cell A2
-    }
-
-    /**
-     * Register events to modify the sheet.
-     *
-     * @return array
-     */
-    public function registerEvents(): array
-    {
-        $branch = Branch::find($this->branchId);
-
-        return [
-            AfterSheet::class => function(AfterSheet $event) use($branch) {
-                $event->sheet->setCellValue('A1', 'Company Name');
-                $event->sheet->setCellValue('B1', $branch->company->company_name);
-
-                $event->sheet->setCellValue('A2', 'Branch Name');
-                $event->sheet->setCellValue('B2', $branch->name);
-
-                $event->sheet->setCellValue('A3', 'Address');
-                $event->sheet->setCellValue('B3', $branch->unit_floor_number . ', ' . $branch->street . ', ' . $branch->city->name . ', ' . $branch->province->name . ', ' . $branch->region->name);
-
-                $event->sheet->setCellValue('A5', 'Products');
-            },
-        ];
+        return 'A1'; // Data will start from cell A2
     }
 }
