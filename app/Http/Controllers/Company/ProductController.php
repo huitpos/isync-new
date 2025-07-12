@@ -144,14 +144,18 @@ class ProductController extends Controller
             'branch_srps' => 'nullable|array',
             'branch_srps.*' => [
                 'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($value > 0 && $value < $request->input('cost')) {
-                        $fail("Must be greater than or equal to cost.");
-                    }
-                },
+                // function ($attribute, $value, $fail) use ($request) {
+                //     if ($value > 0 && $value < $request->input('cost')) {
+                //         $fail("Must be greater than or equal to cost.");
+                //     }
+                // },
             ],
             'branch_costs' => 'nullable|array',
             'branch_costs.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
+            'branch_markups' => 'nullable|array',
+            'branch_markups.*' => [
                 'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
             ],
         ], [
@@ -261,11 +265,15 @@ class ProductController extends Controller
             }
 
             if ($branchSrps = $request->input('branch_srps')) {
+                $branchCosts = $request->input('branch_costs');
+                $branchMarkups = $request->input('branch_markups');
+
                 foreach ($branchSrps as $branchId => $srp) {
                     $product->branches()->syncWithoutDetaching([
                         $branchId => [
                             'price' => $srp,
-                            'cost' => $branchCosts[$branchId] ?? null
+                            'cost' => $branchCosts[$branchId] ?? null,
+                            'markup' => $branchMarkups[$branchId] ?? null,
                         ]
                     ]);
                 }
@@ -388,14 +396,18 @@ class ProductController extends Controller
             'branch_srps' => 'nullable|array',
             'branch_srps.*' => [
                 'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($value > 0 && $value < $request->input('cost')) {
-                        $fail("Must be greater than or equal to cost.");
-                    }
-                },
+                // function ($attribute, $value, $fail) use ($request) {
+                //     if ($value > 0 && $value < $request->input('cost')) {
+                //         $fail("Must be greater than or equal to cost.");
+                //     }
+                // },
             ],
             'branch_costs' => 'nullable|array',
             'branch_costs.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
+            'branch_markups' => 'nullable|array',
+            'branch_markups.*' => [
                 'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
             ],
         ], [
@@ -506,12 +518,14 @@ class ProductController extends Controller
 
             if ($branchSrps = $request->input('branch_srps')) {
                 $branchCosts = $request->input('branch_costs');
+                $branchMarkups = $request->input('branch_markups');
 
                 foreach ($branchSrps as $branchId => $srp) {
                     $product->branches()->syncWithoutDetaching([
                         $branchId => [
                             'price' => $srp,
-                            'cost' => $branchCosts[$branchId] ?? null
+                            'cost' => $branchCosts[$branchId] ?? null,
+                            'markup' => $branchMarkups[$branchId] ?? null,
                         ]
                     ]);
                 }

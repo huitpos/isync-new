@@ -163,7 +163,15 @@ class MiscController extends BaseController
                     $subQuery->where('show_in_cashier', true);
                 })
                 ->addSelect([
-                    'price' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.price, 0), products.srp)')
+                    'srp' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.price, 0), products.srp)')
+                        ->whereColumn('branch_product.product_id', 'products.id')
+                        ->where('branch_product.branch_id', $branchId)
+                        ->limit(1),
+                    'cost' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.cost, 0), products.cost)')
+                        ->whereColumn('branch_product.product_id', 'products.id')
+                        ->where('branch_product.branch_id', $branchId)
+                        ->limit(1),
+                    'markup' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.markup, 0), products.markup)')
                         ->whereColumn('branch_product.product_id', 'products.id')
                         ->where('branch_product.branch_id', $branchId)
                         ->limit(1)
