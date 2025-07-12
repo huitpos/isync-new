@@ -866,6 +866,7 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -875,6 +876,7 @@ class MiscController extends BaseController
         $query = TakeOrderOrder::where([
             'branch_id' => $request->branch_id,
             'is_completed' => false,
+            'pos_machine_id' => $request->pos_machine_id,
         ]);
 
         if ($request->has('transaction_id')) {
@@ -1551,7 +1553,8 @@ class MiscController extends BaseController
     public function getTakeOrderDiscounts(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required'
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1559,7 +1562,8 @@ class MiscController extends BaseController
         }
 
         $query = TakeOrderDiscount::where([
-            'branch_id' => $request->branch_id
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id
         ]);
 
         if ($request->has('transaction_id')) {
@@ -1737,7 +1741,8 @@ class MiscController extends BaseController
     public function getTakeOrderDiscountDetails(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required'
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1745,7 +1750,8 @@ class MiscController extends BaseController
         }
 
         $query = TakeOrderDiscountDetail::where([
-                'branch_id' => $request->branch_id
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
             ]);
 
         if ($request->has('transaction_id')) {
@@ -2058,7 +2064,8 @@ class MiscController extends BaseController
     public function getTakeOrderDiscountOtherInformations(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required'
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -2069,7 +2076,8 @@ class MiscController extends BaseController
         $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
 
         $query = TakeOrderDiscountOtherInformation::where([
-                'branch_id' => $request->branch_id
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
             ]);
 
         if ($request->has('transaction_id')) {
