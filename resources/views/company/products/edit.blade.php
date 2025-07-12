@@ -7,6 +7,10 @@
     @php 
         $branchSrpsErrors = $errors->get('branch_srps.*', []);
         $oldBranchSrps = old('branch_srps', []);
+
+        $branchCostsErrors = $errors->get('branch_costs.*', []);
+
+        // dd($errors);
     @endphp
 
     <div class="card">
@@ -20,10 +24,7 @@
                         <a class="nav-link {{ empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_1">Product Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch SRP</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_3">Branch Cost</a>
+                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch Prices</a>
                     </li>
                 </ul>
 
@@ -639,10 +640,13 @@
 
                     <div class="tab-pane fade {{ !empty($branchSrpsErrors) ? 'show active' : '' }}" id="kt_tab_pane_2" role="tabpanel">
                         <div class="table-responsive">
+                            <h2>SRP</h2>
                             <table class="table table-row-dashed table-row-gray-500 gy-7">
                                 <thead>
                                     <tr class="fw-bold fs-6 text-gray-800">
                                         <th>Branch</th>
+                                        <th>Cost</th>
+                                        <th>Markup</th>
                                         <th>Srp</th>
                                     </tr>
                                 </thead>
@@ -650,53 +654,24 @@
                                     @foreach($srpBranches as $branch)
                                         @php
                                             $branchSrpsError = $branchSrpsErrors['branch_srps.' . $branch->id] ?? null;
+                                            $srp = isset($branch->products[0]) && !empty($branch->products[0]->pivot?->price) && $branch->products[0]->pivot?->price > 0 ? $branch->products[0]->pivot?->price : $product->srp;
+                                            $cost = isset($branch->products[0]) && !empty($branch->products[0]->pivot?->cost) && $branch->products[0]->pivot?->cost > 0 ? $branch->products[0]->pivot?->cost : $product->cost;
+                                            $markup = isset($branch->products[0]) && !empty($branch->products[0]->pivot?->markup) && $branch->products[0]->pivot?->markup > 0 ? $branch->products[0]->pivot?->markup : $product->markup;
 
-                                            $value = isset($branch->products[0]) && !empty($branch->products[0]->pivot?->price) && $branch->products[0]->pivot?->price > 0 ? $branch->products[0]->pivot?->price : $product->srp;
-
-                                            $value = $oldBranchSrps[$branch->id] ?? $value;
+                                            $srp = number_format((float)$srp, 4, '.', '');
+                                            $cost = number_format((float)$cost, 4, '.', '');
+                                            $markup = number_format((float)$markup, 4, '.', '');
                                         @endphp
                                         <tr>
                                             <td>{{ $branch->name }}</td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_srps[{{ $branch->id }}]" value="{{ $value }}" />
-
-                                                @if($branchSrpsError)
-                                                    <div class="invalid-feedback"> {{ $branchSrpsError[0] }}</div>
-                                                @endif
+                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_costs[{{ $branch->id }}]" value="{{ $cost }}" />
                                             </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="tab-pane fade {{ !empty($branchCostsErrors) ? 'show active' : '' }}" id="kt_tab_pane_3" role="tabpanel">
-                        <div class="table-responsive">
-                            <table class="table table-row-dashed table-row-gray-500 gy-7">
-                                <thead>
-                                    <tr class="fw-bold fs-6 text-gray-800">
-                                        <th>Branch</th>
-                                        <th>Cost</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($srpBranches as $branch)
-                                        @php
-                                            $branchCostError = $branchCostsErrors['branch_costs.' . $branch->id] ?? null;
-
-                                            $value = isset($branch->products[0]) && !empty($branch->products[0]->pivot?->cost) && $branch->products[0]->pivot?->cost > 0 ? $branch->products[0]->pivot?->cost : $product->cost;
-
-                                            $value = $oldBranchCosts[$branch->id] ?? $value;
-                                        @endphp
-                                        <tr>
-                                            <td>{{ $branch->name }}</td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchCostError ? 'is-invalid' : '' }}" name="branch_costs[{{ $branch->id }}]" value="{{ $value }}" />
-
-                                                @if($branchCostError)
-                                                    <div class="invalid-feedback"> {{ $branchCostError[0] }}</div>
-                                                @endif
+                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_markups[{{ $branch->id }}]" value="{{ $markup }}" />
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_srps[{{ $branch->id }}]" value="{{ $srp }}" />
                                             </td>
                                         </tr>
                                     @endforeach

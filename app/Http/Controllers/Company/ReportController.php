@@ -342,6 +342,7 @@ class ReportController extends Controller
 
         $endOfDays = EndOfDay::where('branch_id', $branchId)
             ->whereBetween('treg', [$startDate, $endDate])
+            ->orderBy('reading_number')
             ->get();
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');
