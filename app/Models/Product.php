@@ -68,7 +68,7 @@ class Product extends Model
 
     public function branches()
     {
-        return $this->belongsToMany(Branch::class)->withPivot('price', 'stock', 'cost');
+        return $this->belongsToMany(Branch::class)->withPivot('price', 'stock', 'cost', 'markup');
     }
 
     public function itemLocations()
