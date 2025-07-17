@@ -36,7 +36,22 @@ class ProductsDataTable extends DataTable
                 return number_format($data->cost, 2);
             })
             ->editColumn('srp', function (Product $data) {
-                return number_format($data['branches'][0]['pivot']['price'] ?? $data->srp, 2);
+                return number_format($data->srp, 2);
+            })
+            ->editColumn('markup', function (Product $data) {
+                return number_format($data->markup, 2);
+            })
+            ->addColumn('branch_srp', function (Product $data) {
+                $pivotData = $data['branches'][0]['pivot'] ?? null;
+                return $pivotData ? number_format($pivotData['price'], 2) : '-';
+            })
+            ->addColumn('branch_cost', function (Product $data) {
+                $pivotData = $data['branches'][0]['pivot'] ?? null;
+                return $pivotData ? number_format($pivotData['cost'] , 2) : '-';
+            })
+            ->addColumn('branch_markup', function (Product $data) {
+                $pivotData = $data['branches'][0]['pivot'] ?? null;
+                return $pivotData ? number_format($pivotData['markup'], 2) : '-';
             })
             ->addColumn('actions', function (Product $data) use ($companySlug, $branchSlug) {
                 return view('branch.datatables._actions', [
@@ -98,8 +113,12 @@ class ProductsDataTable extends DataTable
             Column::make('item_type.name', 'itemType.name')->title('Item Type'),
             Column::make('uom.name')->title('UOM'),
             Column::make('code')->title('Item Code'),
-            Column::make('cost'),
-            Column::make('srp'),
+            Column::make('cost')->title('Company Cost'),
+            Column::make('srp')->title('Company SRP'),
+            Column::make('markup')->title('Company Markup'),
+            Column::make('branch_cost')->title('Branch Cost'),
+            Column::make('branch_srp')->title('Branch SRP'),
+            Column::make('branch_markup')->title('Branch Markup'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::make('actions'),
