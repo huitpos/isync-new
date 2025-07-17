@@ -101,7 +101,8 @@ class ProductsDataTable extends DataTable
             Column::make('cost'),
             Column::make('srp'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
-            Column::make('status')
+            Column::make('status'),
+            Column::make('actions'),
         ];
     }
 
