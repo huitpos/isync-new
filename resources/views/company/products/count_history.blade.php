@@ -1,11 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        {{$branch->name}} Products
-    @endsection
-
-    @section('breadcrumbs')
-        {{ Breadcrumbs::render('company.products.index', $company) }}
+        {{$branch->name}} - {{ $product->name }}
     @endsection
 
     @if($errors->all())

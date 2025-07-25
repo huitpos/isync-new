@@ -333,6 +333,7 @@ class ReportController extends Controller
 
         $endOfDays = EndOfDay::where('branch_id', $branchId)
             ->whereBetween('treg', [$startDate, $endDate])
+            ->orderBy('reading_number')
             ->get();
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');
@@ -529,7 +530,7 @@ class ReportController extends Controller
                     AND transactions.is_void = FALSE
                     AND transactions.is_back_out = FALSE
                     AND orders.product_id = $productId
-                    -- AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
                 ";
 
             $transactions = DB::select($transactionQuery);
@@ -665,8 +666,6 @@ class ReportController extends Controller
                     AND product_disposals.created_at BETWEEN '$startDate' AND '$endDate'
             ";
 
-            // echo($disposalQuery);
-            // die();
             $disposals = DB::select($disposalQuery);
         }
 
