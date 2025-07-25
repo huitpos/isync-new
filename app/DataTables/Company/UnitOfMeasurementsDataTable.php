@@ -38,6 +38,9 @@ class UnitOfMeasurementsDataTable extends DataTable
                 } else {
                     return '';
                 }
+            })
+            ->filterColumn('name', function($query, $keyword) {
+                $query->where('name', 'like', "%$keyword%");
             });
     }
 
@@ -77,7 +80,7 @@ class UnitOfMeasurementsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id')->visible(false),
+            Column::make('id')->visible(false)->searchable(false),
             Column::make('name'),
             Column::make('description'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
