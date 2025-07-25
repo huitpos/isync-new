@@ -2,18 +2,12 @@
 
 namespace App\Imports;
 
-use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithValidation;
+
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Maatwebsite\Excel\Concerns\WithStartRow;
-use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
-use Maatwebsite\Excel\Concerns\WithLimit;
-use Maatwebsite\Excel\Concerns\WithColumnLimit;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use App\Jobs\UpdateOrCreateProductJob;
+
 
 use App\Models\UnitOfMeasurement;
 use App\Models\Department;
@@ -23,6 +17,18 @@ use App\Models\Subcategory;
 use App\Models\ItemType;
 use App\Models\Product;
 
+use App\Jobs\UpdateOrCreateProductJob;
+
+use Maatwebsite\Excel\Validators\Failure;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\WithLimit;
+use Maatwebsite\Excel\Concerns\WithColumnLimit;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+
 class ProductsImport implements ToCollection,
     WithValidation,
     WithStartRow,
@@ -30,10 +36,12 @@ class ProductsImport implements ToCollection,
     // WithLimit,
     WithColumnLimit,
     ShouldQueue,
-    WithChunkReading
+    WithChunkReading,
+    SkipsOnFailure
 {
     protected $companyId;
     protected $data = [];
+
 
     public function __construct(int $companyId)
     {
@@ -74,6 +82,16 @@ class ProductsImport implements ToCollection,
         $categories = Category::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
         $categories = array_map('strtolower', $categories);
 
+        $subcategoriesData = Subcategory::where('company_id', $this->companyId)
+            ->select('id', 'name', 'category_id')
+            ->get();
+
+        $subcategoriesMap = [];
+        foreach ($subcategoriesData as $subcategory) {
+            $key = strtolower($subcategory->name) . '_' . $subcategory->category_id;
+            $subcategoriesMap[$key] = $subcategory->id;
+        }
+
         $subcategories = Subcategory::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
         $subcategories = array_map('strtolower', $subcategories);
 
@@ -85,6 +103,12 @@ class ProductsImport implements ToCollection,
 
         foreach ($rows as $key => $row) {
             $lastNumber++;
+            
+            $categoryId = array_search(strtolower($row[8]), $categories) ?? null;
+            
+            $lookupKey = strtolower($row[9]) . '_' . $categoryId;
+            $subCategoryId = $subcategoriesMap[$lookupKey] ?? array_search(strtolower($row[9]), $subcategories) ?? null;
+
             $productData = [
                 'status' => $row[0], //A
                 'name' => $row[1], //B
@@ -94,13 +118,13 @@ class ProductsImport implements ToCollection,
                 'uom_id' => array_search(strtolower($row[5]), $units), //F
                 'barcode' => $row[6], //G
                 'department_id' => array_search(strtolower($row[7]), $departments) ?? null, //H
-                'category_id' => array_search(strtolower($row[8]), $categories) ?? null, //I
-                'subcategory_id' => array_search(strtolower($row[9]), $subcategories) ?? null, //J
+                'category_id' => $categoryId, //I
+                'subcategory_id' => $subCategoryId ?? null, //J
                 'markup_type' => $row[10], //K
                 'markup' => $row[11], //L
                 'cost' => $row[12], //M
-                'item_type_id' => array_search(strtolower($row[13]), $itemTypes), //N
-                'srp' => $row[14], //O
+                'srp' => $row[13], //N
+                'item_type_id' => array_search(strtolower($row[14]), $itemTypes), //O
                 'item_locations' => array_search(strtolower($row[15]), $itemLocations), //P
                 'max_discount' => $row[16] ?? 0, //Q
                 'minimum_stock_level' => $row[17] ?? 0, //R
@@ -116,7 +140,21 @@ class ProductsImport implements ToCollection,
             $importItemLocations = $productData['item_locations'];
             unset($productData['item_locations']);
 
-            UpdateOrCreateProductJob::dispatch($productData, $importItemLocations);
+            try {
+                $product = Product::updateOrCreate(
+                    [
+                        'name' => $productData['name'],
+                        'company_id' => $productData['company_id'],
+                    ],
+                    $productData
+                );
+        
+                if ($importItemLocations) {
+                    $product->itemLocations()->sync([$importItemLocations]);
+                }
+            } catch (\Exception $e) {
+                dd($e->getMessage(), $productData);
+            }
         }
     }
 
@@ -272,6 +310,18 @@ class ProductsImport implements ToCollection,
 
     public function chunkSize(): int
     {
-        return 500;
+        return 1000;
+    }
+
+    public function batchSize(): int
+    {
+        return 1000;
+    }
+
+    public function onFailure(Failure ...$failures)
+    {
+        foreach ($failures as $failure) {
+            echo 'Excel import failure: ' . $failure->values()[1] . ' at row ' . $failure->row() . ' in column ' . $failure->attribute() . ': ' . $failure->errors()[0] . PHP_EOL;
+        }
     }
 }
