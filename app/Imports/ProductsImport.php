@@ -143,21 +143,8 @@ class ProductsImport implements ToCollection,
             $importItemLocations = $productData['item_locations'];
             unset($productData['item_locations']);
 
-            try {
-                $product = Product::updateOrCreate(
-                    [
-                        'name' => $productData['name'],
-                        'company_id' => $productData['company_id'],
-                    ],
-                    $productData
-                );
-        
-                if ($importItemLocations) {
-                    $product->itemLocations()->sync([$importItemLocations]);
-                }
-            } catch (\Exception $e) {
-                dd($e->getMessage(), $productData);
-            }
+
+            UpdateOrCreateProductJob::dispatch($productData, $importItemLocations);
         }
     }
 
@@ -313,7 +300,7 @@ class ProductsImport implements ToCollection,
 
     public function chunkSize(): int
     {
-        return 500;
+        return 100;
     }
 
     public function onFailure(Failure ...$failures)
