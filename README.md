@@ -67,6 +67,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ## cron
 php artisan schedule:run
+php artisan queue:work
 
 ## setting up project on local
 1. clone project
