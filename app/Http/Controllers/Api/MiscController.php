@@ -46,6 +46,10 @@ use App\Models\SpotAuditDenomination;
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
 use App\Models\BranchProduct;
+use App\Models\Table;
+use App\Models\TableLocation;
+use App\Models\TableStatus;
+use App\Models\Printer;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 
@@ -3496,5 +3500,72 @@ class MiscController extends BaseController
         ]);
 
         return $this->sendResponse($transaction, 'Transaction updated successfully.');
+    }
+
+    public function getBranchTables(Request $request, $branchId)
+    {
+        $tables = Table::where('branch_id', $branchId)
+            ->with([
+                'tableLocation',
+                'tableStatus'
+            ])
+            ->get();
+
+        return $this->sendResponse($tables, 'data retrieved successfully.');
+    }
+
+    public function getBranchTableLocations(Request $request, $branchId)
+    {
+        $data = TableLocation::where('branch_id', $branchId)->get();
+
+        return $this->sendResponse($data, 'data retrieved successfully.');
+    }
+
+    public function getBranchTableStatuses(Request $request, $branchId)
+    {
+        $data = TableStatus::where('branch_id', $branchId)->orWhereNull('branch_id')->get();
+
+        return $this->sendResponse($data, 'data retrieved successfully.');
+    }
+
+    public function getBranchPrinters(Request $request, $branchId)
+    {
+        $data = Printer::where('branch_id', $branchId)->with('departments')->get();
+
+        return $this->sendResponse($data, 'data retrieved successfully.');
+    }
+
+    public function saveBranchTables(Request $request)
+    {
+        $validator = validator($request->all(), [
+            'branch_id' => 'required',
+            'table_id' => 'required',
+            'table_status_id' => 'required',
+            'transaction_id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
+        }
+
+        //get table first or fail use branch_id
+        $table = Table::where('branch_id', $request->branch_id)
+            ->where('id', $request->table_id)
+            ->first();
+
+        if (!$table) {
+            return $this->sendError('Table not found.', [], 404);
+        }
+
+        $postData = [
+            'table_status_id' => $request->table_status_id,
+            'dine_in_time' => $request->dine_in_time,
+            'transaction_id' => $request->transaction_id,
+        ];
+
+        $message = 'Table updated successfully.';
+        $data = $table->update($postData);
+
+        return $this->sendResponse($table, $message);
     }
 }

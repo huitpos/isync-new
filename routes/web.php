@@ -59,6 +59,10 @@ use App\Http\Controllers\Branch\StockTransferDeliveryController as BranchStockTr
 use App\Http\Controllers\Branch\ProductPhysicalCountController as BranchProductPhysicalCountController;
 use App\Http\Controllers\Branch\ProductDisposalController as BranchProductDisposalController;
 use App\Http\Controllers\Branch\ChargeAccountController as BranchChargeAccountController;
+use App\Http\Controllers\Branch\TableLocationController as BranchTableLocationController;
+use App\Http\Controllers\Branch\TableController as BranchTableController;
+use App\Http\Controllers\Branch\TableStatusController as BranchTableStatusController;
+use App\Http\Controllers\Branch\PrinterController as BranchPrinterController;
 
 use Illuminate\Support\Facades\Response;
 
@@ -229,6 +233,10 @@ Route::middleware('auth')->group(function () {
             Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');
 
             Route::resource('charge-accounts', BranchChargeAccountController::class, ['as' => 'branch']);
+            Route::resource('table-locations', BranchTableLocationController::class, ['as' => 'branch']);
+            Route::resource('tables', BranchTableController::class, ['as' => 'branch']);
+            Route::resource('table-statuses', BranchTableStatusController::class, ['as' => 'branch']);
+            Route::resource('printers', BranchPrinterController::class, ['as' => 'branch']);
 
             Route::prefix('reports')->group(function () {
                 Route::get('/transactions', [BranchReportController::class, 'transactions'])->name('branch.reports.transactions');

@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Table extends Model
+{
+    use HasFactory;
+
+    protected $guarded = [];
+
+    //tableLocation
+    public function tableLocation()
+    {
+        return $this->belongsTo(TableLocation::class);
+    }
+
+    //table_status
+    public function tableStatus()
+    {
+        return $this->belongsTo(TableStatus::class);
+    }
+}

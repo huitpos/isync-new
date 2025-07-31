@@ -302,6 +302,41 @@
 					</a>
 				</div>
 
+				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
+					{{ request()->routeIs(
+						'branch.table-locations.*',
+						'branch.tables.*',
+						'branch.table-statuses.*',
+						'branch.printers.*',
+					) ? 'here show' : '' }}"
+				>
+					<span class="menu-link">
+						<span class="menu-icon"><i class="fa-solid fa-chair fs-2"></i></span>
+						<span class="menu-title">Table Management</span>
+						<span class="menu-arrow"></span>
+					</span>
+
+					<div class="menu-sub menu-sub-accordion">
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('branch.table-locations.*') ? 'active' : '' }}" href="{{ route('branch.table-locations.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Locations</span>
+							</a>
+
+							<a class="menu-link {{ request()->routeIs('branch.tables.*') ? 'active' : '' }}" href="{{ route('branch.tables.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Tables</span>
+							</a>
+
+							<a class="menu-link {{ request()->routeIs('branch.table-statuses.*') ? 'active' : '' }}" href="{{ route('branch.table-statuses.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Statuses</span>
+							</a>
+
+							<a class="menu-link {{ request()->routeIs('branch.printers.*') ? 'active' : '' }}" href="{{ route('branch.printers.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+								<span class="menu-title">Printers</span>
+							</a>
+						</div>
+					</div>
+				</div>
+
 			@elseif (request()->attributes->get('company'))
 				@if (in_array('Main Dashboard', $permissions))
 				<div class="menu-item">
