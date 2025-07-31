@@ -45,6 +45,7 @@ use App\Models\SpotAudit;
 use App\Models\SpotAuditDenomination;
 use App\Models\TakeOrderTransaction;
 use App\Models\TakeOrderOrder;
+use App\Models\BranchProduct;
 use App\Models\Table;
 use App\Models\TableLocation;
 use App\Models\TableStatus;
@@ -161,10 +162,24 @@ class MiscController extends BaseController
     {
         $branch = Branch::with([
             'company',
-            'company.products' => function ($query) use ($request) {
+            'company.products' => function ($query) use ($request, $branchId) {
                 $query->whereHas('itemType', function ($subQuery) {
                     $subQuery->where('show_in_cashier', true);
                 })
+                ->addSelect([
+                    'srp' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.price, 0), products.srp)')
+                        ->whereColumn('branch_product.product_id', 'products.id')
+                        ->where('branch_product.branch_id', $branchId)
+                        ->limit(1),
+                    'cost' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.cost, 0), products.cost)')
+                        ->whereColumn('branch_product.product_id', 'products.id')
+                        ->where('branch_product.branch_id', $branchId)
+                        ->limit(1),
+                    'markup' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.markup, 0), products.markup)')
+                        ->whereColumn('branch_product.product_id', 'products.id')
+                        ->where('branch_product.branch_id', $branchId)
+                        ->limit(1)
+                ])
                 ->with(
                     'itemType',
                     'uom',
@@ -174,6 +189,7 @@ class MiscController extends BaseController
                     'rawItems'
                 )
                 ->where('uom_id', '>', 0)
+                ->where('id', '=', 85)
                 ->when($request->from_date, function ($q) use ($request) {
                     $q->where(function ($query) use ($request) {
                         $query->where('updated_at', '>=', $request->from_date)
@@ -181,10 +197,11 @@ class MiscController extends BaseController
                     });
                 });
             },
-        ])->find($branchId);
-        
-        $products = $branch->company->products; // No additional query
-        
+        ])
+        ->find($branchId);
+
+        $products = $branch->company->products;
+
         return $this->sendResponse($products, 'Products retrieved successfully.');
     }
 
@@ -196,6 +213,8 @@ class MiscController extends BaseController
             return $this->sendError('Branch not found.', 404);
         }
 
+        $request->merge(['return_data' => filter_var($request->return_data ?? true, FILTER_VALIDATE_BOOLEAN)]);
+        
         $productsQuery = $branch->company->products()
             ->whereHas('itemType', function ($subQuery) {
                 $subQuery->where('show_in_cashier', true);
@@ -217,8 +236,23 @@ class MiscController extends BaseController
             });
 
         // Paginate the products
-        $perPage = $request->get('per_page', 2); // Default to 15 per page if not specified
+        $perPage = $request->get('per_page', 500); // Default to 15 per page if not specified
         $products = $productsQuery->paginate($perPage);
+
+        if (!$request->return_data) {
+            // Return the pagination information without the 'data'
+            return $this->sendResponse([
+                'current_page' => $products->currentPage(),
+                'from' => $products->firstItem(),
+                'last_page' => $products->lastPage(),
+                'links' => $products->links(),
+                'next_page_url' => $products->nextPageUrl(),
+                'per_page' => $products->perPage(),
+                'prev_page_url' => $products->previousPageUrl(),
+                'to' => $products->lastItem(),
+                'total' => $products->total(),
+            ], 'Data not returned because return_data is false.');
+        }
 
         return $this->sendResponse($products, 'Products retrieved successfully.');
     }
@@ -248,7 +282,7 @@ class MiscController extends BaseController
             'is_complete' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
             'branch_id' => 'required',
-            'total_quantity' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'total_quantity' => ['required', 'numeric'],
             'total_void_qty' => 'required|numeric',
             'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'is_return' => 'required|boolean',
@@ -353,18 +387,18 @@ class MiscController extends BaseController
         $validator = validator($request->all(), [
             'transaction_id' => 'required|numeric|min:1',
             'pos_machine_id' => 'required',
-            'gross_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'net_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_exempt_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'tender_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'change' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'service_charge' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'gross_sales' => ['required', 'numeric'],
+            'net_sales' => ['required', 'numeric'],
+            'vatable_sales' => ['required', 'numeric'],
+            'vat_exempt_sales' => ['required', 'numeric'],
+            'vat_amount' => ['required', 'numeric'],
+            'discount_amount' => ['required', 'numeric'],
+            'tender_amount' => ['required', 'numeric'],
+            'change' => ['required', 'numeric'],
+            'service_charge' => ['required', 'numeric'],
             'cashier_id' => 'required',
-            'total_unit_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_void_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'total_unit_cost' => ['required', 'numeric'],
+            'total_void_amount' => ['required', 'numeric'],
             'is_void' => 'required|boolean',
             'is_back_out' => 'required|boolean',
             'is_account_receivable' => 'required|boolean',
@@ -372,17 +406,25 @@ class MiscController extends BaseController
             'is_complete' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
             'branch_id' => 'required',
-            'total_quantity' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'total_quantity' => ['required', 'numeric'],
             'total_void_qty' => 'required|numeric',
-            'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'vat_expense' => ['required', 'numeric'],
             'is_return' => 'required|boolean',
-            'total_cash_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_return_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'total_cash_amount' => ['required', 'numeric'],
+            'total_return_amount' => ['required', 'numeric'],
             'void_counter' => 'required|numeric',
         ]);
 
+        $log = new ApiRequestLog();
+        $log->type = 'transaction_request';
+        $log->method = $request->method();
+        $log->request = json_encode($requestData);
+        $log->control_number = $request->control_number;
+        $log->receipt_number = $request->receipt_number;
+        $log->branch_id = $request->branch_id;
+        $log->save();
+
         if ($validator->fails()) {
-            //log request
             $log = new ApiRequestLog();
             $log->type = 'saveTransactions';
             $log->method = $request->method();
@@ -462,6 +504,61 @@ class MiscController extends BaseController
         $message = 'Transaction created successfully.';
         if ($transaction) {
             $message = 'Transaction updated successfully.';
+
+            $transaction->fill($postData);
+
+            $isCompleteNewValue = ($request->is_complete) ? 1 : 0;
+            $isVoidNewValue = ($request->is_void) ? 1 : 0; 
+            $transaction->is_complete = $isCompleteNewValue;
+            $transaction->is_void = $isVoidNewValue;
+
+            if ($request->order_ids) {
+                $branch = Branch::findOrFail($request->branch_id);
+                
+                $orders = Order::where([
+                    'transaction_id' => $request->transaction_id,
+                    'pos_machine_id' => $request->pos_machine_id,
+                    'branch_id' => $request->branch_id,
+                ])
+                ->whereIn('order_id', $request->order_ids)
+                ->get();
+
+                if ($transaction->isDirty('is_complete')) {
+                    $isCompleteOldValue = $transaction->getOriginal('is_complete'); // Old value before changes
+
+                    if ($isCompleteOldValue == 0 && $isCompleteNewValue == 1) {
+                        foreach ($orders as $order) {
+                            $product = Product::find($order['product_id']);
+
+                            if ($product) {
+                                $this->productRepository->updateBranchQuantity($product, $branch, $order->order_id, 'orders', $order->qty, null, 'subtract', $order->unit_id);
+                            }
+                        }
+                    }
+                }
+
+                if ($transaction->isDirty('is_void')) {
+                    $isVoidValue = $transaction->getOriginal('is_void');
+
+                    if ($isVoidValue == 0 && $isVoidNewValue == 1) {
+                        foreach ($orders as $order) {
+                            $product = Product::find($order['product_id']);
+
+                            if ($product) {
+                                $this->productRepository->updateBranchQuantity($product, $branch, $order->order_id, 'orders', $order->qty, null, 'add', $order->unit_id);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // fill receipt_number if receipt_number is empty. exclude if already set
+            if (empty($transaction->receipt_number) && !empty($request->receipt_number)) {
+                $postData['receipt_number'] = $request->receipt_number;
+            } else {
+                unset($postData['receipt_number']);
+            }
+
             $transaction->update($postData);
 
             return $this->sendResponse($transaction, $message);
@@ -530,15 +627,15 @@ class MiscController extends BaseController
             'pos_machine_id' => 'required',
             'transaction_id' => 'required',
             'product_id' => 'required',
-            'cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'qty' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'cost' => ['required', 'numeric'],
+            'qty' => ['required', 'numeric'],
             'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'original_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'gross' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'total_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'is_vatable' => 'required|boolean',
-            'vat_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'vat_amount' => ['required', 'numeric'],
             'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'vat_exempt_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
@@ -653,8 +750,8 @@ class MiscController extends BaseController
             'pos_machine_id' => 'required',
             'transaction_id' => 'required',
             'product_id' => 'required',
-            'cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'qty' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'cost' => ['required', 'numeric'],
+            'qty' => ['required', 'numeric'],
             'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'original_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
             'gross' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
@@ -773,6 +870,7 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -782,6 +880,7 @@ class MiscController extends BaseController
         $query = TakeOrderOrder::where([
             'branch_id' => $request->branch_id,
             'is_completed' => false,
+            'pos_machine_id' => $request->pos_machine_id,
         ]);
 
         if ($request->has('transaction_id')) {
@@ -1191,16 +1290,6 @@ class MiscController extends BaseController
             'is_complete' => $request->is_complete,
         ];
 
-        if ($request['products']) {
-            foreach ($request['products'] as $reqProduct) {
-                $product = Product::find($reqProduct['productId']);
-
-                if ($product) {
-                    $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
-                }
-            }
-        }
-
         $endOfDay = EndOfDay::where([
             'end_of_day_id' => $request->end_of_day_id,
             'pos_machine_id' => $request->pos_machine_id,
@@ -1468,7 +1557,8 @@ class MiscController extends BaseController
     public function getTakeOrderDiscounts(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required'
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1476,7 +1566,8 @@ class MiscController extends BaseController
         }
 
         $query = TakeOrderDiscount::where([
-            'branch_id' => $request->branch_id
+            'branch_id' => $request->branch_id,
+            'pos_machine_id' => $request->pos_machine_id
         ]);
 
         if ($request->has('transaction_id')) {
@@ -1654,7 +1745,8 @@ class MiscController extends BaseController
     public function getTakeOrderDiscountDetails(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required'
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1662,7 +1754,8 @@ class MiscController extends BaseController
         }
 
         $query = TakeOrderDiscountDetail::where([
-                'branch_id' => $request->branch_id
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
             ]);
 
         if ($request->has('transaction_id')) {
@@ -1975,7 +2068,8 @@ class MiscController extends BaseController
     public function getTakeOrderDiscountOtherInformations(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required'
+            'branch_id' => 'required',
+            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1986,7 +2080,8 @@ class MiscController extends BaseController
         $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
 
         $query = TakeOrderDiscountOtherInformation::where([
-                'branch_id' => $request->branch_id
+                'branch_id' => $request->branch_id,
+                'pos_machine_id' => $request->pos_machine_id
             ]);
 
         if ($request->has('transaction_id')) {

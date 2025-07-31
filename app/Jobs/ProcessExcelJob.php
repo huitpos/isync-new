@@ -16,18 +16,20 @@ class ProcessExcelJob implements ShouldQueue
 
     protected $filePath;
     protected $companyId;
+    protected $userId;
 
-    public function __construct($filePath, $companyId)
+    public function __construct($filePath, $companyId, $userId)
     {
         $this->filePath = $filePath;
         $this->companyId = $companyId;
+        $this->userId = $userId;
     }
 
     public function handle()
     {
         try {
             // Run the import logic with Maatwebsite
-            $import = new ProductsImport($this->companyId);
+            $import = new ProductsImport($this->companyId, $this->userId);
             Excel::import($import, $this->filePath);
 
             \Log::info('Excel import successful');

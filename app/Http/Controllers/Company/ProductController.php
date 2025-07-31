@@ -22,6 +22,11 @@ use App\Models\Product;
 use App\Models\Branch;
 use App\Models\DiscountType;
 
+use Carbon\Carbon;
+
+use App\Exports\InventoryExport;
+use App\Exports\ProductsExport;
+
 class ProductController extends Controller
 {
     protected $productRepository;
@@ -86,6 +91,8 @@ class ProductController extends Controller
             ->orderBy('id')
             ->get();
 
+        $srpBranches = $company->branches()->where('status', 'active')->get();
+
         return view('company.products.create', [
             'company' => $company,
             'categories' => $categories,
@@ -93,6 +100,7 @@ class ProductController extends Controller
             'departments' => $departments,
             'itemTypes' => $itemTypes,
             'discountTypes' => $discountTypes,
+            'srpBranches' => $srpBranches,
         ]);
     }
 
@@ -132,7 +140,24 @@ class ProductController extends Controller
                         $fail('The ' . $attribute . ' must be greater than cost.');
                     }
                 },
-            ]
+            ],
+            'branch_srps' => 'nullable|array',
+            'branch_srps.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                // function ($attribute, $value, $fail) use ($request) {
+                //     if ($value > 0 && $value < $request->input('cost')) {
+                //         $fail("Must be greater than or equal to cost.");
+                //     }
+                // },
+            ],
+            'branch_costs' => 'nullable|array',
+            'branch_costs.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
+            'branch_markups' => 'nullable|array',
+            'branch_markups.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -238,6 +263,22 @@ class ProductController extends Controller
                 $product->image = $path;
                 $product->save();
             }
+
+            if ($branchSrps = $request->input('branch_srps')) {
+                $branchCosts = $request->input('branch_costs');
+                $branchMarkups = $request->input('branch_markups');
+
+                foreach ($branchSrps as $branchId => $srp) {
+                    $product->branches()->syncWithoutDetaching([
+                        $branchId => [
+                            'price' => $srp,
+                            'cost' => $branchCosts[$branchId] ?? null,
+                            'markup' => $branchMarkups[$branchId] ?? null,
+                        ]
+                    ]);
+                }
+            }
+
             return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Product created successfully');
         }
@@ -256,9 +297,12 @@ class ProductController extends Controller
 
         $company = $request->attributes->get('company');
 
+        $srpBranches = $company->branches()->where('status', 'active')->get();
+
         return view('company.products.show', [
             'product' => $product,
             'company' => $company,
+            'srpBranches' => $srpBranches
         ]);
     }
 
@@ -293,6 +337,14 @@ class ProductController extends Controller
             ->orderBy('id')
             ->get();
 
+        $srpBranches = $company->branches()
+            ->with([
+                'products' => function ($query) use ($product) {
+                    $query->where('product_id', '=', $product->id);
+                },
+            ])
+            ->where('status', 'active')->get();
+
         return view('company.products.edit', [
             'company' => $company,
             'product' => $product,
@@ -301,6 +353,7 @@ class ProductController extends Controller
             'subcategories' => $subcategories,
             'itemTypes' => $itemTypes,
             'discountTypes' => $discountTypes,
+            'srpBranches' => $srpBranches,
         ]);
     }
 
@@ -339,7 +392,24 @@ class ProductController extends Controller
                         $fail('The ' . $attribute . ' must be greater than cost.');
                     }
                 },
-            ]
+            ],
+            'branch_srps' => 'nullable|array',
+            'branch_srps.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                // function ($attribute, $value, $fail) use ($request) {
+                //     if ($value > 0 && $value < $request->input('cost')) {
+                //         $fail("Must be greater than or equal to cost.");
+                //     }
+                // },
+            ],
+            'branch_costs' => 'nullable|array',
+            'branch_costs.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
+            'branch_markups' => 'nullable|array',
+            'branch_markups.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -446,6 +516,21 @@ class ProductController extends Controller
                 }
             }
 
+            if ($branchSrps = $request->input('branch_srps')) {
+                $branchCosts = $request->input('branch_costs');
+                $branchMarkups = $request->input('branch_markups');
+
+                foreach ($branchSrps as $branchId => $srp) {
+                    $product->branches()->syncWithoutDetaching([
+                        $branchId => [
+                            'price' => $srp,
+                            'cost' => $branchCosts[$branchId] ?? null,
+                            'markup' => $branchMarkups[$branchId] ?? null,
+                        ]
+                    ]);
+                }
+            }
+
             return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Product updated successfully');
         }
@@ -470,7 +555,11 @@ class ProductController extends Controller
         $file = $request->file('file');
         $path = $file->store('uploads');
 
-        ProcessExcelJob::dispatch($path, $company->id);
+        ProcessExcelJob::dispatch(
+            $path,
+            $company->id,
+            auth()->user()->id
+        );
 
         return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Products import started');
@@ -506,6 +595,8 @@ class ProductController extends Controller
         $company = $request->attributes->get('company');
         $branches = auth()->user()->activeBranches;
 
+        $product = $this->productRepository->find($productId);
+
         $branch = Branch::find($branchId);
         return $dataTable->with('company_id', $company->id)
             ->with('branch_id', $branchId)
@@ -514,7 +605,28 @@ class ProductController extends Controller
                 'company' => $company,
                 'branches' => $branches,
                 'branchId' => $branchId,
-                'branch' => $branch
+                'branch' => $branch,
+                'product' => $product
             ]);
+    }
+
+    public function inventoryDownload (Request $request, $companySlug, $branchId)
+    {
+        $company = $request->attributes->get('company');
+        $branch = Branch::find($branchId);
+
+        return Excel::download(new InventoryExport($branch->id), "$company->name - $branch->name - ".Carbon::now()->format('Y-m-d 23:59:59')." - Inventory.xlsx");
+    }
+
+    /**
+     * Export products listing to Excel
+     */
+    public function export(Request $request, $companySlug)
+    {
+        $company = $request->attributes->get('company');
+        return Excel::download(
+            new ProductsExport($company->id),
+            "$company->name - Products - ".Carbon::now()->format('Y-m-d')." - List.xlsx"
+        );
     }
 }

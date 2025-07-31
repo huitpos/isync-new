@@ -48,10 +48,11 @@ class CategoriesDataTable extends DataTable
     public function query(Category $model): QueryBuilder
     {
         return $model->newQuery()
-            ->where('company_id', $this->company_id)
+            ->where('categories.company_id', $this->company_id)
             ->with([
                 'company',
-                'createdBy'
+                'createdBy',
+                'department'
             ]);
     }
 
@@ -80,6 +81,7 @@ class CategoriesDataTable extends DataTable
             Column::make('id')->visible(false),
             Column::make('name'),
             Column::make('description'),
+            Column::make('department.name', 'department.name')->title('Department'),
             Column::make('created_by.name', 'createdBy.name')->title('Created By'),
             Column::make('status'),
             Column::computed('actions')

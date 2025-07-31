@@ -18,7 +18,7 @@ use App\Models\Branch;
 use App\Models\PosMachine;
 use App\Models\Product;
 
-class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCustomStartCell, WithEvents, ShouldAutoSize
+class InventoryExport implements FromCollection, WithHeadings, WithMapping, WithCustomStartCell, ShouldAutoSize
 {
     protected $branchId;
 
@@ -36,8 +36,29 @@ class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCus
     {
         $branch = Branch::find($this->branchId);
 
-        $products = Product::where('company_id', $branch->company->id)
-            ->get();
+        $branchId = $branch->id;
+        $companyId = $branch->company_id;
+
+        $products = DB::select("
+            SELECT 
+                p.id,
+                p.name,
+                p.description,
+                p.code,
+                p.cost,
+                p.srp,
+                c.name as category_name,
+                sc.name as subcategory_name,
+                d.name as department_name,
+                COALESCE(bp.stock, 0) as stock,
+                COALESCE(bp.price, p.srp) as branch_price
+            FROM products p
+            LEFT JOIN branch_product bp ON p.id = bp.product_id AND bp.branch_id = ?
+            LEFT JOIN categories c ON p.category_id = c.id
+            LEFT JOIN subcategories sc ON p.subcategory_id = sc.id
+            LEFT JOIN departments d ON p.department_id = d.id
+            WHERE p.company_id = ?
+        ", [$branchId, $companyId]);
 
         return new Collection($products);
     }
@@ -53,7 +74,12 @@ class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCus
             'Product Name',
             'Description',
             'Barcode',
-            'SRP',
+            'Stock',
+            'Unit Cost',
+            'Branch SRP',
+            'Category',
+            'Subcategory',
+            'Department',
         ];
     }
 
@@ -62,8 +88,13 @@ class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCus
         return [
             $product->name,
             $product->description,
-            $product->barcode,
-            $product->srp,
+            $product->code,
+            $product->stock,
+            $product->cost,
+            $product->branch_price,
+            $product->category_name ?? 'N/A',
+            $product->subcategory_name ?? 'N/A',
+            $product->department_name ?? 'N/A',
         ];
     }
 
@@ -74,31 +105,6 @@ class BackupExport implements FromCollection, WithHeadings, WithMapping, WithCus
      */
     public function startCell(): string
     {
-        return 'A6'; // Data will start from cell A2
-    }
-
-    /**
-     * Register events to modify the sheet.
-     *
-     * @return array
-     */
-    public function registerEvents(): array
-    {
-        $branch = Branch::find($this->branchId);
-
-        return [
-            AfterSheet::class => function(AfterSheet $event) use($branch) {
-                $event->sheet->setCellValue('A1', 'Company Name');
-                $event->sheet->setCellValue('B1', $branch->company->company_name);
-
-                $event->sheet->setCellValue('A2', 'Branch Name');
-                $event->sheet->setCellValue('B2', $branch->name);
-
-                $event->sheet->setCellValue('A3', 'Address');
-                $event->sheet->setCellValue('B3', $branch->unit_floor_number . ', ' . $branch->street . ', ' . $branch->city->name . ', ' . $branch->province->name . ', ' . $branch->region->name);
-
-                $event->sheet->setCellValue('A5', 'Products');
-            },
-        ];
+        return 'A1'; // Data will start from cell A2
     }
 }

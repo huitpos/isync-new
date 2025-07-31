@@ -27,6 +27,7 @@
                         <label class="form-label">Department</label>
                         <select id="department_id" name="department_id" class="form-select pr_department_id @error('department_id') is-invalid @enderror" required>
                             <option value="">Select Department</option>
+                            <option value="all">All Department</option>
                             @foreach($departments as $department)
                                 <option value="{{ $department->id }}" {{ $department->id == old('department_id') ? 'selected' : '' }}>{{ $department->name }}</option>
                             @endforeach

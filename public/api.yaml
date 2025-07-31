@@ -3640,6 +3640,7 @@ paths:
                 items:
                   type: string
 
+
   /api/branch-tables/{branchId}:
     get:
       tags:
@@ -3652,6 +3653,7 @@ paths:
           required: true
           description: Numeric ID of the branch to get
         - in: query
+
           name: device_id
           schema:
             type: integer
@@ -3691,6 +3693,7 @@ paths:
                 type: array
                 items:
                   type: string
+
   
   /api/branch-table-statuses/{branchId}:
     get:
@@ -3704,6 +3707,7 @@ paths:
           required: true
           description: Numeric ID of the branch to get
         - in: query
+
           name: device_id
           schema:
             type: integer
@@ -3744,6 +3748,7 @@ paths:
                 items:
                   type: string
 
+
   /api/update-branch-table:
     post:
       tags:
@@ -3755,6 +3760,7 @@ paths:
             schema:
               type: object
               properties:
+
                 device_id:
                   type: number
                 branch_id:

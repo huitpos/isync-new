@@ -93,6 +93,7 @@ Route::get('/download-product-import-template', function () {
 });
 
 Route::get('/map-data', [TestController::class, 'mapData']);
+Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
 
 require __DIR__ . '/auth.php';
 
@@ -151,9 +152,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('products', CompanyProductController::class, ['as' => 'company']);
         Route::get('/branch/{branchId}/inventory', [CompanyProductController::class, 'inventory'])->name('company.branch-inventory.index');
         Route::get('/branch/{branchId}/inventory/{productId}', [CompanyProductController::class, 'inventoryProduct'])->name('company.branch-inventory.show');
+        Route::get('/branch/{branchId}/inventory-download', [CompanyProductController::class, 'inventoryDownload'])->name('company.branch-inventory.download');
 
         Route::get('/import-product', [CompanyProductController::class, 'showForm']);
         Route::post('/import-product', [CompanyProductController::class, 'import'])->name('company.products.import');
+        Route::get('/products-export', [CompanyProductController::class, 'export'])->name('company.products.export');
         Route::resource('users', CompanyUserController::class, ['as' => 'company']);
         Route::resource('payment-terms', CompanyPaymentTermController::class, ['as' => 'company']);
         Route::resource('supplier-terms', CompanySupplierTermController::class, ['as' => 'company']);
@@ -166,6 +169,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/purchase-requests/{id}/print', [CompanyPurchaseRequestController::class, 'print'])->name('company.purchase-requests.print');
         Route::get('/purchase-orders/{id}/print', [CompanyPurchaseOrderController::class, 'print'])->name('company.purchase-orders.print');
+        Route::get('/product-disposals/{id}/print', [CompanyProductDisposalController::class, 'print'])->name('company.product-disposals.print');
+        Route::get('/stock-transfer-requests/{id}/print', [CompanyStockTransferRequestController::class, 'print'])->name('company.stock-transfer-requests.print');
         Route::get('/purchase-deliveries/{id}/print', [CompanyPurchaseDeliveryController::class, 'print'])->name('company.purchase-deliveries.print');
 
         Route::resource('roles', CompanyRoleController::class, ['as' => 'company']);
@@ -185,6 +190,7 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'z-reading-report', [CompanyReportController::class, 'zReadingReport'])->name('company.reports.z-reading-report');
             Route::match(['get', 'post'], 'discounts-report', [CompanyReportController::class, 'discountsReport'])->name('company.reports.discounts-report');
             Route::match(['get', 'post'], 'item-sales', [CompanyReportController::class, 'itemSales'])->name('company.reports.item-sales-report');
+            Route::match(['get', 'post'], 'top-performing-products', [CompanyReportController::class, 'topPerformingProducts'])->name('company.reports.top-performing-products-report');
 
             Route::get('stock-card', [CompanyReportController::class, 'stockCard'])->name('company.reports.stock-card');
             Route::match(['get', 'post'], 'audit-trail', [CompanyReportController::class, 'auditTrail'])->name('company.reports.audit-trail');
@@ -193,6 +199,14 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'bir-pwd-sales-report', [CompanyReportController::class, 'birPwdSalesReport'])->name('company.reports.bir-pwd-sales-report');
             Route::match(['get', 'post'], 'bir-naac-sales-report', [CompanyReportController::class, 'birNaacSalesReport'])->name('company.reports.bir-naac-sales-report');
             Route::match(['get', 'post'], 'bir-solo-parent-sales-report', [CompanyReportController::class, 'birSoloParentSalesReport'])->name('company.reports.bir-solo-parent-sales-report');
+            Route::match(['get', 'post'], 'category-sales-report', [CompanyReportController::class, 'categorySalesReport'])->name('company.reports.category-sales-report');
+            Route::match(['get', 'post'], 'department-sales-report', [CompanyReportController::class, 'departmentSalesReport'])->name('company.reports.department-sales-report');
+            Route::match(['get', 'post'], 'sales-return-report', [CompanyReportController::class, 'salesReturnReport'])->name('company.reports.sales-return-report');
+            Route::match(['get', 'post'], 'subcategory-sales-report', [CompanyReportController::class, 'subCategorySalesReport'])->name('company.reports.subcategory-sales-report');
+            Route::match(['get', 'post'], 'hourly-sales-report', [CompanyReportController::class, 'hourlySalesReport'])->name('company.reports.hourly-sales-report');
+            Route::match(['get', 'post'], 'monthly-sales-summary-report', [CompanyReportController::class, 'monthlySalesSummaryReport'])->name('company.reports.monthly-sales-summary-report');
+            Route::match(['get', 'post'], 'hourly-transaction-report', [CompanyReportController::class, 'hourlyTransactionReport'])->name('company.reports.hourly-transaction-report');
+            Route::match(['get', 'post'], 'safekeeping-report', [CompanyReportController::class, 'safekeepingReport'])->name('company.reports.safekeeping-report');
         });
 
         //branch
@@ -214,6 +228,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/purchase-requests/{id}/print', [BranchPurchaseRequestController::class, 'print'])->name('branch.purchase-requests.print');
             Route::get('/purchase-orders/{id}/print', [BranchPurchaseOrderController::class, 'print'])->name('branch.purchase-orders.print');
             Route::get('/purchase-deliveries/{id}/print', [BranchPurchaseDeliveryController::class, 'print'])->name('branch.purchase-deliveries.print');
+            Route::get('/product-disposals/{id}/print', [BranchProductDisposalController::class, 'print'])->name('branch.product-disposals.print');
 
             Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');
 
@@ -248,3 +263,5 @@ Route::middleware('auth')->group(function () {
         });
     });
 });
+
+Route::get('/company/{company}/dashboard/department-products', [CompanyPageController::class, 'getDepartmentProducts'])->name('company.dashboard.department-products');

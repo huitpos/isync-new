@@ -67,7 +67,7 @@
 
             <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">Stock</div>
-                <div class="text-gray-600">{{ $pivotData->stock }}</div>
+                <div class="text-gray-600">{{ $pivotData?->stock }}</div>
             </div>
 
             <form class="mt-3" action="{{ route('branch.products.update', ['companySlug' => $company->slug, 'product' => $product->id, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
@@ -76,9 +76,27 @@
 
                 <div class="mb-4">
                     <label class="form-label">SRP</label>
-                    <input value="{{ old('name') ?? $pivotData->price }}" name="price" type="text" class="form-control @error('price') is-invalid @enderror" placeholder="SRP" required/>
+                    <input value="{{ old('name') ?? number_format($pivotData->price ?? $product->srp, 2) }}" name="price" type="text" class="form-control @error('price') is-invalid @enderror" placeholder="SRP" required/>
 
                     @error('price')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Cost</label>
+                    <input value="{{ old('cost') ?? number_format($pivotData->cost ?? $product->cost, 2) }}" name="cost" type="text" class="form-control @error('cost') is-invalid @enderror" placeholder="Cost" required/>
+
+                    @error('cost')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Markup</label>
+                    <input value="{{ old('markup') ?? number_format($pivotData->markup ?? $product->markup, 2) }}" name="markup" type="text" class="form-control @error('markup') is-invalid @enderror" placeholder="Markup" required/>
+
+                    @error('markup')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>

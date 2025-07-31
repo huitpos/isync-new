@@ -178,6 +178,26 @@
                 <div class="fw-bold">Mark Up Type</div>
                 <div class="text-gray-600">{{ $product->markup_type }}</div>
             </div>
+
+            <h3 class="mt-5">Branch SRP</h3>
+            <table class="table table-row-dashed table-row-gray-500 gy-7">
+                <thead>
+                    <tr class="fw-bold fs-6 text-gray-800">
+                        <th>Branch</th>
+                        <th>Srp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($srpBranches as $branch)
+                        <tr>
+                            <td>{{ $branch->name }}</td>
+                            <td>
+                                {{ isset($branch->products[0]) ? $branch->products[0]->pivot?->price : $product->srp }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </x-default-layout>
