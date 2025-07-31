@@ -34,7 +34,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Department</label>
-                        <input value="{{ $po->department->name }}" type="text" readonly class="form-control"/>
+                        <input value="{{ $po->department_id == 'all' ? "All" : $po->department->name }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
 
