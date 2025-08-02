@@ -300,7 +300,7 @@ class ProductsImport implements ToCollection,
 
     public function chunkSize(): int
     {
-        return 100;
+        return 1000;
     }
 
     public function onFailure(Failure ...$failures)
