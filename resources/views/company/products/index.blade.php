@@ -27,6 +27,10 @@
 
             <div class="card-toolbar">
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
+                    <a href="{{ route('company.products.export', ['companySlug' => $company->slug]) }}" class="btn btn-light-primary me-3">
+                        Export Products
+                    </a>
+
                     @if (in_array('Settings/Products/Import Products', $permissions))
                     <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#kt_modal_1">
                         Import Products

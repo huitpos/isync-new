@@ -89,6 +89,7 @@ Route::get('/download-product-import-template', function () {
 });
 
 Route::get('/map-data', [TestController::class, 'mapData']);
+Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
 
 require __DIR__ . '/auth.php';
 
@@ -151,6 +152,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/import-product', [CompanyProductController::class, 'showForm']);
         Route::post('/import-product', [CompanyProductController::class, 'import'])->name('company.products.import');
+        Route::get('/products-export', [CompanyProductController::class, 'export'])->name('company.products.export');
         Route::resource('users', CompanyUserController::class, ['as' => 'company']);
         Route::resource('payment-terms', CompanyPaymentTermController::class, ['as' => 'company']);
         Route::resource('supplier-terms', CompanySupplierTermController::class, ['as' => 'company']);
@@ -241,3 +243,5 @@ Route::middleware('auth')->group(function () {
         });
     });
 });
+
+Route::get('/company/{company}/dashboard/department-products', [CompanyPageController::class, 'getDepartmentProducts'])->name('company.dashboard.department-products');
