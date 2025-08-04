@@ -475,7 +475,7 @@ class ProductController extends Controller
         $file = $request->file('file');
         $path = $file->store('uploads');
 
-        ProcessExcelJob::dispatch($path, $company->id);
+        ProcessExcelJob::dispatch($path, $company->id, auth()->user()->id);
 
         return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Products import started');

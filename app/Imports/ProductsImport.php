@@ -40,15 +40,17 @@ class ProductsImport implements ToCollection,
     SkipsOnFailure
 {
     protected $companyId;
+    protected $userId;
     protected $data = [];
 
 
-    public function __construct(int $companyId)
+    public function __construct(int $companyId, ?int $userId = null)
     {
         ini_set('memory_limit', '-1');
         ini_set('max_execution_time', '-1');
 
         $this->companyId = $companyId;
+        $this->userId = $userId;
     }
 
     /**
@@ -132,6 +134,7 @@ class ProductsImport implements ToCollection,
                 'part_number' => $row[19] ?? null, //T
 
                 'company_id' => $this->companyId,
+                'created_by' => $this->userId,
                 'code' => $lastNumber,
             ];
 
