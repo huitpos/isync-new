@@ -44,16 +44,14 @@ class ProductsImport implements ToCollection,
     protected $data = [];
     protected $lookupCache = [];
 
-    public function __construct(int $companyId, $userId)
+
+    public function __construct(int $companyId, ?int $userId = null)
     {
         ini_set('memory_limit', '256M'); // Lower memory limit
         ini_set('max_execution_time', '180'); // 3 minutes
 
         $this->companyId = $companyId;
         $this->userId = $userId;
-        
-        // Load lookup data once sa constructor
-        $this->loadLookupData();
     }
 
     /**
@@ -178,6 +176,7 @@ class ProductsImport implements ToCollection,
                 'maximum_stock_level' => (int)($row[18] ?? 0),
                 'part_number' => trim($row[19] ?? ''),
                 'company_id' => $this->companyId,
+                'created_by' => $this->userId,
                 'code' => $lastNumber,
                 'created_by' => $this->userId
             ];

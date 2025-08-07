@@ -18,7 +18,7 @@ class ProcessExcelJob implements ShouldQueue
     protected $companyId;
     protected $userId;
 
-    public function __construct($filePath, $companyId, $userId)
+    public function __construct($filePath, $companyId, $userId = null)
     {
         $this->filePath = $filePath;
         $this->companyId = $companyId;

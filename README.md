@@ -77,3 +77,14 @@ php artisan queue:work
 5. npm install
 6. php artisan migrate
 7. php artisan migrate --database=transactional_db --path=database/migrations/transactional_db
+
+# Basic deployment
+./deploy.sh
+
+# Advanced deployment with options
+./deploy-advanced.sh --help                    # Show help
+./deploy-advanced.sh                           # Full deployment
+./deploy-advanced.sh --skip-git                # Skip git pull
+./deploy-advanced.sh --migrate                 # Include migrations
+./deploy-advanced.sh --branch develop          # Deploy specific branch
+./deploy-advanced.sh --skip-composer --skip-npm # Skip dependencies
