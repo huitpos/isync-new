@@ -29,7 +29,7 @@
     <div class="container d-flex flex-column align-items-center">
 
       <h1>Coming Soon....</h1>
-      <h2>We're working hard to improve our websitessss.</h2>
+      <h2>We're working hard to improve our website.</h2>
 
     </div>
   </header><!-- End #header -->
