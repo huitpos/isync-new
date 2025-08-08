@@ -121,6 +121,8 @@ class PurchaseRequestController extends Controller
         $prData['pr_number'] = $prNumber;
         unset($prData['pr_items']);
 
+        $prData['department_id'] = $postData['department_id'] == 'all' ? null : $postData['department_id'];
+
         //save the purchase request and its items using model
         $purchaseRequest = new PurchaseRequest();
         $purchaseRequest->fill($prData);
