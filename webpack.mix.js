@@ -63,7 +63,7 @@ mix.sass(`${dir}/sass/style.scss`, `public/assets/css/style.bundle.css`, {sassOp
 
 // Build media
 mix.copyDirectory(`${dir}/media`, `public/assets/media`);
-mix.copyDirectory(`${dir}/coming_soon`, `public/assets/coming_soon`);
+mix.copyDirectory(`${dir}/play`, `public/assets/play`);
 
 let plugins = [
     new ReplaceInFileWebpackPlugin([
