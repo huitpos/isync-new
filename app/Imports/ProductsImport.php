@@ -42,13 +42,12 @@ class ProductsImport implements ToCollection,
     protected $companyId;
     protected $userId;
     protected $data = [];
-    protected $lookupCache = [];
 
 
     public function __construct(int $companyId, ?int $userId = null)
     {
-        ini_set('memory_limit', '256M'); // Lower memory limit
-        ini_set('max_execution_time', '180'); // 3 minutes
+        ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', '-1');
 
         $this->companyId = $companyId;
         $this->userId = $userId;
@@ -62,164 +61,188 @@ class ProductsImport implements ToCollection,
         return 2;
     }
 
+    public function limit(): int
+    {
+        return 500;
+    }
+
     public function endColumn(): string
     {
         return 'T';
     }
 
-    protected function loadLookupData()
+    public function collection(Collection $rows)
     {
-        // Pre-load all lookup data once to avoid repeated queries
-        // Use select() para sa specific columns lang para mas efficient
-        $this->lookupCache['units'] = UnitOfMeasurement::where('company_id', $this->companyId)
-            ->select('id', 'name')
-            ->get()
-            ->pluck('name', 'id')
-            ->map(function($name) { return strtolower(trim($name)); })
-            ->toArray();
+        $lastNumber = Product::where('company_id', $this->companyId)->max('code'); 
 
-        $this->lookupCache['departments'] = Department::where('company_id', $this->companyId)
-            ->select('id', 'name')
-            ->get()
-            ->pluck('name', 'id')
-            ->map(function($name) { return strtolower(trim($name)); })
-            ->toArray();
+        $units = UnitOfMeasurement::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $units = array_map('strtolower', $units);
 
-        $this->lookupCache['categories'] = Category::where('company_id', $this->companyId)
-            ->select('id', 'name')
-            ->get()
-            ->pluck('name', 'id')
-            ->map(function($name) { return strtolower(trim($name)); })
-            ->toArray();
+        $departments = Department::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $departments = array_map('strtolower', $departments);
 
-        $this->lookupCache['itemTypes'] = ItemType::where('company_id', $this->companyId)
-            ->select('id', 'name')
-            ->get()
-            ->pluck('name', 'id')
-            ->map(function($name) { return strtolower(trim($name)); })
-            ->toArray();
+        $categories = Category::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $categories = array_map('strtolower', $categories);
 
-        $this->lookupCache['itemLocations'] = ItemLocation::where('company_id', $this->companyId)
-            ->select('id', 'name')
-            ->get()
-            ->pluck('name', 'id')
-            ->map(function($name) { return strtolower(trim($name)); })
-            ->toArray();
-
-        // Build subcategories map - more efficient
         $subcategoriesData = Subcategory::where('company_id', $this->companyId)
             ->select('id', 'name', 'category_id')
             ->get();
 
-        $this->lookupCache['subcategoriesMap'] = [];
-        $this->lookupCache['subcategories'] = [];
-        
+        $subcategoriesMap = [];
         foreach ($subcategoriesData as $subcategory) {
-            $name = strtolower(trim($subcategory->name));
-            $key = $name . '_' . $subcategory->category_id;
-            $this->lookupCache['subcategoriesMap'][$key] = $subcategory->id;
-            $this->lookupCache['subcategories'][$subcategory->id] = $name;
-        }
-        
-        // Clear subcategoriesData to free memory
-        unset($subcategoriesData);
-    }
-
-    public function collection(Collection $rows)
-    {
-        // Skip empty rows immediately
-        $rows = $rows->filter(function($row) {
-            return !empty(array_filter($row->toArray()));
-        });
-        
-        if ($rows->isEmpty()) {
-            return;
+            $key = strtolower($subcategory->name) . '_' . $subcategory->category_id;
+            $subcategoriesMap[$key] = $subcategory->id;
         }
 
-        $lastNumber = Product::where('company_id', $this->companyId)->max('code') ?? 0;
-        $batchData = [];
+        $subcategories = Subcategory::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $subcategories = array_map('strtolower', $subcategories);
+
+        $itemTypes = ItemType::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $itemTypes = array_map('strtolower', $itemTypes);
+
+        $itemLocations = ItemLocation::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $itemLocations = array_map('strtolower', $itemLocations);
 
         foreach ($rows as $key => $row) {
             $lastNumber++;
             
-            // More efficient lookups with null coalescing
-            $categoryName = strtolower(trim($row[8] ?? ''));
-            $categoryId = $this->findInCache($categoryName, $this->lookupCache['categories']);
+            $categoryId = array_search(strtolower($row[8]), $categories) ?? null;
             
-            $subcategoryId = null;
-            if ($categoryId && !empty($row[9])) {
-                $subcategoryName = strtolower(trim($row[9]));
-                $lookupKey = $subcategoryName . '_' . $categoryId;
-                $subcategoryId = $this->lookupCache['subcategoriesMap'][$lookupKey] ?? 
-                               $this->findInCache($subcategoryName, $this->lookupCache['subcategories']);
-            }
+            $lookupKey = strtolower($row[9]) . '_' . $categoryId;
+            $subCategoryId = $subcategoriesMap[$lookupKey] ?? array_search(strtolower($row[9]), $subcategories) ?? null;
 
             $productData = [
-                'status' => trim($row[0] ?? 'active'),
-                'name' => trim($row[1] ?? ''),
-                'description' => trim($row[2] ?? ''),
-                'sku' => trim($row[3] ?? ''),
-                'abbreviation' => trim($row[4] ?? ''),
-                'uom_id' => $this->findInCache(strtolower(trim($row[5] ?? '')), $this->lookupCache['units']),
-                'barcode' => trim($row[6] ?? ''),
-                'department_id' => $this->findInCache(strtolower(trim($row[7] ?? '')), $this->lookupCache['departments']),
-                'category_id' => $categoryId,
-                'subcategory_id' => $subcategoryId,
-                'markup_type' => trim($row[10] ?? 'percentage'),
-                'markup' => (float)($row[11] ?? 0),
-                'cost' => (float)($row[12] ?? 0),
-                'srp' => (float)($row[13] ?? 0),
-                'item_type_id' => $this->findInCache(strtolower(trim($row[14] ?? '')), $this->lookupCache['itemTypes']),
-                'item_locations' => $this->findInCache(strtolower(trim($row[15] ?? '')), $this->lookupCache['itemLocations']),
-                'max_discount' => (float)($row[16] ?? 0),
-                'minimum_stock_level' => (int)($row[17] ?? 0),
-                'maximum_stock_level' => (int)($row[18] ?? 0),
-                'part_number' => trim($row[19] ?? ''),
+                'status' => $row[0], //A
+                'name' => $row[1], //B
+                'description' => $row[2], //C
+                'sku' => $row[3], //D
+                'abbreviation' => $row[4], //E
+                'uom_id' => array_search(strtolower($row[5]), $units), //F
+                'delivery_uom_id' => array_search(strtolower($row[6]), $units), //G
+                'barcode' => $row[7], //H
+                'department_id' => array_search(strtolower($row[8]), $departments) ?? null, //I
+                'category_id' => array_search(strtolower($row[9]), $categories) ?? null, //J
+                'subcategory_id' => $subCategoryId ?? null, //K
+                'markup_type' => $row[11], //L
+                'markup' => $row[12], //M
+                'cost' => $row[13], //N
+                'srp' => $row[14], //O
+                'item_type_id' => array_search(strtolower($row[15]), $itemTypes), //P
+                'item_locations' => array_search(strtolower($row[16]), $itemLocations), //Q
+                'max_discount' => $row[17] ?? 0, //R
+                'minimum_stock_level' => $row[18] ?? 0, //S
+                'maximum_stock_level' => $row[19] ?? 0, //T
+                'part_number' => $row[20] ?? null, //U
+
                 'company_id' => $this->companyId,
                 'created_by' => $this->userId,
                 'code' => $lastNumber,
-                'created_by' => $this->userId
             ];
 
-            $batchData[] = $productData;
-        }
+            $this->data[] = $productData;
 
-        // Process in batches instead of individual jobs
-        if (!empty($batchData)) {
-            UpdateOrCreateProductJob::dispatch($batchData);
-        }
+            $importItemLocations = $productData['item_locations'];
+            unset($productData['item_locations']);
 
-        // Clear memory after processing
-        unset($batchData, $rows);
-        gc_collect_cycles();
-    }
 
-    /**
-     * Helper method para sa efficient array search
-     */
-    private function findInCache($needle, $haystack)
-    {
-        if (empty($needle) || empty($haystack)) {
-            return null;
+            UpdateOrCreateProductJob::dispatch($productData, $importItemLocations);
         }
-        
-        return array_search($needle, $haystack) ?: null;
     }
 
     public function rules(): array
     {
-        // Simplified validation rules para lower CPU usage
+        $units = UnitOfMeasurement::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $units = array_map('strtolower', $units);
+
+        $departments = Department::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $departments = array_map('strtolower', $departments);
+
+        $categories = Category::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $categories = array_map('strtolower', $categories);
+
+        $subcategories = Subcategory::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $subcategories = array_map('strtolower', $subcategories);
+
+        $itemTypes = ItemType::where('company_id', $this->companyId)->get()->pluck('name', 'id')->toArray();
+        $itemTypes = array_map('strtolower', $itemTypes);
+
         return [
-            '*.0' => [Rule::in(['active', 'inactive'])],
-            '*.1' => ['required', 'distinct'], // Product name
-            // Disable other validations muna para sa testing
-            // '*.5' => [
-            //     function ($attribute, $value, $fail) {
-            //         if (!empty($value) && !$this->findInCache(strtolower(trim($value)), $this->lookupCache['units'])) {
-            //             $fail('UOM does not exist');
-            //         }
-            //     },
-            // ],
+            '*.0' => [
+                // 'required',
+                Rule::in(['active', 'inactive']),
+            ],
+            '*.1' => [
+                'required',
+                'distinct',
+            ],
+            '*.2' => [
+                // 'required',
+            ],
+            '*.3' => [
+                // 'required',
+                // 'distinct',
+                // 'unique:products,sku,NULL,id,company_id,' . $this->companyId,
+            ],
+            '*.4' => [
+                // 'required',
+            ],
+            '*.5' => [
+                // 'required',
+                function ($attribute, $value, $fail) use($units) {
+                    if (!array_search(strtolower($value), $units)) {
+                        // $fail('UOM does not exists');
+                    }
+                },
+            ],
+            '*.6' => [
+                // 'required',
+                // 'distinct',
+                // 'unique:products,barcode,NULL,id,company_id,' . $this->companyId,
+            ],
+            '*.7' => [
+                // 'required',
+                function ($attribute, $value, $fail) use($departments) {
+                    if (!array_search(strtolower($value), $departments)) {
+                        // $fail('Department does not exists');
+                    }
+                },
+            ],
+            '*.8' => [
+                // 'required',
+                function ($attribute, $value, $fail) use($categories) {
+                    if (!array_search(strtolower($value), $categories)) {
+                        // $fail('Category does not exists');
+                    }
+                },
+            ],
+            '*.9' => [
+                // 'required',
+                function ($attribute, $value, $fail) use($subcategories) {
+                    if (!array_search(strtolower($value), $subcategories)) {
+                        // $fail('Subcategory does not exists');
+                    }
+                },
+            ],
+            '*.10' => [
+                // 'required',
+                // Rule::in(['fixed', 'percentage']),
+            ],
+            '*.11' => [
+                // 'required',
+                // 'numeric'
+            ],
+            '*.12' => [
+                // 'required',
+                // 'numeric'
+            ],
+            '*.13' => [
+                // 'required',
+                function ($attribute, $value, $fail) use($itemTypes) {
+                    if (!array_search(strtolower($value), $itemTypes)) {
+                        // $fail('Item Type does not exists');
+                    }
+                },
+            ],
         ];
     }
 
@@ -278,7 +301,7 @@ class ProductsImport implements ToCollection,
 
     public function chunkSize(): int
     {
-        return 2000;
+        return 100;
     }
 
     public function onFailure(Failure ...$failures)

@@ -41,6 +41,7 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping, WithCustom
                 'products.sku',
                 'products.abbreviation',
                 'unit_of_measurements.name as uom_name',
+                'delivery_uom.name as delivery_uom_name',
                 'products.barcode',
                 'departments.name as department_name',
                 'categories.name as category_name',
@@ -59,6 +60,7 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping, WithCustom
             ])
             ->leftJoin('item_types', 'products.item_type_id', '=', 'item_types.id')
             ->leftJoin('unit_of_measurements', 'products.uom_id', '=', 'unit_of_measurements.id')
+            ->leftJoin('unit_of_measurements as delivery_uom', 'products.delivery_uom_id', '=', 'delivery_uom.id')
             ->leftJoin('departments', 'products.department_id', '=', 'departments.id')
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->leftJoin('subcategories', 'products.subcategory_id', '=', 'subcategories.id')
@@ -67,7 +69,7 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping, WithCustom
             ->where('products.company_id', $this->companyId)
             ->groupBy([
                 'products.id', 'products.status', 'products.name', 'products.description',
-                'products.sku', 'products.abbreviation', 'unit_of_measurements.name',
+                'products.sku', 'products.abbreviation', 'unit_of_measurements.name', 'delivery_uom.name',
                 'products.barcode', 'departments.name', 'categories.name',
                 'subcategories.name', 'products.markup_type', 'products.markup',
                 'products.cost', 'item_types.name', 'products.srp',
@@ -99,6 +101,7 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping, WithCustom
             'SKU',
             'Abbreviation',
             'UOM',
+            'Delivery UOM',
             'Barcode',
             'Department',
             'Category',
@@ -126,6 +129,7 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping, WithCustom
             $product->sku ?? '',
             $product->abbreviation ?? '',
             $product->uom_name ?? '',
+            $product->delivery_uom_name ?? '',
             $product->barcode ?? '',
             $product->department_name ?? '',
             $product->category_name ?? '',
@@ -161,12 +165,12 @@ class ProductsExport implements FromQuery, WithHeadings, WithMapping, WithCustom
     public function columnFormats(): array
     {
         return [
-            'L' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2, // Markup
-            'M' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2, // Cost
+            'M' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2, // Markup
+            'N' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2, // Cost
             'O' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2, // SRP
-            'Q' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2, // Max Discount
-            'R' => NumberFormat::FORMAT_NUMBER, // Minimum Stock Level
-            'S' => NumberFormat::FORMAT_NUMBER, // Maximum Stock Level
+            'R' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED2, // Max Discount
+            'S' => NumberFormat::FORMAT_NUMBER, // Minimum Stock Level
+            'T' => NumberFormat::FORMAT_NUMBER, // Maximum Stock Level
         ];
     }
 }
