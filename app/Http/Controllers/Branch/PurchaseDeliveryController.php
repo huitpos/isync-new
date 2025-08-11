@@ -171,9 +171,6 @@ class PurchaseDeliveryController extends Controller
 
                 $srp = $product->markup_type == 'percentage' ? $item->unit_price + ($item->unit_price * ($product->markup / 100)) : $item->unit_price + $product->markup;
 
-                $product->srp = $srp;
-                $product->save();
-
                 $this->productRepository->updateBranchQuantity($product, $branch, $id, 'purchase_deliveries', $item->qty, $srp, 'add', $item->uom_id);
             }
         }

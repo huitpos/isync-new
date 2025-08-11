@@ -176,6 +176,29 @@ class ProductDisposalController extends Controller
     }
 
     /**
+     * Print the specified product disposal as PDF.
+     */
+    public function print(Request $request, string $companySlug, string $branchSlug, string $id)
+    {
+        $disposal = ProductDisposal::with([
+            'items',
+            'createdBy',
+            'productDisposalReason'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('branch.productDisposals.print', [
+            'disposal' => $disposal,
+            'company' => $company,
+            'branch' => $branch
+        ]);
+
+        return $pdf->download("PDIS-{$disposal->pdis_number}.pdf");
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)

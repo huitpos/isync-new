@@ -44,7 +44,6 @@ class BranchesDataTable extends DataTable
                 'createdBy',
                 'company.client.user',
                 'cluster',
-
             ]);
     }
 

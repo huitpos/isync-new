@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\DataTables\Company\ProductDisposalsDataTable;
 
 use App\Models\ProductDisposal;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ProductDisposalController extends Controller
 {
@@ -92,5 +93,27 @@ class ProductDisposalController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function print(Request $request, string $slug, string $id)
+    {
+        $disposal = ProductDisposal::with([
+            'items',
+            'items.product',
+            'items.uom',
+            'productDisposalReason',
+            'createdBy',
+            'department'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('company.productDisposals.print', [
+            'disposal' => $disposal,
+            'company' => $company,
+            'branch' => $disposal->branch
+        ]);
+
+        return $pdf->download("PD-$disposal->id.pdf");
     }
 }

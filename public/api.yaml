@@ -3639,3 +3639,99 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /api/sb-cutoff:
+    get:
+      tags:
+        - SB
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: machine_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the machine
+        - in: query
+          name: date
+          schema:
+            type: string
+          required: true
+          description: Date of the cutoff (YYYY-MM-DD)
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/sb-endofday:
+
+    get:
+      tags:
+        - SB
+      parameters:
+        - in: query
+          name: branch_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the branch to get
+        - in: query
+          name: machine_id
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the machine
+        - in: query
+          name: date
+          schema:
+            type: string
+          required: true
+          description: Date of the cutoff (YYYY-MM-DD)
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  
+  /api/sb-update:
+    post:
+      tags:
+        - SB
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                machine_id:
+                  type: integer
+                  required: true
+                branch_id:
+                  type: integer
+                  required: true
+                percentage:
+                  type: number
+                  required: true
+                date:
+                  type: string
+                  required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string

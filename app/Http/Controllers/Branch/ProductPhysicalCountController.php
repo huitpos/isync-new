@@ -99,6 +99,8 @@ class ProductPhysicalCountController extends Controller
 
         $physicalCountData['pcount_number'] = $pcountNumber;
 
+        $physicalCountData['department_id'] = $postData['department_id'] == 'all' ? null : $postData['department_id'];
+
         //save the purchase request and its items using model
         $physicalCount = new ProductPhysicalCount();
         $physicalCount->fill($physicalCountData);
