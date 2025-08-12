@@ -192,7 +192,7 @@
                         <tr>
                             <td>{{ $branch->name }}</td>
                             <td>
-                                {{ isset($branch->products[0]) ? $branch->products[0]->pivot?->price : $product->srp }}
+                                {{ number_format(isset($branch->products[0]) ? $branch->products[0]->pivot?->price : $product->srp, 2)}}
                             </td>
                         </tr>
                     @endforeach
