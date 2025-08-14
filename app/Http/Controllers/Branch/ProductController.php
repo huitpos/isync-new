@@ -100,6 +100,16 @@ class ProductController extends Controller
             // Product doesn't exist in the branch, create a new pivot record
             $branch->products()->attach($id, $updateData);
         }
+        
+        $product = Product::findOrFail($id);
+
+        $branch->products()->updateExistingPivot($id, [
+            'price' => $request->price
+        ]);
+
+        $product->update([
+            'updated_at' => now()
+        ]);
 
         return redirect()->route('branch.products.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])
                 ->with('success', 'Product updated successfully');
