@@ -62,7 +62,7 @@
 
             <div class="pb-1 fs-6 mt-2">
                 <div class="fw-bold">Sub-Category</div>
-                <div class="text-gray-600">{{ $product->subcategory->name }}</div>
+                <div class="text-gray-600">{{ $product->subcategory?->name }}</div>
             </div>
 
             <h3 class="mt-5">Price</h3>
