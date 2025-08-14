@@ -85,8 +85,14 @@ class ProductController extends Controller
             'price' => 'required'
         ]);
 
+        $product = Product::findOrFail($id);
+
         $branch->products()->updateExistingPivot($id, [
             'price' => $request->price
+        ]);
+
+        $product->update([
+            'updated_at' => now()
         ]);
 
         return redirect()->route('branch.products.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])
