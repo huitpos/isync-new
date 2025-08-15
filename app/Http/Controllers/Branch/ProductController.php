@@ -21,6 +21,7 @@ class ProductController extends Controller
 
         return $dataTable
             ->with('company_id', $company->id)
+            ->with('branch_id', $branch->id)
             ->with('company_slug', $company->slug)
             ->with('branch_slug', $branch->slug)
             ->render('branch.products.index');
@@ -81,12 +82,24 @@ class ProductController extends Controller
         $branch = $request->attributes->get('branch');
 
         $request->validate([
-            'price' => 'required'
+            'price' => 'required',
+            'cost' => 'required',
+            'markup' => 'required',
         ]);
 
-        $branch->products()->updateExistingPivot($id, [
-            'price' => $request->price
-        ]);
+        $updateData = [
+            'price' => $request->price,
+            'cost' => $request->cost,
+            'markup' => $request->markup,
+        ];
+
+        if ($branch->products()->where('product_id', $id)->exists()) {
+            // Product already exists in the branch, update the existing pivot record
+            $branch->products()->updateExistingPivot($id, $updateData);
+        } else {
+            // Product doesn't exist in the branch, create a new pivot record
+            $branch->products()->attach($id, $updateData);
+        }
 
         return redirect()->route('branch.products.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])
                 ->with('success', 'Product updated successfully');
