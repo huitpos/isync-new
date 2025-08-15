@@ -89,7 +89,7 @@ class ProductsDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('name')->title('Product Name'),
-            Column::make('description')->searchable(false),
+            Column::make('description'),
             Column::make('item_type.name', 'itemType.name')->title('Item Type')->searchable(false),
             Column::make('uom.name')->title('UOM')->searchable(false),
             Column::make('code')->title('Item Code')->searchable(false),
