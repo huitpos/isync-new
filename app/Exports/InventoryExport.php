@@ -39,14 +39,26 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
         $branchId = $branch->id;
         $companyId = $branch->company_id;
 
-        $products = Product::where('company_id', $companyId)
-            ->with([
-                'branches' => function ($query) use ($branchId) {
-                    $query->where('branches.id', $branchId);
-                }
-            ])
-            ->where('company_id', $companyId)
-            ->get();
+        $products = DB::select("
+            SELECT 
+                p.id,
+                p.name,
+                p.description,
+                p.code,
+                p.cost,
+                p.srp,
+                c.name as category_name,
+                sc.name as subcategory_name,
+                d.name as department_name,
+                COALESCE(bp.stock, 0) as stock,
+                COALESCE(bp.price, p.srp) as branch_price
+            FROM products p
+            LEFT JOIN branch_product bp ON p.id = bp.product_id AND bp.branch_id = ?
+            LEFT JOIN categories c ON p.category_id = c.id
+            LEFT JOIN subcategories sc ON p.subcategory_id = sc.id
+            LEFT JOIN departments d ON p.department_id = d.id
+            WHERE p.company_id = ?
+        ", [$branchId, $companyId]);
 
         return new Collection($products);
     }
@@ -65,6 +77,9 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
             'Stock',
             'Unit Cost',
             'Branch SRP',
+            'Category',
+            'Subcategory',
+            'Department',
         ];
     }
 
@@ -74,9 +89,12 @@ class InventoryExport implements FromCollection, WithHeadings, WithMapping, With
             $product->name,
             $product->description,
             $product->code,
-            $product['branches'][0]['pivot']['stock'] ?? 0,
+            $product->stock,
             $product->cost,
-            $product['branches'][0]['pivot']['price'] ?? $product->srp
+            $product->branch_price,
+            $product->category_name ?? 'N/A',
+            $product->subcategory_name ?? 'N/A',
+            $product->department_name ?? 'N/A',
         ];
     }
 
