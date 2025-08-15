@@ -61,6 +61,7 @@ class ProductsDataTable extends DataTable
             ->with([
                 'itemType',
                 'uom',
+                'deliveryUom',
                 'createdBy'
             ]);
     }
@@ -92,6 +93,7 @@ class ProductsDataTable extends DataTable
             Column::make('description'),
             Column::make('item_type.name', 'itemType.name')->title('Item Type')->searchable(false),
             Column::make('uom.name')->title('UOM')->searchable(false),
+            Column::make('delivery_uom.name', 'deliveryUom.name')->title('Delivery UOM')->searchable(false),
             Column::make('code')->title('Item Code')->searchable(false),
             Column::make('cost')->title('cost')->searchable(false),
             Column::make('srp')->title('srp')->searchable(false),
