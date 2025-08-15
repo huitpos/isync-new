@@ -54,6 +54,8 @@ class StockTransferRequestController extends Controller
             'city',
             'province',
             'region'
+        ])->where([
+            'status' => 'active'
         ])->get();
 
         $suppliers = [];
