@@ -1,0 +1,23 @@
+name: Deploy to EC2 Staging
+
+on:
+  push:
+    branches: [ staging ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd /var/www/isync-new
+          git pull origin staging --no-ff
+          php artisan migrate --force
+          php artisan migrate --database=transactional_db --path=database/migrations/transactional_db
+          php artisan config:cache

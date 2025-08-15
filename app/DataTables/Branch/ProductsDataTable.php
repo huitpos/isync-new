@@ -78,10 +78,11 @@ class ProductsDataTable extends DataTable
             ->with([
                 'itemType',
                 'uom',
-                'createdBy',
                 'branches' => function ($query) use ($branchId) {
                     $query->where('branches.id', $branchId);
-                }
+                },
+                'deliveryUom',
+                'createdBy'
             ]);
     }
 
@@ -112,6 +113,7 @@ class ProductsDataTable extends DataTable
             Column::make('description'),
             Column::make('item_type.name', 'itemType.name')->title('Item Type'),
             Column::make('uom.name')->title('UOM'),
+            Column::make('delivery_uom.name', 'deliveryUom.name')->title('Delivery UOM'),
             Column::make('code')->title('Item Code'),
             Column::make('cost')->title('Company Cost'),
             Column::make('srp')->title('Company SRP'),

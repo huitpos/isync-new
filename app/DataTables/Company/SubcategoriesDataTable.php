@@ -38,6 +38,9 @@ class SubcategoriesDataTable extends DataTable
                 } else {
                     return '';
                 }
+            })
+            ->filterColumn('name', function($query, $keyword) {
+                $query->where('name', 'like', "%$keyword%");
             });
     }
 
@@ -78,7 +81,7 @@ class SubcategoriesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id')->visible(false),
+            Column::make('id')->visible(false)->searchable(false),
             Column::make('name')->title('Subcategory'),
             Column::make('description'),
             Column::make('category.name', 'category.name')->title('Category'),

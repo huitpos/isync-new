@@ -205,7 +205,7 @@
                                                                 @foreach ($field['options'] as $option)
                                                                     <div data-repeater-item>
                                                                         <label class="form-label">Option:</label>
-                                                                        <input value="{{ $option['option'] ?? $option }}" name="option" class="form-control mb-2 mb-md-0 @error('discount_type_fields.' . $key . '.options') is-invalid @enderror" placeholder="Option"/>
+                                                                        <input value="" name="option" class="form-control mb-2 mb-md-0 @error('discount_type_fields.' . $key . '.options') is-invalid @enderror" placeholder="Option"/>
         
                                                                         @error('discount_type_fields.' . $key . '.options')
                                                                             <div class="invalid-feedback"> {{ $message }}</div>
@@ -223,7 +223,7 @@
 
                                                 <div class="col-md-2">
                                                     <label class="form-label">Required:</label>
-                                                    <input {{ $field['is_required'] ? 'checked' : '' }} class="form-check-input form-control" name="required" type="checkbox" value="1"/>
+                                                    <input class="form-check-input form-control" name="required" type="checkbox" value="1"/>
                                                 </div>
 
                                                 <div class="col-md-2">

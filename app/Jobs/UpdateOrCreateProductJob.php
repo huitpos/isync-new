@@ -9,17 +9,19 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateOrCreateProductJob implements ShouldQueue
+class UpdateOrCreateProductJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $productData;
     protected $itemLocations;
+    protected $rowCount;
 
-    public function __construct(array $productData, $itemLocations = null)
+    public function __construct(array $productData, $itemLocations = null, $rowCount = null)
     {
         $this->productData = $productData;
         $this->itemLocations = $itemLocations;
+        $this->rowCount = $rowCount;
     }
 
     public function handle()
@@ -37,7 +39,7 @@ class UpdateOrCreateProductJob implements ShouldQueue
                 $product->itemLocations()->sync([$this->itemLocations]);
             }
         } catch (\Exception $e) {
-            dd($e->getMessage(), $this->productData);
+            dd($e->getMessage(), $this->productData, $this->rowCount);
         }
     }
 }
