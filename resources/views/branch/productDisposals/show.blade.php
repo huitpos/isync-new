@@ -86,6 +86,14 @@
                     </div>
                     @endforeach
 
+                    @if ($disposal->status == 'approved')
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a href="{{ route('branch.product-disposals.print', ['companySlug' => $company->slug, 'id' => $disposal->id, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">Print</a>
+                            </div>
+                        </div>
+                    @endif
+
                     @if($disposal->status == 'pending')
                     <div class="mt-8">
                         <input type="hidden" name="status" id="status">

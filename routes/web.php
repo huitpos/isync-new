@@ -213,6 +213,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/purchase-requests/{id}/print', [BranchPurchaseRequestController::class, 'print'])->name('branch.purchase-requests.print');
             Route::get('/purchase-orders/{id}/print', [BranchPurchaseOrderController::class, 'print'])->name('branch.purchase-orders.print');
             Route::get('/purchase-deliveries/{id}/print', [BranchPurchaseDeliveryController::class, 'print'])->name('branch.purchase-deliveries.print');
+            Route::get('/product-disposals/{id}/print', [BranchProductDisposalController::class, 'print'])->name('branch.product-disposals.print');
 
             Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');
 

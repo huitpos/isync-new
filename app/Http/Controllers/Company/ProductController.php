@@ -91,6 +91,8 @@ class ProductController extends Controller
             ->orderBy('id')
             ->get();
 
+        $srpBranches = $company->branches()->where('status', 'active')->get();
+
         return view('company.products.create', [
             'company' => $company,
             'categories' => $categories,
@@ -98,6 +100,7 @@ class ProductController extends Controller
             'departments' => $departments,
             'itemTypes' => $itemTypes,
             'discountTypes' => $discountTypes,
+            'srpBranches' => $srpBranches,
         ]);
     }
 
@@ -137,7 +140,24 @@ class ProductController extends Controller
                         $fail('The ' . $attribute . ' must be greater than cost.');
                     }
                 },
-            ]
+            ],
+            'branch_srps' => 'nullable|array',
+            'branch_srps.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                // function ($attribute, $value, $fail) use ($request) {
+                //     if ($value > 0 && $value < $request->input('cost')) {
+                //         $fail("Must be greater than or equal to cost.");
+                //     }
+                // },
+            ],
+            'branch_costs' => 'nullable|array',
+            'branch_costs.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
+            'branch_markups' => 'nullable|array',
+            'branch_markups.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -243,6 +263,22 @@ class ProductController extends Controller
                 $product->image = $path;
                 $product->save();
             }
+
+            if ($branchSrps = $request->input('branch_srps')) {
+                $branchCosts = $request->input('branch_costs');
+                $branchMarkups = $request->input('branch_markups');
+
+                foreach ($branchSrps as $branchId => $srp) {
+                    $product->branches()->syncWithoutDetaching([
+                        $branchId => [
+                            'price' => $srp,
+                            'cost' => $branchCosts[$branchId] ?? null,
+                            'markup' => $branchMarkups[$branchId] ?? null,
+                        ]
+                    ]);
+                }
+            }
+
             return redirect()->route('company.products.index', ['companySlug' => $company->slug])
                 ->with('success', 'Product created successfully');
         }
@@ -261,9 +297,12 @@ class ProductController extends Controller
 
         $company = $request->attributes->get('company');
 
+        $srpBranches = $company->branches()->where('status', 'active')->get();
+
         return view('company.products.show', [
             'product' => $product,
             'company' => $company,
+            'srpBranches' => $srpBranches
         ]);
     }
 
@@ -298,6 +337,14 @@ class ProductController extends Controller
             ->orderBy('id')
             ->get();
 
+        $srpBranches = $company->branches()
+            ->with([
+                'products' => function ($query) use ($product) {
+                    $query->where('product_id', '=', $product->id);
+                },
+            ])
+            ->where('status', 'active')->get();
+
         return view('company.products.edit', [
             'company' => $company,
             'product' => $product,
@@ -306,6 +353,7 @@ class ProductController extends Controller
             'subcategories' => $subcategories,
             'itemTypes' => $itemTypes,
             'discountTypes' => $discountTypes,
+            'srpBranches' => $srpBranches,
         ]);
     }
 
@@ -344,7 +392,24 @@ class ProductController extends Controller
                         $fail('The ' . $attribute . ' must be greater than cost.');
                     }
                 },
-            ]
+            ],
+            'branch_srps' => 'nullable|array',
+            'branch_srps.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                // function ($attribute, $value, $fail) use ($request) {
+                //     if ($value > 0 && $value < $request->input('cost')) {
+                //         $fail("Must be greater than or equal to cost.");
+                //     }
+                // },
+            ],
+            'branch_costs' => 'nullable|array',
+            'branch_costs.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
+            'branch_markups' => 'nullable|array',
+            'branch_markups.*' => [
+                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+            ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -447,6 +512,21 @@ class ProductController extends Controller
                     $product->discounts()->attach($discount['discount_type_id'], [
                         'type' => $discount['type'],
                         'discount' => $discount['discount']
+                    ]);
+                }
+            }
+
+            if ($branchSrps = $request->input('branch_srps')) {
+                $branchCosts = $request->input('branch_costs');
+                $branchMarkups = $request->input('branch_markups');
+
+                foreach ($branchSrps as $branchId => $srp) {
+                    $product->branches()->syncWithoutDetaching([
+                        $branchId => [
+                            'price' => $srp,
+                            'cost' => $branchCosts[$branchId] ?? null,
+                            'markup' => $branchMarkups[$branchId] ?? null,
+                        ]
                     ]);
                 }
             }

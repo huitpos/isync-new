@@ -66,7 +66,18 @@
                             <tr>
                                 <td>{{ $transaction->completed_at }}</td>
                                 <th>{{ $transaction->machine->machine_number }}</th>
-                                <th>{{ $transaction->receipt_number }}</th>
+                                <th>
+                                    <a href="{{ route('branch.reports.view-transaction', [
+                                            'transactionId' => $transaction->id,
+                                            'companySlug' => $company->slug,
+                                            'branchSlug' => $branch->slug,
+                                        ]) }}"
+                                        target="_blank"
+                                    >
+                                        {{ $transaction->transaction_number }}
+                                        {{ $transaction->receipt_number }}
+                                    </a>
+                                </th>
                                 <th></th>
                                 <th>1</th>
                                 <th>{{ $transaction->cashier_name }}</th>
