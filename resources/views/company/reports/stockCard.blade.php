@@ -256,9 +256,9 @@
                                     <td>{{ $item->receipt_number }}</td>
                                     <td>{{ $item->qty }}</td>
                                     <td>{{ $item->unit }}</td>
-                                    <td>{{ $item->gross }}</td>
-                                    <td>{{ $item->cost }}</td>
-                                    <td>{{ $item->profit }}</td>
+                                    <td>{{ number_format($item->gross, 2) }}</td>
+                                    <td>{{ number_format($item->cost, 2) }}</td>
+                                    <td>{{ number_format($item->profit, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
