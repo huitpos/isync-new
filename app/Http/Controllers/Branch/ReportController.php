@@ -79,7 +79,7 @@ class ReportController extends Controller
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('branch.reports.salesInvoicesReport', compact('transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        return view('branch.reports.salesInvoicesReport', compact('transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam', 'branch', 'company'));
     }
     
     public function salesTransactionReport(Request $request)

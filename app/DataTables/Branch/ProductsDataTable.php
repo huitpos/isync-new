@@ -82,7 +82,7 @@ class ProductsDataTable extends DataTable
                 'branches' => function ($query) use ($branchId) {
                     $query->where('branches.id', $branchId);
                 },
-                'deliveryUom',
+                'deliveryUom'
             ]);
     }
 
