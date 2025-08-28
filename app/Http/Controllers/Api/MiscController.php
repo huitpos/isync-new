@@ -185,7 +185,6 @@ class MiscController extends BaseController
                     'rawItems'
                 )
                 ->where('uom_id', '>', 0)
-                ->where('id', '=', 85)
                 ->when($request->from_date, function ($q) use ($request) {
                     $q->where(function ($query) use ($request) {
                         $query->where('updated_at', '>=', $request->from_date)
