@@ -58,7 +58,7 @@
             <td>Requested By</td>
             <td>{{ $pr->createdBy->first_name }} {{ $pr->createdBy->last_name }}</td>
             <td>Department</td>
-            <td>{{ $pr->purchaseOrder->department->name }}</td>
+            <td>{{ ($pr->purchaseOrder->department_id == 'all' || empty($pr->purchaseOrder->department_id)) ? "All" : $pr->purchaseOrder->department->name }}</td>
         </tr>
         <tr>
             <td>Type</td>
