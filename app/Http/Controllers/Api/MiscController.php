@@ -816,6 +816,10 @@ class MiscController extends BaseController
             $query->where('transaction_id', $request->transaction_id);
         }
 
+        if ($request->has('pos_machine_id')) {
+            $query->where('pos_machine_id', $request->pos_machine_id);
+        }
+
         $orders = $query->get();
 
         return $this->sendResponse($orders, 'Orders retrieved successfully.');
@@ -1511,6 +1515,10 @@ class MiscController extends BaseController
             $query->where('transaction_id', $request->transaction_id);
         }
 
+        if ($request->has('pos_machine_id')) {
+            $query->where('pos_machine_id', $request->pos_machine_id);
+        }
+
         $discounts = $query->get();
 
         return $this->sendResponse($discounts, 'Discounts retrieved successfully.');
@@ -1695,6 +1703,10 @@ class MiscController extends BaseController
 
         if ($request->has('transaction_id')) {
             $query->where('transaction_id', $request->transaction_id);
+        }
+
+        if ($request->has('pos_machine_id')) {
+            $query->where('pos_machine_id', $request->pos_machine_id);
         }
 
         $discounts = $query->get();
@@ -2019,6 +2031,10 @@ class MiscController extends BaseController
 
         if ($request->has('transaction_id')) {
             $query->where('transaction_id', $request->transaction_id);
+        }
+
+        if ($request->has('pos_machine_id')) {
+            $query->where('pos_machine_id', $request->pos_machine_id);
         }
 
         $records = $query->get();
