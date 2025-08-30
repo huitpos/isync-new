@@ -1572,6 +1572,94 @@ class ReportController extends Controller
         ));
     }
 
+    public function hourlyTransactionReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+        
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d');
+        $endDate = Carbon::now()->format('Y-m-d');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d');
+        }
+
+        if ($request->isMethod('post')) {
+            $branch = Branch::find($branchId);
+            
+            return Excel::download(
+                new HourlyTransactionReportExport($branchId, $startDate, $endDate),
+                'Hourly_Transaction_Report_' . $branch->name . '_' . Carbon::parse($startDate)->format('Y-m-d') . '_' . Carbon::parse($endDate)->format('Y-m-d') . '.xlsx'
+            );
+        }
+
+        // Get hourly transaction data for the view using raw SQL
+        $hourlyTransactionQuery = "
+            SELECT 
+                DATE(transactions.treg) as transaction_date,
+                HOUR(transactions.treg) as transaction_hour,
+                COUNT(transactions.id) as transaction_count
+            FROM transactional_db.transactions
+            WHERE transactions.is_complete = TRUE
+                AND transactions.branch_id = $branchId
+                AND transactions.is_void = FALSE
+                AND transactions.is_back_out = FALSE
+                AND transactions.treg BETWEEN '$startDate 00:00:00' AND '$endDate 23:59:59'
+            GROUP BY DATE(transactions.treg), HOUR(transactions.treg)
+            ORDER BY transaction_date, transaction_hour
+        ";
+
+        $transactionsData = collect(DB::select($hourlyTransactionQuery));
+        
+        // Organize data by date and hour
+        $transactionsByHour = [];
+        $timeSlots = [
+            '00:00-01:00', '01:00-02:00', '02:00-3:00', '3:00-4:00', '4:00-5:00',
+            '5:00-6:00', '6:00-7:00', '7:00-08:00', '8:00-9:00', '9:00-10:00',
+            '10:00-11:00', '11:00-12:00', '12:00-13:00', '13:00-14:00', '14:00-15:00',
+            '15:00-16:00', '16:00-17:00', '17:00-18:00', '18:00-19:00', '19:00-20:00',
+            '20:00-21:00', '21:00-22:00', '22:00-23:00', '23:00-24:00'
+        ];
+        
+        foreach ($transactionsData as $transaction) {
+            $transactionsByHour[$transaction->transaction_date][intval($transaction->transaction_hour)] = $transaction->transaction_count;
+        }
+        
+        // Create date range for the view
+        $period = \Carbon\CarbonPeriod::create($startDate, $endDate);
+        $days = [];
+        
+        foreach ($period as $date) {
+            $days[] = [
+                'date' => $date->format('Y-m-d'),
+                'formatted_date' => $date->format('M j, Y'),
+                'day_name' => $date->format('l')
+            ];
+        }
+
+        $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
+        $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
+        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+
+        return view('company.reports.hourlyTransaction', compact(
+            'company', 
+            'branches', 
+            'branchId',
+            'transactionsByHour',
+            'timeSlots',
+            'days',
+            'startDateParam',
+            'endDateParam',
+            'selectedRangeParam'
+        ));
+    }
+
     public function safekeepingReport(Request $request)
     {
         $company = $request->attributes->get('company');

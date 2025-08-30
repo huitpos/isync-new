@@ -657,6 +657,7 @@
 							'company.reports.hourly-sales-report',
 							'company.reports.hourly-transaction-report',
 							'company.reports.safekeeping-report',
+							'company.reports.bir-sales-summary-report'
 						) ? 'here show' : '' }}" data-kt-menu-trigger="click">
 							<span class="menu-link">
 								<span class="menu-title">Sales Reports</span>
@@ -727,6 +728,26 @@
 
 									<a class="menu-link {{ request()->routeIs('company.reports.monthly-sales-summary-report') ? 'active' : '' }}" href="{{ route('company.reports.monthly-sales-summary-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 										<span class="menu-title">Monthly Sales Report</span>
+									</a>
+
+									<a class="menu-link {{ request()->routeIs('company.reports.bir-sales-summary-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-sales-summary-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">BIR Sales Summary Report</span>
+									</a>
+
+									<a class="menu-link {{ request()->routeIs('company.reports.bir-senior-citizen-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-senior-citizen-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Senior Citizen Sales Book/Report</span>
+									</a>
+
+									<a class="menu-link {{ request()->routeIs('company.reports.bir-pwd-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-pwd-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Persons with Disability Sales Book/Report</span>
+									</a>
+									
+									<a class="menu-link {{ request()->routeIs('company.reports.bir-naac-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-naac-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">National Athletes and Coaches Sales Book/Report</span>
+									</a>
+									
+									<a class="menu-link {{ request()->routeIs('company.reports.bir-solo-parent-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-solo-parent-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+										<span class="menu-title">Solo Parent Sales Book/Report</span>
 									</a>
 								</div>
 							</div>
