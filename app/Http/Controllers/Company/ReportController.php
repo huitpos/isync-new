@@ -1029,7 +1029,7 @@ class ReportController extends Controller
 
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.categorySales', compact(
             'company', 
@@ -1112,7 +1112,7 @@ class ReportController extends Controller
 
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.departmentSales', compact(
             'company', 
@@ -1187,7 +1187,7 @@ class ReportController extends Controller
         
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.salesReturn', compact(
             'company', 
@@ -1268,7 +1268,7 @@ class ReportController extends Controller
 
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.subCategorySales', compact(
             'company', 
@@ -1356,7 +1356,7 @@ class ReportController extends Controller
 
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.hourlySales', compact(
             'company', 
@@ -1547,7 +1547,7 @@ class ReportController extends Controller
 
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.hourlySalesSummary', compact(
             'company', 
@@ -1639,7 +1639,7 @@ class ReportController extends Controller
 
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.hourlyTransaction', compact(
             'company', 
@@ -1701,7 +1701,7 @@ class ReportController extends Controller
 
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.safekeeping', compact(
             'company', 
@@ -1938,7 +1938,7 @@ class ReportController extends Controller
 
         $startDateParam = Carbon::parse($startDate)->format('m/d/Y');
         $endDateParam = Carbon::parse($endDate)->format('m/d/Y');
-        $selectedRangeParam = $startDateParam . ' - ' . $endDateParam;
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
 
         return view('company.reports.monthlySalesSummary', compact(
             'company', 
