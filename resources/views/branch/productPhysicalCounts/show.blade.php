@@ -36,7 +36,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Department</label>
-                        <input value="{{ $count->department->name }}" type="text" readonly class="form-control"/>
+                        <input value="{{ ($count->department_id == 'all' || empty($count->department_id)) ? "All" : $count->department->name }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
 
