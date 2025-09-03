@@ -43,7 +43,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Department</label>
-                        <input value="{{ $sto->department->name }}" type="text" readonly class="form-control"/>
+                        <input value="{{ ($sto->department_id == 'all' || empty($sto->department_id)) ? "All" : $sto->department->name }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
 

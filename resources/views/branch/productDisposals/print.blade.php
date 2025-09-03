@@ -25,7 +25,7 @@
     <div class="section">
         <strong>Status:</strong> {{ ucfirst($disposal->status) }}<br>
         <strong>Requested By:</strong> {{ $disposal->createdBy->name }}<br>
-        <strong>Department:</strong> {{ $disposal->department->name ?? '' }}<br>
+        <strong>Department:</strong> {{ $disposal->department_id == 'all' || empty($disposal->department_id)) ? "All" : $disposal->department->name ?? '' }}<br>
         <strong>Reason:</strong> {{ $disposal->productDisposalReason?->name }}<br>
         <strong>Remarks:</strong> {{ $disposal->remarks }}
     </div>
