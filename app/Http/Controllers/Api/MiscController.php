@@ -193,8 +193,6 @@ class MiscController extends BaseController
 
         $products = $branch->company->products;
 
-        dd($products);
-
         return $this->sendResponse($products, 'Products retrieved successfully.');
     }
 
