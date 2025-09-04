@@ -162,19 +162,15 @@ class MiscController extends BaseController
                 $query->whereHas('itemType', function ($subQuery) {
                     $subQuery->where('show_in_cashier', true);
                 })
+                ->leftJoin('branch_product', function ($join) use ($branchId) {
+                    $join->on('branch_product.product_id', '=', 'products.id')
+                         ->where('branch_product.branch_id', '=', $branchId);
+                })
                 ->addSelect([
-                    'srp' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.price, 0), products.srp)')
-                        ->whereColumn('branch_product.product_id', 'products.id')
-                        ->where('branch_product.branch_id', $branchId)
-                        ->limit(1),
-                    'cost' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.cost, 0), products.cost)')
-                        ->whereColumn('branch_product.product_id', 'products.id')
-                        ->where('branch_product.branch_id', $branchId)
-                        ->limit(1),
-                    'markup' => BranchProduct::selectRaw('IFNULL(NULLIF(branch_product.markup, 0), products.markup)')
-                        ->whereColumn('branch_product.product_id', 'products.id')
-                        ->where('branch_product.branch_id', $branchId)
-                        ->limit(1)
+                    'products.*',
+                    DB::raw('IFNULL(NULLIF(branch_product.price, 0), products.srp) as srp'),
+                    DB::raw('IFNULL(NULLIF(branch_product.cost, 0), products.cost) as cost'),
+                    DB::raw('IFNULL(NULLIF(branch_product.markup, 0), products.markup) as markup')
                 ])
                 ->with(
                     'itemType',
@@ -857,6 +853,10 @@ class MiscController extends BaseController
 
         if ($request->has('transaction_id')) {
             $query->where('transaction_id', $request->transaction_id);
+        }
+
+        if ($request->has('pos_machine_id')) {
+            $query->where('pos_machine_id', $request->pos_machine_id);
         }
 
         $orders = $query->get();
@@ -1701,6 +1701,10 @@ class MiscController extends BaseController
             $query->where('transaction_id', $request->transaction_id);
         }
 
+        if ($request->has('pos_machine_id')) {
+            $query->where('pos_machine_id', $request->pos_machine_id);
+        }
+
         $discounts = $query->get();
 
         return $this->sendResponse($discounts, 'Discounts retrieved successfully.');
@@ -1917,6 +1921,10 @@ class MiscController extends BaseController
 
         if ($request->has('transaction_id')) {
             $query->where('transaction_id', $request->transaction_id);
+        }
+
+        if ($request->has('pos_machine_id')) {
+            $query->where('pos_machine_id', $request->pos_machine_id);
         }
 
         $discounts = $query->get();
@@ -2337,6 +2345,10 @@ class MiscController extends BaseController
 
         if ($request->has('transaction_id')) {
             $query->where('transaction_id', $request->transaction_id);
+        }
+
+        if ($request->has('pos_machine_id')) {
+            $query->where('pos_machine_id', $request->pos_machine_id);
         }
 
         $records = $query->get();
