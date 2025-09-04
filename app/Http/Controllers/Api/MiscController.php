@@ -360,7 +360,25 @@ class MiscController extends BaseController
     public function saveTransactions(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                // If it's an array of transactions
+                $data = $requestData['data'];
+            } else {
+                // If it's a single transaction object
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single transaction object (not inside 'data')
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            // If it's an array of transactions (not inside 'data')
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
+
         $failedRequests = [];
         $rules = [
             'transaction_id' => 'required|numeric|min:1',
@@ -561,7 +579,24 @@ class MiscController extends BaseController
     public function saveOrders(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                // If it's an array of orders
+                $data = $requestData['data'];
+            } else {
+                // If it's a single order object
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single order object (not inside 'data')
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            // If it's an array of orders (not inside 'data')
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'order_id' => 'required|numeric|min:1',
@@ -901,7 +936,24 @@ class MiscController extends BaseController
     public function savePayments(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                // If it's an array of payments
+                $data = $requestData['data'];
+            } else {
+                // If it's a single payment object
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single payment object (not inside 'data')
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            // If it's an array of payments (not inside 'data')
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'payment_id' => 'required|numeric|min:1',
@@ -1026,7 +1078,24 @@ class MiscController extends BaseController
     public function saveSafekeepings(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                // If it's an array of safekeepings
+                $data = $requestData['data'];
+            } else {
+                // If it's a single safekeeping object
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single safekeeping object (not inside 'data')
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            // If it's an array of safekeepings (not inside 'data')
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'safekeeping_id' => 'required|numeric|min:1',
@@ -1149,7 +1218,24 @@ class MiscController extends BaseController
     public function saveSafekeepingsDenominations(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                // If it's an array of safekeeping denominations
+                $data = $requestData['data'];
+            } else {
+                // If it's a single safekeeping denomination object
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single safekeeping denomination object (not inside 'data')
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            // If it's an array of safekeeping denominations (not inside 'data')
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'safekeeping_denomination_id' => 'required|numeric|min:1',
@@ -1275,7 +1361,20 @@ class MiscController extends BaseController
     public function saveEndOfDays(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'end_of_day_id' => 'required|numeric|min:1',
@@ -1452,7 +1551,20 @@ class MiscController extends BaseController
     public function saveCutOffs(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'cut_off_id' => 'required|numeric|min:1',
@@ -1713,7 +1825,21 @@ class MiscController extends BaseController
     public function saveDiscounts(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
+
         $failedRequests = [];
         $rules = [
             'discount_id' => 'required|numeric|min:1',
@@ -1935,7 +2061,20 @@ class MiscController extends BaseController
     public function saveDiscountDetails(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'discount_details_id' => 'required|numeric|min:1',
@@ -2072,7 +2211,20 @@ class MiscController extends BaseController
     public function savePaymentOtherInformations(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'payment_other_information_id' => 'required',
@@ -2244,7 +2396,20 @@ class MiscController extends BaseController
     public function saveDiscountOtherInformations(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'discount_other_information_id' => 'required',
@@ -2393,7 +2558,20 @@ class MiscController extends BaseController
     public function saveCutOffDepartments(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'cut_off_department_id' => 'required',
@@ -2512,7 +2690,20 @@ class MiscController extends BaseController
     public function saveCutOffDiscounts(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'cut_off_discount_id' => 'required',
@@ -2631,7 +2822,20 @@ class MiscController extends BaseController
     public function saveCutOffPayments(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'cut_off_payment_id' => 'required',
@@ -2750,7 +2954,20 @@ class MiscController extends BaseController
     public function saveEndOfDayDiscounts(Request $request) 
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'end_of_day_discount_id' => 'required',
@@ -2832,7 +3049,20 @@ class MiscController extends BaseController
     public function saveEndOfDayPayments(Request $request) 
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'end_of_day_payment_id' => 'required',
@@ -2913,7 +3143,20 @@ class MiscController extends BaseController
     public function saveEndOfDayDepartments(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'end_of_day_department_id' => 'required',
@@ -3037,7 +3280,20 @@ class MiscController extends BaseController
     public function saveCashFunds(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'cash_fund_id' => 'required',
@@ -3154,7 +3410,20 @@ class MiscController extends BaseController
     public function saveCashFundDenominations(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'cash_fund_denomination_id' => 'required',
@@ -3277,7 +3546,20 @@ class MiscController extends BaseController
     public function saveAuditTrails(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'audit_trail_id' => 'required',
@@ -3396,7 +3678,20 @@ class MiscController extends BaseController
     public function saveCutOffProducts(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'cut_off_product_id' => 'required',
@@ -3513,7 +3808,20 @@ class MiscController extends BaseController
     public function savePayouts(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'payout_id' => 'required',
@@ -3638,7 +3946,20 @@ class MiscController extends BaseController
     public function saveOfficialReceiptInformations(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'official_receipt_information_id' => 'required',
@@ -3758,7 +4079,20 @@ class MiscController extends BaseController
     public function saveSpotAudits(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'spot_audit_id' => 'required',
@@ -3922,7 +4256,20 @@ class MiscController extends BaseController
     public function saveSpotAuditDenominations(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'spot_audit_denomination_id' => 'required',
@@ -4046,7 +4393,20 @@ class MiscController extends BaseController
     public function saveEndOfDayProducts(Request $request)
     {
         $requestData = $request->all();
-        $data = $requestData['data'] ?? [];
+        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        if (isset($requestData['data'])) {
+            if (is_array($requestData['data'])) {
+                $data = $requestData['data'];
+            } else {
+                $data = [$requestData['data']];
+            }
+        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            $data = [$requestData];
+        } elseif (is_array($requestData)) {
+            $data = $requestData;
+        } else {
+            $data = [];
+        }
         $failedRequests = [];
         $rules = [
             'end_of_day_product_id' => 'required',
@@ -4243,5 +4603,12 @@ class MiscController extends BaseController
         ]);
 
         return $this->sendResponse($transaction, 'Transaction updated successfully.');
+    }
+
+    // Helper to check if array is associative
+    private static function isAssoc(array $arr)
+    {
+        if ([] === $arr) return false;
+        return array_keys($arr) !== range(0, count($arr) - 1);
     }
 }
