@@ -2749,7 +2749,10 @@ class MiscController extends BaseController
 
     public function saveEndOfDayDiscounts(Request $request) 
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'end_of_day_discount_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -2760,46 +2763,78 @@ class MiscController extends BaseController
             'amount' => 'required',
             'is_sent_to_server' => 'required',
             'treg' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'end_of_day_discount_id' => $request->end_of_day_discount_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'end_of_day_id' => $request->end_of_day_id,
-            'discount_type_id' => $request->discount_type_id,
-            'name' => $request->name,
-            'transaction_count' => $request->transaction_count,
-            'amount' => $request->amount,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'treg' => $request->treg,
-            'company_id' => $request->company_id,
-            'is_zero_rated' => $request->is_zero_rated,
         ];
 
-        $message = 'end of day discount created successfully.';
-        $record = EndOfDayDiscount::where([
-            'end_of_day_discount_id' => $request->end_of_day_discount_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'end of day discount updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $discount) {
+                $validator = validator($discount, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $discount;
+                    continue;
+                }
+
+                $postData = [
+                    'end_of_day_discount_id' => $discount['end_of_day_discount_id'] ?? null,
+                    'pos_machine_id' => $discount['pos_machine_id'] ?? null,
+                    'branch_id' => $discount['branch_id'] ?? null,
+                    'end_of_day_id' => $discount['end_of_day_id'] ?? null,
+                    'discount_type_id' => $discount['discount_type_id'] ?? null,
+                    'name' => $discount['name'] ?? null,
+                    'transaction_count' => $discount['transaction_count'] ?? null,
+                    'amount' => $discount['amount'] ?? null,
+                    'is_sent_to_server' => $discount['is_sent_to_server'] ?? null,
+                    'treg' => $discount['treg'] ?? null,
+                    'company_id' => $discount['company_id'] ?? null,
+                    'is_zero_rated' => $discount['is_zero_rated'] ?? null,
+                ];
+
+                $record = EndOfDayDiscount::where([
+                    'end_of_day_discount_id' => $discount['end_of_day_discount_id'],
+                    'pos_machine_id' => $discount['pos_machine_id'],
+                    'branch_id' => $discount['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                EndOfDayDiscount::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(EndOfDayDiscount::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'End Of Day Discounts processed successfully.');
     }
 
     public function saveEndOfDayPayments(Request $request) 
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'end_of_day_payment_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -2810,40 +2845,69 @@ class MiscController extends BaseController
             'amount' => 'required',
             'is_sent_to_server' => 'required',
             'treg' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'end_of_day_payment_id' => $request->end_of_day_payment_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'end_of_day_id' => $request->end_of_day_id,
-            'payment_type_id' => $request->payment_type_id,
-            'name' => $request->name,
-            'transaction_count' => $request->transaction_count,
-            'amount' => $request->amount,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'treg' => $request->treg,
-            'company_id' => $request->company_id,
         ];
 
-        $message = 'end of day payment created successfully.';
-        $record = EndOfDayPayment::where([
-            'end_of_day_payment_id' => $request->end_of_day_payment_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'end of day payment updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $payment) {
+                $validator = validator($payment, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $payment;
+                    continue;
+                }
+
+                $postData = [
+                    'end_of_day_payment_id' => $payment['end_of_day_payment_id'] ?? null,
+                    'pos_machine_id' => $payment['pos_machine_id'] ?? null,
+                    'branch_id' => $payment['branch_id'] ?? null,
+                    'end_of_day_id' => $payment['end_of_day_id'] ?? null,
+                    'payment_type_id' => $payment['payment_type_id'] ?? null,
+                    'name' => $payment['name'] ?? null,
+                    'transaction_count' => $payment['transaction_count'] ?? null,
+                    'amount' => $payment['amount'] ?? null,
+                    'is_sent_to_server' => $payment['is_sent_to_server'] ?? null,
+                    'treg' => $payment['treg'] ?? null,
+                    'company_id' => $payment['company_id'] ?? null,
+                ];
+
+                $record = EndOfDayPayment::where([
+                    'end_of_day_payment_id' => $payment['end_of_day_payment_id'],
+                    'pos_machine_id' => $payment['pos_machine_id'],
+                    'branch_id' => $payment['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                EndOfDayPayment::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(EndOfDayPayment::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'End Of Day Payments processed successfully.');
     }
 
     public function saveEndOfDayDepartments(Request $request)
@@ -2972,7 +3036,10 @@ class MiscController extends BaseController
 
     public function saveCashFunds(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'cash_fund_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -2983,42 +3050,71 @@ class MiscController extends BaseController
             'end_of_day_id' => 'required',
             'is_sent_to_server' => 'required',
             'shift_number' => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'cash_fund_id' => $request->cash_fund_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'amount' => $request->amount,
-            'cashier_id' => $request->cashier_id,
-            'is_cut_off' => $request->is_cut_off,
-            'cut_off_id' => $request->cut_off_id,
-            'end_of_day_id' => $request->end_of_day_id,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'shift_number' => $request->shift_number,
-            'treg' => $request->treg,
-            'cashier_name' => $request->cashier_name,
-            'company_id' => $request->company_id,
         ];
 
-        $message = 'Cash fund created successfully.';
-        $record = CashFund::where([
-            'cash_fund_id' => $request->cash_fund_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'Cash fund updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $fund) {
+                $validator = validator($fund, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $fund;
+                    continue;
+                }
+
+                $postData = [
+                    'cash_fund_id' => $fund['cash_fund_id'] ?? null,
+                    'pos_machine_id' => $fund['pos_machine_id'] ?? null,
+                    'branch_id' => $fund['branch_id'] ?? null,
+                    'amount' => $fund['amount'] ?? null,
+                    'cashier_id' => $fund['cashier_id'] ?? null,
+                    'is_cut_off' => $fund['is_cut_off'] ?? null,
+                    'cut_off_id' => $fund['cut_off_id'] ?? null,
+                    'end_of_day_id' => $fund['end_of_day_id'] ?? null,
+                    'is_sent_to_server' => $fund['is_sent_to_server'] ?? null,
+                    'shift_number' => $fund['shift_number'] ?? null,
+                    'treg' => $fund['treg'] ?? null,
+                    'cashier_name' => $fund['cashier_name'] ?? null,
+                    'company_id' => $fund['company_id'] ?? null,
+                ];
+
+                $record = CashFund::where([
+                    'cash_fund_id' => $fund['cash_fund_id'],
+                    'pos_machine_id' => $fund['pos_machine_id'],
+                    'branch_id' => $fund['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                CashFund::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(CashFund::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'Cash Funds processed successfully.');
     }
 
     public function getCashFunds(Request $request)
@@ -3057,7 +3153,10 @@ class MiscController extends BaseController
 
     public function saveCashFundDenominations(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'cash_fund_denomination_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -3071,45 +3170,74 @@ class MiscController extends BaseController
             'end_of_day_id' => 'required',
             'is_sent_to_server' => 'required',
             'shift_number' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'cash_fund_denomination_id' => $request->cash_fund_denomination_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'cash_fund_id' => $request->cash_fund_id,
-            'cash_denomination_id' => $request->cash_denomination_id,
-            'name' => $request->name,
-            'amount' => $request->amount,
-            'qty' => $request->qty,
-            'total' => $request->total,
-            'is_cut_off' => $request->is_cut_off,
-            'cut_off_id' => $request->cut_off_id,
-            'end_of_day_id' => $request->end_of_day_id,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'shift_number' => $request->shift_number,
-            'treg' => $request->treg,
-            'company_id' => $request->company_id,
         ];
 
-        $message = 'Cash fund denomination created successfully.';
-        $record = CashFundDenomination::where([
-            'cash_fund_denomination_id' => $request->cash_fund_denomination_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'Cash fund denomination updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $denom) {
+                $validator = validator($denom, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $denom;
+                    continue;
+                }
+
+                $postData = [
+                    'cash_fund_denomination_id' => $denom['cash_fund_denomination_id'] ?? null,
+                    'pos_machine_id' => $denom['pos_machine_id'] ?? null,
+                    'branch_id' => $denom['branch_id'] ?? null,
+                    'cash_fund_id' => $denom['cash_fund_id'] ?? null,
+                    'cash_denomination_id' => $denom['cash_denomination_id'] ?? null,
+                    'name' => $denom['name'] ?? null,
+                    'amount' => $denom['amount'] ?? null,
+                    'qty' => $denom['qty'] ?? null,
+                    'total' => $denom['total'] ?? null,
+                    'is_cut_off' => $denom['is_cut_off'] ?? null,
+                    'cut_off_id' => $denom['cut_off_id'] ?? null,
+                    'end_of_day_id' => $denom['end_of_day_id'] ?? null,
+                    'is_sent_to_server' => $denom['is_sent_to_server'] ?? null,
+                    'shift_number' => $denom['shift_number'] ?? null,
+                    'treg' => $denom['treg'] ?? null,
+                    'company_id' => $denom['company_id'] ?? null,
+                ];
+
+                $record = CashFundDenomination::where([
+                    'cash_fund_denomination_id' => $denom['cash_fund_denomination_id'],
+                    'pos_machine_id' => $denom['pos_machine_id'],
+                    'branch_id' => $denom['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                CashFundDenomination::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(CashFundDenomination::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'Cash Fund Denominations processed successfully.');
     }
 
     public function getCashFundDenominations(Request $request)
@@ -3148,7 +3276,10 @@ class MiscController extends BaseController
 
     public function saveAuditTrails(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'audit_trail_id' => 'required',
             'branch_id' => 'required',
             'pos_machine_id' => 'required',
@@ -3159,44 +3290,73 @@ class MiscController extends BaseController
             'order_id' => 'required',
             'price_change_reason_id' => 'required',
             'company_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'audit_trail_id' => $request->audit_trail_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'user_id' => $request->user_id,
-            'user_name' => $request->user_name,
-            'transaction_id' => $request->transaction_id,
-            'action' => $request->action,
-            'description' => $request->description,
-            'authorize_id' => $request->authorize_id,
-            'authorize_name' => $request->authorize_name,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'treg' => $request->treg,
-            'order_id' => $request->order_id,
-            'price_change_reason_id' => $request->price_change_reason_id,
-            'company_id' => $request->company_id,
         ];
 
-        $message = 'Audit Trail created successfully.';
-        $record = AuditTrail::where([
-            'audit_trail_id' => $request->audit_trail_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'Audit Trail updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $audit) {
+                $validator = validator($audit, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $audit;
+                    continue;
+                }
+
+                $postData = [
+                    'audit_trail_id' => $audit['audit_trail_id'] ?? null,
+                    'pos_machine_id' => $audit['pos_machine_id'] ?? null,
+                    'branch_id' => $audit['branch_id'] ?? null,
+                    'user_id' => $audit['user_id'] ?? null,
+                    'user_name' => $audit['user_name'] ?? null,
+                    'transaction_id' => $audit['transaction_id'] ?? null,
+                    'action' => $audit['action'] ?? null,
+                    'description' => $audit['description'] ?? null,
+                    'authorize_id' => $audit['authorize_id'] ?? null,
+                    'authorize_name' => $audit['authorize_name'] ?? null,
+                    'is_sent_to_server' => $audit['is_sent_to_server'] ?? null,
+                    'treg' => $audit['treg'] ?? null,
+                    'order_id' => $audit['order_id'] ?? null,
+                    'price_change_reason_id' => $audit['price_change_reason_id'] ?? null,
+                    'company_id' => $audit['company_id'] ?? null,
+                ];
+
+                $record = AuditTrail::where([
+                    'audit_trail_id' => $audit['audit_trail_id'],
+                    'pos_machine_id' => $audit['pos_machine_id'],
+                    'branch_id' => $audit['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                AuditTrail::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(AuditTrail::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'Audit Trails processed successfully.');
     }
 
     public function getAuditTrails(Request $request)
@@ -3235,7 +3395,10 @@ class MiscController extends BaseController
 
     public function saveCutOffProducts(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'cut_off_product_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -3247,41 +3410,70 @@ class MiscController extends BaseController
             'end_of_day_id' => 'required',
             'is_sent_to_server' => 'required',
             'treg' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'cut_off_product_id' => $request->cut_off_product_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'company_id' => $request->company_id,
-            'cut_off_id' => $request->cut_off_id,
-            'product_id' => $request->product_id,
-            'qty' => $request->qty,
-            'is_cut_off' => $request->is_cut_off,
-            'cut_off_at' => $request->cut_off_at,
-            'end_of_day_id' => $request->end_of_day_id,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'treg' => $request->treg,
         ];
 
-        $message = 'Cut off product created successfully.';
-        $record = CutOffProduct::where([
-            'cut_off_product_id' => $request->cut_off_product_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'Cut off product updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $product) {
+                $validator = validator($product, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $product;
+                    continue;
+                }
+
+                $postData = [
+                    'cut_off_product_id' => $product['cut_off_product_id'] ?? null,
+                    'pos_machine_id' => $product['pos_machine_id'] ?? null,
+                    'branch_id' => $product['branch_id'] ?? null,
+                    'company_id' => $product['company_id'] ?? null,
+                    'cut_off_id' => $product['cut_off_id'] ?? null,
+                    'product_id' => $product['product_id'] ?? null,
+                    'qty' => $product['qty'] ?? null,
+                    'is_cut_off' => $product['is_cut_off'] ?? null,
+                    'cut_off_at' => $product['cut_off_at'] ?? null,
+                    'end_of_day_id' => $product['end_of_day_id'] ?? null,
+                    'is_sent_to_server' => $product['is_sent_to_server'] ?? null,
+                    'treg' => $product['treg'] ?? null,
+                ];
+
+                $record = CutOffProduct::where([
+                    'cut_off_product_id' => $product['cut_off_product_id'],
+                    'pos_machine_id' => $product['pos_machine_id'],
+                    'branch_id' => $product['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                CutOffProduct::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(CutOffProduct::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'Cut Off Products processed successfully.');
     }
 
     public function getCutOffProducts(Request $request)
@@ -3320,7 +3512,10 @@ class MiscController extends BaseController
 
     public function savePayouts(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'payout_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -3335,46 +3530,75 @@ class MiscController extends BaseController
             'is_cut_off' => 'required',
             'cut_off_id' => 'required',
             'treg' => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'payout_id' => $request->payout_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'company_id' => $request->company_id,
-            'control_number' => $request->control_number,
-            'amount' => $request->amount,
-            'reason' => $request->reason,
-            'cashier_id' => $request->cashier_id,
-            'cashier_name' => $request->cashier_name,
-            'authorize_id' => $request->authorize_id,
-            'authorize_name' => $request->authorize_name,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'is_cut_off' => $request->is_cut_off,
-            'cut_off_id' => $request->cut_off_id,
-            'cut_off_at' => $request->cut_off_at,
-            'treg' => $request->treg,
-            'safekeeping_id' => $request->safekeeping_id,
         ];
 
-        $message = 'Payout created successfully.';
-        $record = Payout::where([
-            'payout_id' => $request->payout_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'Payout updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $payout) {
+                $validator = validator($payout, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $payout;
+                    continue;
+                }
+
+                $postData = [
+                    'payout_id' => $payout['payout_id'] ?? null,
+                    'pos_machine_id' => $payout['pos_machine_id'] ?? null,
+                    'branch_id' => $payout['branch_id'] ?? null,
+                    'company_id' => $payout['company_id'] ?? null,
+                    'control_number' => $payout['control_number'] ?? null,
+                    'amount' => $payout['amount'] ?? null,
+                    'reason' => $payout['reason'] ?? null,
+                    'cashier_id' => $payout['cashier_id'] ?? null,
+                    'cashier_name' => $payout['cashier_name'] ?? null,
+                    'authorize_id' => $payout['authorize_id'] ?? null,
+                    'authorize_name' => $payout['authorize_name'] ?? null,
+                    'is_sent_to_server' => $payout['is_sent_to_server'] ?? null,
+                    'is_cut_off' => $payout['is_cut_off'] ?? null,
+                    'cut_off_id' => $payout['cut_off_id'] ?? null,
+                    'cut_off_at' => $payout['cut_off_at'] ?? null,
+                    'treg' => $payout['treg'] ?? null,
+                    'safekeeping_id' => $payout['safekeeping_id'] ?? null,
+                ];
+
+                $record = Payout::where([
+                    'payout_id' => $payout['payout_id'],
+                    'pos_machine_id' => $payout['pos_machine_id'],
+                    'branch_id' => $payout['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                Payout::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(Payout::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'Payouts processed successfully.');
     }
 
     public function getPayouts(Request $request)
@@ -3413,7 +3637,10 @@ class MiscController extends BaseController
 
     public function saveOfficialReceiptInformations(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'official_receipt_information_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -3425,44 +3652,73 @@ class MiscController extends BaseController
             'business_style' => 'required',
             'is_void' => 'required',
             'is_sent_to_server' => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'official_receipt_information_id' => $request->official_receipt_information_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'company_id' => $request->company_id,
-            'transaction_id' => $request->transaction_id,
-            'name' => $request->name,
-            'address' => $request->address,
-            'tin' => $request->tin,
-            'business_style' => $request->business_style,
-            'is_void' => $request->is_void,
-            'void_by' => $request->void_by,
-            'void_name' => $request->void_name,
-            'void_at' => $request->void_at,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'treg' => $request->treg,
         ];
 
-        $message = 'Official receipt information created successfully.';
-        $record = OfficialReceiptInformation::where([
-            'official_receipt_information_id' => $request->official_receipt_information_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'Official receipt information updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $info) {
+                $validator = validator($info, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $info;
+                    continue;
+                }
+
+                $postData = [
+                    'official_receipt_information_id' => $info['official_receipt_information_id'] ?? null,
+                    'pos_machine_id' => $info['pos_machine_id'] ?? null,
+                    'branch_id' => $info['branch_id'] ?? null,
+                    'company_id' => $info['company_id'] ?? null,
+                    'transaction_id' => $info['transaction_id'] ?? null,
+                    'name' => $info['name'] ?? null,
+                    'address' => $info['address'] ?? null,
+                    'tin' => $info['tin'] ?? null,
+                    'business_style' => $info['business_style'] ?? null,
+                    'is_void' => $info['is_void'] ?? null,
+                    'void_by' => $info['void_by'] ?? null,
+                    'void_name' => $info['void_name'] ?? null,
+                    'void_at' => $info['void_at'] ?? null,
+                    'is_sent_to_server' => $info['is_sent_to_server'] ?? null,
+                    'treg' => $info['treg'] ?? null,
+                ];
+
+                $record = OfficialReceiptInformation::where([
+                    'official_receipt_information_id' => $info['official_receipt_information_id'],
+                    'pos_machine_id' => $info['pos_machine_id'],
+                    'branch_id' => $info['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                OfficialReceiptInformation::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(OfficialReceiptInformation::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'Official Receipt Informations processed successfully.');
     }
 
     public function getOfficialReceiptInformations(Request $request)
@@ -3501,7 +3757,10 @@ class MiscController extends BaseController
 
     public function saveSpotAudits(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'spot_audit_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -3537,64 +3796,93 @@ class MiscController extends BaseController
             'cut_off_id' => 'required',
             'is_sent_to_server' => 'required',
             'treg' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'spot_audit_id' => $request->spot_audit_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'company_id' => $request->company_id,
-            'beginning_or' => $request->beginning_or,
-            'ending_or' => $request->ending_or,
-            'beginning_amount' => $request->beginning_amount,
-            'ending_amount' => $request->ending_amount,
-            'total_transactions' => $request->total_transactions,
-            'gross_sales' => $request->gross_sales,
-            'net_sales' => $request->net_sales,
-            'vatable_sales' => $request->vatable_sales,
-            'vat_exempt_sales' => $request->vat_exempt_sales,
-            'vat_amount' => $request->vat_amount,
-            'vat_expense' => $request->vat_expense,
-            'void_qty' => $request->void_qty,
-            'void_amount' => $request->void_amount,
-            'total_change' => $request->total_change,
-            'total_payout' => $request->total_payout,
-            'total_service_charge' => $request->total_service_charge,
-            'total_discount_amount' => $request->total_discount_amount,
-            'total_cost' => $request->total_cost,
-            'safekeeping_amount' => $request->safekeeping_amount,
-            'safekeeping_short_over' => $request->safekeeping_short_over,
-            'total_sk' => $request->total_sk,
-            'total_short_over' => $request->total_short_over,
-            'cashier_id' => $request->cashier_id,
-            'cashier_name' => $request->cashier_name,
-            'admin_id' => $request->admin_id,
-            'admin_name' => $request->admin_name,
-            'shift_number' => $request->shift_number,
-            'is_cut_off' => $request->is_cut_off,
-            'cut_off_id' => $request->cut_off_id,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'treg' => $request->treg,
         ];
 
-        $message = 'Spot audit created successfully.';
-        $record = SpotAudit::where([
-            'spot_audit_id' => $request->spot_audit_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'Spot audit updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $audit) {
+                $validator = validator($audit, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $audit;
+                    continue;
+                }
+
+                $postData = [
+                    'spot_audit_id' => $audit['spot_audit_id'] ?? null,
+                    'pos_machine_id' => $audit['pos_machine_id'] ?? null,
+                    'branch_id' => $audit['branch_id'] ?? null,
+                    'company_id' => $audit['company_id'] ?? null,
+                    'beginning_or' => $audit['beginning_or'] ?? null,
+                    'ending_or' => $audit['ending_or'] ?? null,
+                    'beginning_amount' => $audit['beginning_amount'] ?? null,
+                    'ending_amount' => $audit['ending_amount'] ?? null,
+                    'total_transactions' => $audit['total_transactions'] ?? null,
+                    'gross_sales' => $audit['gross_sales'] ?? null,
+                    'net_sales' => $audit['net_sales'] ?? null,
+                    'vatable_sales' => $audit['vatable_sales'] ?? null,
+                    'vat_exempt_sales' => $audit['vat_exempt_sales'] ?? null,
+                    'vat_amount' => $audit['vat_amount'] ?? null,
+                    'vat_expense' => $audit['vat_expense'] ?? null,
+                    'void_qty' => $audit['void_qty'] ?? null,
+                    'void_amount' => $audit['void_amount'] ?? null,
+                    'total_change' => $audit['total_change'] ?? null,
+                    'total_payout' => $audit['total_payout'] ?? null,
+                    'total_service_charge' => $audit['total_service_charge'] ?? null,
+                    'total_discount_amount' => $audit['total_discount_amount'] ?? null,
+                    'total_cost' => $audit['total_cost'] ?? null,
+                    'safekeeping_amount' => $audit['safekeeping_amount'] ?? null,
+                    'safekeeping_short_over' => $audit['safekeeping_short_over'] ?? null,
+                    'total_sk' => $audit['total_sk'] ?? null,
+                    'total_short_over' => $audit['total_short_over'] ?? null,
+                    'cashier_id' => $audit['cashier_id'] ?? null,
+                    'cashier_name' => $audit['cashier_name'] ?? null,
+                    'admin_id' => $audit['admin_id'] ?? null,
+                    'admin_name' => $audit['admin_name'] ?? null,
+                    'shift_number' => $audit['shift_number'] ?? null,
+                    'is_cut_off' => $audit['is_cut_off'] ?? null,
+                    'cut_off_id' => $audit['cut_off_id'] ?? null,
+                    'is_sent_to_server' => $audit['is_sent_to_server'] ?? null,
+                    'treg' => $audit['treg'] ?? null,
+                ];
+
+                $record = SpotAudit::where([
+                    'spot_audit_id' => $audit['spot_audit_id'],
+                    'pos_machine_id' => $audit['pos_machine_id'],
+                    'branch_id' => $audit['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                SpotAudit::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(SpotAudit::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'Spot Audits processed successfully.');
     }
 
     public function getSpotAudits(Request $request)
@@ -3633,7 +3921,10 @@ class MiscController extends BaseController
 
     public function saveSpotAuditDenominations(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'spot_audit_denomination_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -3649,44 +3940,73 @@ class MiscController extends BaseController
             'is_sent_to_server' => 'required',
             'shift_number' => 'required',
             'treg' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'spot_audit_denomination_id' => $request->spot_audit_denomination_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'company_id' => $request->company_id,
-            'spot_audit_id' => $request->spot_audit_id,
-            'cash_denomination_id' => $request->cash_denomination_id,
-            'name' => $request->name,
-            'amount' => $request->amount,
-            'qty' => $request->qty,
-            'total' => $request->total,
-            'is_cut_off' => $request->is_cut_off,
-            'cut_off_id' => $request->cut_off_id,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'shift_number' => $request->shift_number,
-            'treg' => $request->treg,
         ];
 
-        $message = 'Spot audit denomination created successfully.';
-        $record = SpotAuditDenomination::where([
-            'spot_audit_denomination_id' => $request->spot_audit_denomination_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'Spot audit denomination updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $denom) {
+                $validator = validator($denom, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $denom;
+                    continue;
+                }
+
+                $postData = [
+                    'spot_audit_denomination_id' => $denom['spot_audit_denomination_id'] ?? null,
+                    'pos_machine_id' => $denom['pos_machine_id'] ?? null,
+                    'branch_id' => $denom['branch_id'] ?? null,
+                    'company_id' => $denom['company_id'] ?? null,
+                    'spot_audit_id' => $denom['spot_audit_id'] ?? null,
+                    'cash_denomination_id' => $denom['cash_denomination_id'] ?? null,
+                    'name' => $denom['name'] ?? null,
+                    'amount' => $denom['amount'] ?? null,
+                    'qty' => $denom['qty'] ?? null,
+                    'total' => $denom['total'] ?? null,
+                    'is_cut_off' => $denom['is_cut_off'] ?? null,
+                    'cut_off_id' => $denom['cut_off_id'] ?? null,
+                    'is_sent_to_server' => $denom['is_sent_to_server'] ?? null,
+                    'shift_number' => $denom['shift_number'] ?? null,
+                    'treg' => $denom['treg'] ?? null,
+                ];
+
+                $record = SpotAuditDenomination::where([
+                    'spot_audit_denomination_id' => $denom['spot_audit_denomination_id'],
+                    'pos_machine_id' => $denom['pos_machine_id'],
+                    'branch_id' => $denom['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                SpotAuditDenomination::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(SpotAuditDenomination::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'Spot Audit Denominations processed successfully.');
     }
 
     public function getSpotAuditDenominations(Request $request)
@@ -3725,7 +4045,10 @@ class MiscController extends BaseController
 
     public function saveEndOfDayProducts(Request $request)
     {
-        $validator = validator($request->all(), [
+        $requestData = $request->all();
+        $data = $requestData['data'] ?? [];
+        $failedRequests = [];
+        $rules = [
             'end_of_day_product_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -3735,38 +4058,67 @@ class MiscController extends BaseController
             'qty' => 'required',
             'is_sent_to_server' => 'required',
             'treg' => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return $this->sendError('Validation Error', $validator->errors(), 422);
-        }
-
-        $postData = [
-            'end_of_day_product_id' => $request->end_of_day_product_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-            'company_id' => $request->company_id,
-            'end_of_day_id' => $request->end_of_day_id,
-            'product_id' => $request->product_id,
-            'qty' => $request->qty,
-            'is_sent_to_server' => $request->is_sent_to_server,
-            'treg' => $request->treg,
         ];
 
-        $message = 'End of day product created successfully.';
-        $record = EndOfDayProduct::where([
-            'end_of_day_product_id' => $request->end_of_day_product_id,
-            'pos_machine_id' => $request->pos_machine_id,
-            'branch_id' => $request->branch_id,
-        ])->first();
+        $toInsert = [];
+        $toUpdate = [];
 
-        if ($record) {
-            $message = 'End of day product updated successfully.';
-            $record->update($postData);
-            return $this->sendResponse($record, $message);
+        DB::beginTransaction();
+        try {
+            foreach ($data as $idx => $product) {
+                $validator = validator($product, $rules);
+                if ($validator->fails()) {
+                    $failedRequests[$idx] = $product;
+                    continue;
+                }
+
+                $postData = [
+                    'end_of_day_product_id' => $product['end_of_day_product_id'] ?? null,
+                    'pos_machine_id' => $product['pos_machine_id'] ?? null,
+                    'branch_id' => $product['branch_id'] ?? null,
+                    'company_id' => $product['company_id'] ?? null,
+                    'end_of_day_id' => $product['end_of_day_id'] ?? null,
+                    'product_id' => $product['product_id'] ?? null,
+                    'qty' => $product['qty'] ?? null,
+                    'is_sent_to_server' => $product['is_sent_to_server'] ?? null,
+                    'treg' => $product['treg'] ?? null,
+                ];
+
+                $record = EndOfDayProduct::where([
+                    'end_of_day_product_id' => $product['end_of_day_product_id'],
+                    'pos_machine_id' => $product['pos_machine_id'],
+                    'branch_id' => $product['branch_id'],
+                ])->first();
+
+                if ($record) {
+                    $toUpdate[] = [
+                        'model' => $record,
+                        'data' => $postData
+                    ];
+                } else {
+                    $toInsert[] = $postData;
+                }
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                EndOfDayProduct::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['model']->update($item['data']);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
-        return $this->sendResponse(EndOfDayProduct::create($postData), $message);
+        return $this->sendResponse([
+            'failed_requests' => array_values($failedRequests)
+        ], 'End Of Day Products processed successfully.');
     }
 
     public function getEndOfDayProducts(Request $request)
