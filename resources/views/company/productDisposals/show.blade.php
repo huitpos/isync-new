@@ -32,7 +32,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Department</label>
-                        <input value="{{ $disposal->department->name }}" type="text" readonly class="form-control"/>
+                        <input value="{{ ($disposal->department_id == 'all' || empty($disposal->department_id)) ? "All" : $disposal->department->name }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
 
