@@ -183,8 +183,8 @@ class MiscController extends BaseController
                 ->where('uom_id', '>', 0)
                 ->when($request->from_date, function ($q) use ($request) {
                     $q->where(function ($query) use ($request) {
-                        $query->where('updated_at', '>=', $request->from_date)
-                              ->orWhere('created_at', '>=', $request->from_date);
+                        $query->where('products.updated_at', '>=', $request->from_date)
+                              ->orWhere('products.created_at', '>=', $request->from_date);
                     });
                 });
             },
