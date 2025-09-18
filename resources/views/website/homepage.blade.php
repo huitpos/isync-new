@@ -16,53 +16,7 @@
     <link rel="stylesheet" href="assets/play/assets/css/ud-styles.css" />
   </head>
   <body>
-    <!-- ====== Header Start ====== -->
-    <header class="ud-header">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-            <nav class="navbar navbar-expand-lg">
-              <a class="navbar-brand" href="index.html">
-                <img src="{{ image('logos/logo-dark.png') }}" alt="Logo" />
-              </a>
-              <button class="navbar-toggler">
-                <span class="toggler-icon"> </span>
-                <span class="toggler-icon"> </span>
-                <span class="toggler-icon"> </span>
-              </button>
-
-              <div class="navbar-collapse">
-                <ul id="nav" class="navbar-nav mx-auto">
-                  <li class="nav-item">
-                    <a class="ud-menu-scroll" href="#home">Home</a>
-                  </li>
-
-                  <li class="nav-item">
-                    <a class="ud-menu-scroll" href="#about">About</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="ud-menu-scroll" href="#pricing">Pricing</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="ud-menu-scroll" href="#team">Team</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="ud-menu-scroll" href="#contact">Contact</a>
-                  </li>
-                </ul>
-              </div>
-
-              <div class="navbar-btn d-none d-sm-inline-block">
-                <a href="/login" class="ud-main-btn ud-login-btn">
-                  Log In
-                </a>
-              </div>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </header>
-    <!-- ====== Header End ====== -->
+    @include('website.header')
 
     <!-- ====== Hero Start ====== -->
     <section class="ud-hero" id="home">
@@ -106,6 +60,7 @@
             </div>
           </div>
         </div>
+
         <div class="row">
           <div class="col-xl-4 col-lg-4 col-sm-6">
             <div class="ud-single-feature wow fadeInUp text-center">
@@ -241,6 +196,112 @@
     </section>
     <!-- ====== Features End ====== -->
 
+    <section class="ud-features">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="ud-section-title mx-auto">
+              <h2>What Makes Your Business Better with Our POS</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="ud-single-feature wow fadeInUp text-center">
+              <div class="ud-faq-icon mx-auto">
+                <img src="assets/play/assets/images/homepage/anytime.png"/>
+              </div>
+              <div class="ud-feature-content">
+                <h3 class="ud-feature-title">Anytime, Anywhere Access</h3>
+                <p class="ud-feature-desc">
+                  Manage your business remotely with real-time insights.
+                </p>
+              </div>
+            </div>
+
+            <div class="ud-single-feature wow fadeInUp text-center">
+              <div class="ud-faq-icon mx-auto">
+                <img src="assets/play/assets/images/homepage/customer-centric.png"/>
+              </div>
+              <div class="ud-feature-content">
+                <h3 class="ud-feature-title">Customer-Centric Service</h3>
+                <p class="ud-feature-desc">
+                  Deliver fast, accurate, and hassle-free checkouts.
+                </p>
+              </div>
+            </div>
+
+            <div class="ud-single-feature wow fadeInUp text-center">
+              <div class="ud-faq-icon mx-auto">
+                <img src="assets/play/assets/images/homepage/unmatched-reliability.png"/>
+              </div>
+              <div class="ud-feature-content">
+                <h3 class="ud-feature-title">Unmatched Reliability</h3>
+                <p class="ud-feature-desc">
+                  Secure data, backups, and disaster recovery you can trust.
+                </p>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-lg-6">
+            <div class="ud-single-feature wow fadeInUp text-center">
+              <div class="ud-faq-icon mx-auto">
+                <img src="assets/play/assets/images/homepage/maximum-efficiency.png"/>
+              </div>
+              <div class="ud-feature-content">
+                <h3 class="ud-feature-title">Maximum Efficiency</h3>
+                <p class="ud-feature-desc">
+                  Speed up transactions and automate processes to save time.
+                </p>
+              </div>
+            </div>
+
+            <div class="ud-single-feature wow fadeInUp text-center">
+              <div class="ud-faq-icon mx-auto">
+                <img src="assets/play/assets/images/homepage/full-customization.png"/>
+              </div>
+              <div class="ud-feature-content">
+                <h3 class="ud-feature-title">Full Customization</h3>
+                <p class="ud-feature-desc">
+                  Configure the system to match your workflows and needs.
+                </p>
+              </div>
+            </div>
+
+            <div class="ud-single-feature wow fadeInUp text-center">
+              <div class="ud-faq-icon mx-auto">
+                <img src="assets/play/assets/images/homepage/full-customization.png"/>
+              </div>
+              <div class="ud-feature-content">
+                <h3 class="ud-feature-title">Continuous Innovation</h3>
+                <p class="ud-feature-desc">
+                  Stay ahead with regular updates and smart features.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="ud-about">
+      <div class="container">
+        <div class="ud-about-wrapper wow fadeInUp" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+          <div class="ud-about-content-wrapper">
+            <div class="ud-about-content">
+              <h2>Upgrade your POS experience now and enjoy seamless operations.</h2>
+              <a href="javascript:void(0)" class="ud-main-btn">Learn More</a>
+            </div>
+          </div>
+          <div class="ud-about-image">
+            <img src="assets/play/assets/images/homepage/pos-screenshot.png" alt="about-image">
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ====== Footer Start ====== -->
     <footer class="ud-footer wow fadeInUp" data-wow-delay=".15s">
       <div class="shape shape-1">
@@ -255,13 +316,23 @@
       <div class="ud-footer-widgets">
         <div class="container">
           <div class="row">
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-6">
               <div class="ud-widget">
                 <a href="index.html" class="ud-footer-logo">
                   <img src="{{ image('logos/logo-dark.png') }}" alt="logo" />
                 </a>
                 <p class="ud-widget-desc">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eget.
+                  Call us at:  09171933977<br/>
+                  Email: sales@isync.ph</br/>
+                  Address: Blk 18 Lot 39 Madrid St. Town and Country West Molino 3 Bacoor Cavite
+                </p>
+              </div>
+            </div>
+
+            <div class="col-xl-5">
+              <div class="ud-widget" style="margin-top: 80px">
+                <p class="ud-widget-desc">
+                  One click away from smarter sales and seamless service, get in touch now.
                 </p>
                 <ul class="ud-widget-socials">
                   <li>
@@ -286,6 +357,25 @@
                   </li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ud-footer-bottom">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-8">
+              <ul class="ud-footer-bottom-left">
+                <li>
+                  <a href="javascript:void(0)">Privacy policy</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Support policy</a>
+                </li>
+                <li>
+                  <a href="javascript:void(0)">Terms of service</a>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

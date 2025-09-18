@@ -96,7 +96,11 @@ require __DIR__ . '/auth.php';
 
 Route::view('/swagger', 'swagger');
 
-Route::view('/', 'comingSoon');
+Route::view('/', 'website.homepage');
+Route::view('/product-retail', 'website.retail');
+Route::view('/product-restaurant', 'website.restaurant');
+Route::view('/about-us', 'website.aboutUs');
+Route::view('/contact-us', 'website.contactUs');
 
 Route::middleware('auth')->group(function () {
     Route::prefix('ajax')->group(function () {

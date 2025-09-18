@@ -27,6 +27,10 @@ use App\Models\Permission;
 
 class CopyCompanyData extends Command
 {
+
+    // php artisan command:copy-company-data 6 11
+
+    
     /**
      * The name and signature of the console command.
      *
