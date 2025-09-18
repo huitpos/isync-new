@@ -498,7 +498,7 @@ p {
 /* ===== Hero CSS ===== */
 .ud-hero {
   background: var(--primary-color);
-  padding-top: 180px;
+  padding-top: 90px;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 991px) {
@@ -653,8 +653,8 @@ p {
 
 /* ===== Features CSS ===== */
 .ud-features {
-  padding-top: 120px;
-  padding-bottom: 90px;
+  padding-top: 40px;
+  padding-bottom: 40px;
 }
 
 @media (max-width: 767px) {
@@ -665,8 +665,7 @@ p {
 }
 
 .ud-section-title {
-  max-width: 620px;
-  margin-bottom: 70px;
+  margin-bottom: 20px;
 }
 
 .ud-section-title span {
@@ -706,9 +705,14 @@ p {
   transform: rotate(45deg);
 }
 
+.ud-faq-icon {
+  margin-top: -60px;
+  margin-bottom: -60px;
+}
+
 .ud-single-feature .ud-feature-icon {
-  width: 70px;
-  height: 70px;
+  width: 150px;
+  height: 150px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -719,13 +723,12 @@ p {
       -ms-flex-pack: center;
           justify-content: center;
   border-radius: 14px;
-  background: var(--primary-color);
+  /* background: var(--primary-color); */
   font-size: 32px;
   color: var(--white);
   position: relative;
   z-index: 1;
   text-align: center;
-  margin-bottom: 40px;
 }
 
 .ud-single-feature .ud-feature-icon::before {
@@ -736,7 +739,7 @@ p {
   top: 0;
   left: 0;
   border-radius: 14px;
-  background: var(--primary-color);
+  /* background: var(--primary-color); */
   opacity: 0.2;
   z-index: -1;
   -webkit-transform: rotate(23deg);
@@ -777,7 +780,7 @@ p {
 /* ===== About CSS ===== */
 .ud-about {
   background: #f3f4fe;
-  padding: 120px 0;
+  padding: 70px 0;
 }
 
 @media (max-width: 767px) {
@@ -1218,8 +1221,8 @@ p {
 }
 
 .ud-single-team .ud-team-image-wrapper {
-  width: 170px;
-  height: 170px;
+  width: 225px;
+  height: 225px;
   position: relative;
   margin: 0px auto 25px;
 }
@@ -1255,15 +1258,22 @@ p {
 
 .ud-single-team .ud-team-info h5 {
   font-weight: 500;
-  font-size: 18px;
+  font-size: 20px;
   text-transform: capitalize;
   margin-bottom: 10px;
 }
 
 .ud-single-team .ud-team-info h6 {
   font-weight: 500;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--body-color);
+}
+
+.ud-single-team .ud-team-info p {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--body-color);
+  margin-top: 10px;
 }
 
 .ud-single-team .ud-team-socials {
@@ -1372,14 +1382,15 @@ p {
   display: -ms-flexbox;
   display: flex;
   max-width: 100%;
-  width: 330px;
+  width: 50%;
   margin-bottom: 30px;
 }
 
 .ud-contact-info-wrapper .ud-info-icon {
   font-size: 32px;
   color: var(--primary-color);
-  margin-right: 24px;
+  margin-left: 24px;
+  width: 30%;
 }
 
 .ud-contact-info-wrapper .ud-info-meta h5 {
@@ -1455,7 +1466,7 @@ p {
 /* ===== Footer CSS ===== */
 .ud-footer {
   background: var(--primary-color);
-  padding-top: 100px;
+  padding-top: 40px;
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -1630,8 +1641,8 @@ p {
 
 /* ====== Banner CSS ======= */
 .ud-page-banner {
-  padding-top: 130px;
-  padding-bottom: 80px;
+  padding-top: 100px;
+  padding-bottom: 25px;
   background: var(--primary-color);
   background-image: url("../images/banner/banner-bg.svg");
   background-position: center;
@@ -1649,6 +1660,18 @@ p {
   color: var(--white);
   font-size: 38px;
   font-weight: 600;
+}
+
+.ud-banner-content .ud-banner-desc {
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 35px;
+  text-align: center;
+  color: var(--white);
+  opacity: 0.8;
+  max-width: 600px;
+  margin: auto;
+  margin-bottom: 30px;
 }
 
 /* ====== Login CSS ====== */
@@ -1773,12 +1796,17 @@ p {
 
 /* ====== Blog CSS ====== */
 .ud-blog-grids {
-  padding-top: 120px;
   padding-bottom: 80px;
 }
 
 .ud-blog-grids.ud-related-articles {
   padding-top: 100px;
+}
+
+.ud-blog-content {
+  border: 2px solid black;
+  padding: 10px;
+  height: 200px;
 }
 
 @media (max-width: 767px) {
@@ -1799,8 +1827,10 @@ p {
 
 .ud-single-blog .ud-blog-image {
   border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
 }
 
 .ud-single-blog .ud-blog-image a {
@@ -1808,7 +1838,7 @@ p {
 }
 
 .ud-single-blog .ud-blog-image img {
-  width: 100%;
+  width: 50%;
   -webkit-transition: all 0.3s ease-out 0s;
   transition: all 0.3s ease-out 0s;
 }
@@ -1886,7 +1916,7 @@ p {
   position: relative;
   border-radius: 5px;
   overflow: hidden;
-  height: 500px;
+  height: 800px;
 }
 
 @media (max-width: 767px) {
