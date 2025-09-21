@@ -1,25 +1,74 @@
-name: Deploy to EC2 Staging
+name: Build and Deploy to EC2 Staging
 
 on:
   push:
     branches: [ staging ]
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # palitan depende sa PHP version mo
+          extensions: mbstring, bcmath, intl
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run production
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: public
+
   deploy:
     runs-on: ubuntu-latest
-    
+    needs: build
+
     steps:
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          cd /var/www/isync-new
-          git pull origin staging --no-ff
-          php artisan migrate --force
-          php artisan migrate --database=transactional_db --path=database/migrations/transactional_db
-          php artisan config:cache
-          npm install
-          npm run production
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: public
+
+      - name: Deploy to EC2 (code + migrations)
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /var/www/isync-new
+            git pull origin staging --no-ff
+            composer install --no-interaction --prefer-dist --optimize-autoloader
+            php artisan migrate --force
+            php artisan migrate --database=transactional_db --path=database/migrations/transactional_db
+            php artisan config:cache
+
+      - name: Upload public folder (compiled assets)
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "public/*"
+          target: "/var/www/isync-new/public"
