@@ -21,3 +21,5 @@ jobs:
           php artisan migrate --force
           php artisan migrate --database=transactional_db --path=database/migrations/transactional_db
           php artisan config:cache
+          npm install
+          npm run production
