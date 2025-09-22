@@ -15,7 +15,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # palitan depende sa PHP version mo
+          php-version: '8.2' # palitan depende sa version ng project mo
           extensions: mbstring, bcmath, intl
           coverage: none
 
@@ -32,6 +32,11 @@ jobs:
 
       - name: Build assets
         run: npm run production
+
+      # fix for Zone.Identifier files (invalid filenames with colon ":")
+      - name: Remove invalid Zone.Identifier files
+        run: |
+          find public -type f -name "*:*" -delete
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
