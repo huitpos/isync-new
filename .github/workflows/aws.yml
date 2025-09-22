@@ -76,3 +76,13 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "build-public/*"    # ✅ ayusin yung source
           target: "/var/www/isync-new/public"
+
+      - name: Deploy to EC2 (code + migrations)
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cp -r /var/www/isync-new/public/build-public/* /var/www/isync-new/public/
+            rm -rf /var/www/isync-new/public/build-public
