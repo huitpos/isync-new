@@ -15,7 +15,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # palitan depende sa PHP version ng project mo
+          php-version: '8.2' # palitan kung ibang PHP version ang gamit mo
           extensions: mbstring, bcmath, intl
           coverage: none
 
@@ -25,18 +25,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22.12
+          node-version: 22
 
       - name: Install NPM dependencies
         run: npm ci
 
-      - name: Build assets
-        run: npm run production
-
-      # fix for Zone.Identifier files (invalid filenames with colon ":")
       - name: Remove invalid Zone.Identifier files
         run: |
-          find public -type f -name "*:*" -delete
+          find . -type f -name "*:*" -delete
+
+      - name: Build assets
+        run: npm run production
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -53,7 +52,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .   # download to root, not inside another /public
+          path: .   # idedrop sa runner root
+
+      - name: Check contents after artifact download
+        run: ls -R public
 
       - name: Deploy to EC2 (code + migrations)
         uses: appleboy/ssh-action@v0.1.7
@@ -75,5 +77,5 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "public/*"
-          target: "/var/www/isync-new/public"
+          source: "public"
+          target: "/var/www/isync-new"
