@@ -15,7 +15,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # palitan depende sa version ng project mo
+          php-version: '8.2' # palitan depende sa PHP version ng project mo
           extensions: mbstring, bcmath, intl
           coverage: none
 
@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.12
 
       - name: Install NPM dependencies
         run: npm ci
@@ -53,7 +53,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: public
+          path: .   # download to root, not inside another /public
 
       - name: Deploy to EC2 (code + migrations)
         uses: appleboy/ssh-action@v0.1.7
