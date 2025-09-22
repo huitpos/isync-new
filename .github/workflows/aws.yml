@@ -52,10 +52,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .   # idedrop sa runner root
-
-      - name: Check contents after artifact download
-        run: ls -R public
+          path: .
 
       - name: Deploy to EC2 (code + migrations)
         uses: appleboy/ssh-action@v0.1.7
