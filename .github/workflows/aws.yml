@@ -52,7 +52,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-output
-          path: .
+          path: public
 
       - name: Deploy to EC2 (code + migrations)
         uses: appleboy/ssh-action@v0.1.7
@@ -74,5 +74,5 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "public"
-          target: "/var/www/isync-new"
+          source: "public/*"
+          target: "/var/www/isync-new/public"
