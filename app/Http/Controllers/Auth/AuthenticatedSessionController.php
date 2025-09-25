@@ -43,6 +43,7 @@ class AuthenticatedSessionController extends Controller
         session(['_apiToken' => $user->createToken('app')->plainTextToken]);
 
         $roles = $user->roles;
+        $branches = auth()->user()->activeBranches;
 
         $permissions = collect();
         foreach ($roles as $role) {
@@ -66,10 +67,14 @@ class AuthenticatedSessionController extends Controller
 
             $parentPermission = $companyLevelPermission->whereNull('parent_id')->first();
             $childPermission = $companyLevelPermission->where('parent_id', $parentPermission->id)->first();
+            $route = $childPermission->route ?? 'company.dashboard';
 
-            $route = $routes[$childPermission->name] ?? 'company.dashboard';
-
-            return route($route, ['companySlug' => $company->slug]);
+            return route($route, [
+                'companySlug' => $company->slug,
+                'companyId' => $company->id,
+                'branchSlug' => $branches->first()->slug,
+                'branchId' => $branches->first()->id
+            ]);
         }
 
         if ($user->hasRole('branch_user')) {
