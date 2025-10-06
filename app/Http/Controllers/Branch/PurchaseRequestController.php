@@ -12,8 +12,17 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\DataTables\Branch\PurchaseRequestsDataTable;
 
+use App\Repositories\Interfaces\ProductRepositoryInterface;
+
 class PurchaseRequestController extends Controller
 {
+    protected $productRepository;
+
+    public function __construct(
+        ProductRepositoryInterface $productRepository
+    ) {
+        $this->productRepository = $productRepository;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -119,6 +128,7 @@ class PurchaseRequestController extends Controller
         $prData = $request->all();
         $prData['branch_id'] = $branch->id;
         $prData['pr_number'] = $prNumber;
+        $prData['status'] = 'approved';
         unset($prData['pr_items']);
 
         $prData['department_id'] = $postData['department_id'] == 'all' ? null : $postData['department_id'];
@@ -129,6 +139,20 @@ class PurchaseRequestController extends Controller
         $purchaseRequest->save();
 
         $purchaseRequest->items()->createMany($postData['pr_items']);
+        
+        $pd = PurchaseRequest::findOrFail($purchaseRequest->id);
+        foreach ($pd->items as $item) {
+            $product = $item->product;
+
+            $product->cost = $item->unit_price;
+
+            $srp = $product->markup_type == 'percentage' ? $item->unit_price + ($item->unit_price * ($product->markup / 100)) : $item->unit_price + $product->markup;
+
+            $product->srp = $srp;
+            $product->save();
+
+            $this->productRepository->updateBranchQuantity($product, $branch, $purchaseRequest->id, 'purchase_deliveries', $item->quantity, $srp, 'add', $item->uom_id);
+        }
 
         return redirect()->route('branch.purchase-requests.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Purchase Request has been created.');
 

@@ -112,39 +112,11 @@
 					</a>
 				</div>
 
-				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
-					{{ request()->routeIs(
-						'branch.purchase-requests.*',
-						'branch.purchase-orders.*',
-						'branch.purchase-deliveries.*',
-						'branch.purchase-delivery.*',
-					) ? 'here show' : '' }}"
-				>
-					<span class="menu-link">
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('branch.purchase-requests.*') ? 'active' : '' }}" href="{{ route('branch.purchase-requests.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 						<span class="menu-icon"><i class="fa-solid fa-boxes-stacked fs-2"></i></span>
-						<span class="menu-title">Procurement</span>
-						<span class="menu-arrow"></span>
-					</span>
-
-					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('branch.purchase-requests.*') ? 'active' : '' }}" href="{{ route('branch.purchase-requests.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-								<span class="menu-title">Purchase Requests</span>
-							</a>
-						</div>
-
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('branch.purchase-orders.*') ? 'active' : '' }}" href="{{ route('branch.purchase-orders.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-								<span class="menu-title">Purchase Orders</span>
-							</a>
-						</div>
-
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('branch.purchase-deliveries.*') || request()->routeIs('branch.purchase-delivery.*') ? 'active' : '' }}" href="{{ route('branch.purchase-deliveries.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-								<span class="menu-title">Purchase Deliveries</span>
-							</a>
-						</div>
-					</div>
+						<span class="menu-title">Incoming Delivery</span>
+					</a>
 				</div>
 
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
@@ -359,56 +331,12 @@
 				</div>
 				@endif
 
-				@if (in_array('Procurement', $permissions))
-				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
-					{{ request()->routeIs(
-						'company.purchase-requests.*',
-						'company.purchase-orders.*',
-						'company.purchase-deliveries.*',
-						'company.stock-transfer-requests.*',
-					) ? 'here show' : '' }}"
-				>
-					<span class="menu-link">
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('company.purchase-requests.*') ? 'active' : '' }}" href="{{ route('company.purchase-requests.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 						<span class="menu-icon"><i class="fa-solid fa-boxes-stacked fs-2"></i></span>
-						<span class="menu-title">Procurement</span>
-						<span class="menu-arrow"></span>
-					</span>
-
-					<div class="menu-sub menu-sub-accordion">
-						@if (in_array('Procurement/Purchase Requests', $permissions))
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.purchase-requests.*') ? 'active' : '' }}" href="{{ route('company.purchase-requests.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Purchase Requests</span>
-							</a>
-						</div>
-						@endif
-
-						@if (in_array('Procurement/Purchase Orders', $permissions))
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.purchase-orders.*') ? 'active' : '' }}" href="{{ route('company.purchase-orders.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Purchase Orders</span>
-							</a>
-						</div>
-						@endif
-
-						@if (in_array('Procurement/Purchase Deliveries', $permissions))
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.purchase-deliveries.*') ? 'active' : '' }}" href="{{ route('company.purchase-deliveries.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Purchase Deliveries</span>
-							</a>
-						</div>
-						@endif
-
-						@if (in_array('Procurement/Stock Transfer Requests', $permissions))
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('company.stock-transfer-requests.*') ? 'active' : '' }}" href="{{ route('company.stock-transfer-requests.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">Stock Transfer Requests</span>
-							</a>
-						</div>
-						@endif
-					</div>
+						<span class="menu-title">Incoming Delivery</span>
+					</a>
 				</div>
-				@endif
 
 				@if (in_array('Company Access Level', $permissions))
 				<div data-kt-menu-trigger="click" class="menu-item menu-accordion
@@ -695,8 +623,6 @@
 								<span class="menu-title">Solo Parent Sales Book/Report</span>
 							</a>
 						</div>
-
-						
 					</div>
 				</div>
 			@endif

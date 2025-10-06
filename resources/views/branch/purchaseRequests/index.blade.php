@@ -1,11 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Purchase Requests
-    @endsection
-
-    @section('breadcrumbs')
-        {{ Breadcrumbs::render('branch.purchaseRequests.index', $company, $branch) }}
+        Incoming Delivery
     @endsection
 
     <div class="card">
@@ -22,18 +18,10 @@
             </div>
 
             <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
-
-                <select id="status" class="form-select form-control-solid w-100 mw-250px">
-                    <option value="">Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                </select>
-
                 <div class="d-flex justify-content-end" data-kt-user-table-toolbar="base">
                     <a href="{{ route('branch.purchase-requests.create', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">
                         {!! getIcon('plus', 'fs-2', '', 'i') !!}
-                        Add Purchase Request
+                        Incoming Delivery
                     </a>
                 </div>
             </div>

@@ -26,15 +26,6 @@
                     </div>
                 </div>
 
-                @if ($pr->status != 'pending')
-                <div class="row mb-5">
-                    <div class="col-md-12">
-                        <label class="form-label">Approved/Rejected By:</label>
-                        <input value="{{ $pr->actionBy->name }}" type="text" readonly class="form-control"/>
-                    </div>
-                </div>
-                @endif
-
                 <div class="row mb-5">
                     <div class="col-md-6">
                         <label class="form-label">Requested By</label>

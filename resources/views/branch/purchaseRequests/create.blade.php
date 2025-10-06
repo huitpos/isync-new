@@ -1,11 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Create a new purchase request
-    @endsection
-
-    @section('breadcrumbs')
-        {{ Breadcrumbs::render('branch.purchaseRequests.create', $company, $branch) }}
+        Create a new incoming delivery
     @endsection
 
     @error('pr_items')
