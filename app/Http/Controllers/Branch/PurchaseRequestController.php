@@ -89,17 +89,9 @@ class PurchaseRequestController extends Controller
     {
         $request->validate([
             'department_id' => 'required',
-            'date_needed' => [
-                'required',
-                'date',
-                function ($attribute, $value, $fail) {
-                    if (!strtotime($value) && !strtotime(str_replace('T', ' ', $value))) {
-                        $fail($attribute . ' is not in a valid date-time format.');
-                    }
-                },
-            ],
-            'delivery_location_id' => 'required',
             'supplier_id' => 'required',
+            'delivery_number' => 'required',
+            'sales_invoice_number' => 'required',
             'pr_items' => 'required',
             'pr_items.*.product_id' => 'required',
             'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',

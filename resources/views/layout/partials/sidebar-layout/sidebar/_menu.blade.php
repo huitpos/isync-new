@@ -104,15 +104,6 @@
 				</div>
 
 				<div class="menu-item">
-					<a class="menu-link {{ request()->routeIs('branch.delivery-locations.*') ? 'active' : '' }}" href="{{ route('branch.delivery-locations.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-						<span class="menu-icon">
-							<i class="fa-solid fa-map-location-dot fs-2"></i>
-						</span>
-						<span class="menu-title">Delivery Locations</span>
-					</a>
-				</div>
-
-				<div class="menu-item">
 					<a class="menu-link {{ request()->routeIs('branch.purchase-requests.*') ? 'active' : '' }}" href="{{ route('branch.purchase-requests.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 						<span class="menu-icon"><i class="fa-solid fa-boxes-stacked fs-2"></i></span>
 						<span class="menu-title">Incoming Delivery</span>
@@ -135,24 +126,6 @@
 					</span>
 
 					<div class="menu-sub menu-sub-accordion">
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('branch.stock-transfer-requests.*') ? 'active' : '' }}" href="{{ route('branch.stock-transfer-requests.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-								<span class="menu-title">Stock Transfer Requests</span>
-							</a>
-						</div>
-
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('branch.stock-transfer-orders.*') ? 'active' : '' }}" href="{{ route('branch.stock-transfer-orders.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-								<span class="menu-title">Stock Transfer Orders</span>
-							</a>
-						</div>
-
-						<div class="menu-item">
-							<a class="menu-link {{ request()->routeIs('branch.stock-transfer-deliveries.*') ? 'active' : '' }}" href="{{ route('branch.stock-transfer-deliveries.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-								<span class="menu-title">Stock Transfer Deliveries</span>
-							</a>
-						</div>
-
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('branch.product-physical-counts.*') ? 'active' : '' }}" href="{{ route('branch.product-physical-counts.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
 								<span class="menu-title">Product Physical Count</span>
@@ -260,18 +233,6 @@
 							</a>
 						</div>
 					</div>
-				</div>
-
-				<div class="menu-item">
-					<a class="menu-link {{ request()->routeIs('branch.charge-accounts.*') ? 'active' : '' }}" href="{{ route('branch.charge-accounts.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-						<span class="menu-title">Customer Informations</span>
-					</a>
-				</div>
-
-				<div class="menu-item">
-					<a class="menu-link {{ request()->routeIs('branch.reports.backup') ? 'active' : '' }}" href="{{ route('branch.reports.backup', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-						<span class="menu-title">Back Up</span>
-					</a>
 				</div>
 
 			@elseif (request()->attributes->get('company'))

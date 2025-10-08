@@ -47,23 +47,22 @@
                 </div>
 
                 <div class="row mb-5">
-                    <div class="col-md-6 mb-5">
-                        <label class="form-label">Delivery Location</label>
-                        <input value="{{ $pr->deliveryLocation->name }}" type="text" readonly class="form-control"/>
-                    </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Supplier</label>
                         <input value="{{ $pr->supplier->name }}" type="text" readonly class="form-control"/>
                     </div>
+                </div>
 
-                    <div class="col-md-12">
-                        <label class="form-label">Delivery Address</label>
-                        <input type="text"
-                            value="{{ $pr->deliveryLocation->unit_floor_number . ', ' . $pr->deliveryLocation->street . ', ' . $pr->deliveryLocation->barangay->name . ', ' . $pr->deliveryLocation->city->name . ', ' . $pr->deliveryLocation->province->name . ', ' . $pr->deliveryLocation->region->name }}"
-                            readonly
-                            class="form-control"
-                        />
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <label class="form-label">Sales Invoice Number</label>
+                        <input value="{{ $pr->sales_invoice_number }}" type="text" readonly class="form-control"/>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Delivery Number</label>
+                        <input value="{{ $pr->delivery_number }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
 

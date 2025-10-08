@@ -36,47 +36,7 @@
                 </div>
 
                 <div class="row mb-5">
-                    <div class="col-md-6">
-                        <label class="form-label">Type</label>
-                        <select id="type" name="type" class="form-control" required>
-                            <option value="for_po">For PO</option>
-                        </select>
-
-                        @error('status')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Date Needed</label>
-                        <input data-min-date="today" value="{{ old('date_needed') }}" name="date_needed" type="text" class="form-control @error('date_needed') is-invalid @enderror flatpack-picker" placeholder="Date Needed" required/>
-
-                        @error('date_needed')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row mb-5">
-                    <div class="col-md-6 mb-5">
-                        <label class="form-label">Delivery Location</label>
-                        <select id="delivery_location_id" name="delivery_location_id" class="form-select @error('delivery_location_id') is-invalid @enderror" required>
-                            <option value="">Select Location</option>
-                            @foreach($deliveryLocations as $deliveryLocation)
-                                @php
-                                    $address = $deliveryLocation->unit_floor_number . ' ' . $deliveryLocation->street . ', ' . $deliveryLocation->barangay->name . ', ' . $deliveryLocation->city->name . ', ' . $deliveryLocation->province->name . ', ' . $deliveryLocation->region->name;
-                                @endphp
-
-                                <option data-address="{{ $address }}" value="{{ $deliveryLocation->id }}">{{ $deliveryLocation->name }}</option>
-                            @endforeach
-                        </select>
-
-                        @error('delivery_location_id')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="form-label">Supplier</label>
                         <select id="supplier_id" name="supplier_id" class="form-select @error('supplier_id') is-invalid @enderror" required>
                             <option value="">Select Supplier</option>
@@ -90,10 +50,25 @@
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
                     </div>
+                </div>
 
-                    <div class="col-md-12">
-                        <label class="form-label">Delivery Address</label>
-                        <input id="delivery_address" type="text" disabled class="form-control"/>
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <label class="form-label">Sales Invoice Number</label>
+                        <input value="" name="sales_invoice_number" type="text" class="form-control @error('sales_invoice_number') is-invalid @enderror"/>
+
+                        @error('sales_invoice_number')
+                            <div class="invalid-feedback"> {{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Delivery Number</label>
+                        <input value="" name="delivery_number" type="text" class="form-control @error('delivery_number') is-invalid @enderror"/>
+
+                        @error('delivery_number')
+                            <div class="invalid-feedback"> {{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
