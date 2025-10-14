@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
+use App\Models\Supplier;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -49,7 +50,6 @@ class PurchaseRequestController extends Controller
     {
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
-
         $departments = $company->departments()->where([
             'status' => 'active'
         ])->get();
@@ -65,13 +65,10 @@ class PurchaseRequestController extends Controller
             'region'
         ])->get();
 
-        $suppliers = [];
-        if (old('department_id')) {
-            $department = Department::find(old('department_id'));
-            $suppliers = $department->suppliers()->where([
-                'status' => 'active'
-            ])->get();
-        }
+        $suppliers = Supplier::where([
+            'status' => 'active',
+            'company_id' => $company->id
+        ])->get();
 
         return view('branch.purchaseRequests.create', [
             'company' => $company,
@@ -87,11 +84,13 @@ class PurchaseRequestController extends Controller
      */
     public function store(Request $request)
     {
+        $branch = $request->attributes->get('branch');
+        
         $request->validate([
             'department_id' => 'required',
             'supplier_id' => 'required',
             'delivery_number' => 'required',
-            'sales_invoice_number' => 'required',
+            'sales_invoice_number' => 'required|unique:purchase_requests,sales_invoice_number,NULL,id,branch_id,' . $branch->id,
             'pr_items' => 'required',
             'pr_items.*.product_id' => 'required',
             'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
@@ -101,9 +100,9 @@ class PurchaseRequestController extends Controller
             'pr_items' => 'Product is required',
             'pr_items.*.quantity' => 'Quantity field required',
             'pr_items.*.uom_id' => 'The product you selected has no UOM. Please assign a UOM first before continuing',
+            'sales_invoice_number.unique' => 'The sales invoice number has already been used for this branch.',
         ]);
 
-        $branch = $request->attributes->get('branch');
         $company = $request->attributes->get('company');
 
         $prCount = PurchaseRequest::where([

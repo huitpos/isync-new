@@ -51,7 +51,6 @@
                 </div>
 
                 <div class="row mb-5">
-
                     <div class="col-md-6">
                         <label class="form-label">Supplier</label>
                         <input value="{{ $pr->supplier->name }}" type="text" readonly class="form-control"/>

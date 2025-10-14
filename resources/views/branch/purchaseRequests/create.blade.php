@@ -14,24 +14,16 @@
                 @csrf
 
                 <div class="row mb-5">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="form-label">Requested By</label>
                         <input value="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}" type="text" disabled class="form-control"/>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-6 d-none">
                         <label class="form-label">Department</label>
                         <select id="department_id" name="department_id" class="form-select pr_department_id @error('department_id') is-invalid @enderror" required>
-                            <option value="">Select Department</option>
                             <option value="all">All Department</option>
-                            @foreach($departments as $department)
-                                <option value="{{ $department->id }}" {{ $department->id == old('department_id') ? 'selected' : '' }}>{{ $department->name }}</option>
-                            @endforeach
                         </select>
-
-                        @error('department_id')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
                     </div>
                 </div>
 
@@ -55,7 +47,7 @@
                 <div class="row mb-5">
                     <div class="col-md-6">
                         <label class="form-label">Sales Invoice Number</label>
-                        <input value="" name="sales_invoice_number" type="text" class="form-control @error('sales_invoice_number') is-invalid @enderror"/>
+                        <input value="{{ old('sales_invoice_number') }}" name="sales_invoice_number" type="text" class="form-control @error('sales_invoice_number') is-invalid @enderror"/>
 
                         @error('sales_invoice_number')
                             <div class="invalid-feedback"> {{ $message }}</div>
@@ -64,7 +56,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Delivery Number</label>
-                        <input value="" name="delivery_number" type="text" class="form-control @error('delivery_number') is-invalid @enderror"/>
+                        <input value="{{ old('delivery_number') }}" name="delivery_number" type="text" class="form-control @error('delivery_number') is-invalid @enderror"/>
 
                         @error('delivery_number')
                             <div class="invalid-feedback"> {{ $message }}</div>
