@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Purchase Request {{ $pr->pr_number }}
+        Incoming Delivery {{ $pr->pr_number }}
     @endsection
 
     @section('breadcrumbs')

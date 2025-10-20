@@ -413,7 +413,7 @@ Breadcrumbs::for('branch.users.edit', function (BreadcrumbTrail $trail, $company
 Breadcrumbs::for('branch.purchaseRequests.index', function (BreadcrumbTrail $trail, $company, $branch) {
     $trail->parent('company.dashboard', $company);
     $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
-    $trail->push('Purchase Requests', route('branch.purchase-requests.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Incoming Deliveries', route('branch.purchase-requests.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
 });
 
 Breadcrumbs::for('branch.purchaseRequests.create', function (BreadcrumbTrail $trail, $company, $branch) {
