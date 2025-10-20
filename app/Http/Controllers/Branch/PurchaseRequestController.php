@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseDelivery;
 use App\Models\Supplier;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -130,7 +131,92 @@ class PurchaseRequestController extends Controller
         $purchaseRequest->save();
 
         $purchaseRequest->items()->createMany($postData['pr_items']);
-        
+
+        $pr = PurchaseRequest::findOrFail($purchaseRequest->id);
+        $branch = $pr->branch;
+
+        $poCount = PurchaseOrder::where([
+            'branch_id' => $branch->id
+        ])->count();
+
+        $branchCode = strtoupper($branch->code);
+        $date = date('Ymd');
+        $counter = str_pad($poCount+1, 4, '0', STR_PAD_LEFT);
+        $poNumber = "PO$branchCode$date$counter";
+
+        $poData = [
+            'branch_id' => $pr->branch_id,
+            'department_id' => $pr->department_id,
+            'delivery_location_id' => 1,
+            'supplier_id' => $pr->supplier_id,
+            'payment_term_id' => 1,
+            'supplier_term_id' => 1,
+            'purchase_request_id' => $pr->id,
+            'po_number' => $poNumber,
+            'date_needed' => date('Y-m-d'),
+            'pr_remarks' => $pr->remarks,
+            'total' => $pr->total,
+            'status' => 'approved',
+            'action_by' => auth()->user()->id,
+        ];
+
+        $purchaseOrder = new PurchaseOrder();
+        $purchaseOrder->fill($poData);
+        $purchaseOrder->save();
+
+        $poItems = [];
+        $totalQty = 0;
+        $totalAmount = 0;
+        foreach ($pr->items as $item) {
+            $poItems[] = [
+                'product_id' => $item->product_id,
+                'uom_id' => $item->uom_id,
+                'unit_price' => $item->unit_price,
+                'quantity' => $item->quantity,
+                'balance' => 0,
+                'total' => $item->total,
+                'pr_remarks' => $item->remarks,
+            ];
+
+            $totalQty += $item->quantity;
+            $totalAmount += $item->total;
+        }
+
+        $purchaseOrder->items()->createMany($poItems);
+
+        $branchCode = strtoupper($branch->code);
+        $date = date('Ymd');
+        $counter = str_pad($poCount+1, 4, '0', STR_PAD_LEFT);
+        $pdNumber = "MRI$branchCode$date$counter";
+        $pdData = [
+            'purchase_order_id' => $purchaseOrder->id,
+            'sales_invoice_number' => $request->sales_invoice_number,
+            'delivery_number' => $request->delivery_number,
+            'total_qty' => $totalQty,
+            'total_amount' => $totalAmount,
+            'pd_number' => $pdNumber,
+            'branch_id' => $branch->id,
+            'status' => 'approved'
+        ];
+
+        $pd = PurchaseDelivery::create($pdData);
+
+        $po = PurchaseOrder::findOrFail($purchaseOrder->id);
+        $poItems = [];
+        foreach ($po->items as $item) {
+            $poItems[] = [
+                'purchase_order_item_id' => $item->id,
+                'product_id' => $item->product_id,
+                'uom_id' => $item->uom_id,
+                'po_unit_price' => $item->unit_price,
+                'unit_price' => $item->unit_price,
+                'qty' => $item->quantity,
+                'total' => $item->total,
+            ];
+        }
+
+        $pd->items()->createMany($poItems);
+
         $pd = PurchaseRequest::findOrFail($purchaseRequest->id);
         foreach ($pd->items as $item) {
             $product = $item->product;
