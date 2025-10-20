@@ -15,38 +15,9 @@
 
             <div class="card-body py-4">
                 <div class="row mb-5">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <label class="form-label">PR Number</label>
                         <input value="{{ $pr->pr_number }}" type="text" readonly class="form-control"/>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Status</label>
-                        <input value="{{ ucfirst($pr->status) }}" type="text" readonly class="form-control"/>
-                    </div>
-                </div>
-
-                <div class="row mb-5">
-                    <div class="col-md-6">
-                        <label class="form-label">Requested By</label>
-                        <input value="{{ $pr->createdBy->name }}" type="text" readonly class="form-control"/>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Department</label>
-                        <input value="{{ ($pr->department_id == 'all' || empty($pr->department) ) ? "All" : $pr->department->name }}" type="text" readonly class="form-control"/>
-                    </div>
-                </div>
-
-                <div class="row mb-5">
-                    <div class="col-md-6">
-                        <label class="form-label">Type</label>
-                        <input value="For PO" type="text" readonly class="form-control"/>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Date Needed</label>
-                        <input value="{{ $pr->date_needed }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
 
@@ -54,6 +25,11 @@
                     <div class="col-md-6">
                         <label class="form-label">Supplier</label>
                         <input value="{{ $pr->supplier->name }}" type="text" readonly class="form-control"/>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Requested By</label>
+                        <input value="{{ $pr->createdBy->name }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
 
