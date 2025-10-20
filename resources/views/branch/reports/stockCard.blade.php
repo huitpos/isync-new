@@ -166,20 +166,6 @@
                 </li>
 
                 <li class="nav-item mb-3 me-3 me-lg-6">
-                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#transfer_stock_in_div">
-                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Transfer Stocks (In)</span>
-                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
-                    </a>
-                </li>
-
-                <li class="nav-item mb-3 me-3 me-lg-6">
-                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#transfer_stock_out_div">
-                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Transfer Stocks (Out)</span>
-                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
-                    </a>
-                </li>
-
-                <li class="nav-item mb-3 me-3 me-lg-6">
                     <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden  pt-5 pb-5" id="kt_stats_widget_16_tab_link_1" data-bs-toggle="pill" href="#disposal_div">
                         <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Disposal</span>
                         <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
