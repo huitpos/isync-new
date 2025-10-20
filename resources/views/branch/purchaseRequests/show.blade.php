@@ -28,7 +28,7 @@
                     </div>
                     
                     <div class="col-md-6">
-                        <label class="form-label">Requested By</label>
+                        <label class="form-label">Created By</label>
                         <input value="{{ $pr->createdBy->name }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
