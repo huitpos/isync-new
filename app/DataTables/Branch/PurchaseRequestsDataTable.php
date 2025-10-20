@@ -81,7 +81,7 @@ class PurchaseRequestsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('pr_number'),
+            Column::make('pr_number')->title('ID Number'),
             Column::make('branch.name'),
             Column::make('date_needed'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),

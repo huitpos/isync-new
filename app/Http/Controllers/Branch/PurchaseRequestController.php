@@ -112,7 +112,7 @@ class PurchaseRequestController extends Controller
         $branchCode = strtoupper($branch->code);
         $date = date('Ymd');
         $counter = str_pad($prCount+1, 4, '0', STR_PAD_LEFT);
-        $prNumber = "PR$branchCode$date$counter";
+        $prNumber = "ID$branchCode$date$counter";
 
         $postData = $request->all();
 
