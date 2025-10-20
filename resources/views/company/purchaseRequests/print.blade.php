@@ -67,14 +67,8 @@
             <td>{{ $pr->date_needed }}</td>
         </tr>
         <tr>
-            <td>Delivery Location</td>
-            <td>{{ $pr->deliveryLocation->name }}</td>
             <td>Supplier</td>
             <td>{{ $pr->supplier->name }}</td>
-        </tr>
-        <tr>
-            <td>Delivery Address</td>
-            <td colspan="3">{{ $pr->deliveryLocation->unit_floor_number }},  {{ $pr->deliveryLocation->street }}, {{ $pr->deliveryLocation->city->name }}, {{ $pr->deliveryLocation->province->name }}, {{ $pr->deliveryLocation->region->name }}</td>
         </tr>
         
     </table>
@@ -123,10 +117,6 @@
                 <td>
                     <div class="signature-line">{{ $pr->createdBy->first_name }} {{ $pr->createdBy->last_name }}</div>
                     <p>Requested By:</p>
-                </td>
-                <td>
-                    <div class="signature-line">{{ $pr->actionBy->first_name }} {{ $pr->actionBy->last_name }}</div>
-                    <p>Approved By:</p>
                 </td>
             </tr>
         </table>

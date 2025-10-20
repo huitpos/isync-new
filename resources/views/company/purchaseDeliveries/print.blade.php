@@ -124,10 +124,6 @@
                     <div class="signature-line">{{ $pr->createdBy->first_name }} {{ $pr->createdBy->last_name }}</div>
                     <p>Requested By:</p>
                 </td>
-                <td>
-                    <div class="signature-line">{{ $pr->actionBy->first_name }} {{ $pr->actionBy->last_name }}</div>
-                    <p>Approved By:</p>
-                </td>
             </tr>
         </table>
     </div>
