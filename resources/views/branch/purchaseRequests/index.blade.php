@@ -61,14 +61,7 @@
                     { data: 'id' },
                     { data: 'pr_number' },
                     { data: 'branch.name' },
-                    {
-                        data: 'date_needed',
-                        render: function(data, type, row) {
-                            return moment(data).format("YYYY-MM-DD");
-                        }
-                    },
                     { data: 'created_by.name' },
-                    { data: 'status' },
                     {
                         data: 'created_at',
                         render: function(data, type, row) {
