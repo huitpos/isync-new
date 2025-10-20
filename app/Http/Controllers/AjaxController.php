@@ -125,6 +125,11 @@ class AjaxController extends Controller
 
         $products = $productsQuery->get();
 
+        //limit to 300 results
+        if ($products->count() > 300) {
+            $products = $products->take(300);
+        }
+
         $responseData = [];
         foreach ($products as $product) {
             $responseData[] = [
