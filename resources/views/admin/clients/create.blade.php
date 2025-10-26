@@ -186,10 +186,7 @@
                 <div class="mb-4">
                     <label class="form-label">POS Type</label>
                     <select class="form-select @error('pos_type') is-invalid @enderror" name="pos_type">
-                        <option value="">Select a POS Type</option>
-                        <option value="retail" {{ old('pos_type', env('POS_TYPE')) == 'retail' ? 'selected' : '' }}>Retail</option>
                         <option value="resto" {{ old('pos_type', env('POS_TYPE')) == 'resto' ? 'selected' : '' }}>Restaurant</option>
-                        <option value="hospitality" {{ old('pos_type', env('POS_TYPE')) == 'hospitality' ? 'selected' : '' }}>Hospitality</option>
                     </select>
 
                     @error('pos_type')

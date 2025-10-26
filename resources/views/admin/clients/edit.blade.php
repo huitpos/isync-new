@@ -203,10 +203,7 @@
                 <div class="mb-4">
                     <label class="form-label">POS Type</label>
                     <select class="form-select @error('pos_type') is-invalid @enderror" name="pos_type">
-                        <option value="">Select a POS Type</option>
-                        <option value="retail" {{ old('pos_type') == 'retail' || $company->pos_type == 'retail' ? 'selected' : '' }}>Retail</option>
                         <option value="restaurant" {{ old('pos_type') == 'resto' || $company->pos_type == 'resto' ? 'selected' : '' }}>Restaurant</option>
-                        <option value="hospitality" {{ old('pos_type') == 'hospitality' || $company->pos_type == 'hospitality' ? 'selected' : '' }}>Hospitality</option>
                     </select>
 
                     @error('pos_type')
