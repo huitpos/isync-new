@@ -240,7 +240,6 @@ class ClientController extends Controller
             'floor_number' => $request['unit_floor_number'],
             'city' => $request['city_id'],
             'province' => $request['province_id'],
-            'pos_type' => $request['pos_type'],
         ]);
 
         $path = '';
@@ -263,7 +262,8 @@ class ClientController extends Controller
             'barangay_id' => $request['barangay_id'],
             'slug' => Str::slug($request['trade_name']),
             'street' => $request['street'],
-            'company_registered_name' => ''
+            'company_registered_name' => '',
+            'pos_type' => $request['pos_type'],
         ]);
 
         $userData = [
