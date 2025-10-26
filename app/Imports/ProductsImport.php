@@ -124,8 +124,8 @@ class ProductsImport implements ToCollection,
                 'markup_type' => $row[10], //K
                 'markup' => $row[11], //L
                 'cost' => $row[12], //M
-                'srp' => $row[13], //N
-                'item_type_id' => array_search(strtolower($row[14]), $itemTypes), //O
+                'item_type_id' => array_search(strtolower($row[13]), $itemTypes), //N
+                'srp' => $row[14], //O
                 'item_locations' => array_search(strtolower($row[15]), $itemLocations), //P
                 'max_discount' => $row[16] ?? 0, //Q
                 'minimum_stock_level' => $row[17] ?? 0, //R
