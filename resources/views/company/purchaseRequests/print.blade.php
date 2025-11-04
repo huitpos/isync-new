@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Purchase Request</title>
+    <title>Incoming Delivery</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -57,18 +57,14 @@
         <tr>
             <td>Requested By</td>
             <td>{{ $pr->createdBy->first_name }} {{ $pr->createdBy->last_name }}</td>
-            <td>Department</td>
-            <td>{{ ($pr->department_id == 'all' || empty($pr->department_id)) ? "All" : $pr->department->name }}</td>
-        </tr>
-        <tr>
-            <td>Type</td>
-            <td>For PR</td>
-            <td>Date Needed</td>
-            <td>{{ $pr->date_needed }}</td>
-        </tr>
-        <tr>
             <td>Supplier</td>
             <td>{{ $pr->supplier->name }}</td>
+        </tr>
+        <tr>
+            <td>Sales Invoice Number</td>
+            <td>{{ $pr->sales_invoice_number }}</td>
+            <td>Delivery Number</td>
+            <td>{{ $pr->delivery_number }}</td>
         </tr>
         
     </table>
