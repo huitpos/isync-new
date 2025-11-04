@@ -48,22 +48,6 @@ class TestController extends Controller
             $_product = Product::find($product->product_id);
             $branch = Branch::find($product->branch_id);
 
-            // Check for duplicate end_of_days logs
-            $duplicateLogs = DB::select('
-                SELECT object_id, COUNT(*) as count
-                FROM product_count_logs
-                WHERE branch_id = ?
-                AND product_id = ?
-                AND object_type = "end_of_days"
-                GROUP BY object_id
-                HAVING count > 1
-            ', [$product->branch_id, $product->product_id]);
-
-            // Skip if no duplicates found
-            if (empty($duplicateLogs)) {
-                continue;
-            }
-
             $latestPPC = DB::table('product_count_logs')
                 ->where('object_type', 'product_physical_counts')
                 ->where('branch_id', $product->branch_id)
