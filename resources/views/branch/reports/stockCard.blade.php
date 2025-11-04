@@ -239,30 +239,24 @@
                         <thead>
                             <tr class="fw-semibold fs-6 text-muted">
                                 <th>Date Received</th>
-                                <th>PO No.</th>
-                                <th>DP No.</th>
                                 <th>Supplier</th>
                                 <th>Sales Invoice</th>
                                 <th>Qty</th>
                                 <th>Cost per Unit</th>
                                 <th>Total Cost</th>
                                 <th>Received By</th>
-                                <th>Approved By</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($incomingStocks as $item)
                                 <tr>
                                     <td>{{ $item->delivery_date }}</td>
-                                    <td>{{ $item->po_number }}</td>
-                                    <td>{{ $item->pd_number }}</td>
                                     <td>{{ $item->supplier }}</td>
                                     <td>{{ $item->sales_invoice_number }}</td>
                                     <td>{{ $item->qty }}</td>
                                     <td>{{ $item->unit_price }}</td>
                                     <td>{{ $item->unit_price * $item->qty }}</td>
                                     <td>{{ $item->created_by }}</td>
-                                    <td>{{ $item->action_by }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
