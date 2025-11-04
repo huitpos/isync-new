@@ -668,6 +668,7 @@ class ReportController extends Controller
                 WHERE product_disposals.status = 'approved'
                     AND product_disposal_items.product_id = $productId
                     AND product_disposals.created_at BETWEEN '$startDate' AND '$endDate'
+                    AND product_disposals.branch_id = $branchId
             ";
 
             $disposals = DB::select($disposalQuery);
