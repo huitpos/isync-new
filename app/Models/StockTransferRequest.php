@@ -50,4 +50,10 @@ class StockTransferRequest extends Model
     {
         return $this->belongsTo(User::class, 'action_by');
     }
+
+    //stocktransferorder
+    public function stockTransferOrder()
+    {
+        return $this->hasOne(StockTransferOrder::class);
+    }
 }
