@@ -47,6 +47,7 @@ class StockTransferRequestsDataTable extends DataTable
                 'createdBy',
                 'branch',
                 'sourceBranch',
+                'stockTransferOrder'
             ])
             ->whereHas('branch', function ($query) use ($branchId) {
                 $query->where('destination_branch_id', $branchId);
@@ -77,6 +78,7 @@ class StockTransferRequestsDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('str_number'),
+            Column::make('stock_transfer_order.sto_number')->title('stock transfer order'),
             Column::make('branch.name')->title('destination branch'),
             Column::make('source_branch.name')->title('source branch'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
