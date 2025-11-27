@@ -75,7 +75,7 @@
 
 					@foreach($branches as $branch)
 						<div class="menu-item p-0">
-							<a href="{{ route('branch.dashboard', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => $branch->slug]) }}" class="menu-link p-2 mb-1">
+							<a href="{{ route($branchPermissionCount > 0 ? 'branch.dashboard' : 'branch.users.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => $branch->slug]) }}" class="menu-link p-2 mb-1">
 								{{ $branch->name }}
 							</a>
 						</div>
