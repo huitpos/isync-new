@@ -55,6 +55,7 @@ class AuthenticatedSessionController extends Controller
         $permissionNames = $permissions->pluck('name')->toArray();
 
         $companyLevelPermission = $permissions->where('level', 'company_user');
+        $branchLevelPermission = $permissions->where('level', 'branch_user');
 
         $routes = config('app.permission_routes');
 
@@ -68,6 +69,21 @@ class AuthenticatedSessionController extends Controller
             $parentPermission = $companyLevelPermission->whereNull('parent_id')->first();
             $childPermission = $companyLevelPermission->where('parent_id', $parentPermission->id)->first();
             $route = $childPermission->route ?? 'company.dashboard';
+
+            return route($route, [
+                'companySlug' => $company->slug,
+                'companyId' => $company->id,
+                'branchSlug' => $branches->first()->slug,
+                'branchId' => $branches->first()->id
+            ]);
+        }
+
+        if ($branchLevelPermission->count() > 0) {
+            $company =  Company::find($user->company_id);
+
+            $parentPermission = $branchLevelPermission->whereNull('parent_id')->first();
+            $childPermission = $branchLevelPermission->where('parent_id', $parentPermission->id)->first();
+            $route = $childPermission->route ?? 'branch.dashboard';
 
             return route($route, [
                 'companySlug' => $company->slug,
