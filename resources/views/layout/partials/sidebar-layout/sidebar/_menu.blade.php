@@ -2,6 +2,7 @@
 	$permissions = request()->attributes->get('permissionNames');
 	$companyPermissionCount = request()->attributes->get('companyPermissionCount');
 	$branchPermissionCount = request()->attributes->get('branchPermissionCount');
+	$companyFirstRoute = request()->attributes->get('companyFirstRoute');
 @endphp
 
 
@@ -57,7 +58,7 @@
 				<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-primary fw-semibold w-auto min-w-300px mw-300px" data-kt-menu="true">
 					@if ($companyPermissionCount > 0)
 					<div class="menu-item mt-2">
-						<a href="{{ route('company.dashboard', ['companySlug' => request()->attributes->get('company')->slug]) }}" class="menu-link p-2">
+						<a href="{{ route($companyFirstRoute, ['companySlug' => request()->attributes->get('company')->slug]) }}" class="menu-link p-2">
 							{{ request()->attributes->get('company')->company_name }}
 						</a>
 					</div>
