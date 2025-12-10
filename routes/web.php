@@ -90,6 +90,7 @@ Route::get('/download-product-import-template', function () {
 
 Route::get('/map-data', [TestController::class, 'mapData']);
 Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
+Route::get('/test', [TestController::class, 'test']);
 
 require __DIR__ . '/auth.php';
 
