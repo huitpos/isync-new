@@ -55,20 +55,24 @@
 					<i class="ki-duotone ki-down fs-3 rotate-180 ms-3 me-0"></i>
 				</button>
 
+				@php
+					$branches = auth()->user()->activeBranches;
+				@endphp
+
 				<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-primary fw-semibold w-auto min-w-300px mw-300px" data-kt-menu="true">
 					@if ($companyPermissionCount > 0)
 					<div class="menu-item mt-2">
-						<a href="{{ route($companyFirstRoute, ['companySlug' => request()->attributes->get('company')->slug]) }}" class="menu-link p-2">
+						<a href="{{ route($companyFirstRoute, [
+							'companySlug' => request()->attributes->get('company')->slug,
+							'branchSlug' => request()->attributes->get('branch')?->slug,
+							'branchId' => $branches[0]['id']
+						]) }}" class="menu-link p-2">
 							{{ request()->attributes->get('company')->company_name }}
 						</a>
 					</div>
 
 					<div class="separator mb-3 opacity-75"></div>
 					@endif
-
-					@php
-						$branches = auth()->user()->activeBranches;
-					@endphp
 
 					@if ($branches->count() > 1)
 						<label class="form-label fw-semibold p-2">Branches:</label>
@@ -86,14 +90,16 @@
 			@endif
 
 			@if (request()->attributes->get('branch'))
-				<div class="menu-item">
-					<a class="menu-link {{ request()->routeIs('branch.dashboard') ? 'active' : '' }}" href="{{ route('branch.dashboard', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
-						<span class="menu-icon">
-							<i class="fa-solid fa-chart-line fs-2"></i>
-						</span>
-						<span class="menu-title">Dashboard</span>
-					</a>
-				</div>
+				@if (in_array('Branch Dashboard', $permissions))
+					<div class="menu-item">
+						<a class="menu-link {{ request()->routeIs('branch.dashboard') ? 'active' : '' }}" href="{{ route('branch.dashboard', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">
+							<span class="menu-icon">
+								<i class="fa-solid fa-chart-line fs-2"></i>
+							</span>
+							<span class="menu-title">Dashboard</span>
+						</a>
+					</div>
+				@endif
 
 				<div class="menu-item">
 					<a class="menu-link {{ request()->routeIs('branch.users.*') ? 'active' : '' }}" href="{{ route('branch.users.index', ['companySlug' => request()->attributes->get('company')->slug, 'branchSlug' => request()->attributes->get('branch')->slug]) }}">

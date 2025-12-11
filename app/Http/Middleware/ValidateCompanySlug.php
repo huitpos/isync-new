@@ -19,6 +19,8 @@ class ValidateCompanySlug
     public function handle(Request $request, Closure $next): Response
     {
         $companySlug = $request->route('companySlug');
+        $branchSlug = $request->route('branchSlug');
+
         $route = $request->route()->getName();
         $sitePermissions = Permission::whereNot('route', null)->pluck('route')->toArray();
 
@@ -49,6 +51,15 @@ class ValidateCompanySlug
         $branches = $user->activeBranches->pluck('id')->toArray();
 
         if ( in_array($route, $sitePermissions) && !in_array($route, $permissionRoutes)) {
+            // explode $route. get first part if "branch" or "company"
+            $routeParts = explode('.', $route);
+            if (in_array($routeParts[0], ['branch'])) {
+                return redirect()->route('branch.users.index', [
+                    'companySlug' => $companySlug,
+                    'branchSlug' => $branchSlug
+                ]);
+            }
+            
             abort(403, 'Unauthorized action.');
         }
 
