@@ -93,10 +93,9 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        if ($user->hasRole('branch_user')) {
-            $branch = $user->activeBranches->first();
-            return route('branch.dashboard', ['companySlug' => $branch->company->slug, 'branchSlug' => $branch->slug]);
-        }
+
+        $branch = $user->activeBranches->first();
+        return route('branch.users.index', ['companySlug' => $branch->company->slug, 'branchSlug' => $branch->slug]);
     }
 
     /**
