@@ -25,7 +25,7 @@
 
                         <div class="flex-root d-flex flex-column">
                             <span class="text-muted">Date</span>
-                            <span class="fs-5">{{ $transaction->created_at }}</span>
+                            <span class="fs-5">{{ $transaction->comppleted_at }}</span>
                         </div>
 
                         <div class="flex-root d-flex flex-column">
