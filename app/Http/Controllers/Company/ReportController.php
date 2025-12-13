@@ -488,6 +488,7 @@ class ReportController extends Controller
     public function stockCard(Request $request)
     {
         $transactionalDbName = config('database.connections.transactional_db.database');
+        $defaultDbName = config('database.connections.mysql.database');
 
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
@@ -536,8 +537,8 @@ class ReportController extends Controller
                     AND orders.is_void = FALSE
                     AND orders.is_completed = TRUE
                     AND orders.is_back_out = FALSE
-                INNER JOIN isync.products ON orders.product_id = products.id
-                INNER JOIN isync.unit_of_measurements on orders.unit_id = unit_of_measurements.id
+                INNER JOIN $defaultDbName.products ON orders.product_id = products.id
+                INNER JOIN $defaultDbName.unit_of_measurements on orders.unit_id = unit_of_measurements.id
                 WHERE transactions.is_complete = TRUE
                     AND transactions.branch_id = $branchId
                     AND transactions.is_void = FALSE
@@ -558,12 +559,12 @@ class ReportController extends Controller
                         CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
                         unit_of_measurements.`name` AS `uom`,
                         product_physical_counts.pcount_number
-                    FROM product_physical_counts
-                    INNER JOIN product_physical_count_items ON product_physical_counts.id = product_physical_count_items.product_physical_count_id
-                    INNER JOIN users createdBy ON product_physical_counts.created_by = createdBy.id
-                    INNER JOIN unit_of_measurements ON product_physical_count_items.uom_id = unit_of_measurements.id
-                    LEFT JOIN users actionBy ON product_physical_counts.action_by = actionBy.id
-                    LEFT JOIN product_count_logs ON product_physical_count_items.product_id = product_count_logs.product_id
+                    FROM $defaultDbName.product_physical_counts
+                    INNER JOIN $defaultDbName.product_physical_count_items ON product_physical_counts.id = product_physical_count_items.product_physical_count_id
+                    INNER JOIN $defaultDbName.users createdBy ON product_physical_counts.created_by = createdBy.id
+                    INNER JOIN $defaultDbName.unit_of_measurements ON product_physical_count_items.uom_id = unit_of_measurements.id
+                    LEFT JOIN $defaultDbName.users actionBy ON product_physical_counts.action_by = actionBy.id
+                    LEFT JOIN $defaultDbName.product_count_logs ON product_physical_count_items.product_id = product_count_logs.product_id
                         AND product_count_logs.branch_id = product_physical_counts.branch_id
                         AND product_count_logs.object_id = product_physical_counts.id
                         AND product_count_logs.object_type = 'product_physical_counts'
@@ -584,12 +585,12 @@ class ReportController extends Controller
                     purchase_delivery_items.unit_price,
                     CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
                     CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`
-                FROM purchase_deliveries
-                INNER JOIN purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
-                INNER JOIN purchase_orders ON purchase_deliveries.purchase_order_id = purchase_orders.id
-                INNER JOIN suppliers ON purchase_orders.supplier_id = suppliers.id
-                INNER JOIN users createdBy ON purchase_deliveries.created_by = createdBy.id
-                LEFT JOIN users actionBy ON purchase_deliveries.action_by = actionBy.id
+                FROM $defaultDbName.purchase_deliveries
+                INNER JOIN $defaultDbName.purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
+                INNER JOIN $defaultDbName.purchase_orders ON purchase_deliveries.purchase_order_id = purchase_orders.id
+                INNER JOIN $defaultDbName.suppliers ON purchase_orders.supplier_id = suppliers.id
+                INNER JOIN $defaultDbName.users createdBy ON purchase_deliveries.created_by = createdBy.id
+                LEFT JOIN $defaultDbName.users actionBy ON purchase_deliveries.action_by = actionBy.id
                 WHERE purchase_deliveries.status = 'approved'
                     AND purchase_delivery_items.product_id = $productId
                     AND purchase_deliveries.branch_id = $branchId
@@ -610,17 +611,17 @@ class ReportController extends Controller
                     CONCAT(requestedBy.first_name, ' ', requestedBy.last_name) AS `requested_by`,
                     CONCAT(approvedBy.first_name, ' ', approvedBy.last_name) AS `approved_by`,
                     CONCAT(receivedBy.first_name, ' ', receivedBy.last_name) AS `received_by`
-                FROM stock_transfer_deliveries
-                INNER JOIN stock_transfer_delivery_items ON stock_transfer_delivery_items.stock_transfer_delivery_id = stock_transfer_deliveries.id
-                INNER JOIN stock_transfer_orders ON stock_transfer_deliveries.stock_transfer_order_id = stock_transfer_orders.id
-                INNER JOIN stock_transfer_requests ON stock_transfer_orders.stock_transfer_request_id = stock_transfer_requests.id
-                INNER JOIN branches AS source_branch ON stock_transfer_requests.source_branch_id = source_branch.id
-                INNER JOIN branches AS destination_branch ON stock_transfer_requests.destination_branch_id = destination_branch.id
-                INNER JOIN unit_of_measurements ON stock_transfer_delivery_items.uom_id = unit_of_measurements.id
-                INNER JOIN products ON stock_transfer_delivery_items.product_id = products.id
-                INNER JOIN users AS requestedBy ON stock_transfer_requests.created_by = requestedBy.id
-                INNER JOIN users AS approvedBy ON stock_transfer_requests.action_by = approvedBy.id
-                INNER JOIN users AS receivedBy ON stock_transfer_deliveries.created_by = receivedBy.id 
+                FROM $defaultDbName.stock_transfer_deliveries
+                INNER JOIN $defaultDbName.stock_transfer_delivery_items ON stock_transfer_delivery_items.stock_transfer_delivery_id = stock_transfer_deliveries.id
+                INNER JOIN $defaultDbName.stock_transfer_orders ON stock_transfer_deliveries.stock_transfer_order_id = stock_transfer_orders.id
+                INNER JOIN $defaultDbName.stock_transfer_requests ON stock_transfer_orders.stock_transfer_request_id = stock_transfer_requests.id
+                INNER JOIN $defaultDbName.branches AS source_branch ON stock_transfer_requests.source_branch_id = source_branch.id
+                INNER JOIN $defaultDbName.branches AS destination_branch ON stock_transfer_requests.destination_branch_id = destination_branch.id
+                INNER JOIN $defaultDbName.unit_of_measurements ON stock_transfer_delivery_items.uom_id = unit_of_measurements.id
+                INNER JOIN $defaultDbName.products ON stock_transfer_delivery_items.product_id = products.id
+                INNER JOIN $defaultDbName.users AS requestedBy ON stock_transfer_requests.created_by = requestedBy.id
+                INNER JOIN $defaultDbName.users AS approvedBy ON stock_transfer_requests.action_by = approvedBy.id
+                INNER JOIN $defaultDbName.users AS receivedBy ON stock_transfer_deliveries.created_by = receivedBy.id 
                 WHERE stock_transfer_deliveries.status = 'approved'
                     AND stock_transfer_delivery_items.product_id = $productId
                     AND stock_transfer_requests.destination_branch_id = $branchId
@@ -641,17 +642,17 @@ class ReportController extends Controller
                     CONCAT(requestedBy.first_name, ' ', requestedBy.last_name) AS `requested_by`,
                     CONCAT(approvedBy.first_name, ' ', approvedBy.last_name) AS `approved_by`,
                     CONCAT(receivedBy.first_name, ' ', receivedBy.last_name) AS `received_by`
-                FROM stock_transfer_deliveries
-                INNER JOIN stock_transfer_delivery_items ON stock_transfer_delivery_items.stock_transfer_delivery_id = stock_transfer_deliveries.id
-                INNER JOIN stock_transfer_orders ON stock_transfer_deliveries.stock_transfer_order_id = stock_transfer_orders.id
-                INNER JOIN stock_transfer_requests ON stock_transfer_orders.stock_transfer_request_id = stock_transfer_requests.id
-                INNER JOIN branches AS source_branch ON stock_transfer_requests.source_branch_id = source_branch.id
-                INNER JOIN branches AS destination_branch ON stock_transfer_requests.destination_branch_id = destination_branch.id
-                INNER JOIN unit_of_measurements ON stock_transfer_delivery_items.uom_id = unit_of_measurements.id
-                INNER JOIN products ON stock_transfer_delivery_items.product_id = products.id
-                INNER JOIN users AS requestedBy ON stock_transfer_requests.created_by = requestedBy.id
-                INNER JOIN users AS approvedBy ON stock_transfer_requests.action_by = approvedBy.id
-                INNER JOIN users AS receivedBy ON stock_transfer_deliveries.created_by = receivedBy.id 
+                FROM $defaultDbName.stock_transfer_deliveries
+                INNER JOIN $defaultDbName.stock_transfer_delivery_items ON stock_transfer_delivery_items.stock_transfer_delivery_id = stock_transfer_deliveries.id
+                INNER JOIN $defaultDbName.stock_transfer_orders ON stock_transfer_deliveries.stock_transfer_order_id = stock_transfer_orders.id
+                INNER JOIN $defaultDbName.stock_transfer_requests ON stock_transfer_orders.stock_transfer_request_id = stock_transfer_requests.id
+                INNER JOIN $defaultDbName.branches AS source_branch ON stock_transfer_requests.source_branch_id = source_branch.id
+                INNER JOIN $defaultDbName.branches AS destination_branch ON stock_transfer_requests.destination_branch_id = destination_branch.id
+                INNER JOIN $defaultDbName.unit_of_measurements ON stock_transfer_delivery_items.uom_id = unit_of_measurements.id
+                INNER JOIN $defaultDbName.products ON stock_transfer_delivery_items.product_id = products.id
+                INNER JOIN $defaultDbName.users AS requestedBy ON stock_transfer_requests.created_by = requestedBy.id
+                INNER JOIN $defaultDbName.users AS approvedBy ON stock_transfer_requests.action_by = approvedBy.id
+                INNER JOIN $defaultDbName.users AS receivedBy ON stock_transfer_deliveries.created_by = receivedBy.id 
                 WHERE stock_transfer_deliveries.status = 'approved'
                     AND stock_transfer_delivery_items.product_id = $productId
                     AND stock_transfer_requests.source_branch_id = $branchId
@@ -669,13 +670,13 @@ class ReportController extends Controller
                     CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
                     CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
                     product_disposals.pdis_number
-                FROM product_disposals
-                INNER JOIN product_disposal_items ON product_disposal_items.product_disposal_id = product_disposals.id
-                INNER JOIN unit_of_measurements ON product_disposal_items.uom_id = unit_of_measurements.id
-                INNER JOIN products ON product_disposal_items.product_id = products.id
-                INNER JOIN product_disposal_reasons ON product_disposals.product_disposal_reason_id = product_disposal_reasons.id
-                INNER JOIN users createdBy ON product_disposals.created_by = createdBy.id
-                LEFT JOIN users actionBy ON product_disposals.action_by = actionBy.id
+                FROM $defaultDbName.product_disposals
+                INNER JOIN $defaultDbName.product_disposal_items ON product_disposal_items.product_disposal_id = product_disposals.id
+                INNER JOIN $defaultDbName.unit_of_measurements ON product_disposal_items.uom_id = unit_of_measurements.id
+                INNER JOIN $defaultDbName.products ON product_disposal_items.product_id = products.id
+                INNER JOIN $defaultDbName.product_disposal_reasons ON product_disposals.product_disposal_reason_id = product_disposal_reasons.id
+                INNER JOIN $defaultDbName.users createdBy ON product_disposals.created_by = createdBy.id
+                LEFT JOIN $defaultDbName.users actionBy ON product_disposals.action_by = actionBy.id
                 WHERE product_disposals.status = 'approved'
                     AND product_disposal_items.product_id = $productId
                     AND product_disposals.created_at BETWEEN '$startDate' AND '$endDate'
