@@ -44,7 +44,7 @@
         
                         <div class="mb-4">
                             <label class="form-label">Product Name</label>
-                            <input value="{{ old('name') ?? $product->name }}" name="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="Product Name" required/>
+                            <input id="product-name"  value="{{ old('name') ?? $product->name }}" name="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="Product Name" required/>
         
                             @error('name')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -80,7 +80,7 @@
         
                         <div class="mb-4">
                             <label class="form-label">Item Abbreviation</label>
-                            <input value="{{ old('abbreviation') ?? $product->abbreviation }}" name="abbreviation" type="text" class="form-control @error('abbreviation') is-invalid @enderror" placeholder="Item Abbreviation" required/>
+                            <input id="abbreviation" value="{{ old('abbreviation') ?? $product->abbreviation }}" name="abbreviation" type="text" class="form-control @error('abbreviation') is-invalid @enderror" placeholder="Item Abbreviation" required/>
         
                             @error('abbreviation')
                                 <div class="invalid-feedback"> {{ $message }}</div>
