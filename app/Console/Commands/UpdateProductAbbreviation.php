@@ -83,6 +83,7 @@ class UpdateProductAbbreviation extends Command
      * Generate abbreviation from product name
      * - Remove vowels (a, e, i, o, u)
      * - First letter of each word uppercase, rest lowercase
+     * - Retain spaces between words
      * - Maximum 25 characters
      *
      * @param string $name
@@ -90,40 +91,46 @@ class UpdateProductAbbreviation extends Command
      */
     private function generateAbbreviation(string $name): string
     {
-        // Convert to lowercase first
+        // Remove or convert non-ASCII characters first
+        $name = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $name);
+        
+        // Convert to lowercase
         $name = strtolower($name);
         
+        // Remove any remaining non-printable or problematic characters
+        $name = preg_replace('/[^\x20-\x7E]/', '', $name);
+        
         // Split into words
-        $words = preg_split('/\s+/', $name);
+        $words = preg_split('/\s+/', trim($name));
         
         $abbreviatedWords = [];
         
         foreach ($words as $word) {
-            // Remove vowels (a, e, i, o, u) but keep the first character if it's a vowel
+            if (empty($word)) continue;
+            
+            // Remove all vowels (a, e, i, o, u) from the entire word
             $abbreviatedWord = '';
             
             for ($i = 0; $i < strlen($word); $i++) {
                 $char = $word[$i];
                 
-                // Keep the first character regardless if it's a vowel
-                if ($i === 0) {
+                // Remove vowels from all positions
+                if (!in_array($char, ['a', 'e', 'i', 'o', 'u'])) {
                     $abbreviatedWord .= $char;
-                } else {
-                    // Remove vowels from the rest of the word
-                    if (!in_array($char, ['a', 'e', 'i', 'o', 'u'])) {
-                        $abbreviatedWord .= $char;
-                    }
                 }
             }
             
-            // Capitalize the first letter of the abbreviated word
-            $abbreviatedWords[] = ucfirst($abbreviatedWord);
+            // Only add to result if there are remaining characters after vowel removal
+            if (!empty($abbreviatedWord)) {
+                // Capitalize the first letter of the abbreviated word
+                $abbreviatedWords[] = ucfirst($abbreviatedWord);
+            }
         }
         
-        // Join all words
-        $result = implode('', $abbreviatedWords);
+        // Join all words with spaces
+        $result = implode(' ', $abbreviatedWords);
         
-        // Limit to 25 characters
-        return substr($result, 0, 25);
+        // Limit to 25 characters and trim any trailing spaces
+        return trim(substr($result, 0, 25));
     }
 }
