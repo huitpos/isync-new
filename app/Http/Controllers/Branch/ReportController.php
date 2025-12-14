@@ -488,7 +488,7 @@ class ReportController extends Controller
                     AND transactions.is_void = FALSE
                     AND transactions.is_back_out = FALSE
                     AND orders.product_id = $productId
-                    -- AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
                 ";
 
             $transactions = DB::select($transactionQuery);
