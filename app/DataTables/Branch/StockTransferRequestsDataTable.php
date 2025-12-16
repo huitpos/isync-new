@@ -77,9 +77,9 @@ class StockTransferRequestsDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('str_number'),
-            Column::make('branch.name')->title('destination branch'),
-            Column::make('source_branch.name')->title('source branch'),
-            Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('branch.name')->title('destination branch')->searchable(false),
+            Column::make('source_branch.name')->title('source branch')->searchable(false),
+            Column::make('created_by.name', 'createdBy.name')->title('created by')->searchable(false),
             Column::make('status'),
             Column::make('created_at'),
         ];

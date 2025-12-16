@@ -57,6 +57,12 @@ class StockTransferRequestsDataTable extends DataTable
             $query->where('destination_branch_id', $this->branch_id);
         }
 
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->where('str_number', 'like', '%' . $this->search . '%');
+            });
+        }
+
         return $query;
     }
 
@@ -83,7 +89,7 @@ class StockTransferRequestsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('pr_number'),
+            Column::make('str_number'),
             Column::make('branch.name'),
             Column::make('date_needed'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),

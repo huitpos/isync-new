@@ -25,6 +25,7 @@ class StockTransferRequestController extends Controller
         return $dataTable->with([
             'status' => $request->query('status', null),
             'branch_id' => $request->query('branch_id', null),
+            'search' => $request->query('search', null),
             'company_id' => $company->id,
             'company_slug' => $company->slug,
         ])->render('company.stockTransferRequests.index', [
