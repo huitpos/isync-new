@@ -1325,6 +1325,13 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $log = new ApiRequestLog();
+        $log->type = 'cutoff_request';
+        $log->method = $request->method();
+        $log->request = json_encode($request->all());
+        $log->branch_id = $request->branch_id;
+        $log->save();
+
         $postData = [
             'cut_off_id' => $request->cut_off_id,
             'end_of_day_id' => $request->end_of_day_id,
