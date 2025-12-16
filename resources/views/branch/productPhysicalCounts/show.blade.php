@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Product Physical Count #{{ $count->id }}
+        Product Physical Count #{{ $count->pcount_number }}
     @endsection
 
     @section('breadcrumbs')

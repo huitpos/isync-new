@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        Product Disposal #{{ $disposal->id }}
+        Product Disposal #{{ $disposal->pdis_number }}
     @endsection
 
     @section('breadcrumbs')
