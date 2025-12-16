@@ -718,9 +718,10 @@ class ReportController extends Controller
         $machines = [];
         foreach ($branches as $branch) {
             foreach ($branch->machines as $machine) {
-                $machineIds[] = $machine->id;
-
-                $machines[$machine->id] = $machine;
+                if ($machine->type == 'cashier') {
+                    $machineIds[] = $machine->id;
+                    $machines[$machine->id] = $machine;
+                }
             }
         }
 
