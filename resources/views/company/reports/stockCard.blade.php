@@ -120,6 +120,10 @@
                         <div class="col-md-3">
                             <span class="fw-bold">Actual Stock:</span> {{ $pivotData ? number_format($pivotData->stock, 2) : 0 }}
                         </div>
+
+                        <div class="col-md-3">
+                            <span class="fw-bold">Part Number:</span> {{ $product->part_number }}
+                        </div>
                     </div>
                 </div>
 
