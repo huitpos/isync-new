@@ -104,6 +104,19 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function updateBranchQuantity(Product $product, Branch $branch, $objectId, $objectType, int $qty, $srp = null, $operation = 'add', $uomId): Bool
     {
+        // Trap: Check for existing ProductCountLog before proceeding
+        $existingLog = ProductCountLog::where([
+            'branch_id' => $branch->id,
+            'product_id' => $product->id,
+            'object_id' => $objectId,
+            'object_type' => $objectType,
+        ])->first();
+
+        if ($existingLog) {
+            // If log exists, do not proceed with stock change
+            return false;
+        }
+
         $pivotData = $product->branches->where('id', $branch->id)->first()?->pivot;
         $pivotStock = $pivotData?->stock ?? 0;
         if ($product->uom_id != $uomId) {

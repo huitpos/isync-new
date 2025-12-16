@@ -1325,6 +1325,13 @@ class MiscController extends BaseController
             return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
+        $log = new ApiRequestLog();
+        $log->type = 'cutoff_request';
+        $log->method = $request->method();
+        $log->request = json_encode($request->all());
+        $log->branch_id = $request->branch_id;
+        $log->save();
+
         $postData = [
             'cut_off_id' => $request->cut_off_id,
             'end_of_day_id' => $request->end_of_day_id,
@@ -1378,6 +1385,11 @@ class MiscController extends BaseController
 
         $message = 'Cut Off created successfully.';
         if ($cutOff) {
+            if (empty($cutOff->end_of_day_id) && !empty($cutOff->end_of_day_id)) {
+                $postData['end_of_day_id'] = $request->end_of_day_id;
+            } else {
+                unset($postData['end_of_day_id']);
+            }
             $message = 'Cut Off updated successfully.';
             $cutOff->update($postData);
             return $this->sendResponse($cutOff, $message);

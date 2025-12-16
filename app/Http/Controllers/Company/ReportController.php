@@ -657,7 +657,8 @@ class ReportController extends Controller
                     products.cost,
                     product_disposal_reasons.`name` AS `reason`,
                     CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
-                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`
+                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
+                    product_disposals.pdis_number
                 FROM product_disposals
                 INNER JOIN product_disposal_items ON product_disposal_items.product_disposal_id = product_disposals.id
                 INNER JOIN unit_of_measurements ON product_disposal_items.uom_id = unit_of_measurements.id
@@ -668,6 +669,7 @@ class ReportController extends Controller
                 WHERE product_disposals.status = 'approved'
                     AND product_disposal_items.product_id = $productId
                     AND product_disposals.created_at BETWEEN '$startDate' AND '$endDate'
+                    AND product_disposals.branch_id = $branchId
             ";
 
             $disposals = DB::select($disposalQuery);
