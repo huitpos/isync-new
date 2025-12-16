@@ -1378,6 +1378,11 @@ class MiscController extends BaseController
 
         $message = 'Cut Off created successfully.';
         if ($cutOff) {
+            if (empty($cutOff->end_of_day_id) && !empty($cutOff->end_of_day_id)) {
+                $postData['end_of_day_id'] = $request->end_of_day_id;
+            } else {
+                unset($postData['end_of_day_id']);
+            }
             $message = 'Cut Off updated successfully.';
             $cutOff->update($postData);
             return $this->sendResponse($cutOff, $message);
