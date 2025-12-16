@@ -340,7 +340,7 @@ class ReportController extends Controller
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        return view('company/reports/zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function discountsReport(Request $request)
