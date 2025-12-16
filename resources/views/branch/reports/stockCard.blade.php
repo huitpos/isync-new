@@ -112,7 +112,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <span class="fw-bold">Part Numberk:</span> {{ $product->part_number }}
+                            <span class="fw-bold">Part Number:</span> {{ $product ? $product->part_number : '' }}
                         </div>
                     </div>
                 </div>
