@@ -665,9 +665,10 @@ class ReportController extends Controller
         $machineIds = [];
         $machines = [];
         foreach($branch->machines as $machine) {
-            $machineIds[] = $machine->id;
-
-            $machines[$machine->id] = $machine;
+            if ($machine->type == 'cashier') {
+                $machineIds[] = $machine->id;
+                $machines[$machine->id] = $machine;
+            }
         }
 
         $dateParam = $request->input('date_range', null);
