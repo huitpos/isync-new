@@ -522,6 +522,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3321,6 +3322,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3520,6 +3522,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3667,6 +3670,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3810,6 +3814,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3951,6 +3956,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -4100,6 +4106,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -4244,6 +4251,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -4432,6 +4440,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -4580,6 +4589,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -4716,6 +4726,7 @@ class MiscController extends BaseController
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
