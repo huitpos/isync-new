@@ -358,6 +358,14 @@ class MiscController extends BaseController
     public function saveTransactions(Request $request)
     {
         $requestData = $request->all();
+
+        $log = new ApiRequestLog();
+        $log->type = 'saveTransactionsRequest';
+        $log->method = $request->method();
+        $log->request = json_encode($requestData);
+        $log->response = '';
+        $log->save();
+
         // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
@@ -577,6 +585,14 @@ class MiscController extends BaseController
     public function saveOrders(Request $request)
     {
         $requestData = $request->all();
+
+        $log = new ApiRequestLog();
+        $log->type = 'saveOrdersRequest';
+        $log->method = $request->method();
+        $log->request = json_encode($requestData);
+        $log->response = '';
+        $log->save();
+
         // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
