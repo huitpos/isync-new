@@ -511,6 +511,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Transaction::insert($toInsert);
             }
 
@@ -744,11 +750,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Order::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1038,11 +1051,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Payment::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1178,11 +1198,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Safekeeping::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1318,11 +1345,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 SafekeepingDenomination::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1525,11 +1559,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 EndOfDay::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1710,11 +1751,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOff::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1967,11 +2015,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Discount::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2205,11 +2260,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 DiscountDetail::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2342,11 +2404,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 PaymentOtherInformation::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2532,11 +2601,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 DiscountOtherInformation::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2699,11 +2775,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOffDepartment::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2836,11 +2919,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOffDiscount::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2973,11 +3063,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOffPayment::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3107,11 +3204,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 EndOfDayDiscount::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3206,6 +3310,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 EndOfDayPayment::insert($toInsert);
             }
 
@@ -3399,6 +3509,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CashFund::insert($toInsert);
             }
 
@@ -3540,6 +3656,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CashFundDenomination::insert($toInsert);
             }
 
@@ -3677,6 +3799,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 AuditTrail::insert($toInsert);
             }
 
@@ -3812,6 +3940,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOffProduct::insert($toInsert);
             }
 
@@ -3955,6 +4089,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Payout::insert($toInsert);
             }
 
@@ -4093,6 +4233,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 OfficialReceiptInformation::insert($toInsert);
             }
 
@@ -4275,6 +4421,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 SpotAudit::insert($toInsert);
             }
 
@@ -4417,6 +4569,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 SpotAuditDenomination::insert($toInsert);
             }
 
@@ -4547,6 +4705,12 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 EndOfDayProduct::insert($toInsert);
             }
 
