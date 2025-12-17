@@ -376,7 +376,7 @@
                             @foreach($disposals as $item)
                                 <tr>
                                     <td>{{ $item->date }}</td>
-                                    <td>to follow</td>
+                                    <td>{{ $item->pdis_number }}</td>
                                     <td>{{ $item->quantity }}</td>
                                     <td>{{ $item->uom }}</td>
                                     <td>{{ $item->cost }}</td>

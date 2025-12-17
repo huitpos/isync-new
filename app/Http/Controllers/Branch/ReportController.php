@@ -488,7 +488,7 @@ class ReportController extends Controller
                     AND transactions.is_void = FALSE
                     AND transactions.is_back_out = FALSE
                     AND orders.product_id = $productId
-                    -- AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
                 ";
 
             $transactions = DB::select($transactionQuery);
@@ -611,7 +611,8 @@ class ReportController extends Controller
                     products.cost,
                     product_disposal_reasons.`name` AS `reason`,
                     CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
-                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`
+                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
+                    product_disposals.pdis_number
                 FROM product_disposals
                 INNER JOIN product_disposal_items ON product_disposal_items.product_disposal_id = product_disposals.id
                 INNER JOIN unit_of_measurements ON product_disposal_items.uom_id = unit_of_measurements.id
