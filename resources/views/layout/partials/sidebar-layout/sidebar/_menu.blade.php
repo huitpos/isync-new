@@ -765,6 +765,33 @@
 								<span class="menu-title">Audit Trail</span>
 							</a>
 						</div>
+<<<<<<< HEAD
+=======
+
+						<div class="menu-item">
+							<a class="menu-link {{ request()->routeIs('company.reports.bir-sales-summary-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-sales-summary-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Sales Summary Report</span>
+							</a>
+
+							<a class="menu-link {{ request()->routeIs('company.reports.bir-senior-citizen-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-senior-citizen-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Senior Citizen Sales Book/Report</span>
+							</a>
+
+							<a class="menu-link {{ request()->routeIs('company.reports.bir-pwd-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-pwd-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Persons with Disability Sales Book/Report</span>
+							</a>
+							
+							<a class="menu-link {{ request()->routeIs('company.reports.bir-naac-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-naac-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">National Athletes and Coaches Sales Book/Report</span>
+							</a>
+							
+							<a class="menu-link {{ request()->routeIs('company.reports.bir-solo-parent-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-solo-parent-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+								<span class="menu-title">Solo Parent Sales Book/Report</span>
+							</a>
+						</div>
+
+						
+>>>>>>> POSADMIN-640
 					</div>
 				</div>
 			@endif

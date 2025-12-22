@@ -783,7 +783,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post') && !$request->input('search')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new BirSalesSummaryReportExport($branchId, $startDate, $endDate), "$branch->name - BIR SALES SUMMARY  REPORT - $startDate - $endDate.xlsx");
+            return Excel::download(new BirSalesSummaryReportExport($branchId, $startDate, $endDate), "$branch->name - SALES SUMMARY  REPORT - $startDate - $endDate.xlsx");
         }
 
         $endOfDays = EndOfDay::where('branch_id', $branchId)
