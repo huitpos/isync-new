@@ -683,7 +683,7 @@
 
 						<div class="menu-item">
 							<a class="menu-link {{ request()->routeIs('company.reports.bir-sales-summary-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-sales-summary-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-								<span class="menu-title">BIR Sales Summary Report</span>
+								<span class="menu-title">Sales Summary Report</span>
 							</a>
 
 							<a class="menu-link {{ request()->routeIs('company.reports.bir-senior-citizen-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.bir-senior-citizen-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
