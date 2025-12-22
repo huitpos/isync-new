@@ -204,8 +204,6 @@ class MiscController extends BaseController
             return $this->sendError('Branch not found.', 404);
         }
 
-        $request->merge(['return_data' => filter_var($request->return_data ?? true, FILTER_VALIDATE_BOOLEAN)]);
-        
         $productsQuery = $branch->company->products()
             ->whereHas('itemType', function ($subQuery) {
                 $subQuery->where('show_in_cashier', true);
@@ -227,23 +225,8 @@ class MiscController extends BaseController
             });
 
         // Paginate the products
-        $perPage = $request->get('per_page', 500); // Default to 15 per page if not specified
+        $perPage = $request->get('per_page', 2); // Default to 15 per page if not specified
         $products = $productsQuery->paginate($perPage);
-
-        if (!$request->return_data) {
-            // Return the pagination information without the 'data'
-            return $this->sendResponse([
-                'current_page' => $products->currentPage(),
-                'from' => $products->firstItem(),
-                'last_page' => $products->lastPage(),
-                'links' => $products->links(),
-                'next_page_url' => $products->nextPageUrl(),
-                'per_page' => $products->perPage(),
-                'prev_page_url' => $products->previousPageUrl(),
-                'to' => $products->lastItem(),
-                'total' => $products->total(),
-            ], 'Data not returned because return_data is false.');
-        }
 
         return $this->sendResponse($products, 'Products retrieved successfully.');
     }
@@ -375,6 +358,14 @@ class MiscController extends BaseController
     public function saveTransactions(Request $request)
     {
         $requestData = $request->all();
+
+        $log = new ApiRequestLog();
+        $log->type = 'saveTransactionsRequest';
+        $log->method = $request->method();
+        $log->request = json_encode($requestData);
+        $log->response = '';
+        $log->save();
+
         // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
@@ -520,11 +511,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Transaction::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -594,6 +592,14 @@ class MiscController extends BaseController
     public function saveOrders(Request $request)
     {
         $requestData = $request->all();
+
+        $log = new ApiRequestLog();
+        $log->type = 'saveOrdersRequest';
+        $log->method = $request->method();
+        $log->request = json_encode($requestData);
+        $log->response = '';
+        $log->save();
+
         // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
@@ -612,6 +618,7 @@ class MiscController extends BaseController
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'order_id' => 'required|numeric|min:1',
@@ -620,23 +627,23 @@ class MiscController extends BaseController
             'product_id' => 'required',
             'cost' => ['required', 'numeric'],
             'qty' => ['required', 'numeric'],
-            'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'original_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'gross' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'amount' => ['required', 'numeric'],
+            'original_amount' => ['required', 'numeric'],
+            'gross' => ['required', 'numeric'],
+            'total' => ['required', 'numeric'],
+            'total_cost' => ['required', 'numeric'],
             'is_vatable' => 'required|boolean',
             'vat_amount' => ['required', 'numeric'],
-            'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_exempt_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'vatable_sales' => ['required', 'numeric'],
+            'vat_exempt_sales' => ['required', 'numeric'],
+            'discount_amount' => ['required', 'numeric'],
             'department_id' => 'required',
             'category_id' => 'required',
             'subcategory_id' => 'required',
             'unit_id' => 'required|numeric',
             'is_void' => 'required|boolean',
             'is_back_out' => 'required|boolean',
-            'min_amount_sold' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'min_amount_sold' => ['required', 'numeric'],
             'is_paid' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
             'is_completed' => 'required|boolean',
@@ -644,7 +651,7 @@ class MiscController extends BaseController
             'is_cut_off' => 'required|boolean',
             'is_discount_exempt' => 'required|boolean',
             'is_open_price' => 'required|boolean',
-            'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'vat_expense' => ['required', 'numeric'],
             'with_serial' => 'required|boolean',
             'is_return' => 'required|boolean',
         ];
@@ -744,11 +751,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Order::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -890,7 +904,6 @@ class MiscController extends BaseController
     {
         $validator = validator($request->all(), [
             'branch_id' => 'required',
-            'pos_machine_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -900,7 +913,6 @@ class MiscController extends BaseController
         $query = TakeOrderOrder::where([
             'branch_id' => $request->branch_id,
             'is_completed' => false,
-            'pos_machine_id' => $request->pos_machine_id,
         ]);
 
         if ($request->has('transaction_id')) {
@@ -971,6 +983,7 @@ class MiscController extends BaseController
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'payment_id' => 'required|numeric|min:1',
@@ -978,7 +991,7 @@ class MiscController extends BaseController
             'branch_id' => 'required',
             'transaction_id' => 'required',
             'payment_type_id' => 'required',
-            'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'amount' => ['required', 'numeric'],
             'is_advance_payment' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
             'is_void' => 'required|boolean',
@@ -1039,11 +1052,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Payment::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1113,19 +1133,20 @@ class MiscController extends BaseController
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'safekeeping_id' => 'required|numeric|min:1',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
-            'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'amount' => ['required', 'numeric'],
             'cashier_id' => 'required',
             'authorize_id' => 'required',
             'is_cut_off' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
             'end_of_day_id' => 'required',
             'is_auto' => 'required|boolean',
-            'short_over' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'short_over' => ['required', 'numeric'],
         ];
 
         $toInsert = [];
@@ -1133,42 +1154,42 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $sk) {
-                $validator = validator($sk, $rules);
+            foreach ($data as $idx => $safekeeping) {
+                $validator = validator($safekeeping, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $sk;
+                    $failedRequests[$idx] = $safekeeping;
                     continue;
                 }
 
                 $postData = [
-                    'safekeeping_id' => $sk['safekeeping_id'] ?? null,
-                    'pos_machine_id' => $sk['pos_machine_id'] ?? null,
-                    'branch_id' => $sk['branch_id'] ?? null,
-                    'amount' => $sk['amount'] ?? null,
-                    'cashier_id' => $sk['cashier_id'] ?? null,
-                    'cashier_name' => $sk['cashier_name'] ?? null,
-                    'authorize_id' => $sk['authorize_id'] ?? null,
-                    'authorize_name' => $sk['authorize_name'] ?? null,
-                    'is_cut_off' => $sk['is_cut_off'] ?? null,
-                    'cut_off_id' => $sk['cut_off_id'] ?? null,
-                    'is_sent_to_server' => $sk['is_sent_to_server'] ?? null,
-                    'shift_number' => $sk['shift_number'] ?? null,
-                    'treg' => $sk['treg'] ?? null,
-                    'end_of_day_id' => $sk['end_of_day_id'] ?? null,
-                    'is_auto' => $sk['is_auto'] ?? null,
-                    'short_over' => $sk['short_over'] ?? null,
-                    'company_id' => $sk['company_id'] ?? null,
+                    'safekeeping_id' => $safekeeping['safekeeping_id'] ?? null,
+                    'pos_machine_id' => $safekeeping['pos_machine_id'] ?? null,
+                    'branch_id' => $safekeeping['branch_id'] ?? null,
+                    'amount' => $safekeeping['amount'] ?? null,
+                    'cashier_id' => $safekeeping['cashier_id'] ?? null,
+                    'cashier_name' => $safekeeping['cashier_name'] ?? null,
+                    'authorize_id' => $safekeeping['authorize_id'] ?? null,
+                    'authorize_name' => $safekeeping['authorize_name'] ?? null,
+                    'is_cut_off' => $safekeeping['is_cut_off'] ?? null,
+                    'cut_off_id' => $safekeeping['cut_off_id'] ?? null,
+                    'is_sent_to_server' => $safekeeping['is_sent_to_server'] ?? null,
+                    'shift_number' => $safekeeping['shift_number'] ?? null,
+                    'treg' => $safekeeping['treg'] ?? null,
+                    'end_of_day_id' => $safekeeping['end_of_day_id'] ?? null,
+                    'is_auto' => $safekeeping['is_auto'] ?? null,
+                    'short_over' => $safekeeping['short_over'] ?? null,
+                    'company_id' => $safekeeping['company_id'] ?? null,
                 ];
 
-                $safekeeping = Safekeeping::where([
-                    'safekeeping_id' => $sk['safekeeping_id'],
-                    'pos_machine_id' => $sk['pos_machine_id'],
-                    'branch_id' => $sk['branch_id'],
+                $existingSafekeeping = Safekeeping::where([
+                    'safekeeping_id' => $safekeeping['safekeeping_id'],
+                    'pos_machine_id' => $safekeeping['pos_machine_id'],
+                    'branch_id' => $safekeeping['branch_id'],
                 ])->first();
 
-                if ($safekeeping) {
+                if ($existingSafekeeping) {
                     $toUpdate[] = [
-                        'model' => $safekeeping,
+                        'model' => $existingSafekeeping,
                         'data' => $postData
                     ];
                 } else {
@@ -1178,11 +1199,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Safekeeping::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1253,14 +1281,15 @@ class MiscController extends BaseController
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'safekeeping_denomination_id' => 'required|numeric|min:1',
             'safekeeping_id' => 'required',
             'cash_denomination_id' => 'required',
-            'amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'qty' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'amount' => ['required', 'numeric'],
+            'qty' => ['required', 'numeric'],
+            'total' => ['required', 'numeric'],
             'branch_id' => 'required',
             'pos_machine_id' => 'required',
             'end_of_day_id' => 'required',
@@ -1273,41 +1302,41 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $skd) {
-                $validator = validator($skd, $rules);
+            foreach ($data as $idx => $denomination) {
+                $validator = validator($denomination, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $skd;
+                    $failedRequests[$idx] = $denomination;
                     continue;
                 }
 
                 $postData = [
-                    'branch_id' => $skd['branch_id'] ?? null,
-                    'pos_machine_id' => $skd['pos_machine_id'] ?? null,
-                    'safekeeping_denomination_id' => $skd['safekeeping_denomination_id'] ?? null,
-                    'safekeeping_id' => $skd['safekeeping_id'] ?? null,
-                    'cash_denomination_id' => $skd['cash_denomination_id'] ?? null,
-                    'name' => $skd['name'] ?? null,
-                    'amount' => $skd['amount'] ?? null,
-                    'qty' => $skd['qty'] ?? null,
-                    'total' => $skd['total'] ?? null,
-                    'shift_number' => $skd['shift_number'] ?? null,
-                    'cut_off_id' => $skd['cut_off_id'] ?? null,
-                    'treg' => $skd['treg'] ?? null,
-                    'end_of_day_id' => $skd['end_of_day_id'] ?? null,
-                    'is_cut_off' => $skd['is_cut_off'] ?? null,
-                    'is_sent_to_server' => $skd['is_sent_to_server'] ?? null,
-                    'company_id' => $skd['company_id'] ?? null,
+                    'branch_id' => $denomination['branch_id'] ?? null,
+                    'pos_machine_id' => $denomination['pos_machine_id'] ?? null,
+                    'safekeeping_denomination_id' => $denomination['safekeeping_denomination_id'] ?? null,
+                    'safekeeping_id' => $denomination['safekeeping_id'] ?? null,
+                    'cash_denomination_id' => $denomination['cash_denomination_id'] ?? null,
+                    'name' => $denomination['name'] ?? null,
+                    'amount' => $denomination['amount'] ?? null,
+                    'qty' => $denomination['qty'] ?? null,
+                    'total' => $denomination['total'] ?? null,
+                    'shift_number' => $denomination['shift_number'] ?? null,
+                    'cut_off_id' => $denomination['cut_off_id'] ?? null,
+                    'treg' => $denomination['treg'] ?? null,
+                    'end_of_day_id' => $denomination['end_of_day_id'] ?? null,
+                    'is_cut_off' => $denomination['is_cut_off'] ?? null,
+                    'is_sent_to_server' => $denomination['is_sent_to_server'] ?? null,
+                    'company_id' => $denomination['company_id'] ?? null,
                 ];
 
-                $safekeepingDenomination = SafekeepingDenomination::where([
-                    'safekeeping_denomination_id' => $skd['safekeeping_denomination_id'],
-                    'safekeeping_id' => $skd['safekeeping_id'],
-                    'cash_denomination_id' => $skd['cash_denomination_id'],
+                $existingDenomination = SafekeepingDenomination::where([
+                    'safekeeping_denomination_id' => $denomination['safekeeping_denomination_id'],
+                    'safekeeping_id' => $denomination['safekeeping_id'],
+                    'cash_denomination_id' => $denomination['cash_denomination_id'],
                 ])->first();
 
-                if ($safekeepingDenomination) {
+                if ($existingDenomination) {
                     $toUpdate[] = [
-                        'model' => $safekeepingDenomination,
+                        'model' => $existingDenomination,
                         'data' => $postData
                     ];
                 } else {
@@ -1317,11 +1346,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 SafekeepingDenomination::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1378,145 +1414,165 @@ class MiscController extends BaseController
     public function saveEndOfDays(Request $request)
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of end of days
                 $data = $requestData['data'];
             } else {
+                // If it's a single end of day object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single end of day object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of end of days (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'end_of_day_id' => 'required|numeric|min:1',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
-            'beginning_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'ending_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'beginning_amount' => ['required', 'numeric'],
+            'ending_amount' => ['required', 'numeric'],
             'total_transactions' => 'required|numeric',
-            'gross_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'net_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_exempt_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'void_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_change' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_payout' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_service_charge' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_sk' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'gross_sales' => ['required', 'numeric'],
+            'net_sales' => ['required', 'numeric'],
+            'vatable_sales' => ['required', 'numeric'],
+            'vat_exempt_sales' => ['required', 'numeric'],
+            'vat_amount' => ['required', 'numeric'],
+            'vat_expense' => ['required', 'numeric'],
+            'void_amount' => ['required', 'numeric'],
+            'total_change' => ['required', 'numeric'],
+            'total_payout' => ['required', 'numeric'],
+            'total_service_charge' => ['required', 'numeric'],
+            'total_discount_amount' => ['required', 'numeric'],
+            'total_cost' => ['required', 'numeric'],
+            'total_sk' => ['required', 'numeric'],
             'cashier_id' => 'required',
             'shift_number' => 'required',
             'is_sent_to_server' => 'required|boolean',
             'reading_number' => 'required|numeric',
             'void_qty' => 'required|numeric',
-            'total_short_over' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'total_short_over' => ['required', 'numeric'],
         ];
+
+        $toInsert = [];
+        $toUpdate = [];
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $eod) {
-                $validator = validator($eod, $rules);
+            foreach ($data as $idx => $endOfDay) {
+                $validator = validator($endOfDay, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $eod;
+                    $failedRequests[$idx] = $endOfDay;
                     continue;
                 }
 
-                $branch = Branch::find($eod['branch_id']);
+                $branch = Branch::findOrFail($endOfDay['branch_id']);
 
                 $postData = [
-                    'end_of_day_id' => $eod['end_of_day_id'] ?? null,
-                    'pos_machine_id' => $eod['pos_machine_id'] ?? null,
-                    'branch_id' => $eod['branch_id'] ?? null,
-                    'beginning_or' => $eod['beginning_or'] ?? null,
-                    'ending_or' => $eod['ending_or'] ?? null,
-                    'beginning_amount' => $eod['beginning_amount'] ?? null,
-                    'ending_amount' => $eod['ending_amount'] ?? null,
-                    'total_transactions' => $eod['total_transactions'] ?? null,
-                    'gross_sales' => $eod['gross_sales'] ?? null,
-                    'net_sales' => $eod['net_sales'] ?? null,
-                    'vatable_sales' => $eod['vatable_sales'] ?? null,
-                    'vat_exempt_sales' => $eod['vat_exempt_sales'] ?? null,
-                    'vat_amount' => $eod['vat_amount'] ?? null,
-                    'vat_expense' => $eod['vat_expense'] ?? null,
-                    'void_amount' => $eod['void_amount'] ?? null,
-                    'total_change' => $eod['total_change'] ?? null,
-                    'total_payout' => $eod['total_payout'] ?? null,
-                    'total_service_charge' => $eod['total_service_charge'] ?? null,
-                    'total_discount_amount' => $eod['total_discount_amount'] ?? null,
-                    'total_cost' => $eod['total_cost'] ?? null,
-                    'total_sk' => $eod['total_sk'] ?? null,
-                    'cashier_id' => $eod['cashier_id'] ?? null,
-                    'cashier_name' => $eod['cashier_name'] ?? null,
-                    'admin_id' => $eod['admin_id'] ?? null,
-                    'admin_name' => $eod['admin_name'] ?? null,
-                    'shift_number' => $eod['shift_number'] ?? null,
-                    'is_sent_to_server' => $eod['is_sent_to_server'] ?? null,
-                    'treg' => $eod['treg'] ?? null,
-                    'reading_number' => $eod['reading_number'] ?? null,
-                    'void_qty' => $eod['void_qty'] ?? null,
-                    'total_short_over' => $eod['total_short_over'] ?? null,
-                    'generated_date' => $eod['generated_date'] ?? null,
-                    'beg_reading_number' => $eod['beg_reading_number'] ?? null,
-                    'end_reading_number' => $eod['end_reading_number'] ?? null,
-                    'total_zero_rated_amount' => $eod['total_zero_rated_amount'] ?? null,
-                    'print_string' => $eod['print_string'] ?? null,
-                    'company_id' => $eod['company_id'] ?? null,
-                    'beginning_counter_amount' => $eod['beginning_counter_amount'] ?? null,
-                    'ending_counter_amount' => $eod['ending_counter_amount'] ?? null,
-                    'total_cash_fund' => $eod['total_cash_fund'] ?? null,
-                    'beginning_gt_counter' => $eod['beginning_gt_counter'] ?? null,
-                    'ending_gt_counter' => $eod['ending_gt_counter'] ?? null,
-                    'beginning_cut_off_counter' => $eod['beginning_cut_off_counter'] ?? null,
-                    'ending_cut_off_counter' => $eod['ending_cut_off_counter'] ?? null,
-                    'total_return' => $eod['total_return'] ?? null,
-                    'is_complete' => $eod['is_complete'] ?? null,
+                    'end_of_day_id' => $endOfDay['end_of_day_id'] ?? null,
+                    'pos_machine_id' => $endOfDay['pos_machine_id'] ?? null,
+                    'branch_id' => $endOfDay['branch_id'] ?? null,
+                    'beginning_or' => $endOfDay['beginning_or'] ?? null,
+                    'ending_or' => $endOfDay['ending_or'] ?? null,
+                    'beginning_amount' => $endOfDay['beginning_amount'] ?? null,
+                    'ending_amount' => $endOfDay['ending_amount'] ?? null,
+                    'total_transactions' => $endOfDay['total_transactions'] ?? null,
+                    'gross_sales' => $endOfDay['gross_sales'] ?? null,
+                    'net_sales' => $endOfDay['net_sales'] ?? null,
+                    'vatable_sales' => $endOfDay['vatable_sales'] ?? null,
+                    'vat_exempt_sales' => $endOfDay['vat_exempt_sales'] ?? null,
+                    'vat_amount' => $endOfDay['vat_amount'] ?? null,
+                    'vat_expense' => $endOfDay['vat_expense'] ?? null,
+                    'void_amount' => $endOfDay['void_amount'] ?? null,
+                    'total_change' => $endOfDay['total_change'] ?? null,
+                    'total_payout' => $endOfDay['total_payout'] ?? null,
+                    'total_service_charge' => $endOfDay['total_service_charge'] ?? null,
+                    'total_discount_amount' => $endOfDay['total_discount_amount'] ?? null,
+                    'total_cost' => $endOfDay['total_cost'] ?? null,
+                    'total_sk' => $endOfDay['total_sk'] ?? null,
+                    'cashier_id' => $endOfDay['cashier_id'] ?? null,
+                    'cashier_name' => $endOfDay['cashier_name'] ?? null,
+                    'admin_id' => $endOfDay['admin_id'] ?? null,
+                    'admin_name' => $endOfDay['admin_name'] ?? null,
+                    'shift_number' => $endOfDay['shift_number'] ?? null,
+                    'is_sent_to_server' => $endOfDay['is_sent_to_server'] ?? null,
+                    'treg' => $endOfDay['treg'] ?? null,
+                    'reading_number' => $endOfDay['reading_number'] ?? null,
+                    'void_qty' => $endOfDay['void_qty'] ?? null,
+                    'total_short_over' => $endOfDay['total_short_over'] ?? null,
+                    'generated_date' => $endOfDay['generated_date'] ?? null,
+                    'beg_reading_number' => $endOfDay['beg_reading_number'] ?? null,
+                    'end_reading_number' => $endOfDay['end_reading_number'] ?? null,
+                    'total_zero_rated_amount' => $endOfDay['total_zero_rated_amount'] ?? null,
+                    'print_string' => $endOfDay['print_string'] ?? null,
+                    'company_id' => $endOfDay['company_id'] ?? null,
+                    'beginning_counter_amount' => $endOfDay['beginning_counter_amount'] ?? null,
+                    'ending_counter_amount' => $endOfDay['ending_counter_amount'] ?? null,
+                    'total_cash_fund' => $endOfDay['total_cash_fund'] ?? null,
+                    'beginning_gt_counter' => $endOfDay['beginning_gt_counter'] ?? null,
+                    'ending_gt_counter' => $endOfDay['ending_gt_counter'] ?? null,
+                    'beginning_cut_off_counter' => $endOfDay['beginning_cut_off_counter'] ?? null,
+                    'ending_cut_off_counter' => $endOfDay['ending_cut_off_counter'] ?? null,
+                    'total_return' => $endOfDay['total_return'] ?? null,
+                    'is_complete' => $endOfDay['is_complete'] ?? null,
                 ];
 
-                if (!empty($eod['products']) && $branch) {
-                    foreach ($eod['products'] as $reqProduct) {
-                        $product = Product::find($reqProduct['productId'])
-                            ->load('bundledItems', 'rawItems');
+                if (isset($endOfDay['products'])) {
+                    foreach ($endOfDay['products'] as $reqProduct) {
+                        $product = Product::find($reqProduct['productId']);
 
                         if ($product) {
                             $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
-
-                            foreach ($product->bundledItems as $bundledItem) {
-                                $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
-                            }
-
-                            foreach ($product->rawItems as $rawItem) {
-                                $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
-                            }
                         }
                     }
                 }
 
-                $endOfDay = EndOfDay::where([
-                    'end_of_day_id' => $eod['end_of_day_id'],
-                    'pos_machine_id' => $eod['pos_machine_id'],
-                    'branch_id' => $eod['branch_id'],
+                $existingEndOfDay = EndOfDay::where([
+                    'end_of_day_id' => $endOfDay['end_of_day_id'],
+                    'pos_machine_id' => $endOfDay['pos_machine_id'],
+                    'branch_id' => $endOfDay['branch_id'],
                 ])->first();
 
-                TakeOrderTransaction::where('branch_id', $eod['branch_id'])->delete();
-                TakeOrderOrder::where('branch_id', $eod['branch_id'])->delete();
-                TakeOrderDiscount::where('branch_id', $eod['branch_id'])->delete();
-                TakeOrderDiscountDetail::where('branch_id', $eod['branch_id'])->delete();
-                TakeOrderDiscountOtherInformation::where('branch_id', $eod['branch_id'])->delete();
-
-                if ($endOfDay) {
-                    $endOfDay->update($postData);
+                if ($existingEndOfDay) {
+                    $toUpdate[] = [
+                        'model' => $existingEndOfDay,
+                        'data' => $postData
+                    ];
                 } else {
-                    EndOfDay::create($postData);
+                    $toInsert[] = $postData;
                 }
+
+                // Clean up take order data for this branch
+                TakeOrderTransaction::where('branch_id', $endOfDay['branch_id'])->delete();
+                TakeOrderOrder::where('branch_id', $endOfDay['branch_id'])->delete();
+                TakeOrderDiscount::where('branch_id', $endOfDay['branch_id'])->delete();
+                TakeOrderDiscountDetail::where('branch_id', $endOfDay['branch_id'])->delete();
+                TakeOrderDiscountOtherInformation::where('branch_id', $endOfDay['branch_id'])->delete();
+            }
+
+            // Bulk insert new records
+            if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
+                EndOfDay::insert($toInsert);
+            }
+
+            // Bulk update existing records
+            foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
+                $item['model']->update($item['data']);
             }
 
             DB::commit();
@@ -1527,7 +1583,7 @@ class MiscController extends BaseController
 
         return $this->sendResponse([
             'failed_requests' => array_values($failedRequests)
-        ], 'End Of Days processed successfully.');
+        ], 'End of Days processed successfully.');
     }
 
     public function getEndOfDays(Request $request)
@@ -1573,47 +1629,52 @@ class MiscController extends BaseController
     public function saveCutOffs(Request $request)
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of cut offs
                 $data = $requestData['data'];
             } else {
+                // If it's a single cut off object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single cut off object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of cut offs (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'cut_off_id' => 'required|numeric|min:1',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
-            'beginning_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'ending_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'beginning_amount' => ['required', 'numeric'],
+            'ending_amount' => ['required', 'numeric'],
             'total_transactions' => 'required|numeric',
-            'gross_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'net_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vatable_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_exempt_sales' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'void_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_change' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_payout' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_service_charge' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'total_sk' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'gross_sales' => ['required', 'numeric'],
+            'net_sales' => ['required', 'numeric'],
+            'vatable_sales' => ['required', 'numeric'],
+            'vat_exempt_sales' => ['required', 'numeric'],
+            'vat_amount' => ['required', 'numeric'],
+            'vat_expense' => ['required', 'numeric'],
+            'void_amount' => ['required', 'numeric'],
+            'total_change' => ['required', 'numeric'],
+            'total_payout' => ['required', 'numeric'],
+            'total_service_charge' => ['required', 'numeric'],
+            'total_discount_amount' => ['required', 'numeric'],
+            'total_cost' => ['required', 'numeric'],
+            'total_sk' => ['required', 'numeric'],
             'cashier_id' => 'required',
             'shift_number' => 'required',
             'is_sent_to_server' => 'required|boolean',
             'reading_number' => 'required|numeric',
             'void_qty' => 'required|numeric',
-            'total_short_over' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'total_short_over' => ['required', 'numeric'],
         ];
 
         $toInsert = [];
@@ -1621,67 +1682,67 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $cutoff) {
-                $validator = validator($cutoff, $rules);
+            foreach ($data as $idx => $cutOff) {
+                $validator = validator($cutOff, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $cutoff;
+                    $failedRequests[$idx] = $cutOff;
                     continue;
                 }
 
                 $postData = [
-                    'cut_off_id' => $cutoff['cut_off_id'] ?? null,
-                    'end_of_day_id' => $cutoff['end_of_day_id'] ?? null,
-                    'pos_machine_id' => $cutoff['pos_machine_id'] ?? null,
-                    'branch_id' => $cutoff['branch_id'] ?? null,
-                    'beginning_or' => $cutoff['beginning_or'] ?? null,
-                    'ending_or' => $cutoff['ending_or'] ?? null,
-                    'beginning_amount' => $cutoff['beginning_amount'] ?? null,
-                    'ending_amount' => $cutoff['ending_amount'] ?? null,
-                    'total_transactions' => $cutoff['total_transactions'] ?? null,
-                    'gross_sales' => $cutoff['gross_sales'] ?? null,
-                    'net_sales' => $cutoff['net_sales'] ?? null,
-                    'vatable_sales' => $cutoff['vatable_sales'] ?? null,
-                    'vat_exempt_sales' => $cutoff['vat_exempt_sales'] ?? null,
-                    'vat_amount' => $cutoff['vat_amount'] ?? null,
-                    'vat_expense' => $cutoff['vat_expense'] ?? null,
-                    'void_amount' => $cutoff['void_amount'] ?? null,
-                    'total_change' => $cutoff['total_change'] ?? null,
-                    'total_payout' => $cutoff['total_payout'] ?? null,
-                    'total_service_charge' => $cutoff['total_service_charge'] ?? null,
-                    'total_discount_amount' => $cutoff['total_discount_amount'] ?? null,
-                    'total_cost' => $cutoff['total_cost'] ?? null,
-                    'total_sk' => $cutoff['total_sk'] ?? null,
-                    'cashier_id' => $cutoff['cashier_id'] ?? null,
-                    'cashier_name' => $cutoff['cashier_name'] ?? null,
-                    'admin_id' => $cutoff['admin_id'] ?? null,
-                    'admin_name' => $cutoff['admin_name'] ?? null,
-                    'shift_number' => $cutoff['shift_number'] ?? null,
-                    'is_sent_to_server' => $cutoff['is_sent_to_server'] ?? null,
-                    'treg' => $cutoff['treg'] ?? null,
-                    'reading_number' => $cutoff['reading_number'] ?? null,
-                    'void_qty' => $cutoff['void_qty'] ?? null,
-                    'total_short_over' => $cutoff['total_short_over'] ?? null,
-                    'total_zero_rated_amount' => $cutoff['total_zero_rated_amount'] ?? null,
-                    'print_string' => $cutoff['print_string'] ?? null,
-                    'company_id' => $cutoff['company_id'] ?? null,
-                    'beginning_counter_amount' => $cutoff['beginning_counter_amount'] ?? null,
-                    'ending_counter_amount' => $cutoff['ending_counter_amount'] ?? null,
-                    'total_cash_fund' => $cutoff['total_cash_fund'] ?? null,
-                    'beginning_gt_counter' => $cutoff['beginning_gt_counter'] ?? null,
-                    'ending_gt_counter' => $cutoff['ending_gt_counter'] ?? null,
-                    'total_return' => $cutoff['total_return'] ?? null,
-                    'is_complete' => $cutoff['is_complete'] ?? null,
+                    'cut_off_id' => $cutOff['cut_off_id'] ?? null,
+                    'end_of_day_id' => $cutOff['end_of_day_id'] ?? null,
+                    'pos_machine_id' => $cutOff['pos_machine_id'] ?? null,
+                    'branch_id' => $cutOff['branch_id'] ?? null,
+                    'beginning_or' => $cutOff['beginning_or'] ?? null,
+                    'ending_or' => $cutOff['ending_or'] ?? null,
+                    'beginning_amount' => $cutOff['beginning_amount'] ?? null,
+                    'ending_amount' => $cutOff['ending_amount'] ?? null,
+                    'total_transactions' => $cutOff['total_transactions'] ?? null,
+                    'gross_sales' => $cutOff['gross_sales'] ?? null,
+                    'net_sales' => $cutOff['net_sales'] ?? null,
+                    'vatable_sales' => $cutOff['vatable_sales'] ?? null,
+                    'vat_exempt_sales' => $cutOff['vat_exempt_sales'] ?? null,
+                    'vat_amount' => $cutOff['vat_amount'] ?? null,
+                    'vat_expense' => $cutOff['vat_expense'] ?? null,
+                    'void_amount' => $cutOff['void_amount'] ?? null,
+                    'total_change' => $cutOff['total_change'] ?? null,
+                    'total_payout' => $cutOff['total_payout'] ?? null,
+                    'total_service_charge' => $cutOff['total_service_charge'] ?? null,
+                    'total_discount_amount' => $cutOff['total_discount_amount'] ?? null,
+                    'total_cost' => $cutOff['total_cost'] ?? null,
+                    'total_sk' => $cutOff['total_sk'] ?? null,
+                    'cashier_id' => $cutOff['cashier_id'] ?? null,
+                    'cashier_name' => $cutOff['cashier_name'] ?? null,
+                    'admin_id' => $cutOff['admin_id'] ?? null,
+                    'admin_name' => $cutOff['admin_name'] ?? null,
+                    'shift_number' => $cutOff['shift_number'] ?? null,
+                    'is_sent_to_server' => $cutOff['is_sent_to_server'] ?? null,
+                    'treg' => $cutOff['treg'] ?? null,
+                    'reading_number' => $cutOff['reading_number'] ?? null,
+                    'void_qty' => $cutOff['void_qty'] ?? null,
+                    'total_short_over' => $cutOff['total_short_over'] ?? null,
+                    'total_zero_rated_amount' => $cutOff['total_zero_rated_amount'] ?? null,
+                    'print_string' => $cutOff['print_string'] ?? null,
+                    'company_id' => $cutOff['company_id'] ?? null,
+                    'beginning_counter_amount' => $cutOff['beginning_counter_amount'] ?? null,
+                    'ending_counter_amount' => $cutOff['ending_counter_amount'] ?? null,
+                    'total_cash_fund' => $cutOff['total_cash_fund'] ?? null,
+                    'beginning_gt_counter' => $cutOff['beginning_gt_counter'] ?? null,
+                    'ending_gt_counter' => $cutOff['ending_gt_counter'] ?? null,
+                    'total_return' => $cutOff['total_return'] ?? null,
+                    'is_complete' => $cutOff['is_complete'] ?? null,
                 ];
 
-                $cutOff = CutOff::where([
-                    'cut_off_id' => $cutoff['cut_off_id'],
-                    'pos_machine_id' => $cutoff['pos_machine_id'],
-                    'branch_id' => $cutoff['branch_id'],
+                $existingCutOff = CutOff::where([
+                    'cut_off_id' => $cutOff['cut_off_id'],
+                    'pos_machine_id' => $cutOff['pos_machine_id'],
+                    'branch_id' => $cutOff['branch_id'],
                 ])->first();
 
-                if ($cutOff) {
+                if ($existingCutOff) {
                     $toUpdate[] = [
-                        'model' => $cutOff,
+                        'model' => $existingCutOff,
                         'data' => $postData
                     ];
                 } else {
@@ -1691,11 +1752,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOff::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -1820,8 +1888,7 @@ class MiscController extends BaseController
     public function getTakeOrderDiscounts(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required',
-            'pos_machine_id' => 'required',
+            'branch_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -1829,8 +1896,7 @@ class MiscController extends BaseController
         }
 
         $query = TakeOrderDiscount::where([
-            'branch_id' => $request->branch_id,
-            'pos_machine_id' => $request->pos_machine_id
+            'branch_id' => $request->branch_id
         ]);
 
         if ($request->has('transaction_id')) {
@@ -1849,16 +1915,20 @@ class MiscController extends BaseController
     public function saveDiscounts(Request $request)
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of discounts
                 $data = $requestData['data'];
             } else {
+                // If it's a single discount object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single discount object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of discounts (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
@@ -1872,10 +1942,10 @@ class MiscController extends BaseController
             'transaction_id' => 'required',
             'custom_discount_id' => 'required|numeric',
             'discount_type_id' => 'required',
-            'value' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_exempt_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'value' => ['required', 'numeric'],
+            'discount_amount' => ['required', 'numeric'],
+            'vat_exempt_amount' => ['required', 'numeric'],
+            'vat_expense' => ['required', 'numeric'],
             'cashier_id' => 'required',
             'is_void' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
@@ -1946,11 +2016,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Discount::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2058,8 +2135,7 @@ class MiscController extends BaseController
     public function getTakeOrderDiscountDetails(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required',
-            'pos_machine_id' => 'required',
+            'branch_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -2067,8 +2143,7 @@ class MiscController extends BaseController
         }
 
         $query = TakeOrderDiscountDetail::where([
-                'branch_id' => $request->branch_id,
-                'pos_machine_id' => $request->pos_machine_id
+                'branch_id' => $request->branch_id
             ]);
 
         if ($request->has('transaction_id')) {
@@ -2087,20 +2162,25 @@ class MiscController extends BaseController
     public function saveDiscountDetails(Request $request)
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of discount details
                 $data = $requestData['data'];
             } else {
+                // If it's a single discount detail object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single discount detail object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of discount details (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'discount_details_id' => 'required|numeric|min:1',
@@ -2111,10 +2191,10 @@ class MiscController extends BaseController
             'transaction_id' => 'required|numeric',
             'order_id' => 'required|numeric',
             'discount_type_id' => 'required|numeric',
-            'value' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'discount_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_exempt_amount' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'vat_expense' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'value' => ['required', 'numeric'],
+            'discount_amount' => ['required', 'numeric'],
+            'vat_exempt_amount' => ['required', 'numeric'],
+            'vat_expense' => ['required', 'numeric'],
             'is_void' => 'required|boolean',
             'is_sent_to_server' => 'required|boolean',
             'is_cut_off' => 'required|boolean',
@@ -2126,52 +2206,52 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $detail) {
-                $validator = validator($detail, $rules);
+            foreach ($data as $idx => $discountDetail) {
+                $validator = validator($discountDetail, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $detail;
+                    $failedRequests[$idx] = $discountDetail;
                     continue;
                 }
 
                 $postData = [
-                    'discount_details_id' => $detail['discount_details_id'] ?? null,
-                    'discount_id' => $detail['discount_id'] ?? null,
-                    'pos_machine_id' => $detail['pos_machine_id'] ?? null,
-                    'branch_id' => $detail['branch_id'] ?? null,
-                    'custom_discount_id' => $detail['custom_discount_id'] ?? null,
-                    'transaction_id' => $detail['transaction_id'] ?? null,
-                    'order_id' => $detail['order_id'] ?? null,
-                    'discount_type_id' => $detail['discount_type_id'] ?? null,
-                    'value' => $detail['value'] ?? null,
-                    'discount_amount' => $detail['discount_amount'] ?? null,
-                    'vat_exempt_amount' => $detail['vat_exempt_amount'] ?? null,
-                    'type' => $detail['type'] ?? null,
-                    'is_void' => $detail['is_void'] ?? null,
-                    'void_by_id' => $detail['void_by_id'] ?? null,
-                    'void_by' => $detail['void_by'] ?? null,
-                    'void_at' => $detail['void_at'] ?? null,
-                    'is_sent_to_server' => $detail['is_sent_to_server'] ?? null,
-                    'is_cut_off' => $detail['is_cut_off'] ?? null,
-                    'cut_off_id' => $detail['cut_off_id'] ?? null,
-                    'is_vat_exempt' => $detail['is_vat_exempt'] ?? null,
-                    'shift_number' => $detail['shift_number'] ?? null,
-                    'treg' => $detail['treg'] ?? null,
-                    'vat_expense' => $detail['vat_expense'] ?? null,
-                    'is_zero_rated' => $detail['is_zero_rated'] ?? null,
-                    'company_id' => $detail['company_id'] ?? null,
-                    'is_completed' => $detail['is_completed'] ?? null,
-                    'completed_at' => $detail['completed_at'] ?? null,
+                    'discount_details_id' => $discountDetail['discount_details_id'] ?? null,
+                    'discount_id' => $discountDetail['discount_id'] ?? null,
+                    'pos_machine_id' => $discountDetail['pos_machine_id'] ?? null,
+                    'branch_id' => $discountDetail['branch_id'] ?? null,
+                    'custom_discount_id' => $discountDetail['custom_discount_id'] ?? null,
+                    'transaction_id' => $discountDetail['transaction_id'] ?? null,
+                    'order_id' => $discountDetail['order_id'] ?? null,
+                    'discount_type_id' => $discountDetail['discount_type_id'] ?? null,
+                    'value' => $discountDetail['value'] ?? null,
+                    'discount_amount' => $discountDetail['discount_amount'] ?? null,
+                    'vat_exempt_amount' => $discountDetail['vat_exempt_amount'] ?? null,
+                    'type' => $discountDetail['type'] ?? null,
+                    'is_void' => $discountDetail['is_void'] ?? null,
+                    'void_by_id' => $discountDetail['void_by_id'] ?? null,
+                    'void_by' => $discountDetail['void_by'] ?? null,
+                    'void_at' => $discountDetail['void_at'] ?? null,
+                    'is_sent_to_server' => $discountDetail['is_sent_to_server'] ?? null,
+                    'is_cut_off' => $discountDetail['is_cut_off'] ?? null,
+                    'cut_off_id' => $discountDetail['cut_off_id'] ?? null,
+                    'is_vat_exempt' => $discountDetail['is_vat_exempt'] ?? null,
+                    'shift_number' => $discountDetail['shift_number'] ?? null,
+                    'treg' => $discountDetail['treg'] ?? null,
+                    'vat_expense' => $discountDetail['vat_expense'] ?? null,
+                    'is_zero_rated' => $discountDetail['is_zero_rated'] ?? null,
+                    'company_id' => $discountDetail['company_id'] ?? null,
+                    'is_completed' => $discountDetail['is_completed'] ?? null,
+                    'completed_at' => $discountDetail['completed_at'] ?? null,
                 ];
 
-                $discountDetails = DiscountDetail::where([
-                    'discount_details_id' => $detail['discount_details_id'],
-                    'pos_machine_id' => $detail['pos_machine_id'],
-                    'branch_id' => $detail['branch_id'],
+                $existingDiscountDetail = DiscountDetail::where([
+                    'discount_details_id' => $discountDetail['discount_details_id'],
+                    'pos_machine_id' => $discountDetail['pos_machine_id'],
+                    'branch_id' => $discountDetail['branch_id'],
                 ])->first();
 
-                if ($discountDetails) {
+                if ($existingDiscountDetail) {
                     $toUpdate[] = [
-                        'model' => $discountDetails,
+                        'model' => $existingDiscountDetail,
                         'data' => $postData
                     ];
                 } else {
@@ -2181,11 +2261,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 DiscountDetail::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2234,23 +2321,28 @@ class MiscController extends BaseController
         return $this->sendResponse($discounts, 'Discount details retrieved successfully.');
     }
 
-    public function savePaymentOtherInformations(Request $request)
+    public function savePaymentOtherInformations(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of payment other informations
                 $data = $requestData['data'];
             } else {
+                // If it's a single payment other information object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single payment other information object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of payment other informations (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'payment_other_information_id' => 'required',
@@ -2271,39 +2363,39 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $info) {
-                $validator = validator($info, $rules);
+            foreach ($data as $idx => $paymentInfo) {
+                $validator = validator($paymentInfo, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $info;
+                    $failedRequests[$idx] = $paymentInfo;
                     continue;
                 }
 
                 $postData = [
-                    'payment_other_information_id' => $info['payment_other_information_id'] ?? null,
-                    'pos_machine_id' => $info['pos_machine_id'] ?? null,
-                    'branch_id' => $info['branch_id'] ?? null,
-                    'transaction_id' => $info['transaction_id'] ?? null,
-                    'payment_id' => $info['payment_id'] ?? null,
-                    'name' => $info['name'] ?? null,
-                    'value' => $info['value'] ?? null,
-                    'is_cut_off' => $info['is_cut_off'] ?? null,
-                    'cut_off_id' => $info['cut_off_id'] ?? null,
-                    'is_void' => $info['is_void'] ?? null,
-                    'is_sent_to_server' => $info['is_sent_to_server'] ?? null,
-                    'treg' => $info['treg'] ?? null,
-                    'company_id' => $info['company_id'] ?? null,
-                    'is_mask' => $info['is_mask'] ?? null,
+                    'payment_other_information_id' => $paymentInfo['payment_other_information_id'] ?? null,
+                    'pos_machine_id' => $paymentInfo['pos_machine_id'] ?? null,
+                    'branch_id' => $paymentInfo['branch_id'] ?? null,
+                    'transaction_id' => $paymentInfo['transaction_id'] ?? null,
+                    'payment_id' => $paymentInfo['payment_id'] ?? null,
+                    'name' => $paymentInfo['name'] ?? null,
+                    'value' => $paymentInfo['value'] ?? null,
+                    'is_cut_off' => $paymentInfo['is_cut_off'] ?? null,
+                    'cut_off_id' => $paymentInfo['cut_off_id'] ?? null,
+                    'is_void' => $paymentInfo['is_void'] ?? null,
+                    'is_sent_to_server' => $paymentInfo['is_sent_to_server'] ?? null,
+                    'treg' => $paymentInfo['treg'] ?? null,
+                    'company_id' => $paymentInfo['company_id'] ?? null,
+                    'is_mask' => $paymentInfo['is_mask'] ?? null,
                 ];
 
-                $record = PaymentOtherInformation::where([
-                    'payment_other_information_id' => $info['payment_other_information_id'],
-                    'pos_machine_id' => $info['pos_machine_id'],
-                    'branch_id' => $info['branch_id'],
+                $existingRecord = PaymentOtherInformation::where([
+                    'payment_other_information_id' => $paymentInfo['payment_other_information_id'],
+                    'pos_machine_id' => $paymentInfo['pos_machine_id'],
+                    'branch_id' => $paymentInfo['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -2313,11 +2405,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 PaymentOtherInformation::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2419,23 +2518,28 @@ class MiscController extends BaseController
         return $this->sendResponse(TakeOrderDiscountOtherInformation::create($postData), $message);
     }
 
-    public function saveDiscountOtherInformations(Request $request)
+    public function saveDiscountOtherInformations(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of discount other informations
                 $data = $requestData['data'];
             } else {
+                // If it's a single discount other information object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single discount other information object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of discount other informations (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'discount_other_information_id' => 'required',
@@ -2457,38 +2561,38 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $info) {
-                $validator = validator($info, $rules);
+            foreach ($data as $idx => $discountInfo) {
+                $validator = validator($discountInfo, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $info;
+                    $failedRequests[$idx] = $discountInfo;
                     continue;
                 }
 
                 $postData = [
-                    'discount_other_information_id' => $info['discount_other_information_id'] ?? null,
-                    'pos_machine_id' => $info['pos_machine_id'] ?? null,
-                    'branch_id' => $info['branch_id'] ?? null,
-                    'transaction_id' => $info['transaction_id'] ?? null,
-                    'discount_id' => $info['discount_id'] ?? null,
-                    'name' => $info['name'] ?? null,
-                    'value' => $info['value'] ?? null,
-                    'is_cut_off' => $info['is_cut_off'] ?? null,
-                    'cut_off_id' => $info['cut_off_id'] ?? null,
-                    'is_void' => $info['is_void'] ?? null,
-                    'is_sent_to_server' => $info['is_sent_to_server'] ?? null,
-                    'treg' => $info['treg'] ?? null,
-                    'company_id' => $info['company_id'] ?? null,
+                    'discount_other_information_id' => $discountInfo['discount_other_information_id'] ?? null,
+                    'pos_machine_id' => $discountInfo['pos_machine_id'] ?? null,
+                    'branch_id' => $discountInfo['branch_id'] ?? null,
+                    'transaction_id' => $discountInfo['transaction_id'] ?? null,
+                    'discount_id' => $discountInfo['discount_id'] ?? null,
+                    'name' => $discountInfo['name'] ?? null,
+                    'value' => $discountInfo['value'] ?? null,
+                    'is_cut_off' => $discountInfo['is_cut_off'] ?? null,
+                    'cut_off_id' => $discountInfo['cut_off_id'] ?? null,
+                    'is_void' => $discountInfo['is_void'] ?? null,
+                    'is_sent_to_server' => $discountInfo['is_sent_to_server'] ?? null,
+                    'treg' => $discountInfo['treg'] ?? null,
+                    'company_id' => $discountInfo['company_id'] ?? null,
                 ];
 
-                $record = DiscountOtherInformation::where([
-                    'discount_other_information_id' => $info['discount_other_information_id'],
-                    'pos_machine_id' => $info['pos_machine_id'],
-                    'branch_id' => $info['branch_id'],
+                $existingRecord = DiscountOtherInformation::where([
+                    'discount_other_information_id' => $discountInfo['discount_other_information_id'],
+                    'pos_machine_id' => $discountInfo['pos_machine_id'],
+                    'branch_id' => $discountInfo['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -2498,11 +2602,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 DiscountOtherInformation::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2520,8 +2631,7 @@ class MiscController extends BaseController
     public function getTakeOrderDiscountOtherInformations(Request $request)
     {
         $validator = validator($request->all(), [
-            'branch_id' => 'required',
-            'pos_machine_id' => 'required',
+            'branch_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -2532,8 +2642,7 @@ class MiscController extends BaseController
         $yesterday = Carbon::yesterday()->format('Y-m-d H:i:s');
 
         $query = TakeOrderDiscountOtherInformation::where([
-                'branch_id' => $request->branch_id,
-                'pos_machine_id' => $request->pos_machine_id
+                'branch_id' => $request->branch_id
             ]);
 
         if ($request->has('transaction_id')) {
@@ -2583,23 +2692,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'Discount Other Informations retrieved successfully.');
     }
 
-    public function saveCutOffDepartments(Request $request)
+    public function saveCutOffDepartments(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of cut off departments
                 $data = $requestData['data'];
             } else {
+                // If it's a single cut off department object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single cut off department object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of cut off departments (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'cut_off_department_id' => 'required',
@@ -2621,38 +2735,38 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $dept) {
-                $validator = validator($dept, $rules);
+            foreach ($data as $idx => $department) {
+                $validator = validator($department, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $dept;
+                    $failedRequests[$idx] = $department;
                     continue;
                 }
 
                 $postData = [
-                    'cut_off_department_id' => $dept['cut_off_department_id'] ?? null,
-                    'pos_machine_id' => $dept['pos_machine_id'] ?? null,
-                    'branch_id' => $dept['branch_id'] ?? null,
-                    'is_cut_off' => $dept['is_cut_off'] ?? null,
-                    'cut_off_id' => $dept['cut_off_id'] ?? null,
-                    'department_id' => $dept['department_id'] ?? null,
-                    'name' => $dept['name'] ?? null,
-                    'transaction_count' => $dept['transaction_count'] ?? null,
-                    'amount' => $dept['amount'] ?? null,
-                    'end_of_day_id' => $dept['end_of_day_id'] ?? null,
-                    'is_sent_to_server' => $dept['is_sent_to_server'] ?? null,
-                    'treg' => $dept['treg'] ?? null,
-                    'company_id' => $dept['company_id'] ?? null,
+                    'cut_off_department_id' => $department['cut_off_department_id'] ?? null,
+                    'pos_machine_id' => $department['pos_machine_id'] ?? null,
+                    'branch_id' => $department['branch_id'] ?? null,
+                    'is_cut_off' => $department['is_cut_off'] ?? null,
+                    'cut_off_id' => $department['cut_off_id'] ?? null,
+                    'department_id' => $department['department_id'] ?? null,
+                    'name' => $department['name'] ?? null,
+                    'transaction_count' => $department['transaction_count'] ?? null,
+                    'amount' => $department['amount'] ?? null,
+                    'end_of_day_id' => $department['end_of_day_id'] ?? null,
+                    'is_sent_to_server' => $department['is_sent_to_server'] ?? null,
+                    'treg' => $department['treg'] ?? null,
+                    'company_id' => $department['company_id'] ?? null,
                 ];
 
-                $record = CutOffDepartment::where([
-                    'cut_off_department_id' => $dept['cut_off_department_id'],
-                    'pos_machine_id' => $dept['pos_machine_id'],
-                    'branch_id' => $dept['branch_id'],
+                $existingRecord = CutOffDepartment::where([
+                    'cut_off_department_id' => $department['cut_off_department_id'],
+                    'pos_machine_id' => $department['pos_machine_id'],
+                    'branch_id' => $department['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -2662,11 +2776,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOffDepartment::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2715,23 +2836,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'cut off departments retrieved successfully.');
     }
 
-    public function saveCutOffDiscounts(Request $request)
+    public function saveCutOffDiscounts(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of cut off discounts
                 $data = $requestData['data'];
             } else {
+                // If it's a single cut off discount object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single cut off discount object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of cut off discounts (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'cut_off_discount_id' => 'required',
@@ -2776,15 +2902,15 @@ class MiscController extends BaseController
                     'is_zero_rated' => $discount['is_zero_rated'] ?? null,
                 ];
 
-                $record = CutOffDiscount::where([
+                $existingRecord = CutOffDiscount::where([
                     'cut_off_discount_id' => $discount['cut_off_discount_id'],
                     'pos_machine_id' => $discount['pos_machine_id'],
                     'branch_id' => $discount['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -2794,11 +2920,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOffDiscount::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2847,23 +2980,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'cut off discounts retrieved successfully.');
     }
 
-    public function saveCutOffPayments(Request $request)
+    public function saveCutOffPayments(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of cut off payments
                 $data = $requestData['data'];
             } else {
+                // If it's a single cut off payment object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single cut off payment object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of cut off payments (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'cut_off_payment_id' => 'required',
@@ -2908,15 +3046,15 @@ class MiscController extends BaseController
                     'company_id' => $payment['company_id'] ?? null,
                 ];
 
-                $record = CutOffPayment::where([
+                $existingRecord = CutOffPayment::where([
                     'cut_off_payment_id' => $payment['cut_off_payment_id'],
                     'pos_machine_id' => $payment['pos_machine_id'],
                     'branch_id' => $payment['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -2926,11 +3064,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOffPayment::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -2982,20 +3127,25 @@ class MiscController extends BaseController
     public function saveEndOfDayDiscounts(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of end of day discounts
                 $data = $requestData['data'];
             } else {
+                // If it's a single end of day discount object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single end of day discount object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of end of day discounts (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'end_of_day_discount_id' => 'required',
@@ -3037,15 +3187,15 @@ class MiscController extends BaseController
                     'is_zero_rated' => $discount['is_zero_rated'] ?? null,
                 ];
 
-                $record = EndOfDayDiscount::where([
+                $existingRecord = EndOfDayDiscount::where([
                     'end_of_day_discount_id' => $discount['end_of_day_discount_id'],
                     'pos_machine_id' => $discount['pos_machine_id'],
                     'branch_id' => $discount['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -3055,11 +3205,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 EndOfDayDiscount::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3077,20 +3234,25 @@ class MiscController extends BaseController
     public function saveEndOfDayPayments(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of end of day payments
                 $data = $requestData['data'];
             } else {
+                // If it's a single end of day payment object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single end of day payment object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of end of day payments (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'end_of_day_payment_id' => 'required',
@@ -3131,15 +3293,15 @@ class MiscController extends BaseController
                     'company_id' => $payment['company_id'] ?? null,
                 ];
 
-                $record = EndOfDayPayment::where([
+                $existingRecord = EndOfDayPayment::where([
                     'end_of_day_payment_id' => $payment['end_of_day_payment_id'],
                     'pos_machine_id' => $payment['pos_machine_id'],
                     'branch_id' => $payment['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -3149,11 +3311,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 EndOfDayPayment::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3168,25 +3337,9 @@ class MiscController extends BaseController
         ], 'End Of Day Payments processed successfully.');
     }
 
-    public function saveEndOfDayDepartments(Request $request)
+    public function saveEndOfDayDepartments(Request $request) 
     {
-        $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
-        if (isset($requestData['data'])) {
-            if (is_array($requestData['data'])) {
-                $data = $requestData['data'];
-            } else {
-                $data = [$requestData['data']];
-            }
-        } elseif (is_array($requestData) && self::isAssoc($requestData)) {
-            $data = [$requestData];
-        } elseif (is_array($requestData)) {
-            $data = $requestData;
-        } else {
-            $data = [];
-        }
-        $failedRequests = [];
-        $rules = [
+        $validator = validator($request->all(), [
             'end_of_day_department_id' => 'required',
             'pos_machine_id' => 'required',
             'branch_id' => 'required',
@@ -3196,69 +3349,40 @@ class MiscController extends BaseController
             'amount' => 'required',
             'is_sent_to_server' => 'required',
             'treg' => 'required',
-        ];
+        ]);
 
-        $toInsert = [];
-        $toUpdate = [];
-
-        DB::beginTransaction();
-        try {
-            foreach ($data as $idx => $dept) {
-                $validator = validator($dept, $rules);
-                if ($validator->fails()) {
-                    $failedRequests[$idx] = $dept;
-                    continue;
-                }
-
-                $postData = [
-                    'end_of_day_department_id' => $dept['end_of_day_department_id'] ?? null,
-                    'pos_machine_id' => $dept['pos_machine_id'] ?? null,
-                    'branch_id' => $dept['branch_id'] ?? null,
-                    'end_of_day_id' => $dept['end_of_day_id'] ?? null,
-                    'name' => $dept['name'] ?? null,
-                    'transaction_count' => $dept['transaction_count'] ?? null,
-                    'amount' => $dept['amount'] ?? null,
-                    'is_sent_to_server' => $dept['is_sent_to_server'] ?? null,
-                    'treg' => $dept['treg'] ?? null,
-                    'company_id' => $dept['company_id'] ?? null,
-                    'department_id' => $dept['department_id'] ?? null,
-                ];
-
-                $record = EndOfDayDepartment::where([
-                    'end_of_day_department_id' => $dept['end_of_day_department_id'],
-                    'pos_machine_id' => $dept['pos_machine_id'],
-                    'branch_id' => $dept['branch_id'],
-                ])->first();
-
-                if ($record) {
-                    $toUpdate[] = [
-                        'model' => $record,
-                        'data' => $postData
-                    ];
-                } else {
-                    $toInsert[] = $postData;
-                }
-            }
-
-            // Bulk insert new records
-            if (!empty($toInsert)) {
-                EndOfDayDepartment::insert($toInsert);
-            }
-
-            // Bulk update existing records
-            foreach ($toUpdate as $item) {
-                $item['model']->update($item['data']);
-            }
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->sendError('Database Error', $e->getMessage(), 500);
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors(), 422);
         }
 
-        return $this->sendResponse([
-            'failed_requests' => array_values($failedRequests)
-        ], 'End Of Day Departments processed successfully.');
+        $postData = [
+            'end_of_day_department_id' => $request->end_of_day_department_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+            'end_of_day_id' => $request->end_of_day_id,
+            'name' => $request->name,
+            'transaction_count' => $request->transaction_count,
+            'amount' => $request->amount,
+            'is_sent_to_server' => $request->is_sent_to_server,
+            'treg' => $request->treg,
+            'company_id' => $request->company_id,
+            'department_id' => $request->department_id,
+        ];
+
+        $message = 'end of day department created successfully.';
+        $record = EndOfDayDepartment::where([
+            'end_of_day_department_id' => $request->end_of_day_department_id,
+            'pos_machine_id' => $request->pos_machine_id,
+            'branch_id' => $request->branch_id,
+        ])->first();
+
+        if ($record) {
+            $message = 'end of day department updated successfully.';
+            $record->update($postData);
+            return $this->sendResponse($record, $message);
+        }
+
+        return $this->sendResponse(EndOfDayDepartment::create($postData), $message);
     }
 
     public function bulkSaveTransactions(Request $request)
@@ -3305,23 +3429,28 @@ class MiscController extends BaseController
         }
     }
 
-    public function saveCashFunds(Request $request)
+    public function saveCashFunds(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of cash funds
                 $data = $requestData['data'];
             } else {
+                // If it's a single cash fund object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single cash fund object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of cash funds (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'cash_fund_id' => 'required',
@@ -3341,38 +3470,38 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $fund) {
-                $validator = validator($fund, $rules);
+            foreach ($data as $idx => $cashFund) {
+                $validator = validator($cashFund, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $fund;
+                    $failedRequests[$idx] = $cashFund;
                     continue;
                 }
 
                 $postData = [
-                    'cash_fund_id' => $fund['cash_fund_id'] ?? null,
-                    'pos_machine_id' => $fund['pos_machine_id'] ?? null,
-                    'branch_id' => $fund['branch_id'] ?? null,
-                    'amount' => $fund['amount'] ?? null,
-                    'cashier_id' => $fund['cashier_id'] ?? null,
-                    'is_cut_off' => $fund['is_cut_off'] ?? null,
-                    'cut_off_id' => $fund['cut_off_id'] ?? null,
-                    'end_of_day_id' => $fund['end_of_day_id'] ?? null,
-                    'is_sent_to_server' => $fund['is_sent_to_server'] ?? null,
-                    'shift_number' => $fund['shift_number'] ?? null,
-                    'treg' => $fund['treg'] ?? null,
-                    'cashier_name' => $fund['cashier_name'] ?? null,
-                    'company_id' => $fund['company_id'] ?? null,
+                    'cash_fund_id' => $cashFund['cash_fund_id'] ?? null,
+                    'pos_machine_id' => $cashFund['pos_machine_id'] ?? null,
+                    'branch_id' => $cashFund['branch_id'] ?? null,
+                    'amount' => $cashFund['amount'] ?? null,
+                    'cashier_id' => $cashFund['cashier_id'] ?? null,
+                    'is_cut_off' => $cashFund['is_cut_off'] ?? null,
+                    'cut_off_id' => $cashFund['cut_off_id'] ?? null,
+                    'end_of_day_id' => $cashFund['end_of_day_id'] ?? null,
+                    'is_sent_to_server' => $cashFund['is_sent_to_server'] ?? null,
+                    'shift_number' => $cashFund['shift_number'] ?? null,
+                    'treg' => $cashFund['treg'] ?? null,
+                    'cashier_name' => $cashFund['cashier_name'] ?? null,
+                    'company_id' => $cashFund['company_id'] ?? null,
                 ];
 
-                $record = CashFund::where([
-                    'cash_fund_id' => $fund['cash_fund_id'],
-                    'pos_machine_id' => $fund['pos_machine_id'],
-                    'branch_id' => $fund['branch_id'],
+                $existingRecord = CashFund::where([
+                    'cash_fund_id' => $cashFund['cash_fund_id'],
+                    'pos_machine_id' => $cashFund['pos_machine_id'],
+                    'branch_id' => $cashFund['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -3382,11 +3511,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CashFund::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3435,23 +3571,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'cash fund retrieved successfully.');
     }
 
-    public function saveCashFundDenominations(Request $request)
+    public function saveCashFundDenominations(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of cash fund denominations
                 $data = $requestData['data'];
             } else {
+                // If it's a single cash fund denomination object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single cash fund denomination object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of cash fund denominations (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'cash_fund_denomination_id' => 'required',
@@ -3474,41 +3615,41 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $denom) {
-                $validator = validator($denom, $rules);
+            foreach ($data as $idx => $denomination) {
+                $validator = validator($denomination, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $denom;
+                    $failedRequests[$idx] = $denomination;
                     continue;
                 }
 
                 $postData = [
-                    'cash_fund_denomination_id' => $denom['cash_fund_denomination_id'] ?? null,
-                    'pos_machine_id' => $denom['pos_machine_id'] ?? null,
-                    'branch_id' => $denom['branch_id'] ?? null,
-                    'cash_fund_id' => $denom['cash_fund_id'] ?? null,
-                    'cash_denomination_id' => $denom['cash_denomination_id'] ?? null,
-                    'name' => $denom['name'] ?? null,
-                    'amount' => $denom['amount'] ?? null,
-                    'qty' => $denom['qty'] ?? null,
-                    'total' => $denom['total'] ?? null,
-                    'is_cut_off' => $denom['is_cut_off'] ?? null,
-                    'cut_off_id' => $denom['cut_off_id'] ?? null,
-                    'end_of_day_id' => $denom['end_of_day_id'] ?? null,
-                    'is_sent_to_server' => $denom['is_sent_to_server'] ?? null,
-                    'shift_number' => $denom['shift_number'] ?? null,
-                    'treg' => $denom['treg'] ?? null,
-                    'company_id' => $denom['company_id'] ?? null,
+                    'cash_fund_denomination_id' => $denomination['cash_fund_denomination_id'] ?? null,
+                    'pos_machine_id' => $denomination['pos_machine_id'] ?? null,
+                    'branch_id' => $denomination['branch_id'] ?? null,
+                    'cash_fund_id' => $denomination['cash_fund_id'] ?? null,
+                    'cash_denomination_id' => $denomination['cash_denomination_id'] ?? null,
+                    'name' => $denomination['name'] ?? null,
+                    'amount' => $denomination['amount'] ?? null,
+                    'qty' => $denomination['qty'] ?? null,
+                    'total' => $denomination['total'] ?? null,
+                    'is_cut_off' => $denomination['is_cut_off'] ?? null,
+                    'cut_off_id' => $denomination['cut_off_id'] ?? null,
+                    'end_of_day_id' => $denomination['end_of_day_id'] ?? null,
+                    'is_sent_to_server' => $denomination['is_sent_to_server'] ?? null,
+                    'shift_number' => $denomination['shift_number'] ?? null,
+                    'treg' => $denomination['treg'] ?? null,
+                    'company_id' => $denomination['company_id'] ?? null,
                 ];
 
-                $record = CashFundDenomination::where([
-                    'cash_fund_denomination_id' => $denom['cash_fund_denomination_id'],
-                    'pos_machine_id' => $denom['pos_machine_id'],
-                    'branch_id' => $denom['branch_id'],
+                $existingRecord = CashFundDenomination::where([
+                    'cash_fund_denomination_id' => $denomination['cash_fund_denomination_id'],
+                    'pos_machine_id' => $denomination['pos_machine_id'],
+                    'branch_id' => $denomination['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -3518,11 +3659,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CashFundDenomination::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3571,23 +3719,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'cash fund denomination retrieved successfully.');
     }
 
-    public function saveAuditTrails(Request $request)
+    public function saveAuditTrails(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of audit trails
                 $data = $requestData['data'];
             } else {
+                // If it's a single audit trail object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single audit trail object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of audit trails (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'audit_trail_id' => 'required',
@@ -3607,40 +3760,40 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $audit) {
-                $validator = validator($audit, $rules);
+            foreach ($data as $idx => $auditTrail) {
+                $validator = validator($auditTrail, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $audit;
+                    $failedRequests[$idx] = $auditTrail;
                     continue;
                 }
 
                 $postData = [
-                    'audit_trail_id' => $audit['audit_trail_id'] ?? null,
-                    'pos_machine_id' => $audit['pos_machine_id'] ?? null,
-                    'branch_id' => $audit['branch_id'] ?? null,
-                    'user_id' => $audit['user_id'] ?? null,
-                    'user_name' => $audit['user_name'] ?? null,
-                    'transaction_id' => $audit['transaction_id'] ?? null,
-                    'action' => $audit['action'] ?? null,
-                    'description' => $audit['description'] ?? null,
-                    'authorize_id' => $audit['authorize_id'] ?? null,
-                    'authorize_name' => $audit['authorize_name'] ?? null,
-                    'is_sent_to_server' => $audit['is_sent_to_server'] ?? null,
-                    'treg' => $audit['treg'] ?? null,
-                    'order_id' => $audit['order_id'] ?? null,
-                    'price_change_reason_id' => $audit['price_change_reason_id'] ?? null,
-                    'company_id' => $audit['company_id'] ?? null,
+                    'audit_trail_id' => $auditTrail['audit_trail_id'] ?? null,
+                    'pos_machine_id' => $auditTrail['pos_machine_id'] ?? null,
+                    'branch_id' => $auditTrail['branch_id'] ?? null,
+                    'user_id' => $auditTrail['user_id'] ?? null,
+                    'user_name' => $auditTrail['user_name'] ?? null,
+                    'transaction_id' => $auditTrail['transaction_id'] ?? null,
+                    'action' => $auditTrail['action'] ?? null,
+                    'description' => $auditTrail['description'] ?? null,
+                    'authorize_id' => $auditTrail['authorize_id'] ?? null,
+                    'authorize_name' => $auditTrail['authorize_name'] ?? null,
+                    'is_sent_to_server' => $auditTrail['is_sent_to_server'] ?? null,
+                    'treg' => $auditTrail['treg'] ?? null,
+                    'order_id' => $auditTrail['order_id'] ?? null,
+                    'price_change_reason_id' => $auditTrail['price_change_reason_id'] ?? null,
+                    'company_id' => $auditTrail['company_id'] ?? null,
                 ];
 
-                $record = AuditTrail::where([
-                    'audit_trail_id' => $audit['audit_trail_id'],
-                    'pos_machine_id' => $audit['pos_machine_id'],
-                    'branch_id' => $audit['branch_id'],
+                $existingRecord = AuditTrail::where([
+                    'audit_trail_id' => $auditTrail['audit_trail_id'],
+                    'pos_machine_id' => $auditTrail['pos_machine_id'],
+                    'branch_id' => $auditTrail['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -3650,11 +3803,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 AuditTrail::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3703,23 +3863,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'audit trail retrieved successfully.');
     }
 
-    public function saveCutOffProducts(Request $request)
+    public function saveCutOffProducts(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of cut off products
                 $data = $requestData['data'];
             } else {
+                // If it's a single cut off product object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single cut off product object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of cut off products (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'cut_off_product_id' => 'required',
@@ -3762,15 +3927,15 @@ class MiscController extends BaseController
                     'treg' => $product['treg'] ?? null,
                 ];
 
-                $record = CutOffProduct::where([
+                $existingRecord = CutOffProduct::where([
                     'cut_off_product_id' => $product['cut_off_product_id'],
                     'pos_machine_id' => $product['pos_machine_id'],
                     'branch_id' => $product['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -3780,11 +3945,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 CutOffProduct::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3833,23 +4005,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'cut off product retrieved successfully.');
     }
 
-    public function savePayouts(Request $request)
+    public function savePayouts(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of payouts
                 $data = $requestData['data'];
             } else {
+                // If it's a single payout object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single payout object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of payouts (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'payout_id' => 'required',
@@ -3900,15 +4077,15 @@ class MiscController extends BaseController
                     'safekeeping_id' => $payout['safekeeping_id'] ?? null,
                 ];
 
-                $record = Payout::where([
+                $existingRecord = Payout::where([
                     'payout_id' => $payout['payout_id'],
                     'pos_machine_id' => $payout['pos_machine_id'],
                     'branch_id' => $payout['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -3918,11 +4095,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 Payout::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -3971,23 +4155,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'payout retrieved successfully.');
     }
 
-    public function saveOfficialReceiptInformations(Request $request)
+    public function saveOfficialReceiptInformations(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of official receipt informations
                 $data = $requestData['data'];
             } else {
+                // If it's a single official receipt information object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single official receipt information object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of official receipt informations (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'official_receipt_information_id' => 'required',
@@ -4008,40 +4197,40 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $info) {
-                $validator = validator($info, $rules);
+            foreach ($data as $idx => $information) {
+                $validator = validator($information, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $info;
+                    $failedRequests[$idx] = $information;
                     continue;
                 }
 
                 $postData = [
-                    'official_receipt_information_id' => $info['official_receipt_information_id'] ?? null,
-                    'pos_machine_id' => $info['pos_machine_id'] ?? null,
-                    'branch_id' => $info['branch_id'] ?? null,
-                    'company_id' => $info['company_id'] ?? null,
-                    'transaction_id' => $info['transaction_id'] ?? null,
-                    'name' => $info['name'] ?? null,
-                    'address' => $info['address'] ?? null,
-                    'tin' => $info['tin'] ?? null,
-                    'business_style' => $info['business_style'] ?? null,
-                    'is_void' => $info['is_void'] ?? null,
-                    'void_by' => $info['void_by'] ?? null,
-                    'void_name' => $info['void_name'] ?? null,
-                    'void_at' => $info['void_at'] ?? null,
-                    'is_sent_to_server' => $info['is_sent_to_server'] ?? null,
-                    'treg' => $info['treg'] ?? null,
+                    'official_receipt_information_id' => $information['official_receipt_information_id'] ?? null,
+                    'pos_machine_id' => $information['pos_machine_id'] ?? null,
+                    'branch_id' => $information['branch_id'] ?? null,
+                    'company_id' => $information['company_id'] ?? null,
+                    'transaction_id' => $information['transaction_id'] ?? null,
+                    'name' => $information['name'] ?? null,
+                    'address' => $information['address'] ?? null,
+                    'tin' => $information['tin'] ?? null,
+                    'business_style' => $information['business_style'] ?? null,
+                    'is_void' => $information['is_void'] ?? null,
+                    'void_by' => $information['void_by'] ?? null,
+                    'void_name' => $information['void_name'] ?? null,
+                    'void_at' => $information['void_at'] ?? null,
+                    'is_sent_to_server' => $information['is_sent_to_server'] ?? null,
+                    'treg' => $information['treg'] ?? null,
                 ];
 
-                $record = OfficialReceiptInformation::where([
-                    'official_receipt_information_id' => $info['official_receipt_information_id'],
-                    'pos_machine_id' => $info['pos_machine_id'],
-                    'branch_id' => $info['branch_id'],
+                $existingRecord = OfficialReceiptInformation::where([
+                    'official_receipt_information_id' => $information['official_receipt_information_id'],
+                    'pos_machine_id' => $information['pos_machine_id'],
+                    'branch_id' => $information['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -4051,11 +4240,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 OfficialReceiptInformation::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -4104,23 +4300,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'official receipt information retrieved successfully.');
     }
 
-    public function saveSpotAudits(Request $request)
+    public function saveSpotAudits(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of spot audits
                 $data = $requestData['data'];
             } else {
+                // If it's a single spot audit object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single spot audit object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of spot audits (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'spot_audit_id' => 'required',
@@ -4210,15 +4411,15 @@ class MiscController extends BaseController
                     'treg' => $audit['treg'] ?? null,
                 ];
 
-                $record = SpotAudit::where([
+                $existingRecord = SpotAudit::where([
                     'spot_audit_id' => $audit['spot_audit_id'],
                     'pos_machine_id' => $audit['pos_machine_id'],
                     'branch_id' => $audit['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -4228,11 +4429,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 SpotAudit::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -4281,23 +4489,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'spot audit retrieved successfully.');
     }
 
-    public function saveSpotAuditDenominations(Request $request)
+    public function saveSpotAuditDenominations(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of spot audit denominations
                 $data = $requestData['data'];
             } else {
+                // If it's a single spot audit denomination object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single spot audit denomination object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of spot audit denominations (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'spot_audit_denomination_id' => 'required',
@@ -4322,40 +4535,40 @@ class MiscController extends BaseController
 
         DB::beginTransaction();
         try {
-            foreach ($data as $idx => $denom) {
-                $validator = validator($denom, $rules);
+            foreach ($data as $idx => $denomination) {
+                $validator = validator($denomination, $rules);
                 if ($validator->fails()) {
-                    $failedRequests[$idx] = $denom;
+                    $failedRequests[$idx] = $denomination;
                     continue;
                 }
 
                 $postData = [
-                    'spot_audit_denomination_id' => $denom['spot_audit_denomination_id'] ?? null,
-                    'pos_machine_id' => $denom['pos_machine_id'] ?? null,
-                    'branch_id' => $denom['branch_id'] ?? null,
-                    'company_id' => $denom['company_id'] ?? null,
-                    'spot_audit_id' => $denom['spot_audit_id'] ?? null,
-                    'cash_denomination_id' => $denom['cash_denomination_id'] ?? null,
-                    'name' => $denom['name'] ?? null,
-                    'amount' => $denom['amount'] ?? null,
-                    'qty' => $denom['qty'] ?? null,
-                    'total' => $denom['total'] ?? null,
-                    'is_cut_off' => $denom['is_cut_off'] ?? null,
-                    'cut_off_id' => $denom['cut_off_id'] ?? null,
-                    'is_sent_to_server' => $denom['is_sent_to_server'] ?? null,
-                    'shift_number' => $denom['shift_number'] ?? null,
-                    'treg' => $denom['treg'] ?? null,
+                    'spot_audit_denomination_id' => $denomination['spot_audit_denomination_id'] ?? null,
+                    'pos_machine_id' => $denomination['pos_machine_id'] ?? null,
+                    'branch_id' => $denomination['branch_id'] ?? null,
+                    'company_id' => $denomination['company_id'] ?? null,
+                    'spot_audit_id' => $denomination['spot_audit_id'] ?? null,
+                    'cash_denomination_id' => $denomination['cash_denomination_id'] ?? null,
+                    'name' => $denomination['name'] ?? null,
+                    'amount' => $denomination['amount'] ?? null,
+                    'qty' => $denomination['qty'] ?? null,
+                    'total' => $denomination['total'] ?? null,
+                    'is_cut_off' => $denomination['is_cut_off'] ?? null,
+                    'cut_off_id' => $denomination['cut_off_id'] ?? null,
+                    'is_sent_to_server' => $denomination['is_sent_to_server'] ?? null,
+                    'shift_number' => $denomination['shift_number'] ?? null,
+                    'treg' => $denomination['treg'] ?? null,
                 ];
 
-                $record = SpotAuditDenomination::where([
-                    'spot_audit_denomination_id' => $denom['spot_audit_denomination_id'],
-                    'pos_machine_id' => $denom['pos_machine_id'],
-                    'branch_id' => $denom['branch_id'],
+                $existingRecord = SpotAuditDenomination::where([
+                    'spot_audit_denomination_id' => $denomination['spot_audit_denomination_id'],
+                    'pos_machine_id' => $denomination['pos_machine_id'],
+                    'branch_id' => $denomination['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -4365,11 +4578,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 SpotAuditDenomination::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
@@ -4418,23 +4638,28 @@ class MiscController extends BaseController
         return $this->sendResponse($records, 'spot audit denomination retrieved successfully.');
     }
 
-    public function saveEndOfDayProducts(Request $request)
+    public function saveEndOfDayProducts(Request $request) 
     {
         $requestData = $request->all();
-        // Normalize input for backwards compatibility (array or single object, with or without 'data' wrapper)
+        // Normalize input for backwards compatibility
         if (isset($requestData['data'])) {
             if (is_array($requestData['data'])) {
+                // If it's an array of end of day products
                 $data = $requestData['data'];
             } else {
+                // If it's a single end of day product object
                 $data = [$requestData['data']];
             }
         } elseif (is_array($requestData) && self::isAssoc($requestData)) {
+            // If it's a single end of day product object (not inside 'data')
             $data = [$requestData];
         } elseif (is_array($requestData)) {
+            // If it's an array of end of day products (not inside 'data')
             $data = $requestData;
         } else {
             $data = [];
         }
+
         $failedRequests = [];
         $rules = [
             'end_of_day_product_id' => 'required',
@@ -4472,15 +4697,15 @@ class MiscController extends BaseController
                     'treg' => $product['treg'] ?? null,
                 ];
 
-                $record = EndOfDayProduct::where([
+                $existingRecord = EndOfDayProduct::where([
                     'end_of_day_product_id' => $product['end_of_day_product_id'],
                     'pos_machine_id' => $product['pos_machine_id'],
                     'branch_id' => $product['branch_id'],
                 ])->first();
 
-                if ($record) {
+                if ($existingRecord) {
                     $toUpdate[] = [
-                        'model' => $record,
+                        'model' => $existingRecord,
                         'data' => $postData
                     ];
                 } else {
@@ -4490,11 +4715,18 @@ class MiscController extends BaseController
 
             // Bulk insert new records
             if (!empty($toInsert)) {
+                // Add timestamps manually for bulk insert
+                $now = now();
+                foreach ($toInsert as &$item) {
+                    $item['created_at'] = $now;
+                    $item['updated_at'] = $now;
+                }
                 EndOfDayProduct::insert($toInsert);
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
+                $item['data']['updated_at'] = now();
                 $item['model']->update($item['data']);
             }
 
