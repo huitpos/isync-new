@@ -517,6 +517,7 @@ class ReportController extends Controller
                     WHERE product_physical_count_items.product_id = $productId
                         AND product_physical_counts.branch_id = $branchId
                         AND product_physical_counts.created_at BETWEEN '$startDate' AND '$endDate'
+                        AND product_physical_counts.status = 'approved'
                 ";
 
             $physicalCounts = DB::select($physicalCountQuery);
