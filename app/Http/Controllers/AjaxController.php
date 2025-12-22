@@ -120,7 +120,10 @@ class AjaxController extends Controller
 
         if ($request->has('term')) {
             $term = '%' . $request->term . '%'; // Add wildcard % before and after the search term
-            $productsQuery->where('name', 'like', $term);
+            $productsQuery->where(function ($query) use ($term) {
+                $query->where('name', 'like', $term)
+                    ->orWhere('description', 'like', $term);
+            });
         }
 
         $products = $productsQuery->get();
