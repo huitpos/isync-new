@@ -165,6 +165,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('purchase-orders', CompanyPurchaseOrderController::class, ['as' => 'company']);
         Route::resource('purchase-deliveries', CompanyPurchaseDeliveryController::class, ['as' => 'company']);
         Route::resource('stock-transfer-requests', CompanyStockTransferRequestController::class, ['as' => 'company']);
+        Route::get('/stock-transfer-requests/{id}/print', [CompanyStockTransferRequestController::class, 'print'])->name('company.stock-transfer-requests.print');
         Route::resource('product-disposals', CompanyProductDisposalController::class, ['as' => 'company']);
         Route::resource('product-physical-counts', CompanyProductPhysicalCountController::class, ['as' => 'company']);
 
@@ -229,6 +230,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/purchase-requests/{id}/print', [BranchPurchaseRequestController::class, 'print'])->name('branch.purchase-requests.print');
             Route::get('/purchase-orders/{id}/print', [BranchPurchaseOrderController::class, 'print'])->name('branch.purchase-orders.print');
             Route::get('/purchase-deliveries/{id}/print', [BranchPurchaseDeliveryController::class, 'print'])->name('branch.purchase-deliveries.print');
+            Route::get('/stock-transfer-requests/{id}/print', [BranchStockTransferRequestController::class, 'print'])->name('branch.stock-transfer-requests.print');
+            Route::get('/stock-transfer-orders/{id}/print', [BranchStockTransferOrderController::class, 'print'])->name('branch.stock-transfer-orders.print');
+            Route::get('/stock-transfer-deliveries/{id}/print', [BranchStockTransferDeliveryController::class, 'print'])->name('branch.stock-transfer-deliveries.print');
             Route::get('/product-disposals/{id}/print', [BranchProductDisposalController::class, 'print'])->name('branch.product-disposals.print');
 
             Route::get('transactions', [BranchTransactionController::class, 'index', ['as' => 'branch']])->name('branch.transactions.index');

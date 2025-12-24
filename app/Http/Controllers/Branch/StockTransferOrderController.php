@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Branch;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\DataTables\Branch\StockTransferOrdersDataTable;
 
@@ -162,5 +163,24 @@ class StockTransferOrderController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function print(Request $request, string $companySlug, string $branchSlug, string $id)
+    {
+        $sto = StockTransferOrder::with([
+            'items',
+            'createdBy'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
+        $pdf = Pdf::loadView('branch.stockTransferOrders.print', [
+            'sto' => $sto,
+            'company' => $company,
+            'branch' => $branch
+        ]);
+
+        return $pdf->download("STO-$sto->sto_number.pdf");
     }
 }

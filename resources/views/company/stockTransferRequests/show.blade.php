@@ -114,6 +114,7 @@
                         </div>
                     </div>
 
+                    
                     @if($str->status == 'pending')
                     <div class="mt-8">
                         <input type="hidden" name="status" id="status">

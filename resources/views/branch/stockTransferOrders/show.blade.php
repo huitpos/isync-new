@@ -113,6 +113,14 @@
                     </div>
                     @endforeach
 
+                    @if ($sto->status == 'approved')
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <a href="{{ route('branch.stock-transfer-orders.print', ['companySlug' => $company->slug, 'id' => $sto->id, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">Print</a>
+                            </div>
+                        </div>
+                    @endif
+
                     @if($sto->status == 'pending')
                     <div class="mt-8">
                         <input type="hidden" name="status" id="status">

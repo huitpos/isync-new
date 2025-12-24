@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Branch;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\DataTables\Branch\StockTransferDeliveriesDataTable;
 
@@ -122,5 +123,24 @@ class StockTransferDeliveryController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function print(Request $request, string $companySlug, string $branchSlug, string $id)
+    {
+        $std = StockTransferDelivery::with([
+            'items',
+            'createdBy'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
+        $pdf = Pdf::loadView('branch.stockTransferDeliveries.print', [
+            'std' => $std,
+            'company' => $company,
+            'branch' => $branch
+        ]);
+
+        return $pdf->download("STD-$std->std_number.pdf");
     }
 }

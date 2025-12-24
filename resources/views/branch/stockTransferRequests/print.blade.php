@@ -39,15 +39,8 @@
 </head>
 <body>
     <div class="header">
-<<<<<<< HEAD
-        <h2>{{ $company->company_name }}</h2>
-        <p>
-            {{ $str->sourceBranch->name}}<br>
-            {{ $str->sourceBranch->unit_floor_number }},  {{ $str->sourceBranch->street }}, {{ $str->sourceBranch->city->name }}, {{ $str->sourceBranch->province->name }}, {{ $str->sourceBranch->region->name }}
-        </p>
-=======
         <h2>{{ $company->name }}</h2>
->>>>>>> POSADMIN-719
+        <p>{{ $branch->name }}</p>
         <h3>Stock Transfer Request</h3>
     </div>
 
@@ -56,25 +49,18 @@
             <td style="width:20%">STR#</td>
             <td>{{ $str->str_number }}</td>
             <td>Status</td>
-<<<<<<< HEAD
-            <td>{{ ucfirst($str->status) }}</td>
-=======
             <td>{{ ucfirst($str->status)}}</td>
->>>>>>> POSADMIN-719
         </tr>
+        @if ($str->status != 'pending')
+        <tr>
+            <td>Approved/Rejected By</td>
+            <td colspan="3">{{ ucfirst($str->actionBy?->name) }}</td>
+        </tr>
+        @endif
         <tr>
             <td>Requested By</td>
             <td>{{ $str->createdBy->name }}</td>
             <td>Department</td>
-<<<<<<< HEAD
-            <td>{{ $str->department->name }}</td>
-        </tr>
-        <tr>
-            <td>Source Branch</td>
-            <td>{{ $str->sourceBranch->name }}</td>
-            <td>Delivery Location</td>
-            <td>{{ $str->deliveryLocation->name }}</td>
-=======
             <td>{{ ($str->department_id == 'all' || empty($str->department_id)) ? "All" : $str->department->name }}</td>
         </tr>
         <tr>
@@ -82,16 +68,12 @@
             <td>{{ $str->deliveryLocation->name }}</td>
             <td>Source Branch</td>
             <td>{{ $str->sourceBranch->name }}</td>
->>>>>>> POSADMIN-719
         </tr>
         <tr>
             <td>Delivery Address</td>
             <td colspan="3">{{ $str->deliveryLocation->unit_floor_number }}, {{ $str->deliveryLocation->street }}, {{ $str->deliveryLocation->barangay->name }}, {{ $str->deliveryLocation->city->name }}, {{ $str->deliveryLocation->province->name }}, {{ $str->deliveryLocation->region->name }}</td>
         </tr>
-<<<<<<< HEAD
-=======
         
->>>>>>> POSADMIN-719
     </table>
 
     <table class="product-table" style="margin-top:20px; margin-bottom:20px">
@@ -103,45 +85,28 @@
 
     <table class="product-table">
         <tr>
-<<<<<<< HEAD
-            <th style="width:40%">Product</th>
-=======
             <th style="width:20%">Product</th>
->>>>>>> POSADMIN-719
             <th>UOM</th>
             <th>Barcode</th>
+            <th>Cost</th>
             <th>Quantity</th>
         </tr>
-<<<<<<< HEAD
-        @php
-            $total = 0;
-        @endphp
-=======
->>>>>>> POSADMIN-719
+        @php $grandtotal = 0; @endphp
         @foreach ($str->items as $item)
+            @php $grandtotal += $item->product->cost * $item->quantity @endphp
             <tr>
                 <td>{{ $item->product->name }}</td>
                 <td>{{ $item->uom->name }}</td>
-<<<<<<< HEAD
-                <td>{{ $item->product->barcode }}</td>
+                <td>{{ $item->product->barcode}}</td>
+                <td>{{ number_format($item->product->cost, 2) }}</td>
                 <td>{{ $item->quantity }}</td>
             </tr>
-            @php
-                $total += $item->quantity;
-            @endphp
         @endforeach
-        <tr>
-            <td colspan="3" style="text-align: right;">Total Items</td>
-            <td>{{ $total }}</td>
-        </tr>
     </table>
 
-=======
-                <td>{{ $item->product->barcode}}</td>
-                <td>{{ $item->quantity }}</td>
-            </tr>
-        @endforeach
-    </table>
+    <div style="text-align: right; margin-top: 20px; font-weight: bold;">
+        TOTAL: {{ number_format($grandtotal, 2) }}
+    </div>
 
     <div class="remarks" style="margin-top:20px">
         <strong>Items Remarks:</strong>
@@ -152,7 +117,6 @@
         @endforeach
     </div>
 
->>>>>>> POSADMIN-719
     <div class="signatures">
         <table>
             <tr>
@@ -160,15 +124,6 @@
                     <div class="signature-line">{{ $str->createdBy->name }}</div>
                     <p>Requested By:</p>
                 </td>
-<<<<<<< HEAD
-                @if($str->status != 'pending' && $str->actionBy)
-                <td>
-                    <div class="signature-line">{{ $str->actionBy->name }}</div>
-                    <p>{{ $str->status == 'approved' ? 'Approved' : 'Rejected' }} By:</p>
-                </td>
-                @endif
-=======
->>>>>>> POSADMIN-719
             </tr>
         </table>
     </div>

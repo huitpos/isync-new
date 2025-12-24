@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\DataTables\Company\StockTransferRequestsDataTable;
 
@@ -107,7 +108,8 @@ class StockTransferRequestController extends Controller
             'deliveryLocation.province',
             'deliveryLocation.region',
             'sourceBranch',
-            'actionBy'
+            'actionBy',
+            'createdBy'
         ])->findOrFail($id);
 
         $company = $request->attributes->get('company');
