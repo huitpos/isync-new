@@ -79,6 +79,15 @@
                         render: function(data, type, row) {
                             return moment(data).format("YYYY-MM-DD hh:mm A");
                         }
+                    },
+                    {
+                        data: 'action_date',
+                        render: function(data, type, row) {
+                            if (!data) {
+                                return '';
+                            }
+                            return moment(data).format("YYYY-MM-DD hh:mm A");
+                        }
                     }
                 ]
             });

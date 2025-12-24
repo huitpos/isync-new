@@ -104,6 +104,7 @@ class PurchaseDeliveriesDataTable extends DataTable
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::make('created_at'),
+            Column::make('action_date'),
         ];
     }
 

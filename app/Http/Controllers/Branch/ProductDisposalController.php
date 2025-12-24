@@ -90,6 +90,7 @@ class ProductDisposalController extends Controller
         $disposalsData = $request->all();
         $disposalsData['branch_id'] = $branch->id;
         $disposalsData['action_by'] = auth()->user()->id;
+        $disposalsData['action_date'] = now();
         unset($disposalsData['pr_items']);
 
         $pdisCount = ProductDisposal::where([
