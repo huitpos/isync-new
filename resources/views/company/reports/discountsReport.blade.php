@@ -32,6 +32,7 @@
 
                     <div class="col-md-4">
                         <label class="form-label">Date</label>
+
                         <input id="date_range" 
                             data-selected-range="{{ $selectedRangeParam }}" 
                             data-kt-daterangepicker="true" 
