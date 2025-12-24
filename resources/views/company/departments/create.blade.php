@@ -46,7 +46,7 @@
                 <div class="mb-4">
                     <label class="form-label">Suppliers</label>
                     <select class="form-select" name="suppliers[]" data-control="select2" data-close-on-select="false" data-placeholder="Select supplier" data-allow-clear="true" multiple="multiple">
-                        @foreach ($company->suppliers as $supplier)
+                        @foreach ($company->activeSuppliers as $supplier)
                             <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
                         @endforeach
                     </select>
