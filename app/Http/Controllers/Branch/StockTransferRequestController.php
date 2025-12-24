@@ -166,6 +166,7 @@ class StockTransferRequestController extends Controller
 
         $data = $validatedData;
         $data['action_by'] = auth()->user()->id;
+        $data['action_date'] = now();
 
         if ($str->update($data)) {
             if ($request->status === 'approved') {

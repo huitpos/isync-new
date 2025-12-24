@@ -85,6 +85,7 @@ class ProductPhysicalCountController extends Controller
         $physicalCountData = $request->all();
         $physicalCountData['branch_id'] = $branch->id;
         $physicalCountData['action_by'] = auth()->user()->id;
+        $physicalCountData['action_date'] = now();
         unset($physicalCountData['pr_items']);
         unset($physicalCountData['pr_selected_product_text']);
 
