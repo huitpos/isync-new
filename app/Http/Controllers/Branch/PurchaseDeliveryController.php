@@ -68,7 +68,7 @@ class PurchaseDeliveryController extends Controller
 
         $request->validate([
             'purchase_order_id' => 'required|exists:purchase_orders,id',
-            'sales_invoice_number' => 'required',
+            'sales_invoice_number' => 'required|unique:purchase_deliveries,sales_invoice_number',
             'delivery_number' => 'required',
             'items.*.unit_price' => 'required',
             'items.*.qty' => 'required',
