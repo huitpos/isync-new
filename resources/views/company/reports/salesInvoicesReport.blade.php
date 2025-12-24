@@ -70,6 +70,7 @@
                             <th>Transaction Type</th>
                             <th>Change</th>
                             <th>Approver</th>
+                            <th>Remarks</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -110,6 +111,7 @@
                                 <th>{{ $transaction->type }}</th>
                                 <th>{{ number_format($transaction->change, 2) }}</th>
                                 <th></th>
+                                <th>{{ $transaction->remarks }}</th>
                             </tr>
                         @endforeach
                     </tbody>
