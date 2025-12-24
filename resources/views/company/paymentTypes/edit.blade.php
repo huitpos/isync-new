@@ -136,6 +136,34 @@
                                                 </div>
                                             </div>
 
+                                            <div class="col-md-1">
+                                                <div class="">
+                                                    <label>
+                                                        Mask
+                                                    </label>
+                                                    <br/><br/>
+                                                    <input class="form-check-input" name="mask" type="checkbox" value="1">                                                        
+                                                </div>
+                            
+                                                @error('mask')
+                                                    <div class="invalid-feedback"> {{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-md-1">
+                                                <div class="">
+                                                    <label>
+                                                        Required
+                                                    </label>
+                                                    <br/><br/>
+                                                    <input class="form-check-input" name="required" type="checkbox" value="1">                                                        
+                                                </div>
+                            
+                                                @error('required')
+                                                    <div class="invalid-feedback"> {{ $message }}</div>
+                                                @enderror
+                                            </div>
+
                                             <div class="col-md-3">
                                                 <a href="javascript:;" data-repeater-delete class="btn btn-sm btn-flex btn-light-danger mt-3 mt-md-9">
                                                     <i class="ki-duotone ki-trash fs-5"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
@@ -212,7 +240,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-2">
+                                                <div class="col-md-1">
                                                     <div class="">
                                                         <label>
                                                             Mask
@@ -222,6 +250,20 @@
                                                     </div>
                                 
                                                     @error('mask')
+                                                        <div class="invalid-feedback"> {{ $message }}</div>
+                                                    @enderror
+                                                </div>
+
+                                                <div class="col-md-1">
+                                                    <div class="">
+                                                        <label>
+                                                            Required
+                                                        </label>
+                                                        <br/><br/>
+                                                        <input {{ (isset($field['required']) && $field['required']) ? 'checked="checked"' : '' }} class="form-check-input" name="required" type="checkbox" value="1">                                                        
+                                                    </div>
+                                
+                                                    @error('required')
                                                         <div class="invalid-feedback"> {{ $message }}</div>
                                                     @enderror
                                                 </div>
