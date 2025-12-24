@@ -21,6 +21,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Product;
 use App\Models\Branch;
 use App\Models\DiscountType;
+use App\Models\UnitOfMeasurement;
 
 use Carbon\Carbon;
 
@@ -83,6 +84,23 @@ class ProductController extends Controller
             ]);
         }
 
+        $deliveryUoms = [];
+        if (!empty(old('uom_id'))) {
+            $uom = UnitOfMeasurement::find(old('uom_id'));
+            $conversions = $uom->conversionsTo;
+
+            $deliveryUoms[] = [
+                'id' => $uom->id,
+                'text' => $uom->name
+            ];
+            foreach ($conversions as $conversion) {
+                $deliveryUoms[] = [
+                    'id' => $conversion->from_unit_id,
+                    'text' => $conversion->fromUnit->name. ' (' . $conversion->value . ' ' . $uom->name . ')'
+                ];
+            }
+        }
+
         $departments = $company->departments()->where('status', 'active')->get();
         $itemTypes = $company->itemTypes()->where('status', 'active')->get();
 
@@ -93,7 +111,7 @@ class ProductController extends Controller
 
         $srpBranches = $company->branches()->where('status', 'active')->get();
 
-        return view('company.products.create', [
+        return view('company/products/create', [
             'company' => $company,
             'categories' => $categories,
             'subcategories' => $subcategories,
@@ -101,6 +119,7 @@ class ProductController extends Controller
             'itemTypes' => $itemTypes,
             'discountTypes' => $discountTypes,
             'srpBranches' => $srpBranches,
+            'deliveryUoms' => $deliveryUoms,
         ]);
     }
 
