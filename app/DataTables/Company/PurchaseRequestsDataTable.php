@@ -38,6 +38,9 @@ class PurchaseRequestsDataTable extends DataTable
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;
             })
+            ->editColumn('action_date', function (Model $data) {
+                return $data->action_date;
+            })
             ->addColumn('view_url', function (Model $data) use($companySlug) {
                 return route('company.purchase-requests.show', [
                     'companySlug' => $companySlug,
@@ -102,6 +105,7 @@ class PurchaseRequestsDataTable extends DataTable
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::make('created_at'),
+            Column::make('action_date'),
         ];
     }
 
