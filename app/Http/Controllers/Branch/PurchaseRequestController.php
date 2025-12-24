@@ -194,6 +194,7 @@ class PurchaseRequestController extends Controller
 
         $data = $validatedData;
         $data['action_by'] = auth()->user()->id;
+        $data['action_date'] = now();
 
         if ($pr->update($data)) {
             if ($request->status === 'approved') {
