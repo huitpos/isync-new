@@ -493,8 +493,8 @@ class ReportController extends Controller
                 LEFT JOIN $transactionalDbName.discount_details ON orders.order_id = discount_details.order_id
                     AND orders.branch_id = discount_details.branch_id
                     AND orders.pos_machine_id = discount_details.pos_machine_id
-                INNER JOIN $isyncDbName..products ON orders.product_id = products.id
-                INNER JOIN $isyncDbName..departments on products.department_id = departments.id
+                INNER JOIN $isyncDbName.products ON orders.product_id = products.id
+                INNER JOIN $isyncDbName.departments on products.department_id = departments.id
                 WHERE transactions.is_complete = TRUE
                     AND transactions.branch_id = $branchId
                     AND transactions.is_void = FALSE
