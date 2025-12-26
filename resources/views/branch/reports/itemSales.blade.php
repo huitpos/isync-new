@@ -9,6 +9,7 @@
             <form class="mt-3" method="POST" novalidate>
                 @csrf
 
+                <input type="hidden" id="branch_id" name="branch_id" value="{{ $branchId }}" />
                 <div class="row mb-5">
                     <div class="col-md-4">
                         <label class="form-label">Date</label>
@@ -101,20 +102,43 @@
             $("#kt_datatable_zero_configuration").DataTable();
 
             document.addEventListener('DOMContentLoaded', (event) => {
-                const startDate = document.getElementById('start_date');
+                const dateRange = document.getElementById('date_range');
+                const branchId = document.getElementById('branch_id');
 
                 function updateURLAndRefresh() {
-                    const dateValue = startDate.value;
+                    const dateValue = dateRange.value;
+                    const branchValue = branchId.value;
+
+                    const selectedRange = $("#date_range").attr("data-selected-range");
+                    const startDate = $("#date_range").attr("data-start-date");
+                    const endDate = $("#date_range").attr("data-end-date");
+
                     const url = new URL(window.location.href);
                     if (dateValue) {
-                        url.searchParams.set('start_date', dateValue);
+                        url.searchParams.set('date_range', dateValue);
                     } else {
-                        url.searchParams.delete('start_date');
+                        url.searchParams.delete('date_range');
                     }
+                    if (branchValue) {
+                        url.searchParams.set('branch_id', branchValue);
+                    } else {
+                        url.searchParams.delete('branch_id');
+                    }
+
+                    //use selectedRange, startDate, endDate in searchParams
+                    url.searchParams.set('selectedRange', selectedRange);
+                    url.searchParams.set('startDate', startDate);
+                    url.searchParams.set('endDate', endDate);   
+
                     window.location.href = url.toString();
                 }
 
-                startDate.addEventListener('change', updateURLAndRefresh);
+                dateRange.addEventListener('change', updateURLAndRefresh);
+                branchId.addEventListener('change', updateURLAndRefresh);
+
+                $("#date_range").on("change.datetimepicker", ({date, oldDate}) => {
+                    updateURLAndRefresh()
+                });
             });
         </script>
     @endpush
