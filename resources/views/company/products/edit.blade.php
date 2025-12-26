@@ -665,13 +665,13 @@
                                         <tr>
                                             <td>{{ $branch->name }}</td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_costs[{{ $branch->id }}]" value="{{ $cost }}" />
+                                                <input id="branch_cost_{{ $branch->id }}" type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_costs[{{ $branch->id }}]" value="{{ $cost }}" />
                                             </td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_markups[{{ $branch->id }}]" value="{{ $markup }}" />
+                                                <input data-branch-id="{{ $branch->id }}" type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }} computeBranchMarkup" name="branch_markups[{{ $branch->id }}]" value="{{ $markup }}" />
                                             </td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_srps[{{ $branch->id }}]" value="{{ $srp }}" />
+                                                <input id="branch_srp_{{ $branch->id }}" type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_srps[{{ $branch->id }}]" value="{{ $srp }}" />
                                             </td>
                                         </tr>
                                     @endforeach

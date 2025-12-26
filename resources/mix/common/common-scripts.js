@@ -124,6 +124,25 @@ $(document).ready(function () {
         computeSrp();
     });
 
+    $('.computeBranchMarkup').on('keyup', function() {
+        var branchId = $(this).data('branch-id');
+        var cost = parseFloat($('#branch_cost_' + branchId).val());
+        var markUpType = $('#markup_type').val();
+        var markUpValue = parseFloat($(this).val());
+
+        if (isNaN(cost) || isNaN(markUpValue)) {
+            $('#branch_srp_' + branchId).val(0);
+            return false;
+        }
+
+        var srp = cost + markUpValue;
+        if (markUpType == 'percentage') {
+            srp = cost + (cost * (markUpValue / 100));
+        }
+
+        $('#branch_srp_' + branchId).val(srp);
+    });
+
     $('.compute-srp').on('keyup', function() {
         computeSrp();
     });
