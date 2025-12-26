@@ -420,6 +420,7 @@ class ReportController extends Controller
     public function itemSales(Request $request)
     {
         $transactionalDbName = config('database.connections.transactional_db.database');
+        $isyncDbName = config('database.connections.mysql.database');
 
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
@@ -464,8 +465,8 @@ class ReportController extends Controller
                 LEFT JOIN $transactionalDbName.discount_details ON orders.order_id = discount_details.order_id
                     AND orders.branch_id = discount_details.branch_id
                     AND orders.pos_machine_id = discount_details.pos_machine_id
-                INNER JOIN isync.products ON orders.product_id = products.id
-                INNER JOIN isync.departments on products.department_id = departments.id
+                INNER JOIN $isyncDbName.products ON orders.product_id = products.id
+                INNER JOIN $isyncDbName.departments on products.department_id = departments.id
                 WHERE transactions.is_complete = TRUE
                     AND transactions.branch_id = $branchId
                     AND transactions.is_void = FALSE
