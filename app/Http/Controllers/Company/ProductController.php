@@ -191,6 +191,7 @@ class ProductController extends Controller
             'item_locations' => $request->input('item_locations'),
             'max_discount' => $request->input('max_discount'),
             'part_number' => $request->input('part_number'),
+            'uom_cost' => $request->input('uom_cost'),
         ];
 
         $bundledItems = [];
@@ -441,6 +442,7 @@ class ProductController extends Controller
             'item_locations' => $request->input('item_locations'),
             'max_discount' => $request->input('max_discount'),
             'part_number' => $request->input('part_number'),
+            'uom_cost' => $request->input('uom_cost'),
         ];
 
         if ($file = $request->file('image')) {

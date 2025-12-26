@@ -103,6 +103,15 @@
                                 <div class="invalid-feedback"> {{ $message }}</div>
                             @enderror
                         </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">UOM Cost</label>
+                            <input value="{{ old('uom_cost') }}" name="uom_cost" type="number" class="form-control @error('uom_cost') is-invalid @enderror" placeholder="UOM Cost" required/>
+        
+                            @error('uom_cost')
+                                <div class="invalid-feedback"> {{ $message }}</div>
+                            @enderror
+                        </div>
         
                         <div class="mb-4">
                             <label class="form-label">Barcode</label>
