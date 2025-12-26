@@ -584,13 +584,16 @@ class ReportController extends Controller
                     purchase_delivery_items.qty,
                     purchase_delivery_items.unit_price,
                     CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
-                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`
-                FROM $defaultDbName.purchase_deliveries
-                INNER JOIN $defaultDbName.purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
-                INNER JOIN $defaultDbName.purchase_orders ON purchase_deliveries.purchase_order_id = purchase_orders.id
-                INNER JOIN $defaultDbName.suppliers ON purchase_orders.supplier_id = suppliers.id
-                INNER JOIN $defaultDbName.users createdBy ON purchase_deliveries.created_by = createdBy.id
-                LEFT JOIN $defaultDbName.users actionBy ON purchase_deliveries.action_by = actionBy.id
+                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
+                    unit_of_measurements.name as delivery_uom
+                FROM purchase_deliveries
+                INNER JOIN purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
+                INNER JOIN purchase_orders ON purchase_deliveries.purchase_order_id = purchase_orders.id
+                INNER JOIN suppliers ON purchase_orders.supplier_id = suppliers.id
+                INNER JOIN users createdBy ON purchase_deliveries.created_by = createdBy.id
+                INNER JOIN products ON purchase_delivery_items.product_id = products.id
+                INNER JOIN unit_of_measurements ON products.delivery_uom_id = unit_of_measurements.id
+                LEFT JOIN users actionBy ON purchase_deliveries.action_by = actionBy.id
                 WHERE purchase_deliveries.status = 'approved'
                     AND purchase_delivery_items.product_id = $productId
                     AND purchase_deliveries.branch_id = $branchId
