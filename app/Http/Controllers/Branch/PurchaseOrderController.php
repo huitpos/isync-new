@@ -25,6 +25,7 @@ class PurchaseOrderController extends Controller
             'branch_id' => $branch->id,
             'branch_slug' => $branch->slug,
             'company_slug' => $company->slug,
+            'search' => $request->query('search', null),
         ])->render('branch.purchaseOrders.index', [
             'company' => $company,
             'branch' => $branch,

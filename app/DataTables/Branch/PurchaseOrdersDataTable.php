@@ -49,7 +49,7 @@ class PurchaseOrdersDataTable extends DataTable
     public function query(Model $model): QueryBuilder
     {
         $branchId = $this->branch_id;
-        return $model->newQuery()
+        $query =  $model->newQuery()
             ->with([
                 'createdBy',
                 'purchaseRequest',
@@ -58,6 +58,18 @@ class PurchaseOrdersDataTable extends DataTable
             ->whereHas('branch', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             });
+
+        if ($this->search) {
+            //wrap all in a or group
+            $query->where(function ($query) {
+                $query->where('po_number', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('purchaseRequest', function ($query) {
+                        $query->where('pr_number', 'like', '%' . $this->search . '%');
+                    });
+            });
+        }
+
+        return $query;
     }
 
     /**
