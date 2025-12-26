@@ -274,6 +274,7 @@
                                 <th>DP No.</th>
                                 <th>Supplier</th>
                                 <th>Sales Invoice</th>
+                                <th>Delivery UOM</th>
                                 <th>Qty</th>
                                 <th>Cost per Unit</th>
                                 <th>Total Cost</th>
@@ -289,6 +290,7 @@
                                     <td>{{ $item->pd_number }}</td>
                                     <td>{{ $item->supplier }}</td>
                                     <td>{{ $item->sales_invoice_number }}</td>
+                                    <td>{{ $item->delivery_uom }}</td>
                                     <td>{{ $item->qty }}</td>
                                     <td>{{ $item->unit_price }}</td>
                                     <td>{{ $item->unit_price * $item->qty }}</td>
