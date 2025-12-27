@@ -39,7 +39,7 @@ class ValidateCompanySlug
         $companyUserPermissions = $permissions->where('level', 'company_user');
         $branchUserPermissions = $permissions->where('level', 'branch_user');
 
-        $companyFirstRoute = $permissions->where('level', 'company_user')->pluck('route')->toArray()[1] ?? '';
+        $companyFirstRoute = $permissions->where('parent_id', null)->where('level', 'company_user')->pluck('route')->first();
 
         $permissionNames = $permissions->pluck('name')->toArray();
         $permissionRoutes = $permissions->pluck('route')->toArray();
