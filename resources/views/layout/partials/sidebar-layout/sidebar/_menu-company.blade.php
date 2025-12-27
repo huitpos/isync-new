@@ -272,7 +272,7 @@
 		</div>
         @endif
 
-        @if (in_array('Settings/Change Price Reasons', $permissions))
+        @if (in_array('Settings/Settings/Item Locations', $permissions))
 		<div class="menu-item">
 			<a class="menu-link {{ request()->routeIs('company.change-price-reasons.*') ? 'active' : '' }}" href="{{ route('company.change-price-reasons.index', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 				<span class="menu-title">Change Price Reasons</span>
@@ -295,6 +295,21 @@
 	</span>
 
 	<div class="menu-sub menu-sub-accordion">
+        <div class="menu-item menu-accordion" data-kt-menu-trigger="click">
+			<span class="menu-link">
+				<span class="menu-title">Inventory Reports</span>
+				<span class="menu-arrow"></span>
+			</span>
+
+			<div class="menu-sub menu-sub-accordion pt-3">
+				<div class="menu-item">
+					<a class="menu-link {{ request()->routeIs('company.reports.stock-card') ? 'active' : '' }}" href="{{ route('company.reports.stock-card', ['companySlug' => request()->attributes->get('company')->slug]) }}">
+						<span class="menu-title">Stock Card</span>
+					</a>
+				</div>
+			</div>
+		</div>
+
 		<div class="menu-item menu-accordion {{ request()->routeIs(
 			'company.reports.sales-invoices-report',
 			'company.reports.sales-transaction-report',
@@ -355,21 +370,6 @@
 				<div class="menu-item">
 					<a class="menu-link {{ request()->routeIs('company.reports.item-sales-report') ? 'active' : '' }}" href="{{ route('company.reports.item-sales-report', ['companySlug' => request()->attributes->get('company')->slug]) }}">
 						<span class="menu-title">Item Sales Report</span>
-					</a>
-				</div>
-			</div>
-		</div>
-
-		<div class="menu-item menu-accordion" data-kt-menu-trigger="click">
-			<span class="menu-link">
-				<span class="menu-title">Inventory Reports</span>
-				<span class="menu-arrow"></span>
-			</span>
-
-			<div class="menu-sub menu-sub-accordion pt-3">
-				<div class="menu-item">
-					<a class="menu-link {{ request()->routeIs('company.reports.stock-card') ? 'active' : '' }}" href="{{ route('company.reports.stock-card', ['companySlug' => request()->attributes->get('company')->slug]) }}">
-						<span class="menu-title">Stock Card</span>
 					</a>
 				</div>
 			</div>
