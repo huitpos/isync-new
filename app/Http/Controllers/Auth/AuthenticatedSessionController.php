@@ -66,7 +66,7 @@ class AuthenticatedSessionController extends Controller
         if ($companyLevelPermission->count() > 0) {
             $company =  Company::find($user->company_id);
 
-            $companyFirstRoute = $permissions->where('parent_id', '!=', '')->where('level', 'company_user')->pluck('route')->first();
+            $companyFirstRoute = $permissions->where('route', '!=', '')->where('level', 'company_user')->pluck('route')->first();
 
             return route($companyFirstRoute, [
                 'companySlug' => $company->slug,

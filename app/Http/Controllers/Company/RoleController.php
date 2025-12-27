@@ -113,26 +113,17 @@ class RoleController extends Controller
                 'parent_id' => null,
                 'level' => 'company_user'
             ])
-            ->with([
-                'children'
-            ])
             ->get();
 
         $branchPermissions = Permission::where([
                 'parent_id' => null,
                 'level' => 'branch_user'
             ])
-            ->with([
-                'children'
-            ])
             ->get();
 
         $posPermissions = Permission::where([
                 'parent_id' => null,
                 'level' => 'pos'
-            ])
-            ->with([
-                'children'
             ])
             ->get();
 
@@ -158,6 +149,8 @@ class RoleController extends Controller
 
         if ($role->update(['name' => $request->name])) {
             $role->syncPermissions([]);
+
+            // dd($request->permission);
 
             $role->givePermissionTo($request->permission);
 
