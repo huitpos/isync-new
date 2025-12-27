@@ -124,41 +124,6 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane fade show" id="branch_permissions">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-rounded table-striped border gy-3 gs-3">
-                                    <tbody>
-                                        @foreach ($branchPermissions as $permission)
-                                            <tr>
-                                                <td class="fw-bold">{{ $permission->name }}</td>
-                                                <td class="text-end">
-                                                    <input {{ in_array($permission->id, $rolePermissions) ? 'checked' : '' }} name="permission[]" value="{{ $permission->id }}" type="checkbox" data-permission-id="{{ $permission->id }}" class="form-check-input permission-parent">
-                                                </td>
-                                            </tr>
-
-                                            @foreach ($permission->children as $child)
-                                                <tr>
-                                                    <td class="ps-10">{{ $child->name }}</td>
-                                                    <td class="text-end">
-                                                        <input {{ in_array($child->id, $rolePermissions) ? 'checked' : '' }} name="permission[]" value="{{ $child->id }}" data-parent-id="{{ $child->parent_id }}" type="checkbox" class="form-check-input permission-child" data-permission-id="{{ $child->id }}">
-                                                    </td>
-                                                </tr>
-
-                                                @foreach ($child->children as $grandchild)
-                                                    <tr>
-                                                        <td class="ps-20">{{ $grandchild->name }}</td>
-                                                        <td class="text-end">
-                                                            <input {{ in_array($grandchild->id, $rolePermissions) ? 'checked' : '' }} name="permission[]" value="{{ $grandchild->id }}" data-parent-id="{{ $grandchild->parent_id }}" type="checkbox" class="form-check-input permission-grandchild" data-grandparent-id="{{ $permission->id }}">
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            @endforeach
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
                         <div class="tab-pane fade show" id="pos_permissions">
                             <div class="table-responsive">
                                 <table class="table table-hover table-rounded table-striped border gy-3 gs-3">

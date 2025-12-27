@@ -39,7 +39,8 @@ class ValidateCompanySlug
         $companyUserPermissions = $permissions->where('level', 'company_user');
         $branchUserPermissions = $permissions->where('level', 'branch_user');
 
-        $companyFirstRoute = $permissions->where('level', 'company_user')->pluck('route')->toArray()[1] ?? '';
+        $companyFirstRoute = $permissions->where('route', '!=', null)->where('level', 'company_user')->pluck('route')->first();
+        $branchFirstRoute = $permissions->where('route', '!=', null)->where('level', 'branch_user')->pluck('route')->first();
 
         $permissionNames = $permissions->pluck('name')->toArray();
         $permissionRoutes = $permissions->pluck('route')->toArray();
@@ -54,10 +55,12 @@ class ValidateCompanySlug
             // explode $route. get first part if "branch" or "company"
             $routeParts = explode('.', $route);
             if (in_array($routeParts[0], ['branch'])) {
-                return redirect()->route('branch.users.index', [
-                    'companySlug' => $companySlug,
-                    'branchSlug' => $branchSlug
-                ]);
+                if ($branchFirstRoute) {
+                    return redirect()->route($branchFirstRoute, [
+                        'companySlug' => $companySlug,
+                        'branchSlug' => $branchSlug
+                    ]);
+                }
             }
             
             abort(403, 'Unauthorized action.');
