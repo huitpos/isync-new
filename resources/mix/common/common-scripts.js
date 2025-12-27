@@ -412,29 +412,37 @@ $(document).ready(function () {
         $('#' + targetElement).select2();
     }
 
-    $('.repeater').repeater({
-        initEmpty: $('.repeater').data('init-empty') || false,
-        defaultValues: {
-            'text-input': 'foo'
-        },
-        show: function () {
-            $(this).slideDown();
-            $('.repeater').find('.select2-container').remove();
-            $('.repeater').find('.select2-ajax').removeAttr("data-kt-initialized");
+    $('.repeater').each(function() {
+        element = $(this);
 
-            initConditionsSelect2();
-        },
-        hide: function (deleteElement) {
-            // if(confirm('Are you sure you want to delete this element?')) {
-                $(this).slideUp(deleteElement);
-            // }
-        },
-        isFirstItemUndeletable: false,
-        repeaters: [{
-            // (Required)
-            // Specify the jQuery selector for this nested repeater
-            selector: '.inner-repeater'
-        }]
+        element.repeater({
+            initEmpty: element.data('init-empty') || false,
+            defaultValues: {
+                'text-input': 'foo'
+            },
+            show: function () {
+                $(this).find('.select2-container').remove();
+                $(this).find('.select2-ajax').removeAttr("data-kt-initialized");
+
+                // $('.repeater').find('.select2-container').remove();
+                // $('.repeater').find('.select2-ajax').removeAttr("data-kt-initialized");
+
+                initConditionsSelect2();
+
+                $(this).slideDown();
+            },
+            hide: function (deleteElement) {
+                // if(confirm('Are you sure you want to delete this element?')) {
+                    $(this).slideUp(deleteElement);
+                // }
+            },
+            isFirstItemUndeletable: false,
+            repeaters: [{
+                // (Required)
+                // Specify the jQuery selector for this nested repeater
+                selector: '.inner-repeater'
+            }]
+        });
     });
 });
 

@@ -382,18 +382,19 @@
         
                         <div class="mt-7">
                             <label class="form-label">Bundled Items</label>
-                            <div class="repeater">
+                            <div class="repeater" data-init-empty="{{ empty(old('bundled_items')) && count($product->bundledItems) == 0 }}">
                                 <div class="form-group">
                                     <div data-repeater-list="bundled_items" class="d-flex flex-column gap-3">
                                         @if (empty(old('bundled_items')) && count($product->bundledItems) == 0)
                                             <div data-repeater-item="" class="form-group d-flex flex-wrap align-items-center gap-5">
                                                 <div class="w-100 w-md-200px">
-                                                    <select class="form-select" name="product_id" data-placeholder="Select a variation">
-                                                        <option value="">Product</option>
-                                                        @foreach($company->visibleProducts as $selectProduct)
-                                                            <option value="{{ $selectProduct->id }}">{{ $selectProduct->name }}</option>
-                                                        @endforeach
-                                                    </select>
+                                                    <select
+                                                        name="product_id"
+                                                        data-control="select2"
+                                                        data-ajax-url="/ajax/get-products"
+                                                        data-placeholder="Select a product"
+                                                        class="form-control @error('company_id') is-invalid @enderror select2-ajax"
+                                                    ></select>
                                                 </div>
         
                                                 <input type="text" class="form-control mw-100 w-200px" name="quantity" placeholder="Quantity" />
@@ -416,16 +417,20 @@
                                                 @php
                                                     $productId = $fromOld ? $bundleItem['product_id'] : $bundleItem['bundled_item']['included_product_id'];
                                                     $quantity = $fromOld ? $bundleItem['quantity'] : $bundleItem['bundled_item']['quantity'];
+                                                    $productName = $fromOld ? '' : $bundleItem['name'];
                                                 @endphp
         
                                                 <div data-repeater-item="" class="form-group d-flex flex-wrap align-items-center gap-5">
                                                     <div class="w-100 w-md-200px">
-                                                        <select class="form-select" name="product_id" data-placeholder="Select a variation">
-                                                            <option value="">Product</option>
-                                                            @foreach($company->visibleProducts as $selectProduct)
-                                                                <option value="{{ $selectProduct->id }}" {{ $selectProduct->id == $productId ? 'selected' : '' }}>{{ $selectProduct->name }}</option>
-                                                            @endforeach
-                                                        </select>
+                                                        <select
+                                                            name="product_id"
+                                                            data-control="select2"
+                                                            data-ajax-url="/ajax/get-products"
+                                                            data-placeholder="Select a product"
+                                                            class="form-control @error('company_id') is-invalid @enderror select2-ajax"
+                                                    >
+                                                        <option value="{{ $productId }}">{{ $productName }}</option>
+                                                    </select>
                                                     </div>
         
                                                     <input value="{{ $quantity }}" type="text" class="form-control mw-100 w-200px @error('raw_items.' . $key . '.quantity') is-invalid @enderror" name="quantity" placeholder="Quantity"/>
