@@ -1,4 +1,5 @@
 <?php
+//php artisan db:seed --class=PermissionSeeder
 
 namespace Database\Seeders;
 
@@ -201,6 +202,12 @@ class PermissionSeeder extends Seeder
             ['name' => 'Company Reports/Sales Reports/National Athletes and Coaches Sales Book', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports/Sales Reports', 'route' => 'company.reports.bir-naac-sales-report'],
             ['name' => 'Company Reports/Sales Reports/Solo Parent Sales Book', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports/Sales Reports', 'route' => 'company.reports.bir-solo-parent-sales-report'],
             ['name' => 'Company Reports/Audit Trail Report', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports', 'route' => 'company.reports.audit-trail'],
+            ['name' => 'Company Reports/Product Reports', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports'],
+            ['name' => 'Company Reports/Product Reports/Category Sales Report', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports/Product Reports', 'route' => 'company.reports.category-sales-report'],
+            ['name' => 'Company Reports/Product Reports/Sub Category Sales Report', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports/Product Reports', 'route' => 'company.reports.subcategory-sales-report'],
+            ['name' => 'Company Reports/Product Reports/Department Sales Report', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports/Product Reports', 'route' => 'company.reports.department-sales-report'],
+            ['name' => 'Company Reports/Product Reports/Sales Return Report', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports/Product Reports', 'route' => 'company.reports.sales-return-report'],
+            ['name' => 'Company Reports/Product Reports/Top Performing Products Report', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Company Reports/Product Reports', 'route' => 'company.reports.top-performing-products-report'],
             
             // BRANCH LEVEL PERMISSIONS
             // Branch Dashboard
