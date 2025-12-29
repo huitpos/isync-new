@@ -334,6 +334,7 @@ class MiscController extends BaseController
             'is_account_receivable_redeem' => $request->is_account_receivable_redeem,
             'total_zero_rated_amount' => $request->total_zero_rated_amount,
             'remarks' => $request->remarks,
+            'is_advance_order' => $request->is_advance_order,
         ];
 
         //check if existing. update if yes
@@ -486,6 +487,7 @@ class MiscController extends BaseController
                     'is_account_receivable_redeem' => $tx['is_account_receivable_redeem'] ?? null,
                     'account_receivable_redeem_at' => $tx['account_receivable_redeem_at'] ?? null,
                     'remarks' => $tx['remarks'] ?? null,
+                    'is_advance_order' => $tx['is_advance_order'] ?? null,
                 ];
 
                 $transaction = Transaction::where([
@@ -731,6 +733,7 @@ class MiscController extends BaseController
                     'is_bundle' => $order['is_bundle'] ?? null,
                     'bundle_order_id' => $order['bundle_order_id'] ?? null,
                     'is_posted' => $order['is_posted'] ?? null,
+                    'parent_order_id' => $order['parent_order_id'] ?? null,
                 ];
 
                 $existingOrder = Order::where([
@@ -882,6 +885,7 @@ class MiscController extends BaseController
             'is_bundle' => $request->is_bundle,
             'bundle_order_id' => $request->bundle_order_id,
             'is_posted' => $request->is_posted,
+            'parent_order_id' => $request->parent_order_id,
         ];
 
         $order = TakeOrderOrder::where([
@@ -1032,6 +1036,8 @@ class MiscController extends BaseController
                     'is_account_receivable' => $payment['is_account_receivable'] ?? null,
                     'is_completed' => $payment['is_completed'] ?? null,
                     'completed_at' => $payment['completed_at'] ?? null,
+                    'ar_is_posted' => $payment['ar_is_posted'] ?? null,
+                    'ar_posted_at' => $payment['ar_posted_at'] ?? null,
                 ];
 
                 $existingPayment = Payment::where([
@@ -1741,6 +1747,7 @@ class MiscController extends BaseController
                     'ending_gt_counter' => $cutOff['ending_gt_counter'] ?? null,
                     'total_return' => $cutOff['total_return'] ?? null,
                     'is_complete' => $cutOff['is_complete'] ?? null,
+                    'generated_date' => $cutOff['generated_date'] ?? null,
                 ];
 
                 $existingCutOff = CutOff::where([
@@ -4084,6 +4091,7 @@ class MiscController extends BaseController
                     'cut_off_at' => $payout['cut_off_at'] ?? null,
                     'treg' => $payout['treg'] ?? null,
                     'safekeeping_id' => $payout['safekeeping_id'] ?? null,
+                    'payout_number' => $payout['payout_number'] ?? null,
                 ];
 
                 $existingRecord = Payout::where([
