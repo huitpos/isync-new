@@ -101,15 +101,14 @@ class AjaxController extends Controller
         $productsQuery->where('status', 'active');
 
         $user = Auth::user();
+        $productsQuery->where('company_id', $user->company_id);
 
         $productsQuery->where('status', 'active');
 
         if ($request->has('department_id')) {
             $departmentId = $request->department_id;
 
-            if ($departmentId == 'all') {
-                $productsQuery->where('company_id', $user->company_id);
-            } else {
+            if ($departmentId != 'all') {
                 $productsQuery->where('department_id', $departmentId);
             }
         }
