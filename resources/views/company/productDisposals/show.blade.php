@@ -83,7 +83,15 @@
                     @endforeach
 
                     <div class="row mb-5">
-                        <div class="col-md-12">
+                        @if ($disposal->status == 'approved')
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a href="{{ route('company.product-disposals.print', ['companySlug' => $company->slug, 'id' => $disposal->id]) }}" class="btn btn-primary">Print</a>
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="col-md-<?= $disposal->status != 'approved' ? '12' : '6' ?>">
                             <div class="form-group float-end">
                                 <h2>TOTAL: <span class="grandtotal"> {{ $disposal->total }}</span></h2>
                             </div>

@@ -226,6 +226,55 @@
 					],
 				],
 				[
+					'permission' => 'Company Reports/Product Reports',
+					'title' => 'Product Reports',
+					'isSubmenu' => true,
+					'activeRoutes' => [
+						'company.reports.category-sales-report',
+						'company.reports.department-sales-report',
+						'company.reports.sales-return-report',
+						'company.reports.subcategory-sales-report',
+						'company.reports.top-performing-products-report'
+					],
+					'children' => [
+						[
+							'permission' => 'Company Reports/Product Reports/Category Sales Report',
+							'title' => 'Category Sales Report',
+							'activeRoutes' => ['company.reports.category-sales-report'],
+							'route' => 'company.reports.category-sales-report',
+							'routeParams' => ['companySlug' => $companySlug],
+						],
+						[
+							'permission' => 'Company Reports/Product Reports/Sub Category Sales Report',
+							'title' => 'Sub Category Sales Report',
+							'activeRoutes' => ['company.reports.subcategory-sales-report'],
+							'route' => 'company.reports.subcategory-sales-report',
+							'routeParams' => ['companySlug' => $companySlug],
+						],
+						[
+							'permission' => 'Company Reports/Product Reports/Department Sales Report',
+							'title' => 'Department Sales Report',
+							'activeRoutes' => ['company.reports.department-sales-report'],
+							'route' => 'company.reports.department-sales-report',
+							'routeParams' => ['companySlug' => $companySlug],
+						],
+						[
+							'permission' => 'Company Reports/Product Reports/Sales Return Report',
+							'title' => 'Sales Return Report',
+							'activeRoutes' => ['company.reports.sales-return-report'],
+							'route' => 'company.reports.sales-return-report',
+							'routeParams' => ['companySlug' => $companySlug],
+						],
+						[
+							'permission' => 'Company Reports/Product Reports/Top Performing Products Report',
+							'title' => 'Top Performing Products Report',
+							'activeRoutes' => ['company.reports.top-performing-products-report'],
+							'route' => 'company.reports.top-performing-products-report',
+							'routeParams' => ['companySlug' => $companySlug],
+						],
+					]
+				],
+				[
 					'permission' => 'Company Reports/Sales Reports',
 					'title' => 'Sales Reports',
 					'isSubmenu' => true,
