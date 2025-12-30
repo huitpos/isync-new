@@ -128,6 +128,49 @@ $(document).ready(function () {
         computeSrp();
     });
 
+    $('#product-name').on('input', function () {
+        var name = $(this).val();
+
+        // remove vowels
+        var abbreviation = name.replace(/[aeiou]/gi, '');
+
+        // limit to 25 chars
+        abbreviation = abbreviation.substring(0, 25);
+
+        // first uppercase, rest lowercase
+        if (abbreviation.length > 0) {
+            abbreviation = abbreviation.charAt(0).toUpperCase() + abbreviation.slice(1).toLowerCase();
+        }
+
+        $('#abbreviation').val(abbreviation);
+    });
+
+    // Prevent vowels when editing abbreviation
+    $('#abbreviation').on('input', function (e) {
+        var char = String.fromCharCode(e.which);
+        if (/[aeiouAEIOU]/.test(char)) {
+            e.preventDefault(); // block vowels
+        }
+    });
+
+    // Optional: still enforce rules when user pastes text
+    $('#abbreviation').on('input', function () {
+        var val = $(this).val();
+
+        // remove vowels
+        val = val.replace(/[aeiou]/gi, '');
+
+        // limit to 25 chars
+        val = val.substring(0, 25);
+
+        // first uppercase, rest lowercase
+        if (val.length > 0) {
+            val = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
+        }
+
+        $(this).val(val);
+    });
+
     $('#delivery_location_id').on('change', function() {
         var selectedOption = $(this).find('option:selected');
         var address = selectedOption.data('address');

@@ -35,6 +35,87 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+    /**
+     * Determine the selected range based on start and end dates
+     *
+     * @param string|null $startDateParam
+     * @param string|null $endDateParam
+     * @return string
+     */
+    private function determineSelectedRange($startDateParam, $endDateParam)
+    {
+        if (!$startDateParam || !$endDateParam) {
+            return 'Today';
+        }
+
+        $start = Carbon::parse($startDateParam)->startOfDay();
+        $end = Carbon::parse($endDateParam)->endOfDay();
+        $now = Carbon::now();
+
+        // Check for Today
+        if ($start->isSameDay($now) && $end->isSameDay($now)) {
+            return 'Today';
+        }
+
+        // Check for Yesterday
+        $yesterday = $now->copy()->subDay();
+        if ($start->isSameDay($yesterday) && $end->isSameDay($yesterday)) {
+            return 'Yesterday';
+        }
+
+        // Check for This Week (Sunday to Saturday)
+        $weekStart = $now->copy()->startOfWeek();
+        $weekEnd = $now->copy()->endOfWeek();
+        if ($start->isSameDay($weekStart) && $end->isSameDay($weekEnd)) {
+            return 'This Week';
+        }
+
+        // Check for Last 7 Days
+        $sevenDaysAgo = $now->copy()->subDays(7)->startOfDay();
+        if ($start->isSameDay($sevenDaysAgo) && $end->isSameDay($now)) {
+            return 'Last 7 days';
+        }
+
+        // Check for This Month
+        $monthStart = $now->copy()->startOfMonth();
+        $monthEnd = $now->copy()->endOfMonth();
+        if ($start->isSameDay($monthStart) && $end->isSameDay($monthEnd)) {
+            return 'This Month';
+        }
+
+        // Check for Last Month
+        $lastMonth = $now->copy()->subMonth();
+        $lastMonthStart = $lastMonth->copy()->startOfMonth();
+        $lastMonthEnd = $lastMonth->copy()->endOfMonth();
+        if ($start->isSameDay($lastMonthStart) && $end->isSameDay($lastMonthEnd)) {
+            return 'Last Month';
+        }
+
+        // Check for Last 30 Days
+        $thirtyDaysAgo = $now->copy()->subDays(30)->startOfDay();
+        if ($start->isSameDay($thirtyDaysAgo) && $end->isSameDay($now)) {
+            return 'Last 30 days';
+        }
+
+        // Check for This Year
+        $yearStart = $now->copy()->startOfYear();
+        $yearEnd = $now->copy()->endOfYear();
+        if ($start->isSameDay($yearStart) && $end->isSameDay($yearEnd)) {
+            return 'This Year';
+        }
+
+        // Check for Last Year
+        $lastYear = $now->copy()->subYear();
+        $lastYearStart = $lastYear->copy()->startOfYear();
+        $lastYearEnd = $lastYear->copy()->endOfYear();
+        if ($start->isSameDay($lastYearStart) && $end->isSameDay($lastYearEnd)) {
+            return 'Last Year';
+        }
+
+        // Default to Custom Range
+        return 'Custom Range';
+    }
+
     public function viewTransaction(Request $request, $companySlug, $branchSlug, $id)
     {
         $company = $request->attributes->get('company');
@@ -75,9 +156,9 @@ class ReportController extends Controller
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('branch.reports.salesInvoicesReport', compact('transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam', 'branch', 'company'));
     }
@@ -111,9 +192,9 @@ class ReportController extends Controller
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('branch.reports.salesTransactionReport', compact('transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
@@ -165,9 +246,9 @@ class ReportController extends Controller
         // Fetch the results
         $transactions = $query->select('transactions.*')->get(); // Ensure you're selecting valid columns
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         $paymentTypes = PaymentType::where('company_id', $company->id)
             ->orWhereNull('company_id')
@@ -206,12 +287,13 @@ class ReportController extends Controller
         $transactions = Transaction::where('branch_id', $branchId)
             ->where('is_complete', true)
             ->where('is_account_receivable', false)
+            ->where('is_void', false)
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('branch.reports.vatSalesReport', compact('transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
@@ -254,9 +336,9 @@ class ReportController extends Controller
             ->orderBy('id')
             ->get();
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('branch.reports.xReadingReport', compact('cutoffs', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
@@ -299,9 +381,9 @@ class ReportController extends Controller
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('branch.reports.zReadingReport', compact('branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
@@ -424,9 +506,9 @@ class ReportController extends Controller
         // Convert the array of objects into a collection
         $itemSales = collect($itemSales);
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('branch.reports.itemSales', compact('company', 'branchId', 'dateParam', 'itemSales', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
@@ -488,7 +570,7 @@ class ReportController extends Controller
                     AND transactions.is_void = FALSE
                     AND transactions.is_back_out = FALSE
                     AND orders.product_id = $productId
-                    -- AND transactions.treg BETWEEN '$startDate' AND '$endDate'
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
                 ";
 
             $transactions = DB::select($transactionQuery);
@@ -514,6 +596,7 @@ class ReportController extends Controller
                     WHERE product_physical_count_items.product_id = $productId
                         AND product_physical_counts.branch_id = $branchId
                         AND product_physical_counts.created_at BETWEEN '$startDate' AND '$endDate'
+                        AND product_physical_counts.status = 'approved'
                 ";
 
             $physicalCounts = DB::select($physicalCountQuery);
@@ -611,7 +694,8 @@ class ReportController extends Controller
                     products.cost,
                     product_disposal_reasons.`name` AS `reason`,
                     CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
-                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`
+                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
+                    product_disposals.pdis_number
                 FROM product_disposals
                 INNER JOIN product_disposal_items ON product_disposal_items.product_disposal_id = product_disposals.id
                 INNER JOIN unit_of_measurements ON product_disposal_items.uom_id = unit_of_measurements.id
@@ -630,9 +714,9 @@ class ReportController extends Controller
             $disposals = DB::select($disposalQuery);
         }
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('branch.reports.stockCard', compact(
             'company',
@@ -661,9 +745,10 @@ class ReportController extends Controller
         $machineIds = [];
         $machines = [];
         foreach($branch->machines as $machine) {
-            $machineIds[] = $machine->id;
-
-            $machines[$machine->id] = $machine;
+            if ($machine->type == 'cashier') {
+                $machineIds[] = $machine->id;
+                $machines[$machine->id] = $machine;
+            }
         }
 
         $dateParam = $request->input('date_range', null);
@@ -687,9 +772,9 @@ class ReportController extends Controller
             ->whereBetween('treg', [$startDate, $endDate])
             ->get();
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('branch.reports.auditTrail', compact(
             'company',

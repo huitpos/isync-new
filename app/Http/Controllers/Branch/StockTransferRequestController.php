@@ -59,7 +59,7 @@ class StockTransferRequestController extends Controller
         ])->get();
 
         $suppliers = [];
-        if (old('department_id')) {
+        if (old('department_id') && old('department_id') != 'all') {
             $department = Department::find(old('department_id'));
             $suppliers = $department->suppliers()->where([
                 'status' => 'active'

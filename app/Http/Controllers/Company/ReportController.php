@@ -340,7 +340,7 @@ class ReportController extends Controller
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        return view('company/reports/zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function discountsReport(Request $request)
@@ -401,9 +401,10 @@ class ReportController extends Controller
             ->where('discounts.branch_id', $branchId)
             ->get();
 
-        $selectedRangeParam = $request->input('selectedRange', 'Today');
-        $startDateParam = $request->input('startDate', null);
-        $endDateParam = $request->input('endDate', null);
+        $startDateParam = $startDate;
+        $endDateParam = $endDate;
+
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
         return view('company.reports.discountsReport', compact('company', 'branches', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
@@ -560,6 +561,7 @@ class ReportController extends Controller
                     WHERE product_physical_count_items.product_id = $productId
                         AND product_physical_counts.branch_id = $branchId
                         AND product_physical_counts.created_at BETWEEN '$startDate' AND '$endDate'
+                        AND product_physical_counts.status = 'approved'
                 ";
 
             $physicalCounts = DB::select($physicalCountQuery);
@@ -657,7 +659,8 @@ class ReportController extends Controller
                     products.cost,
                     product_disposal_reasons.`name` AS `reason`,
                     CONCAT(createdBy.first_name, ' ', createdBy.last_name) AS `created_by`,
-                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`
+                    CONCAT(actionBy.first_name, ' ', actionBy.last_name) AS `action_by`,
+                    product_disposals.pdis_number
                 FROM product_disposals
                 INNER JOIN product_disposal_items ON product_disposal_items.product_disposal_id = product_disposals.id
                 INNER JOIN unit_of_measurements ON product_disposal_items.uom_id = unit_of_measurements.id
@@ -668,6 +671,7 @@ class ReportController extends Controller
                 WHERE product_disposals.status = 'approved'
                     AND product_disposal_items.product_id = $productId
                     AND product_disposals.created_at BETWEEN '$startDate' AND '$endDate'
+                    AND product_disposals.branch_id = $branchId
             ";
 
             $disposals = DB::select($disposalQuery);
@@ -705,9 +709,10 @@ class ReportController extends Controller
         $machines = [];
         foreach ($branches as $branch) {
             foreach ($branch->machines as $machine) {
-                $machineIds[] = $machine->id;
-
-                $machines[$machine->id] = $machine;
+                if ($machine->type == 'cashier') {
+                    $machineIds[] = $machine->id;
+                    $machines[$machine->id] = $machine;
+                }
             }
         }
 
@@ -768,7 +773,7 @@ class ReportController extends Controller
 
         if ($request->isMethod('post') && !$request->input('search')) {
             $branch = Branch::find($branchId);
-            return Excel::download(new BirSalesSummaryReportExport($branchId, $startDate, $endDate), "$branch->name - BIR SALES SUMMARY  REPORT - $startDate - $endDate.xlsx");
+            return Excel::download(new BirSalesSummaryReportExport($branchId, $startDate, $endDate), "$branch->name - SALES SUMMARY  REPORT - $startDate - $endDate.xlsx");
         }
 
         $endOfDays = EndOfDay::where('branch_id', $branchId)
@@ -957,5 +962,79 @@ class ReportController extends Controller
             'endDateParam',
             'discounts'
         ));
-    } 
+    }
+
+    private function determineSelectedRange($startDateParam, $endDateParam)
+    {
+        if (!$startDateParam || !$endDateParam) {
+            return 'Today';
+        }
+
+        $start = Carbon::parse($startDateParam)->startOfDay();
+        $end = Carbon::parse($endDateParam)->endOfDay();
+        $now = Carbon::now();
+
+        // Check for Today
+        if ($start->isSameDay($now) && $end->isSameDay($now)) {
+            return 'Today';
+        }
+
+        // Check for Yesterday
+        $yesterday = $now->copy()->subDay();
+        if ($start->isSameDay($yesterday) && $end->isSameDay($yesterday)) {
+            return 'Yesterday';
+        }
+
+        // Check for This Week (Sunday to Saturday)
+        $weekStart = $now->copy()->startOfWeek();
+        $weekEnd = $now->copy()->endOfWeek();
+        if ($start->isSameDay($weekStart) && $end->isSameDay($weekEnd)) {
+            return 'This Week';
+        }
+
+        // Check for Last 7 Days
+        $sevenDaysAgo = $now->copy()->subDays(7)->startOfDay();
+        if ($start->isSameDay($sevenDaysAgo) && $end->isSameDay($now)) {
+            return 'Last 7 days';
+        }
+
+        // Check for This Month
+        $monthStart = $now->copy()->startOfMonth();
+        $monthEnd = $now->copy()->endOfMonth();
+        if ($start->isSameDay($monthStart) && $end->isSameDay($monthEnd)) {
+            return 'This Month';
+        }
+
+        // Check for Last Month
+        $lastMonth = $now->copy()->subMonth();
+        $lastMonthStart = $lastMonth->copy()->startOfMonth();
+        $lastMonthEnd = $lastMonth->copy()->endOfMonth();
+        if ($start->isSameDay($lastMonthStart) && $end->isSameDay($lastMonthEnd)) {
+            return 'Last Month';
+        }
+
+        // Check for Last 30 Days
+        $thirtyDaysAgo = $now->copy()->subDays(30)->startOfDay();
+        if ($start->isSameDay($thirtyDaysAgo) && $end->isSameDay($now)) {
+            return 'Last 30 days';
+        }
+
+        // Check for This Year
+        $yearStart = $now->copy()->startOfYear();
+        $yearEnd = $now->copy()->endOfYear();
+        if ($start->isSameDay($yearStart) && $end->isSameDay($yearEnd)) {
+            return 'This Year';
+        }
+
+        // Check for Last Year
+        $lastYear = $now->copy()->subYear();
+        $lastYearStart = $lastYear->copy()->startOfYear();
+        $lastYearEnd = $lastYear->copy()->endOfYear();
+        if ($start->isSameDay($lastYearStart) && $end->isSameDay($lastYearEnd)) {
+            return 'Last Year';
+        }
+
+        // Default to Custom Range
+        return 'Custom Range';
+    }
 }

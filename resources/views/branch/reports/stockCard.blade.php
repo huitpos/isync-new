@@ -110,6 +110,10 @@
                         <div class="col-md-3">
                             <span class="fw-bold">Actual Stock:</span> {{ $pivotData ? number_format($pivotData->stock, 2) : 0 }}
                         </div>
+
+                        <div class="col-md-3">
+                            <span class="fw-bold">Part Number:</span> {{ $product ? $product->part_number : '' }}
+                        </div>
                     </div>
                 </div>
 
@@ -206,7 +210,7 @@
                             @foreach($physicalCounts as $pc)
                                 <tr>
                                     <td>{{ $pc->physical_count_date }}</td>
-                                    <td>to follow</td>
+                                    <td>{{ $pc->pcount_number }}</td>
                                     <td>{{ $pc->quantity }}</td>
                                     <td>{{ $pc->uom }}</td>
                                     <td>{{ $pc->old_quantity }}</td>
@@ -376,7 +380,7 @@
                             @foreach($disposals as $item)
                                 <tr>
                                     <td>{{ $item->date }}</td>
-                                    <td>to follow</td>
+                                    <td>{{ $item->pdis_number }}</td>
                                     <td>{{ $item->quantity }}</td>
                                     <td>{{ $item->uom }}</td>
                                     <td>{{ $item->cost }}</td>
