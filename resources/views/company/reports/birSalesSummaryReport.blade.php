@@ -1,7 +1,7 @@
 <x-default-layout>
 
     @section('title')
-        BIR SALES SUMMARY REPORT
+        SALES SUMMARY REPORT
     @endsection
 
     <div class="card">

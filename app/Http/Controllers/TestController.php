@@ -22,6 +22,22 @@ class TestController extends Controller
         $this->productRepository = $productRepository;
     }
 
+    public function test()
+    {
+        $product = Product::find(1022)
+            ->load('bundledItems', 'rawItems');
+
+        $branch = Branch::findOrFail(1);
+
+        foreach ($product->bundledItems as $bundledItem) {
+            dd($bundledItem->bundled_item->quantity);
+        }
+
+        $this->productRepository->updateBranchQuantity($product, $branch, 1, 'end_of_days', 5, null, 'subtract', $product->uom_id);
+
+        dd("Test route is working!");
+    }
+
     public function mapData(Request $request)
     {
         $transactionalDbName = config('database.connections.transactional_db.database');

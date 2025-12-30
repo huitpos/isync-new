@@ -55,7 +55,7 @@ class TransactionsDataTable extends DataTable
                 AND orders.pos_machine_id = discount_details.pos_machine_id
             INNER JOIN isync.products ON orders.product_id = products.id
             WHERE transactions.is_complete = TRUE
-                AND transactions.branch_id = 10
+                AND transactions.branch_id = 22222
                 AND transactions.is_void = FALSE
                 AND transactions.is_back_out = FALSE
             GROUP BY orders.product_id';
