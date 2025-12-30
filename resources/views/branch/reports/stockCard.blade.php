@@ -206,7 +206,7 @@
                             @foreach($physicalCounts as $pc)
                                 <tr>
                                     <td>{{ $pc->physical_count_date }}</td>
-                                    <td>to follow</td>
+                                    <td>{{ $pc->pcount_number }}</td>
                                     <td>{{ $pc->quantity }}</td>
                                     <td>{{ $pc->uom }}</td>
                                     <td>{{ $pc->old_quantity }}</td>
