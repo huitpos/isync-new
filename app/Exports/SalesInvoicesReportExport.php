@@ -39,7 +39,6 @@ class SalesInvoicesReportExport implements FromCollection, WithHeadings, WithMap
     {
         $transactions = Transaction::where('branch_id', $this->branchId)
             ->where('is_complete', true)
-            ->where('is_account_receivable', false)
             ->whereBetween('completed_at', [$this->startDate, $this->endDate])
             ->get();
 
