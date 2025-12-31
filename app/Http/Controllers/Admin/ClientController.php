@@ -124,7 +124,9 @@ class ClientController extends Controller
             'barangay_id' => $request['barangay_id'],
             'slug' => Str::slug($request['trade_name']),
             'street' => $request['street'],
-            'company_registered_name' => ''
+            'company_registered_name' => '',
+            'auto_round_off_srp' => $request->has('auto_round_off_srp') ? 1 : 0,
+            'auto_update_srp' => $request->has('auto_update_srp') ? 1 : 0,
         ]);
 
         $path = '';
@@ -261,7 +263,9 @@ class ClientController extends Controller
             'barangay_id' => $request['barangay_id'],
             'slug' => Str::slug($request['trade_name']),
             'street' => $request['street'],
-            'company_registered_name' => ''
+            'company_registered_name' => '',
+            'auto_round_off_srp' => $request->has('auto_round_off_srp') ? 1 : 0,
+            'auto_update_srp' => $request->has('auto_update_srp') ? 1 : 0,
         ]);
 
         $userData = [
