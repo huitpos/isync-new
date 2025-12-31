@@ -40,6 +40,7 @@ use App\Exports\HourlySalesSummaryExport;
 use App\Exports\MonthlySalesSummaryExport;
 use App\Exports\TopPerformingProductsExport;
 use App\Exports\SafekeepingReportExport;
+use App\Exports\HourlyTransactionReportExport;
 use App\Models\AuditTrail;
 use App\Models\PosMachine;
 use Illuminate\Support\Facades\DB;
@@ -968,8 +969,8 @@ class ReportController extends Controller
             'endDateParam',
             'discounts'
         ));
-    }
-
+    } 
+    
     public function categorySalesReport(Request $request)
     {
         $company = $request->attributes->get('company');

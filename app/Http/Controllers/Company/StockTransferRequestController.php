@@ -9,8 +9,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\DataTables\Company\StockTransferRequestsDataTable;
 
 use App\Models\StockTransferRequest;
-use App\Models\StockTransferOrder;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class StockTransferRequestController extends Controller
 {

@@ -75,28 +75,30 @@
                 @method('PUT')
 
                 <div class="mb-4">
-                    <label class="form-label">SRP</label>
-                    <input value="{{ old('name') ?? number_format($pivotData->price ?? $product->srp, 2) }}" name="price" type="text" class="form-control @error('price') is-invalid @enderror" placeholder="SRP" required/>
-
-                    @error('price')
-                        <div class="invalid-feedback"> {{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-4">
                     <label class="form-label">Cost</label>
-                    <input value="{{ old('cost') ?? number_format($pivotData->cost ?? $product->cost, 2) }}" name="cost" type="text" class="form-control @error('cost') is-invalid @enderror" placeholder="Cost" required/>
+                    <input value="{{ old('cost') ?? number_format($pivotData->cost ?? $product->cost, 2) }}" name="cost" type="text" class="form-control @error('cost') is-invalid @enderror compute-srp" id="cost" placeholder="Cost" required/>
 
                     @error('cost')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
 
+                <input type="hidden" value="{{ $product->markup_type }} }}" id="markup_type">
+
                 <div class="mb-4">
                     <label class="form-label">Markup</label>
-                    <input value="{{ old('markup') ?? number_format($pivotData->markup ?? $product->markup, 2) }}" name="markup" type="text" class="form-control @error('markup') is-invalid @enderror" placeholder="Markup" required/>
+                    <input value="{{ old('markup') ?? number_format($pivotData->markup ?? $product->markup, 2) }}" name="markup" type="text" class="form-control @error('markup') is-invalid @enderror compute-srp" id="markup" placeholder="Markup" required/>
 
                     @error('markup')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">SRP</label>
+                    <input value="{{ old('name') ?? number_format($pivotData->price ?? $product->srp, 2) }}" name="price" type="text" class="form-control @error('price') is-invalid @enderror" id="srp" placeholder="SRP" required/>
+
+                    @error('price')
                         <div class="invalid-feedback"> {{ $message }}</div>
                     @enderror
                 </div>
