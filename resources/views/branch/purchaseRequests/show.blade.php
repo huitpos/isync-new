@@ -170,7 +170,7 @@
 
                         <div class="col-md-<?= $pr->status != 'approved' ? '12' : '6' ?>">
                             <div class="form-group float-end">
-                                <h2>TOTAL: <span class="grandtotal"> {{ $pr->total }}</span></h2>
+                                <h2>TOTAL: <span class="grandtotal"> {{ number_format($pr->total, 2) }}</span></h2>
                             </div>
                         </div>
                     </div>
