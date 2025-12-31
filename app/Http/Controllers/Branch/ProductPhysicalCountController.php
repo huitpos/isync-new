@@ -88,7 +88,7 @@ class ProductPhysicalCountController extends Controller
         unset($physicalCountData['pr_items']);
         unset($physicalCountData['pr_selected_product_text']);
 
-        $pcountCount = PurchaseOrder::where([
+        $pcountCount = ProductPhysicalCount::where([
             'branch_id' => $branch->id
         ])->count();
 
