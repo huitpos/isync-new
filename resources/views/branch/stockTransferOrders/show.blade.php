@@ -28,9 +28,14 @@
 
                 @if ($sto->status != 'pending')
                 <div class="row mb-5">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <label class="form-label">Approved/Rejected By</label>
                         <input value="{{ ucfirst($sto->actionBy?->name) }}" type="text" readonly class="form-control"/>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Approved/Rejected Date</label>
+                        <input value="{{ $sto->action_date }}" type="text" readonly class="form-control"/>
                     </div>
                 </div>
                 @endif
