@@ -25,6 +25,11 @@
                         <label class="form-label">Approved/Rejected By</label>
                         <input value="{{ ucfirst($count->actionBy?->name) }}" type="text" readonly class="form-control"/>
                     </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Approved/Rejected Date</label>
+                        <input value="{{ $count->action_date }}" type="text" readonly class="form-control"/>
+                    </div>
                     @endif
                 </div>
 
