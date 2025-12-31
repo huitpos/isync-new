@@ -19,7 +19,7 @@ $(document).ready(function () {
 
         sum = Math.round(sum * 100) / 100;
 
-        $('.grandtotal').html(sum);
+        $('.grandtotal').html(sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
         $('#pr_total').val(sum);
     }
 
@@ -603,35 +603,35 @@ $(document).on('change', '.permission-parent', function (e) {
     var permissionId = $(this).attr('data-permission-id');
     var isChecked = $(this).is(':checked');
 
-    $('[data-parent-id="' + permissionId + '"]').prop('checked', isChecked);
-    $('[data-grandparent-id="' + permissionId + '"]').prop('checked', isChecked);
+    $('.permission-child[data-parent-id="' + permissionId + '"]').prop('checked', isChecked);
+    $('.permission-grandchild[data-grandparent-id="' + permissionId + '"]').prop('checked', isChecked);
 });
 
 
 $(document).on('change', '.permission-child', function (e) {
     var parentId = $(this).attr('data-parent-id');
 
-    var allChildren = $('[data-parent-id="' + parentId + '"]');
+    var allChildren = $('.permission-child[data-parent-id="' + parentId + '"]');
     var atLeastOneChecked = allChildren.is(':checked');
-
-    $('[data-permission-id="' + parentId + '"]').prop('checked', atLeastOneChecked);
+    $('.permission-parent[data-permission-id="' + parentId + '"]').prop('checked', atLeastOneChecked);
 
     var permissionId = $(this).attr('data-permission-id');
     var isChecked = $(this).is(':checked');
-    $('[data-parent-id="' + permissionId + '"]').prop('checked', isChecked);
+    $('.permission-grandchild[data-parent-id="' + permissionId + '"]').prop('checked', isChecked);
 });
 
 $(document).on('change', '.permission-grandchild', function (e) {
     var parentId = $(this).attr('data-parent-id');
     var grandparentId = $(this).attr('data-grandparent-id');
 
-    var allGrandChildren = $('[data-parent-id="' + parentId + '"]');
+    var allGrandChildren = $('.permission-grandchild[data-parent-id="' + parentId + '"]');
     var atLeastOneChecked = allGrandChildren.is(':checked');
+    if (atLeastOneChecked) {
+        $('.permission-child[data-permission-id="' + parentId + '"]').prop('checked', atLeastOneChecked);
+    }
 
-    $('[data-permission-id="' + parentId + '"]').prop('checked', atLeastOneChecked);
-
-    var allChildren = $('[data-parent-id="' + grandparentId + '"]');
+    var allChildren = $('.permission-child[data-parent-id="' + grandparentId + '"]');
     var atLeastOneChecked = allChildren.is(':checked');
 
-    $('[data-permission-id="' + grandparentId + '"]').prop('checked', atLeastOneChecked);
+    $('.permission-parent[data-permission-id="' + grandparentId + '"]').prop('checked', atLeastOneChecked);
 });
