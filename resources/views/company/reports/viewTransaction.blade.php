@@ -79,6 +79,20 @@
                         <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
                     </a>
                 </li>
+
+                <li class="nav-item mb-3 me-3 me-lg-6">
+                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden pt-5 pb-5" id="kt_stats_widget_16_tab_link_2" data-bs-toggle="pill" href="#discounts_tab">
+                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Discounts</span>
+                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                    </a>
+                </li>
+
+                <li class="nav-item mb-3 me-3 me-lg-6">
+                    <a class="nav-link btn btn-outline btn-flex btn-color-muted btn-active-color-primary flex-column overflow-hidden pt-5 pb-5" id="kt_stats_widget_16_tab_link_2" data-bs-toggle="pill" href="#customer_details_tab">
+                        <span class="nav-text text-gray-800 fw-bold fs-6 lh-1">Customer Details</span>
+                        <span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+                    </a>
+                </li>
             </ul>
 
             <div class="tab-content mt-0">
@@ -183,6 +197,74 @@
                                                 ₱ {{ number_format($totalPayment, 2) }}
                                             </td>
                                         </tr>
+                                    </tbody>
+                                </table>
+                                <!--end::Table-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show" id="discounts_tab">
+                    <div class="card card-flush py-4 flex-row-fluid overflow-hidden">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h2>Discounts</h2>  
+                            </div>
+                        </div>
+
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <!--begin::Table-->
+                                <table class="table align-middle table-row-dashed fs-6 gy-5 mb-0">
+                                    <thead>
+                                        <tr class="text-start text-gray-500 fw-bold fs-7 text-uppercase gs-0">
+                                            <th>Discount Type</th>
+                                            <th class="text-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fw-semibold text-gray-600">
+                                        @foreach($transaction->discounts as $discount)
+                                        <tr>
+                                            <td>
+                                                {{ $discount->discount_name }}
+                                            </td>
+                                            <td class="text-end">
+                                                ₱ {{ number_format($discount->discount_amount, 2) }}
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                <!--end::Table-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show" id="customer_details_tab">
+                    <div class="card card-flush py-4 flex-row-fluid overflow-hidden">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <h2>Customer Details</h2>
+                            </div>
+                        </div>
+
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <!--begin::Table-->
+                                <table class="table align-middle table-row-dashed fs-6 gy-5 mb-0">
+                                    <tbody class="fw-semibold text-gray-600">
+                                        @foreach($transaction->discountOtherInformation as $discount)
+                                        <tr>
+                                            <td>
+                                                {{ $discount->name }}
+                                            </td>
+                                            <td>
+                                                {{ $discount->value }}
+                                            </td>
+                                        </tr>
+                                        @endforeach
                                     </tbody>
                                 </table>
                                 <!--end::Table-->
