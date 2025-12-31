@@ -97,7 +97,7 @@
                                 <th>{{ number_format($transaction->service_charge, 2) }}</th>
                                 <th>{{ $transaction->type }}</th>
                                 <th>{{ number_format($transaction->change, 2) }}</th>
-                                <th></th>
+                                <th>{{ $transaction->void_by }}</th>
                                 <th>{{ $transaction->remarks }}</th>
                             </tr>
                         @endforeach
