@@ -276,6 +276,7 @@
                                     <td>{{ $item->pd_number }}</td>
                                     <td>{{ $item->supplier }}</td>
                                     <td>{{ $item->sales_invoice_number }}</td>
+                                    <td>{{ $item->delivery_uom }}</td>
                                     <td>{{ $item->qty }}</td>
                                     <td>{{ $item->unit_price }}</td>
                                     <td>{{ $item->unit_price * $item->qty }}</td>
