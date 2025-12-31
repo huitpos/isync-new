@@ -115,7 +115,14 @@
                     @endforeach
 
                     <div class="row mb-5">
-                        <div class="col-md-12">
+                        @if ($str->status == 'approved')
+                            <div class="col-md-7">
+                                <div class="form-group">
+                                    <a href="{{ route('branch.stock-transfer-requests.print', ['companySlug' => $company->slug, 'id' => $str->id, 'branchSlug' => $branch->slug]) }}" class="btn btn-primary">Print</a>
+                                </div>
+                            </div>
+                        @endif
+                        <div class="col-md-7">
                             <div class="form-group float-end">
                                 <h2>TOTAL: <span class="grandtotal"> {{ $grandtotal }}</span></h2>
                             </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Transfer Request</title>
+    <title>Stock Transfer Order</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,31 +40,38 @@
 <body>
     <div class="header">
         <h2>{{ $company->name }}</h2>
-        <h3>Stock Transfer Request</h3>
+        <p>{{ $branch->name }}</p>
+        <h3>Stock Transfer Order</h3>
     </div>
 
     <table>
         <tr>
-            <td style="width:20%">STR#</td>
-            <td>{{ $str->str_number }}</td>
+            <td style="width:20%">STO#</td>
+            <td>{{ $sto->sto_number }}</td>
             <td>Status</td>
-            <td>{{ ucfirst($str->status)}}</td>
+            <td>{{ ucfirst($sto->status)}}</td>
         </tr>
+        @if ($sto->status != 'pending')
+        <tr>
+            <td>Approved/Rejected By</td>
+            <td colspan="3">{{ ucfirst($sto->actionBy?->name) }}</td>
+        </tr>
+        @endif
         <tr>
             <td>Requested By</td>
-            <td>{{ $str->createdBy->name }}</td>
+            <td>{{ $sto->createdBy->name }}</td>
             <td>Department</td>
-            <td>{{ ($str->department_id == 'all' || empty($str->department_id)) ? "All" : $str->department->name }}</td>
+            <td>{{ ($sto->department_id == 'all' || empty($sto->department_id)) ? "All" : $sto->department->name }}</td>
         </tr>
         <tr>
             <td>Delivery Location</td>
-            <td>{{ $str->deliveryLocation->name }}</td>
+            <td>{{ $sto->deliveryLocation->name }}</td>
             <td>Source Branch</td>
-            <td>{{ $str->sourceBranch->name }}</td>
+            <td>{{ $sto->sourceBranch->name }}</td>
         </tr>
         <tr>
             <td>Delivery Address</td>
-            <td colspan="3">{{ $str->deliveryLocation->unit_floor_number }}, {{ $str->deliveryLocation->street }}, {{ $str->deliveryLocation->barangay->name }}, {{ $str->deliveryLocation->city->name }}, {{ $str->deliveryLocation->province->name }}, {{ $str->deliveryLocation->region->name }}</td>
+            <td colspan="3">{{ $sto->deliveryLocation->unit_floor_number }}, {{ $sto->deliveryLocation->street }}, {{ $sto->deliveryLocation->barangay->name }}, {{ $sto->deliveryLocation->city->name }}, {{ $sto->deliveryLocation->province->name }}, {{ $sto->deliveryLocation->region->name }}</td>
         </tr>
         
     </table>
@@ -72,7 +79,7 @@
     <table class="product-table" style="margin-top:20px; margin-bottom:20px">
         <tr>
             <td style="width:20%">Remarks</td>
-            <td>{{ $str->remarks }}</td>
+            <td>{{ $sto->remarks }}</td>
         </tr>
     </table>
 
@@ -81,13 +88,15 @@
             <th style="width:20%">Product</th>
             <th>UOM</th>
             <th>Barcode</th>
+            <th>Cost</th>
             <th>Quantity</th>
         </tr>
-        @foreach ($str->items as $item)
+        @foreach ($sto->items as $item)
             <tr>
                 <td>{{ $item->product->name }}</td>
                 <td>{{ $item->uom->name }}</td>
                 <td>{{ $item->product->barcode}}</td>
+                <td>{{ number_format($item->product->cost, 2) }}</td>
                 <td>{{ $item->quantity }}</td>
             </tr>
         @endforeach
@@ -95,7 +104,7 @@
 
     <div class="remarks" style="margin-top:20px">
         <strong>Items Remarks:</strong>
-        @foreach ($str->items as $item)
+        @foreach ($sto->items as $item)
             @if($item->remarks)
                 <p><strong>{{ $item->product->name }}:</strong> {{ $item->remarks }}</p>
             @endif
@@ -106,7 +115,7 @@
         <table>
             <tr>
                 <td>
-                    <div class="signature-line">{{ $str->createdBy->name }}</div>
+                    <div class="signature-line">{{ $sto->createdBy->name }}</div>
                     <p>Requested By:</p>
                 </td>
             </tr>

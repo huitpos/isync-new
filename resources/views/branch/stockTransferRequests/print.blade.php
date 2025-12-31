@@ -40,6 +40,7 @@
 <body>
     <div class="header">
         <h2>{{ $company->name }}</h2>
+        <p>{{ $branch->name }}</p>
         <h3>Stock Transfer Request</h3>
     </div>
 
@@ -50,6 +51,12 @@
             <td>Status</td>
             <td>{{ ucfirst($str->status)}}</td>
         </tr>
+        @if ($str->status != 'pending')
+        <tr>
+            <td>Approved/Rejected By</td>
+            <td colspan="3">{{ ucfirst($str->actionBy?->name) }}</td>
+        </tr>
+        @endif
         <tr>
             <td>Requested By</td>
             <td>{{ $str->createdBy->name }}</td>
@@ -81,17 +88,25 @@
             <th style="width:20%">Product</th>
             <th>UOM</th>
             <th>Barcode</th>
+            <th>Cost</th>
             <th>Quantity</th>
         </tr>
+        @php $grandtotal = 0; @endphp
         @foreach ($str->items as $item)
+            @php $grandtotal += $item->product->cost * $item->quantity @endphp
             <tr>
                 <td>{{ $item->product->name }}</td>
                 <td>{{ $item->uom->name }}</td>
                 <td>{{ $item->product->barcode}}</td>
+                <td>{{ number_format($item->product->cost, 2) }}</td>
                 <td>{{ $item->quantity }}</td>
             </tr>
         @endforeach
     </table>
+
+    <div style="text-align: right; margin-top: 20px; font-weight: bold;">
+        TOTAL: {{ number_format($grandtotal, 2) }}
+    </div>
 
     <div class="remarks" style="margin-top:20px">
         <strong>Items Remarks:</strong>

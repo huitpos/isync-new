@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Transfer Request</title>
+    <title>Stock Transfer Delivery</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,62 +40,51 @@
 <body>
     <div class="header">
         <h2>{{ $company->name }}</h2>
-        <h3>Stock Transfer Request</h3>
+        <p>{{ $branch->name }}</p>
+        <h3>Stock Transfer Delivery</h3>
     </div>
 
     <table>
         <tr>
-            <td style="width:20%">STR#</td>
-            <td>{{ $str->str_number }}</td>
+            <td style="width:20%">Control Number</td>
+            <td>{{ $std->std_number }}</td>
             <td>Status</td>
-            <td>{{ ucfirst($str->status)}}</td>
+            <td>{{ ucfirst($std->status)}}</td>
         </tr>
+        @if ($std->status != 'pending')
+        <tr>
+            <td>Approved/Rejected By</td>
+            <td colspan="3">{{ ucfirst($std->actionBy?->name) }}</td>
+        </tr>
+        @endif
         <tr>
             <td>Requested By</td>
-            <td>{{ $str->createdBy->name }}</td>
-            <td>Department</td>
-            <td>{{ ($str->department_id == 'all' || empty($str->department_id)) ? "All" : $str->department->name }}</td>
-        </tr>
-        <tr>
-            <td>Delivery Location</td>
-            <td>{{ $str->deliveryLocation->name }}</td>
+            <td>{{ $std->createdBy->name }}</td>
             <td>Source Branch</td>
-            <td>{{ $str->sourceBranch->name }}</td>
+            <td>{{ $std->sourceBranch->name }}</td>
         </tr>
-        <tr>
-            <td>Delivery Address</td>
-            <td colspan="3">{{ $str->deliveryLocation->unit_floor_number }}, {{ $str->deliveryLocation->street }}, {{ $str->deliveryLocation->barangay->name }}, {{ $str->deliveryLocation->city->name }}, {{ $str->deliveryLocation->province->name }}, {{ $str->deliveryLocation->region->name }}</td>
-        </tr>
-        
     </table>
 
     <table class="product-table" style="margin-top:20px; margin-bottom:20px">
-        <tr>
-            <td style="width:20%">Remarks</td>
-            <td>{{ $str->remarks }}</td>
-        </tr>
-    </table>
-
-    <table class="product-table">
         <tr>
             <th style="width:20%">Product</th>
             <th>UOM</th>
             <th>Barcode</th>
             <th>Quantity</th>
         </tr>
-        @foreach ($str->items as $item)
+        @foreach ($std->items as $item)
             <tr>
                 <td>{{ $item->product->name }}</td>
                 <td>{{ $item->uom->name }}</td>
                 <td>{{ $item->product->barcode}}</td>
-                <td>{{ $item->quantity }}</td>
+                <td>{{ $item->qty }}</td>
             </tr>
         @endforeach
     </table>
 
     <div class="remarks" style="margin-top:20px">
         <strong>Items Remarks:</strong>
-        @foreach ($str->items as $item)
+        @foreach ($std->items as $item)
             @if($item->remarks)
                 <p><strong>{{ $item->product->name }}:</strong> {{ $item->remarks }}</p>
             @endif
@@ -106,7 +95,7 @@
         <table>
             <tr>
                 <td>
-                    <div class="signature-line">{{ $str->createdBy->name }}</div>
+                    <div class="signature-line">{{ $std->createdBy->name }}</div>
                     <p>Requested By:</p>
                 </td>
             </tr>
