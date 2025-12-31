@@ -99,7 +99,15 @@
                     @endforeach
 
                     <div class="row mb-5">
-                        <div class="col-md-12">
+                        @if ($str->status == 'approved')
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a href="{{ route('company.stock-transfer-requests.print', ['companySlug' => $company->slug, 'id' => $str->id]) }}" class="btn btn-primary">Print</a>
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="col-md-<?= $str->status != 'approved' ? '12' : '6' ?>">
                             <div class="form-group float-end">
                                 <h2>TOTAL: <span class="grandtotal"> {{ $str->total }}</span></h2>
                             </div>
