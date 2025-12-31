@@ -2016,8 +2016,13 @@ class ReportController extends Controller
             return 'Last 30 days';
         }
 
-        // Check for This Year
+        // Check for Year to Date
         $yearStart = $now->copy()->startOfYear();
+        if ($start->isSameDay($yearStart) && $end->isSameDay($now)) {
+            return 'Year to Date';
+        }
+
+        // Check for This Year
         $yearEnd = $now->copy()->endOfYear();
         if ($start->isSameDay($yearStart) && $end->isSameDay($yearEnd)) {
             return 'This Year';

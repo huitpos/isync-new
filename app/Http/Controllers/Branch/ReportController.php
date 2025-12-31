@@ -97,11 +97,10 @@ class ReportController extends Controller
             return 'Last 30 days';
         }
 
-        // Check for This Year
+        // Check for Year to Date
         $yearStart = $now->copy()->startOfYear();
-        $yearEnd = $now->copy()->endOfYear();
-        if ($start->isSameDay($yearStart) && $end->isSameDay($yearEnd)) {
-            return 'This Year';
+        if ($start->isSameDay($yearStart) && $end->isSameDay($now)) {
+            return 'Year to Date';
         }
 
         // Check for Last Year
@@ -395,12 +394,16 @@ class ReportController extends Controller
 
         $branchId = $branch->id;
 
-        $dateParam = $request->input('start_date', date('F Y'));
+        $dateParam = $request->input('date_range', null);
 
-        $parsedDate = Carbon::parse($dateParam);
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
 
-        $startDate = $parsedDate->startOfMonth()->format('Y-m-d H:i:s'); // 2024-02-01 00:00:00
-        $endDate = $parsedDate->endOfMonth()->format('Y-m-d H:i:s');
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
 
         $discountTypes = DiscountType::where('company_id', $company->id)
             ->orWhere('company_id', null)
@@ -441,7 +444,12 @@ class ReportController extends Controller
             ->where('discounts.branch_id', $branchId)
             ->get();
 
-        return view('branch.reports.discountsReport', compact('company', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes'));
+        $startDateParam = $startDate;
+        $endDateParam = $endDate;
+
+        $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
+
+        return view('branch.reports.discountsReport', compact('company', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function itemSales(Request $request)
