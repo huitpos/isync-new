@@ -110,6 +110,7 @@ class ProductRepository implements ProductRepositoryInterface
             'product_id' => $product->id,
             'object_id' => $objectId,
             'object_type' => $objectType,
+            'operation' => $operation
         ])->first();
 
         if ($existingLog) {
@@ -171,6 +172,7 @@ class ProductRepository implements ProductRepositoryInterface
         $productCountLog->old_quantity = $pivotData?->stock ?? 0;
         $productCountLog->new_quantity = $newStock;
         $productCountLog->uom_id = $uomId;
+        $productCountLog->operation = $operation;
         $productCountLog->save();
 
         return true;

@@ -761,12 +761,51 @@ class MiscController extends BaseController
                     $item['updated_at'] = $now;
                 }
                 Order::insert($toInsert);
+                
+                // Handle inventory deduction for new completed/voided orders
+                foreach ($toInsert as $item) {
+                    if ($item['is_completed']) {
+                        $this->deductInventory(
+                            $item['product_id'],
+                            $item['qty'],
+                            $item['branch_id'],
+                            $item['order_id'],
+                            'orders'
+                        );
+                    }
+                }
             }
 
             // Bulk update existing records
             foreach ($toUpdate as $item) {
-                $item['data']['updated_at'] = now();
-                $item['model']->update($item['data']);
+                $model = $item['model'];
+                $data = $item['data'];
+                
+                // Check if is_completed changed from false to true
+                if (!$model->is_completed && $data['is_completed']) {
+                    $this->deductInventory(
+                        $data['product_id'],
+                        $data['qty'],
+                        $data['branch_id'],
+                        $data['order_id'],
+                        'orders'
+                    );
+                }
+                
+                // Check if is_void changed from false to true
+                if ($model->is_completed && !$model->is_void && $data['is_void']) {
+                    $this->deductInventory(
+                        $data['product_id'],
+                        $data['qty'],
+                        $data['branch_id'],
+                        $data['order_id'],
+                        'orders',
+                        'add'
+                    );
+                }
+                
+                $data['updated_at'] = now();
+                $model->update($data);
             }
 
             DB::commit();
@@ -1531,24 +1570,23 @@ class MiscController extends BaseController
                     'is_complete' => $endOfDay['is_complete'] ?? null,
                 ];
 
-                if (isset($endOfDay['products'])) {
-                    foreach ($endOfDay['products'] as $reqProduct) {
-                        $product = Product::find($reqProduct['productId'])
-                            ->load('bundledItems', 'rawItems');
+                // if (isset($endOfDay['products'])) {
+                //     foreach ($endOfDay['products'] as $reqProduct) {
+                //         $product = Product::find($reqProduct['productId']);
 
-                        if ($product) {
-                            $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
+                //         if ($product) {
+                //             $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
 
-                            foreach ($product->bundledItems as $bundledItem) {
-                                $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
-                            }
+                //             foreach ($product->bundledItems as $bundledItem) {
+                //                 $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
+                //             }
 
-                            foreach ($product->rawItems as $rawItem) {
-                                $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
-                            }
-                        }
-                    }
-                }
+                //             foreach ($product->rawItems as $rawItem) {
+                //                 $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
+                //             }
+                //         }
+                //     }
+                // }
 
                 $existingEndOfDay = EndOfDay::where([
                     'end_of_day_id' => $endOfDay['end_of_day_id'],
@@ -4887,5 +4925,71 @@ class MiscController extends BaseController
     {
         if ([] === $arr) return false;
         return array_keys($arr) !== range(0, count($arr) - 1);
+    }
+
+    // Helper to deduct inventory when order is completed or voided
+    private function deductInventory($productId, $qty, $branchId = null, $referenceId = null, $referenceType = 'orders', $operation = 'subtract')
+    {
+        try {
+            $product = Product::find($productId)
+                ->load('bundledItems', 'rawItems');
+
+            if (!$product) {
+                return;
+            }
+
+            // Get the branch if not provided
+            if (!$branchId) {
+                return;
+            }
+
+            $branch = Branch::find($branchId);
+            if (!$branch) {
+                return;
+            }
+
+            // Update main product quantity
+            $this->productRepository->updateBranchQuantity(
+                $product,
+                $branch,
+                $referenceId,
+                $referenceType,
+                $qty,
+                null,
+                $operation,
+                $product->uom_id
+            );
+
+            // Update bundled items quantities
+            foreach ($product->bundledItems as $bundledItem) {
+                $this->productRepository->updateBranchQuantity(
+                    $bundledItem,
+                    $branch,
+                    $referenceId,
+                    $referenceType,
+                    $qty * $bundledItem->bundled_item->quantity,
+                    null,
+                    $operation,
+                    $bundledItem->uom_id
+                );
+            }
+
+            // Update raw items quantities
+            foreach ($product->rawItems as $rawItem) {
+                $this->productRepository->updateBranchQuantity(
+                    $rawItem,
+                    $branch,
+                    $referenceId,
+                    $referenceType,
+                    $qty * $rawItem->bundled_item->quantity,
+                    null,
+                    $operation,
+                    $rawItem->uom_id
+                );
+            }
+        } catch (\Exception $e) {
+            // Log the error but don't fail the entire operation
+            \Log::error('Inventory deduction failed for product ' . $productId . ': ' . $e->getMessage());
+        }
     }
 }
