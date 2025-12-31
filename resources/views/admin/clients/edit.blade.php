@@ -214,6 +214,34 @@
                     @enderror
                 </div>
 
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" {{ old('auto_round_off_srp') || $company->auto_round_off_srp ? 'checked' : '' }} name="auto_round_off_srp" type="checkbox" value="1"/>
+                        <label>
+                            Auto round off srp
+                        </label>
+                    </div>
+
+                    @error('auto_round_off_srp')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" {{ old('auto_update_srp') || $company->auto_update_srp ? 'checked' : '' }} name="auto_update_srp" type="checkbox" value="1"/>
+                        <label>
+                            Auto update srp based on incoming cost
+                        </label>
+                    </div>
+
+                    @error('auto_update_srp')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
+
+
                 <h3>Account Registration</h3>
 
                 <div class="mb-4">
