@@ -1753,6 +1753,25 @@ class ReportController extends Controller
             );
         }
 
+        // Calculate total sales for percentage calculation
+        $totalSalesQuery = "SELECT SUM(transactional_db.orders.total) AS total_sales
+                FROM transactional_db.transactions
+                INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
+                    AND transactions.branch_id = orders.branch_id
+                    AND transactions.pos_machine_id = orders.pos_machine_id
+                    AND orders.is_void = FALSE
+                    AND orders.is_completed = TRUE
+                    AND orders.is_back_out = FALSE
+                    AND orders.is_return = FALSE
+                WHERE transactions.is_complete = TRUE
+                    AND transactions.branch_id = $branchId
+                    AND transactions.is_void = FALSE
+                    AND transactions.is_back_out = FALSE
+                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'";
+        
+        $totalSalesResult = DB::selectOne($totalSalesQuery);
+        $totalSales = $totalSalesResult->total_sales ?? 0;
+
         $query = "SELECT
                     products.name AS `description`,
                     products.sku,
@@ -1764,7 +1783,7 @@ class ReportController extends Controller
                     SUM(transactional_db.orders.qty * products.cost) AS `total_unit_cost`,
                     SUM(transactional_db.discount_details.discount_amount) AS `discount_sales`,
                     SUM(transactional_db.orders.total) AS `regular_sales`,
-                    (SUM(transactional_db.orders.total) / (SELECT SUM(total) FROM transactional_db.orders WHERE branch_id = $branchId) * 100) AS `sales_percentage`
+                    (SUM(transactional_db.orders.total) / " . ($totalSales > 0 ? $totalSales : 1) . " * 100) AS `sales_percentage`
                 FROM transactional_db.transactions
                 INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
                     AND transactions.branch_id = orders.branch_id
@@ -1786,8 +1805,7 @@ class ReportController extends Controller
                     AND transactions.is_back_out = FALSE
                     AND transactions.treg BETWEEN '$startDate' AND '$endDate'
                 GROUP BY orders.product_id
-                ORDER BY `regular_sales` DESC
-                LIMIT 100";
+                ORDER BY `regular_sales` DESC";
 
         $topProducts = DB::select($query);
 
