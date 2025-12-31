@@ -48,9 +48,7 @@ class StockTransferRequestsDataTable extends DataTable
                 'branch',
                 'sourceBranch',
             ])
-            ->whereHas('branch', function ($query) use ($branchId) {
-                $query->where('destination_branch_id', $branchId);
-            });
+            ->where('destination_branch_id', $branchId);
     }
 
     /**
@@ -78,7 +76,7 @@ class StockTransferRequestsDataTable extends DataTable
             Column::make('id')->visible(false),
             Column::make('str_number'),
             Column::make('branch.name')->title('destination branch'),
-            Column::make('source_branch.name')->title('source branch'),
+            Column::make('source_branch.name', 'sourceBranch.name')->title('source branch'),
             Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::make('created_at'),
