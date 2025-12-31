@@ -41,17 +41,27 @@ class PurchaseOrdersDataTable extends DataTable
     {
         $companyId = $this->company_id;
         $query = $model->newQuery()
-        ->with([
-            'purchaseRequest',
-            'createdBy',
-            'branch'
-        ])
-        ->whereHas('branch.company', function ($query) use ($companyId) {
-            $query->where('companies.id', $companyId);
-        });
+            ->with([
+                'purchaseRequest',
+                'createdBy',
+                'branch'
+            ])
+            ->whereHas('branch.company', function ($query) use ($companyId) {
+                $query->where('companies.id', $companyId);
+            });
 
         if ($this->branch_id) {
             $query->where('branch_id', $this->branch_id);
+        }
+
+        if ($this->search) {
+            //wrap all in a or group
+            $query->where(function ($query) {
+                $query->where('po_number', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('purchaseRequest', function ($query) {
+                        $query->where('pr_number', 'like', '%' . $this->search . '%');
+                    });
+            });
         }
 
         return $query;

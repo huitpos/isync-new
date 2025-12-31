@@ -51,6 +51,7 @@
                         d.date_from = $('#date_from').val();
                         d.date_to = $('#date_to').val();
                         d.status = $('#status').val();
+                        d.search = $('#searchBar').val();
                     }
                 },
                 columnDefs: [
@@ -87,6 +88,10 @@
 
             $('#date_from, #date_to, #status').on('change', function() {
                 reloadDataTable(); // Reload DataTable when either date input changes
+            });
+
+            document.getElementById('searchBar').addEventListener('keyup', function () {
+                reloadDataTable();
             });
         </script>
     @endpush

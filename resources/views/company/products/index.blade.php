@@ -19,6 +19,13 @@
     <div class="card">
         <div class="card-header border-0 pt-6">
             <div class="card-title">
+                <div class="d-flex flex-wrap justify-content-center pb-lg-0">
+            <button type="button" id="kt_new_password_submit" class="btn btn-primary me-4">
+                @include('partials/general/_button-indicator', ['label' => 'Submit'])a
+            </button>
+
+            <a href="{{ route('login') }}" class="btn btn-light">Cancel</a>
+        </div>
                 <div class="d-flex align-items-center position-relative my-1">
                     {!! getIcon('magnifier', 'fs-3 position-absolute ms-5') !!}
                     <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search" id="searchBar"/>

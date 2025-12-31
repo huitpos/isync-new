@@ -136,7 +136,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-2">
+                                            <div class="col-md-1">
                                                 <div class="">
                                                     <label>
                                                         Mask
@@ -146,6 +146,20 @@
                                                 </div>
                             
                                                 @error('mask')
+                                                    <div class="invalid-feedback"> {{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <div class="col-md-1">
+                                                <div class="">
+                                                    <label>
+                                                        Required
+                                                    </label>
+                                                    <br/><br/>
+                                                    <input class="form-check-input" name="required" type="checkbox" value="1">                                                        
+                                                </div>
+                            
+                                                @error('required')
                                                     <div class="invalid-feedback"> {{ $message }}</div>
                                                 @enderror
                                             </div>

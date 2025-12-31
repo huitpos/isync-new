@@ -1531,6 +1531,14 @@ class MiscController extends BaseController
 
                         if ($product) {
                             $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
+
+                            foreach ($product->bundledItems as $bundledItem) {
+                                $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
+                            }
+
+                            foreach ($product->rawItems as $rawItem) {
+                                $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
+                            }
                         }
                     }
                 }
