@@ -247,7 +247,7 @@ class BirSalesSummaryReportExport implements FromCollection, WithHeadings, WithM
                 $event->sheet->setCellValue('A1', $branch->company->company_name);
 
                 $event->sheet->mergeCells('A13:'.$columnLetter.'13');
-                $event->sheet->setCellValue('A13', 'BIR SALES SUMMARY REPORT');
+                $event->sheet->setCellValue('A13', 'SALES SUMMARY REPORT');
                 $event->sheet->getStyle('A13')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $event->sheet->getStyle('A13')->getFont()->setBold(true);
 
