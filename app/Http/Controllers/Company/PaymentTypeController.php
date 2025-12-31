@@ -98,6 +98,7 @@ class PaymentTypeController extends Controller
                 'name' => $field['name'],
                 'field_type' => $field['field_type'],
                 'mask' => $field['mask'][0] ?? false,
+                'required' => $field['required'][0] ?? false,
             ];
 
             if (!empty($field['options'])) {
@@ -203,6 +204,7 @@ class PaymentTypeController extends Controller
                 'name' => $field['name'],
                 'field_type' => $field['field_type'],
                 'mask' => $field['mask'][0] ?? false,
+                'required' => $field['required'][0] ?? false,
             ];
 
             if (!empty($field['options'])) {

@@ -39,6 +39,11 @@ class Company extends Model
         return $this->hasMany(Supplier::class);
     }
 
+    public function activeSuppliers()
+    {
+        return $this->hasMany(Supplier::class)->where('status', 'active');
+    }
+
     public function categories()
     {
         return $this->hasMany(Category::class);
