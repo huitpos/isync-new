@@ -67,12 +67,12 @@
                                     <td>{{ $product->department }}</td>
                                     <td>{{ $product->category }}</td>
                                     <td>{{ $product->sub_category }}</td>
-                                    <td class="text-end">{{ number_format($product->quantity_sold, 0) }}</td>
+                                    <td class="text-end">{{ number_format($product->quantity_sold, 2) }}</td>
                                     <td class="text-end">{{ number_format($product->ar_unpaid_quantity, 0) }}</td>
                                     <td class="text-end">{{ number_format($product->total_unit_cost, 2) }}</td>
                                     <td class="text-end">{{ number_format($product->discount_sales, 2) }}</td>
                                     <td class="text-end">{{ number_format($product->regular_sales, 2) }}</td>
-                                    <td class="text-end">{{ number_format($product->sales_percentage, 0) }}%</td>
+                                    <td class="text-end">{{ number_format($product->sales_percentage, 2) }}%</td>
                                 </tr>
                             @endforeach
                         @else
