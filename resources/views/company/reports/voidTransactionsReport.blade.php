@@ -104,7 +104,7 @@
                                 <th>{{ number_format($transaction->net_sales - $transaction->vat_amount, 2) }}</th>
                                 <th>{{ $transaction->void_remarks }}</th>
                                 <th>{{ $transaction->cashier_name }}</th>
-                                <th></th>
+                                <th>{{ $transaction->void_by }}</th>
                                 <th>{{ $uniquePaymentTypes }}</th>
                             </tr>
                         @endforeach
