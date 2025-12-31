@@ -44,4 +44,9 @@ class StockTransferDelivery extends Model
     {
         return $this->belongsTo(User::class, 'action_by');
     }
+
+    public function stockTransferOrder()
+    {
+        return $this->belongsTo(StockTransferOrder::class);
+    }
 }
