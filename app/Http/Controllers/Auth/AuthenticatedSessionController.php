@@ -69,11 +69,13 @@ class AuthenticatedSessionController extends Controller
             $childPermission = $companyLevelPermission->where('parent_id', $parentPermission->id)->first();
             $route = $childPermission->route ?? 'company.dashboard';
 
+            $firstBranch = $branches->first();
+
             return route($route, [
                 'companySlug' => $company->slug,
                 'companyId' => $company->id,
-                'branchSlug' => $branches->first()->slug,
-                'branchId' => $branches->first()->id
+                'branchSlug' => $firstBranch ? $firstBranch->slug : null,
+                'branchId' => $firstBranch ? $firstBranch->id : null
             ]);
         }
 
