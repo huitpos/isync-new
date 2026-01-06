@@ -55,6 +55,7 @@ class AuthenticatedSessionController extends Controller
         $permissionNames = $permissions->pluck('name')->toArray();
 
         $companyLevelPermission = $permissions->where('level', 'company_user');
+        $branchLevelPermission = $permissions->where('level', 'branch_user');
 
         $routes = config('app.permission_routes');
 
@@ -65,9 +66,22 @@ class AuthenticatedSessionController extends Controller
         if ($companyLevelPermission->count() > 0) {
             $company =  Company::find($user->company_id);
 
-            $parentPermission = $companyLevelPermission->whereNull('parent_id')->first();
-            $childPermission = $companyLevelPermission->where('parent_id', $parentPermission->id)->first();
-            $route = $childPermission->route ?? 'company.dashboard';
+            $companyFirstRoute = $permissions->where('route', '!=', '')->where('level', 'company_user')->pluck('route')->first();
+
+            return route($companyFirstRoute, [
+                'companySlug' => $company->slug,
+                'companyId' => $company->id,
+                'branchSlug' => $branches->first()->slug,
+                'branchId' => $branches->first()->id
+            ]);
+        }
+
+        if ($branchLevelPermission->count() > 0) {
+            $company =  Company::find($user->company_id);
+
+            $parentPermission = $branchLevelPermission->whereNull('parent_id')->first();
+            $childPermission = $branchLevelPermission->where('parent_id', $parentPermission->id)->first();
+            $route = $childPermission->route ?? 'branch.dashboard';
 
             $firstBranch = $branches->first();
 
@@ -79,10 +93,9 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        if ($user->hasRole('branch_user')) {
-            $branch = $user->activeBranches->first();
-            return route('branch.dashboard', ['companySlug' => $branch->company->slug, 'branchSlug' => $branch->slug]);
-        }
+
+        $branch = $user->activeBranches->first();
+        return route('branch.users.index', ['companySlug' => $branch->company->slug, 'branchSlug' => $branch->slug]);
     }
 
     /**

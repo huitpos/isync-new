@@ -13,6 +13,7 @@
 
     <form method="POST" novalidate>
         @csrf
+        <input type="hidden" name="branch_id" id="branch_id" value="{{ $branchId }}" />
         <div class="row mb-5">
             <div class="col-md-2">
                 <label class="form-label">Date</label>

@@ -111,12 +111,21 @@ class ProductsImport implements ToCollection,
             $lookupKey = strtolower($row[9]) . '_' . $categoryId;
             $subCategoryId = $subcategoriesMap[$lookupKey] ?? array_search(strtolower($row[9]), $subcategories) ?? null;
 
+            // Clean abbreviation (remove vowels, limit 25 chars, proper case)
+            $abbreviationSource = empty($row[4]) ? $row[1] : $row[4];
+            $abbr = preg_replace('/[aeiouAEIOU]/', '', $abbreviationSource);
+            $abbr = mb_substr($abbr, 0, 25);
+            $abbr = implode(' ', array_map(function($word) {
+                return mb_strtoupper(mb_substr($word, 0, 1)) . mb_strtolower(mb_substr($word, 1));
+            }, preg_split('/\s+/', $abbr)));
+            $abbreviation = $abbr;
+
             $productData = [
                 'status' => $row[0], //A
                 'name' => $row[1], //B
                 'description' => $row[2], //C
                 'sku' => $row[3], //D
-                'abbreviation' => $row[4], //E
+                'abbreviation' => $abbreviation, //E
                 'uom_id' => array_search(strtolower($row[5]), $units), //F
                 'delivery_uom_id' => array_search(strtolower($row[6]), $units), //G
                 'barcode' => $row[7], //H

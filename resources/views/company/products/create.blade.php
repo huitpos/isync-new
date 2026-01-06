@@ -45,7 +45,7 @@
         
                         <div class="mb-4">
                             <label class="form-label">Product Name</label>
-                            <input value="{{ old('name') }}" name="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="Product Name" required/>
+                            <input id="product-name" value="{{ old('name') }}" name="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="Product Name" required/>
         
                             @error('name')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -72,7 +72,7 @@
         
                         <div class="mb-4">
                             <label class="form-label">Item Abbreviation</label>
-                            <input value="{{ old('abbreviation') }}" name="abbreviation" type="text" class="form-control @error('abbreviation') is-invalid @enderror" placeholder="Item Abbreviation" required/>
+                            <input id="abbreviation" value="{{ old('abbreviation') }}" name="abbreviation" type="text" class="form-control @error('abbreviation') is-invalid @enderror" placeholder="Item Abbreviation" required/>
         
                             @error('abbreviation')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -97,9 +97,21 @@
                             <label class="form-label">Delivery Uom</label>
                             <select id="delivery_converion_id" name="delivery_uom_id" data-control="select2" data-placeholder="Select a delivery UOM" class="form-select @error('delivery_uom_id') is-invalid @enderror" required>
                                 <option value=""></option>
+                                @foreach ($deliveryUoms as $conversion)
+                                    <option value="{{ $conversion['id'] }}" {{ $conversion['id'] == old('delivery_uom_id') ? 'selected' : '' }}>{{ $conversion['text'] }}</option>
+                                @endforeach
                             </select>
         
                             @error('delivery_uom_id')
+                                <div class="invalid-feedback"> {{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">UOM Cost</label>
+                            <input value="{{ old('uom_cost') }}" name="uom_cost" type="number" class="form-control @error('uom_cost') is-invalid @enderror" placeholder="UOM Cost" required/>
+        
+                            @error('uom_cost')
                                 <div class="invalid-feedback"> {{ $message }}</div>
                             @enderror
                         </div>
@@ -176,8 +188,8 @@
                         <div class="mb-4">
                             <label class="form-label">Markup Type</label>
                             <select id="markup_type" name="markup_type" class="form-control @error('status') is-invalid @enderror compute-srp" required>
-                                <option value="fixed" {{ old('status') == 'fixed' ? 'selected' : '' }}>Fixed Amount</option>
-                                <option value="percentage" {{ old('status') == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                                <option value="fixed" {{ old('markup_type') == 'fixed' ? 'selected' : '' }}>Fixed Amount</option>
+                                <option value="percentage" {{ old('markup_type') == 'percentage' ? 'selected' : '' }}>Percentage</option>
                             </select>
         
                             @error('status')
@@ -205,7 +217,7 @@
         
                         <div class="mb-4 mt-6">
                             <div class="form-check">
-                                <input class="form-check-input" name="vat_exempt" type="checkbox" value="1"/>
+                                <input class="form-check-input" {{ old('vat_exempt') ? 'checked' : '' }} name="vat_exempt" type="checkbox" value="1"/>
                                 <label>
                                     Vat Exempt
                                 </label>
@@ -218,7 +230,7 @@
         
                         <div class="mb-4 mt-6">
                             <div class="form-check">
-                                <input class="form-check-input" name="discount_exempt" type="checkbox" value="1"/>
+                                <input class="form-check-input" {{ old('discount_exempt') ? 'checked' : '' }} name="discount_exempt" type="checkbox" value="1"/>
                                 <label>
                                     Discount Exempt (SC/PWD)
                                 </label>
@@ -231,7 +243,7 @@
         
                         <div class="mb-4 mt-6">
                             <div class="form-check">
-                                <input class="form-check-input" name="open_price" type="checkbox" value="1"/>
+                                <input class="form-check-input" {{ old('open_price') ? 'checked' : '' }} name="open_price" type="checkbox" value="1"/>
                                 <label>
                                     Open Price
                                 </label>
@@ -244,7 +256,7 @@
         
                         <div class="mb-4 mt-6">
                             <div class="form-check">
-                                <input class="form-check-input" name="with_serial" type="checkbox" value="1"/>
+                                <input class="form-check-input" {{ old('with_serial') ? 'checked' : '' }} name="with_serial" type="checkbox" value="1"/>
                                 <label>
                                     With Serial
                                 </label>
@@ -474,7 +486,7 @@
                             <label class="form-label">Item Location</label>
                             <select class="form-select" name="item_locations[]" data-control="select2" data-close-on-select="false" data-placeholder="Select location" data-allow-clear="true" multiple="multiple">
                                 @foreach ($company->itemLocations as $location)
-                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                    <option value="{{ $location->id }}" {{ in_array($location->id, old('item_locations', [])) ? 'selected' : '' }}>{{ $location->name }}</option>
                                 @endforeach
                             </select>
                         </div>

@@ -50,6 +50,11 @@ class PageController extends Controller
         $transactionCount = $this->companyRepository->getTransactionCount($company->id, $startDate, $endDate, $branchId);
         $costAmount = $this->companyRepository->getTransactionCostAmount($company->id, $startDate, $endDate, $branchId);
 
+        // $netAmount = 0;
+        // $grossAmount = 0;
+        // $transactionCount = 0;
+        // $costAmount = 0;
+
         // today
         $todayStart = Carbon::now()->startOfDay()->format('Y-m-d 00:00:00');
         $todayEnd = Carbon::now()->endOfDay()->format('Y-m-d 23:59:59');
@@ -57,6 +62,8 @@ class PageController extends Controller
         $todayGrossAmount = $this->companyRepository->getTransactionGrossSales($company->id, $todayStart, $todayEnd, $branchId);
         $todayTransactionCount = $this->companyRepository->getTransactionCount($company->id, $todayStart, $todayEnd, $branchId);
         $todayCostAmount = $this->companyRepository->getTransactionCostAmount($company->id, $todayStart, $todayEnd, $branchId);
+
+        // $todayNetAmount = $todayGrossAmount = $todayTransactionCount = $todayCostAmount = 0;
 
         $transactions = DB::table('transactional_db.transactions')
             ->select(

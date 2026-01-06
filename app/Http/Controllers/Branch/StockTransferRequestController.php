@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Branch;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Models\Department;
 use App\Models\StockTransferRequest;
@@ -59,7 +60,7 @@ class StockTransferRequestController extends Controller
         ])->get();
 
         $suppliers = [];
-        if (old('department_id')) {
+        if (old('department_id') && old('department_id') != 'all') {
             $department = Department::find(old('department_id'));
             $suppliers = $department->suppliers()->where([
                 'status' => 'active'
@@ -230,5 +231,24 @@ class StockTransferRequestController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function print(Request $request, string $companySlug, string $branchSlug, string $id)
+    {
+        $str = StockTransferRequest::with([
+            'items',
+            'createdBy'
+        ])->findOrFail($id);
+
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+
+        $pdf = Pdf::loadView('branch.stockTransferRequests.print', [
+            'str' => $str,
+            'company' => $company,
+            'branch' => $branch
+        ]);
+
+        return $pdf->download("STR-$str->str_number.pdf");
     }
 }
