@@ -66,13 +66,10 @@ class PurchaseRequestController extends Controller
             'region'
         ])->get();
 
-        $suppliers = [];
-        if (old('department_id') && old('department_id') != 'all') {
-            $department = Department::find(old('department_id'));
-            $suppliers = $department->suppliers()->where([
-                'status' => 'active'
-            ])->get();
-        }
+        $suppliers = Supplier::where([
+            'status' => 'active',
+            'company_id' => $company->id
+        ])->get();
 
         return view('branch.purchaseRequests.create', [
             'company' => $company,
