@@ -31,7 +31,7 @@
 						<a href="{{ route($companyFirstRoute, [
 							'companySlug' => request()->attributes->get('company')->slug,
 							'branchSlug' => request()->attributes->get('branch')?->slug,
-							'branchId' => $branches[0]['id']
+							'branchId' => $branches[0]['id'] ?? null
 						]) }}" class="menu-link p-2">
 							{{ request()->attributes->get('company')->company_name }}
 						</a>
