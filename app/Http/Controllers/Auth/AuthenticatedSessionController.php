@@ -68,11 +68,13 @@ class AuthenticatedSessionController extends Controller
 
             $companyFirstRoute = $permissions->where('route', '!=', '')->where('level', 'company_user')->pluck('route')->first();
 
+            $firstBranch = $branches->first();
+
             return route($companyFirstRoute, [
                 'companySlug' => $company->slug,
                 'companyId' => $company->id,
-                'branchSlug' => $branches->first()->slug,
-                'branchId' => $branches->first()->id
+                'branchSlug' => $firstBranch ? $firstBranch->slug : null,
+                'branchId' => $firstBranch ? $firstBranch->id : null
             ]);
         }
 
