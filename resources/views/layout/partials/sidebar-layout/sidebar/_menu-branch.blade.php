@@ -37,7 +37,7 @@
 			'children' => [
 				[
 					'permission' => 'Branch Procurement/Purchase Requests',
-					'title' => 'Purchase Requests',
+					'title' => 'Incoming Delivery',
 					'route' => 'branch.purchase-requests.index',
 					'routeParams' => $routeParams,
 					'activeRoutes' => ['branch.purchase-requests.*'],
