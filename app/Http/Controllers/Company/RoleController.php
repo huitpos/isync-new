@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Permission;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 use App\DataTables\Company\RolesDataTable;
 
@@ -77,6 +77,7 @@ class RoleController extends Controller
 
         $role = new Role();
         $role->name = $request->name;
+        $role->status = $request->status;
         $role->company_id = $company->id;
 
         if ($role->save()) {
@@ -146,6 +147,7 @@ class RoleController extends Controller
         $company = $request->attributes->get('company');
 
         $role->name = $request->name;
+        $role->status = $request->status;
 
         if ($role->update(['name' => $request->name])) {
             $role->syncPermissions([]);

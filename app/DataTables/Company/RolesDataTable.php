@@ -27,6 +27,9 @@ class RolesDataTable extends DataTable
                     'param' => ['role' => $data->id, 'companySlug' => $data->company->slug],
                     'route' => 'company.roles',
                 ]);
+            })
+            ->editColumn('created_at', function (Model $data) {
+                return $data->created_at ? $data->created_at->format('Y-m-d') : '';
             });
     }
 
@@ -39,7 +42,8 @@ class RolesDataTable extends DataTable
         return $model->newQuery()
             ->where('company_id', $this->company_id)
             ->with([
-                'company'
+                'company',
+                'createdBy',
             ]);
     }
 
@@ -67,6 +71,11 @@ class RolesDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('name'),
+            Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('created_at')->title('Date Created'),
+            Column::computed('status')
+                ->exportable(false)
+                ->printable(false),
             Column::computed('actions')
                 ->exportable(false)
                 ->printable(false),
