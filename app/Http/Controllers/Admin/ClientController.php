@@ -22,6 +22,9 @@ use Illuminate\Support\Str;
 use App\DataTables\Admin\ClientsDataTable;
 use App\DataTables\Admin\CompanyBranchDataTable;
 
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
 class ClientController extends Controller
 {
     protected $clientRepository;
@@ -138,13 +141,23 @@ class ClientController extends Controller
             ]);
         }
 
+        $role = new Role();
+        $role->name = 'Super Admin';
+        $role->company_id = $company->id;
+        $role->guard_name = 'web';
+        $role->save();
+
+        //get all permission company_user or branch_user
+        $permissions = Permission::whereIn('level', ['company_user', 'branch_user', 'pos'])->pluck('id');
+        $role->syncPermissions($permissions);
+
         $user = $this->userRepository->create([
             'name' => $validatedData['owner_name'],
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password']),
             'client_id' => $client->id,
             'company_id' => $company->id,
-            'role' => 'company_admin'
+            'role' => $role->id
         ]);
 
         return redirect()->route('admin.clients.index')->with('success', 'Data has been stored successfully!');
