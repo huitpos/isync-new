@@ -9,6 +9,8 @@ use Illuminate\Validation\Rule;
 use App\DataTables\Company\UsersDataTable;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 
+use App\Models\User;
+
 class UserController extends Controller
 {
     protected $userRepository;
@@ -72,9 +74,17 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $companySlug, string $id)
     {
-        //
+        $company = $request->attributes->get('company');
+
+        $user = User::find($id);
+
+        if ($user->company_id != $company->id) {
+            abort(404);
+        }
+
+        return view('company/users/show', compact('company', 'user'));
     }
 
     /**
