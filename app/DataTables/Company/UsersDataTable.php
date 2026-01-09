@@ -19,6 +19,12 @@ class UsersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('name', function (Model $data) {
+                return view('company.datatables._link', [
+                    'url' => route('company.users.show', ['companySlug' => $data->company->slug, 'user' => $data->id]),
+                    'text' => $data->name,
+                ]);
+            })
             ->addColumn('roles', function (Model $data) {
                 return str_replace('_', ' ', $data->getRoleNames()->implode(', '));
             })
