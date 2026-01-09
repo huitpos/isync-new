@@ -13,6 +13,18 @@
             <form class="mt-3" action="{{ route('company.roles.store', ['companySlug' => $company->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
                 @csrf
 
+                <div class="mb-4">
+                    <label class="form-label">Status</label>
+                    <select id="status" name="status" class="form-control @error('status') is-invalid @enderror" required>
+                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="mb-10">
                     <label class="form-label">Name</label>
                     <input value="{{ old('name') }}" name="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="Name" required/>

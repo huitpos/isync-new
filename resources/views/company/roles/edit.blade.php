@@ -18,6 +18,18 @@
                 @csrf
                 @method('PUT')
 
+                <div class="mb-4">
+                    <label class="form-label">Status</label>
+                    <select id="status" name="status" class="form-control @error('status') is-invalid @enderror" required>
+                        <option value="active" {{ old('status') == 'active' || $role->status == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status') == 'inactive' || $role->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+
+                    @error('status')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
+                </div>
+
                 <div class="mb-10">
                     <label class="form-label">Name</label>
                     <input value="{{ old('name') ?? $role->name }}" name="name" type="text" class="form-control @error('name') is-invalid @enderror" placeholder="Name" required/>
