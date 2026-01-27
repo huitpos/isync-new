@@ -195,6 +195,7 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'top-performing-products', [CompanyReportController::class, 'topPerformingProducts'])->name('company.reports.top-performing-products-report');
 
             Route::get('stock-card', [CompanyReportController::class, 'stockCard'])->name('company.reports.stock-card');
+            Route::get('export-stock-card', [CompanyReportController::class, 'exportStockCard'])->name('company.reports.export-stock-card');
             Route::match(['get', 'post'], 'audit-trail', [CompanyReportController::class, 'auditTrail'])->name('company.reports.audit-trail');
             Route::match(['get', 'post'], 'bir-sales-summary-report', [CompanyReportController::class, 'birSalesSummaryReport'])->name('company.reports.bir-sales-summary-report');
             Route::match(['get', 'post'], 'bir-senior-citizen-sales-report', [CompanyReportController::class, 'birSeniorCitizenSalesReport'])->name('company.reports.bir-senior-citizen-sales-report');

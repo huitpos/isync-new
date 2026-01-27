@@ -151,7 +151,6 @@
         <div class="card-body py-4">
             <div class="row mb-5">
                 <div class="col-md-6">
-                    <label class="form-label">Select Date Range:</label>
                     <input id="date_range" 
                             data-selected-range="{{ $selectedRangeParam }}" 
                             data-kt-daterangepicker="true" 
@@ -163,6 +162,20 @@
                             data-kt-daterangepicker-opens="right"
                         />
                 </div>
+
+                @if($product)
+                    <div class="col-md-6">
+                        <a href="{{ route('company.reports.export-stock-card', [
+                            'companySlug' => $company->slug,
+                            'branch_id' => $branchId,
+                            'product_id' => $product->id,
+                            'startDate' => $startDateParam,
+                            'endDate' => $endDateParam,
+                        ]) }}" class="btn btn-primary">
+                            Export
+                        </a>
+                    </div>
+                @endif
             </div>
             <ul class="nav nav-pills nav-pills-custom mb-3">
                 <li class="nav-item mb-3 me-3 me-lg-6">
