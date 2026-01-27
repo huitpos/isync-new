@@ -27,6 +27,7 @@ use Carbon\Carbon;
 
 use App\Exports\InventoryExport;
 use App\Exports\ProductsExport;
+use App\Exports\ProductCountHistoryExport;
 
 class ProductController extends Controller
 {
@@ -644,6 +645,21 @@ class ProductController extends Controller
         return Excel::download(
             new ProductsExport($company->id),
             "$company->name - Products - ".Carbon::now()->format('Y-m-d')." - List.xlsx"
+        );
+    }
+
+    /**
+     * Export product count history to Excel
+     */
+    public function countHistoryExport(Request $request, $companySlug, $branchId, $productId)
+    {
+        $company = $request->attributes->get('company');
+        $branch = Branch::find($branchId);
+        $product = $this->productRepository->find($productId);
+
+        return Excel::download(
+            new ProductCountHistoryExport($branchId, $productId),
+            "$company->name - $branch->name - $product->name - Count History - ".Carbon::now()->format('Y-m-d').".xlsx"
         );
     }
 }

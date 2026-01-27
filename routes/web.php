@@ -150,6 +150,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/branch/{branchId}/inventory', [CompanyProductController::class, 'inventory'])->name('company.branch-inventory.index');
         Route::get('/branch/{branchId}/inventory/{productId}', [CompanyProductController::class, 'inventoryProduct'])->name('company.branch-inventory.show');
         Route::get('/branch/{branchId}/inventory-download', [CompanyProductController::class, 'inventoryDownload'])->name('company.branch-inventory.download');
+        Route::get('/branch/{branchId}/inventory/{productId}/export', [CompanyProductController::class, 'countHistoryExport'])->name('company.branch-inventory.count-history-export');
 
         Route::get('/import-product', [CompanyProductController::class, 'showForm']);
         Route::post('/import-product', [CompanyProductController::class, 'import'])->name('company.products.import');

@@ -28,6 +28,19 @@
                 <!--begin::Export buttons-->
                 <div id="kt_ecommerce_report_returns_export" class="d-none"></div>
                 <!--end::Export buttons-->
+                <!--begin::Export button-->
+                <a href="{{ route('company.branch-inventory.count-history-export', [
+                    'companySlug' => request()->attributes->get('company')->slug,
+                    'branchId' => $branchId,
+                    'productId' => $product->id
+                ]) }}" class="btn btn-primary ms-2">
+                    <i class="ki-duotone ki-file-down fs-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    Export
+                </a>
+                <!--end::Export button-->
             </div>
             <!--end::Card title-->
         </div>
