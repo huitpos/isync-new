@@ -59,6 +59,9 @@ class SyncBranchProductQuantities extends Command
             $this->info('Filtering by product ID: ' . $this->option('product-id'));
         }
 
+        // Required for chunk() method
+        $query->orderBy('id');
+
         $total = $query->count();
 
         if ($total === 0) {
