@@ -48,6 +48,9 @@ class fixOrders extends Command
 
             $items = $uatTransaction->items;
 
+            // Delete old records first
+            DB::statement("DELETE FROM transactional_db.orders WHERE branch_id = 14 AND transaction_id = ?", [$prodTransaction->transaction_id]);
+
             foreach ($items as $item) {
                 $itemArray = $item->toArray();
                 
@@ -56,9 +59,6 @@ class fixOrders extends Command
                 
                 // Replace transaction_id with prod transaction
                 $itemArray['transaction_id'] = $prodTransaction->transaction_id;
-                
-                // Delete old records first
-                DB::statement("DELETE FROM transactional_db.orders WHERE branch_id = 14 AND transaction_id = ?", [$prodTransaction->transaction_id]);
                 
                 // Get column names and values
                 $columns = array_keys($itemArray);
