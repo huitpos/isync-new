@@ -88,7 +88,7 @@ Route::get('/download-product-import-template', function () {
     return Response::download($filePath);
 });
 
-// Route::get('/map-data', [TestController::class, 'mapData']);
+Route::get('/map-data', [TestController::class, 'mapData']);
 // Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
 // Route::get('/test', [TestController::class, 'test']);
 
