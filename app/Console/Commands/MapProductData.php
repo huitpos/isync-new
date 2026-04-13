@@ -95,7 +95,7 @@ class MapProductData extends Command
             }
 
             // Get incoming after the latest PPC
-            $incomingQuery = 'SELECT SUM(purchase_delivery_items.qty) as total
+            $incomingQuery = 'SELECT CAST(SUM(purchase_delivery_items.qty) AS DECIMAL(10,4)) as total
                 FROM purchase_deliveries
                 INNER JOIN purchase_delivery_items ON purchase_deliveries.id = purchase_delivery_items.purchase_delivery_id
                 WHERE purchase_delivery_items.product_id = ?
@@ -110,7 +110,7 @@ class MapProductData extends Command
 
             $incomingTotal = $incoming[0]->total ?? 0;
 
-            $incomingTransferQuery = 'SELECT SUM(stock_transfer_delivery_items.qty) as total
+            $incomingTransferQuery = 'SELECT CAST(SUM(stock_transfer_delivery_items.qty) AS DECIMAL(10,4)) as total
                 FROM stock_transfer_deliveries
                 INNER JOIN stock_transfer_delivery_items ON stock_transfer_deliveries.id = stock_transfer_delivery_items.stock_transfer_delivery_id
                 WHERE stock_transfer_delivery_items.product_id = ?
@@ -124,7 +124,7 @@ class MapProductData extends Command
             $incomingTransfer = DB::select($incomingTransferQuery, $incomingTransferParams);
             $incomingTransferTotal = $incomingTransfer[0]->total ?? 0;
 
-            $outgoingTransferQuery = 'SELECT SUM(stock_transfer_order_items.quantity) as total
+            $outgoingTransferQuery = 'SELECT CAST(SUM(stock_transfer_order_items.quantity) AS DECIMAL(10,4)) as total
                 FROM stock_transfer_orders
                 INNER JOIN stock_transfer_order_items ON stock_transfer_orders.id = stock_transfer_order_items.stock_transfer_order_id
                 WHERE stock_transfer_order_items.product_id = ?
@@ -140,7 +140,7 @@ class MapProductData extends Command
 
             $transactionQuery = "
                 SELECT
-                    sum(orders.qty) as total
+                    CAST(SUM(orders.qty) AS DECIMAL(10,4)) as total
                 FROM $transactionalDbName.transactions
                 INNER JOIN $transactionalDbName.orders ON transactions.transaction_id = orders.transaction_id
                     AND transactions.branch_id = orders.branch_id
@@ -165,7 +165,7 @@ class MapProductData extends Command
             if ($product->stock != $soh) {
                 $this->productRepository->updateBranchQuantity($_product, $branch, 0, 'manual_edit', $soh, null, 'replace', $_product->uom_id);
                 $updateCount++;
-                $this->info("Updated Product ID: $product->product_id | Branch ID: $product->branch_id | New SOH: $soh");
+                $this->info("Updated Product ID: $product->product_id | Branch ID: $product->branch_id | Old SOH: $product->stock | New SOH: $soh");
             }
         }
 
