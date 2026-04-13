@@ -13,7 +13,7 @@ use App\Repositories\Interfaces\ProductRepositoryInterface;
 // php artisan product:map-data
 
 # Map for a specific branch
-// php artisan product:map-data --branch_id=1
+// php artisan product:map-data --branch_id=14
 
 # Map for a specific product
 // php artisan product:map-data --product_id=100
@@ -124,6 +124,20 @@ class MapProductData extends Command
             $incomingTransfer = DB::select($incomingTransferQuery, $incomingTransferParams);
             $incomingTransferTotal = $incomingTransfer[0]->total ?? 0;
 
+            $outgoingTransferQuery = 'SELECT SUM(stock_transfer_order_items.quantity) as total
+                FROM stock_transfer_orders
+                INNER JOIN stock_transfer_order_items ON stock_transfer_orders.id = stock_transfer_order_items.stock_transfer_order_id
+                WHERE stock_transfer_order_items.product_id = ?
+                AND stock_transfer_orders.source_branch_id = ?
+                AND stock_transfer_orders.status = ?';
+            $outgoingTransferParams = [$product->product_id, $product->branch_id, 'approved'];
+            if ($baseDate) {
+                $outgoingTransferQuery .= ' AND stock_transfer_orders.created_at > ?';
+                $outgoingTransferParams[] = $baseDate;
+            }
+            $outgoingTransfer = DB::select($outgoingTransferQuery, $outgoingTransferParams);
+            $outgoingTransferTotal = $outgoingTransfer[0]->total ?? 0;
+
             $transactionQuery = "
                 SELECT
                     sum(orders.qty) as total
@@ -145,7 +159,7 @@ class MapProductData extends Command
 
             $transactionTotal = $transactions[0]->total ?? 0;
 
-            $soh = $baseQty + $incomingTotal + $incomingTransferTotal - $transactionTotal;
+            $soh = $baseQty + $incomingTotal + $incomingTransferTotal - $transactionTotal - $outgoingTransferTotal;
 
             // Only update if the current stock doesn't match the calculated SOH
             if ($product->stock != $soh) {
