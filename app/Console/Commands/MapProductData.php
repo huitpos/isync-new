@@ -110,6 +110,20 @@ class MapProductData extends Command
 
             $incomingTotal = $incoming[0]->total ?? 0;
 
+            $incomingTransferQuery = 'SELECT SUM(stock_transfer_delivery_items.qty) as total
+                FROM stock_transfer_deliveries
+                INNER JOIN stock_transfer_delivery_items ON stock_transfer_deliveries.id = stock_transfer_delivery_items.stock_transfer_delivery_id
+                WHERE stock_transfer_delivery_items.product_id = ?
+                AND stock_transfer_deliveries.destination_branch_id = ?
+                AND stock_transfer_deliveries.status = ?';
+            $incomingTransferParams = [$product->product_id, $product->branch_id, 'approved'];
+            if ($baseDate) {
+                $incomingTransferQuery .= ' AND stock_transfer_deliveries.created_at > ?';
+                $incomingTransferParams[] = $baseDate;
+            }
+            $incomingTransfer = DB::select($incomingTransferQuery, $incomingTransferParams);
+            $incomingTransferTotal = $incomingTransfer[0]->total ?? 0;
+
             $transactionQuery = "
                 SELECT
                     sum(orders.qty) as total
@@ -131,7 +145,7 @@ class MapProductData extends Command
 
             $transactionTotal = $transactions[0]->total ?? 0;
 
-            $soh = $baseQty + $incomingTotal - $transactionTotal;
+            $soh = $baseQty + $incomingTotal + $incomingTransferTotal - $transactionTotal;
 
             // Only update if the current stock doesn't match the calculated SOH
             if ($product->stock != $soh) {
