@@ -346,7 +346,6 @@ class InventoryProcessor
         if ($orders->isEmpty()) {
             return ['success' => false, 'message' => 'Transaction has no completed orders'];
         }
-
         DB::connection('inventory')->beginTransaction();
         try {
             foreach ($orders as $order) {
@@ -374,6 +373,7 @@ class InventoryProcessor
                 'message' => 'Transaction processed successfully'
             ];
         } catch (Exception $e) {
+            dd($e);
             DB::connection('inventory')->rollBack();
             throw $e;
         }
@@ -398,12 +398,19 @@ class InventoryProcessor
             ->where('product_id', $productId)
             ->first();
 
+        if (!$branchProduct) {
+            $branchProduct = DB::table('branch_product')
+            ->where('branch_id', $branchId)
+            ->where('product_id', $productId)
+            ->first();
+        }
+
         $previousQty = $branchProduct?->stock ?? 0;
 
         // Calculate new quantity
         $newQty = match($operation) {
             'add' => $previousQty + $qty,
-            'subtract' => max(0, $previousQty - $qty),
+            'subtract' => $previousQty - $qty,
             'set' => $qty,
             default => $previousQty
         };

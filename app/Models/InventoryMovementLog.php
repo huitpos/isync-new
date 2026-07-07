@@ -28,7 +28,7 @@ class InventoryMovementLog extends Model
     ];
 
     /**
-     * Get the branch associated with this log
+     * Get the branch associated with this log (from mysql connection)
      */
     public function branch(): BelongsTo
     {
@@ -36,7 +36,7 @@ class InventoryMovementLog extends Model
     }
 
     /**
-     * Get the product associated with this log
+     * Get the product associated with this log (from mysql connection)
      */
     public function product(): BelongsTo
     {
@@ -44,7 +44,7 @@ class InventoryMovementLog extends Model
     }
 
     /**
-     * Get the user who processed this movement
+     * Get the user who processed this movement (from mysql connection)
      */
     public function processedBy(): BelongsTo
     {

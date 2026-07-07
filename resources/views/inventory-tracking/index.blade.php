@@ -22,7 +22,9 @@
 
     <div class="card mb-4">
         <div class="card-header bg-light">
-            <h5 class="mb-0">Filters</h5>
+            <div class="card-title">
+                <h2>Filters</h2>
+            </div>
         </div>
         <div class="card-body">
             <form id="filterForm" class="row g-3">
@@ -185,7 +187,7 @@
         }
 
         movements.forEach(movement => {
-            const movementId = movement.transaction_id || movement.id;
+            const movementId = movement.id;
             const status = movement.status ? movement.status.charAt(0).toUpperCase() + movement.status.slice(1) : (movement.is_complete ? 'Complete' : 'Pending');
             const createdAt = new Date(movement.created_at).toLocaleDateString('en-PH', {
                 year: 'numeric',

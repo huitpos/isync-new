@@ -16,7 +16,7 @@
     <div class="card">
         <div class="card-body">
             <form method="GET" class="row g-3 mb-4">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Movement Type</label>
                     <select name="movement_type" class="form-select">
                         <option value="">All Types</option>
@@ -27,16 +27,40 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label">Branch</label>
-                    <input type="number" name="branch_id" class="form-control" 
-                        value="{{ $currentBranch }}" placeholder="Branch ID">
+                    <select name="branch_id" class="form-select">
+                        <option value="">All Branches</option>
+                        @foreach($branches as $key => $branch)
+                            <option value="{{ $branch->id }}" {{ $currentBranch == $branch->id ? 'selected' : '' }}>
+                                {{ $branch->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Product</label>
+                    <select name="product_id" class="form-select" data-control="select2" data-hide-search="true">
+                        <option value="">All Products</option>
+                        @foreach($products as $key => $product)
+                            <option value="{{ $product->id }}" {{ $currentProduct == $product->id ? 'selected' : '' }}>
+                                {{ $product->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-search"></i> Filter
                     </button>
                 </div>
+                @if ($currentType || $currentBranch || $currentProduct)
+                <div class="col-md-1 d-flex align-items-end">
+                    <a href="/inventory-tracking/history/view" class="btn btn-primary w-100">
+                        <i class="fas fa-redo"></i> Clear Filter
+                    </a>
+                </div>
+                @endif
             </form>
 
             @if($logs->count() > 0)
@@ -65,7 +89,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="badge bg-info">{{ $types[$log->movement_type] ?? $log->movement_type }}</span>
+                                        {{ $types[$log->movement_type] ?? $log->movement_type }}
                                     </td>
                                     <td>
                                         @if($log->branch)
