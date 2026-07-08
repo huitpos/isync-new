@@ -28,6 +28,15 @@ return new class extends Migration
                 });
             }
         }
+
+        // Add to transactions table in transactional_db
+        if (Schema::connection('transactional_db')->hasTable('transactions')) {
+            Schema::connection('transactional_db')->table('transactions', function (Blueprint $table) {
+                if (!Schema::connection('transactional_db')->hasColumn('transactions', 'inventory_processed')) {
+                    $table->boolean('inventory_processed')->default(false)->index();
+                }
+            });
+        }
     }
 
     /**
@@ -51,6 +60,15 @@ return new class extends Migration
                     }
                 });
             }
+        }
+
+        // Remove from transactions table in transactional_db
+        if (Schema::connection('transactional_db')->hasTable('transactions')) {
+            Schema::connection('transactional_db')->table('transactions', function (Blueprint $table) {
+                if (Schema::connection('transactional_db')->hasColumn('transactions', 'inventory_processed')) {
+                    $table->dropColumn('inventory_processed');
+                }
+            });
         }
     }
 };
