@@ -14,6 +14,7 @@ class Product extends Model
     use HasFactory;
     use CreatedUpdatedBy;
 
+    protected $connection = 'mysql';
     protected $guarded = [];
 
     public function bundledItems(): BelongsToMany

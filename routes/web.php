@@ -59,6 +59,7 @@ use App\Http\Controllers\Branch\StockTransferDeliveryController as BranchStockTr
 use App\Http\Controllers\Branch\ProductPhysicalCountController as BranchProductPhysicalCountController;
 use App\Http\Controllers\Branch\ProductDisposalController as BranchProductDisposalController;
 use App\Http\Controllers\Branch\ChargeAccountController as BranchChargeAccountController;
+use App\Http\Controllers\InventoryProcessingController;
 
 use Illuminate\Support\Facades\Response;
 
@@ -94,6 +95,15 @@ Route::get('/test', [TestController::class, 'test']);
 
 require __DIR__ . '/auth.php';
 
+// Inventory Tracking Routes
+Route::middleware(['auth'])->prefix('inventory-tracking')->name('inventory-tracking.')->group(function () {
+    Route::get('/', [InventoryProcessingController::class, 'index'])->name('index');
+    Route::get('/ajax/movements', [InventoryProcessingController::class, 'getMovementsData'])->name('ajax-movements');
+    Route::get('/ajax/products', [InventoryProcessingController::class, 'searchProducts'])->name('ajax-products');
+    Route::get('/history/view', [InventoryProcessingController::class, 'history'])->name('history');
+    Route::get('/{type}/{id}', [InventoryProcessingController::class, 'show'])->name('show');
+    Route::post('/{type}/{id}/process', [InventoryProcessingController::class, 'process'])->name('process');
+});
 
 Route::view('/swagger', 'swagger');
 
