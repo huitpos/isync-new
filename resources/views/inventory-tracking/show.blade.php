@@ -35,6 +35,9 @@
                         $status = $isTransaction ? ($movement->is_complete ? 'complete' : 'pending') : $movement->status;
                         $branchId = $movement->branch_id ?? null;
                         $createdAt = $movement->created_at ?? null;
+
+                        $branch = \App\Models\Branch::find($branchId);
+                        $branchName = $branch ? $branch->name : 'N/A';
                     @endphp
 
                     <div class="row mb-3">
@@ -56,7 +59,7 @@
                         <div class="col-md-6">
                             <label class="form-label text-muted">Branch</label>
                             @if($branchId)
-                                <p class="h6">Branch #{{ $branchId }}</p>
+                                <p class="h6">{{ $branchName }}</p>
                             @else
                                 <p class="h6">N/A</p>
                             @endif
@@ -66,6 +69,15 @@
                             <p class="h6">{{ $createdAt ? \Carbon\Carbon::parse($createdAt)->format('M d, Y H:i') : 'N/A' }}</p>
                         </div>
                     </div>
+
+                    @if($isTransaction)
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">SI</label>
+                            <p class="h6">{{ $movement->receipt_number }}</p>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -93,7 +105,7 @@
                                 <table class="table table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Product ID</th>
+                                            <th>Product Name</th>
                                             <th>Quantity</th>
                                             <th>Price</th>
                                         </tr>
@@ -101,7 +113,7 @@
                                     <tbody>
                                         @foreach($orders as $order)
                                             <tr>
-                                                <td>Product #{{ $order->product_id }}</td>
+                                                <td>{{ $order->name }}</td>
                                                 <td>{{ $order->qty }}</td>
                                                 <td>₱ {{ number_format($order->amount, 2) }}</td>
                                             </tr>

@@ -83,7 +83,6 @@ class InventoryProcessingController extends Controller
     public function show($type, $id)
     {
         $movement = $this->getMovement($type, $id);
-
         if (!$movement) {
             abort(404, 'Movement not found');
         }
