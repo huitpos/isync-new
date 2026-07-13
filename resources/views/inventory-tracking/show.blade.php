@@ -105,7 +105,7 @@
                                 <table class="table table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Product ID</th>
+                                            <th>Product Name</th>
                                             <th>Quantity</th>
                                             <th>Price</th>
                                         </tr>
