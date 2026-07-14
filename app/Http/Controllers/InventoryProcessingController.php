@@ -304,13 +304,13 @@ class InventoryProcessingController extends Controller
                 ->where('is_complete', true)
                 ->where('transactions.receipt_number', '!=', null)
                 ->where('is_void', false);
-            
+
             if ($branchIds) {
                 $query->whereIn('branch_id', $branchIds);
             }
 
             $total = $query->count();
-            $transactions = $query->orderByDesc('created_at')->skip($skip)->take($perPage)->get()
+            $transactions = $query->orderBy('completed_at')->skip($skip)->take($perPage)->get()
                 ->map(fn($t) => [
                     ...(array) $t,
                     'type' => 'transactions',
