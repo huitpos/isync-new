@@ -8,7 +8,8 @@ use App\Models\{
     StockTransferOrder,
     ProductDisposal,
     ProductPhysicalCount,
-    InventoryMovementLog
+    InventoryMovementLog,
+    Company
 };
 use App\Services\InventoryProcessor;
 use Illuminate\Http\Request;
@@ -122,13 +123,14 @@ class InventoryProcessingController extends Controller
     public function history(Request $request)
     {
         $user = Auth::user();
+        $company = Company::find($user->company_id);
 
         $branches = DB::table('branches')
             ->select('id', 'name')
             ->where('company_id', $user->company_id)
             ->orderBy('name')
             ->get();
-        
+
         // get all branch ids for the user's company
         $branchIds = $branches->pluck('id')->toArray();
 
@@ -137,7 +139,8 @@ class InventoryProcessingController extends Controller
         $product_id = $request->input('product_id');
         $perPage = $request->input('per_page', 20);
 
-        $query = InventoryMovementLog::with(['branch', 'product', 'processedBy']);
+        $query = InventoryMovementLog::with(['branch', 'product', 'processedBy'])
+            ->select('inventory_movement_logs.*');
 
         if ($branch_id) {
             $query->where('branch_id', $branch_id);
@@ -155,21 +158,14 @@ class InventoryProcessingController extends Controller
 
         $logs = $query->orderByDesc('processed_at')->paginate($perPage);
 
-        $products = DB::table('products')
-            ->where('status', 'active')
-            ->where('company_id', $user->company_id)
-            ->select('id', 'name', 'sku')
-            ->orderBy('name')
-            ->get();
-
         return view('inventory-tracking.history', [
             'logs' => $logs,
             'types' => $this->getMovementTypes(),
             'currentBranch' => $branch_id,
             'currentType' => $movement_type,
             'currentProduct' => $product_id,
-            'products' => $products,
             'branches' => $branches,
+            'company' => $company,
         ]);
     }
 
@@ -245,7 +241,7 @@ class InventoryProcessingController extends Controller
                     'description' => "STD #{$m->std_number}",
                     'branch' => $m->branch_name ?? 'N/A',
                 ])->toArray();
-                
+
         } elseif ($type === 'stock_transfer_orders') {
             $query = StockTransferOrder::where('inventory_processed', false)
                 ->join('branches', 'stock_transfer_orders.source_branch_id', '=', 'branches.id')
