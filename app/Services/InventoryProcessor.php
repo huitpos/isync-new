@@ -221,7 +221,7 @@ class InventoryProcessor
     private function processProductDisposal(int $id, ?int $userId): array
     {
         $disposal = ProductDisposal::find($id);
-        
+
         if (!$disposal) {
             return ['success' => false, 'message' => 'Product disposal not found'];
         }
@@ -346,9 +346,20 @@ class InventoryProcessor
         if ($orders->isEmpty()) {
             return ['success' => false, 'message' => 'Transaction has no completed orders'];
         }
-        DB::connection('inventory')->beginTransaction();
+
         try {
             foreach ($orders as $order) {
+                // check if already processed. if there's a record in inventory_movement_logs, skip it.
+                $log = InventoryMovementLog::where('object_id', $transaction->transaction_id)
+                    ->where('product_id', $order->product_id)
+                    ->where('branch_id', $transaction->branch_id)
+                    ->where('movement_type', 'transactions')
+                    ->first();
+
+                if ($log) {
+                    continue;
+                }
+
                 $this->updateInventory(
                     branchId: $transaction->branch_id,
                     productId: $order->product_id,
@@ -363,10 +374,8 @@ class InventoryProcessor
             // Mark transaction as processed in transactional_db
             DB::connection('transactional_db')
                 ->table('transactions')
-                ->where('transaction_id', $transaction->transaction_id)
+                ->where('id', $transaction->id)
                 ->update(['inventory_processed' => true]);
-
-            DB::connection('inventory')->commit();
 
             return [
                 'success' => true,
