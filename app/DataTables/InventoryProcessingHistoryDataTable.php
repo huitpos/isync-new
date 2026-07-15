@@ -65,6 +65,8 @@ class InventoryProcessingHistoryDataTable extends DataTable
             $query->where('product_id', $this->product_id);
         }
 
+        $query->orderBy('processed_at', 'desc');
+
         return $query;
     }
 
