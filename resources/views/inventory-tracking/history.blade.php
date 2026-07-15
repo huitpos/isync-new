@@ -85,10 +85,23 @@
                                     if ($log->movement_type == 'transactions') {
                                         $transaction = DB::select('SELECT * FROM transactional_db.transactions WHERE transaction_id = ? and branch_id = ?', [$log->object_id, $log->branch_id]);
 
-                                        $url = '/'.$company->slug.'/reports/transaction/'.$transaction[0]?->id;
+                                        if (isset($transaction[0])) {
+                                            $url = '/'.$company->slug.'/reports/transaction/'.$transaction[0]?->id;
 
-                                        $description = $transaction[0]?->receipt_number ?? '';
-                                        $description = '<a href="'.$url.'" target="_blank">SI #'.$description.'</a>';
+                                            $description = $transaction[0]?->receipt_number;
+                                            $description = '<a href="'.$url.'" target="_blank">SI #'.$description.'</a>';
+                                        }
+                                    }
+
+                                    if ($log->movement_type == 'purchase_deliveries') {
+                                        $purchaseDelivery = DB::select('SELECT * FROM purchase_deliveries WHERE id = ? and branch_id = ?', [$log->object_id, $log->branch_id]);
+
+                                        if (isset($purchaseDelivery[0])) {
+                                            $url = '/'.$company->slug.'/purchase-deliveries/'.$purchaseDelivery[0]?->id;
+
+                                            $description = $purchaseDelivery[0]?->pd_number;
+                                            $description = '<a href="'.$url.'" target="_blank">PD #'.$description.'</a>';
+                                        }
                                     }
                                 @endphp
                                 <tr>
