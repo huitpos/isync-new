@@ -268,7 +268,7 @@ class InventoryProcessingController extends Controller
                 ->join('branches', 'product_disposals.branch_id', '=', 'branches.id')
                 ->select('product_disposals.*', 'branches.name as branch_name')
                 ->where('product_disposals.status', $status);
-            
+
             if ($branchIds) $query->whereIn('branch_id', $branchIds);
 
             $total = $query->count();
@@ -303,7 +303,8 @@ class InventoryProcessingController extends Controller
                 ->where('inventory_processed', false)
                 ->where('is_complete', true)
                 ->where('transactions.receipt_number', '!=', null)
-                ->where('is_void', false);
+                ->where('is_void', false)
+                ->where('is_cut_off', true);
 
             if ($branchIds) {
                 $query->whereIn('branch_id', $branchIds);
