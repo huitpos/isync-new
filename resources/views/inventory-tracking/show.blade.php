@@ -31,7 +31,7 @@
                 <div class="card-body">
                     @php
                         $isTransaction = $type === 'transactions';
-                        $movementId = $isTransaction ? $movement->transaction_id : $movement->id;
+                        $movementId = $movement->id;
                         $status = $isTransaction ? ($movement->is_complete ? 'complete' : 'pending') : $movement->status;
                         $branchId = $movement->branch_id ?? null;
                         $createdAt = $movement->created_at ?? null;
