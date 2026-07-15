@@ -85,7 +85,7 @@
                                     if ($log->movement_type == 'transactions') {
                                         $transaction = DB::select('SELECT * FROM transactional_db.transactions WHERE transaction_id = ? and branch_id = ?', [$log->object_id, $log->branch_id]);
 
-                                        $url = '/'.$company->slug.'/reports/transaction/'.$transaction->id;
+                                        $url = '/'.$company->slug.'/reports/transaction/'.$transaction[0]?->id;
 
                                         $description = $transaction[0]?->receipt_number ?? '';
                                         $description = '<a href="'.$url.'" target="_blank">SI #'.$description.'</a>';
