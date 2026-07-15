@@ -80,11 +80,22 @@
                         </thead>
                         <tbody>
                             @foreach($logs as $log)
+                                @php
+                                    $description = '';
+                                    if ($log->movement_type == 'transactions') {
+                                        $transaction = DB::select('SELECT * FROM transactional_db.transactions WHERE id = ?', [$log->object_id]);
+
+                                        $url = '/'.$company->slug.'/reports/transaction/'.$log->object_id;
+
+                                        $description = $transaction[0]?->receipt_number ?? '';
+                                        $description = '<a href="'.$url.'" target="_blank">SI #'.$description.'</a>';
+                                    }
+                                @endphp
                                 <tr>
                                     <td>
                                         @if($log->product)
                                             <strong>{{ $log->product->name }}</strong><br>
-                                            <small class="text-muted">#{{ $log->product_id }}</small>
+                                            <small class="text-muted">{!! $description !!}</small>
                                         @else
                                             Product #{{ $log->product_id }}
                                         @endif
