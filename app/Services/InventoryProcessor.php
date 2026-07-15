@@ -221,7 +221,7 @@ class InventoryProcessor
     private function processProductDisposal(int $id, ?int $userId): array
     {
         $disposal = ProductDisposal::find($id);
-        
+
         if (!$disposal) {
             return ['success' => false, 'message' => 'Product disposal not found'];
         }
@@ -363,7 +363,7 @@ class InventoryProcessor
             // Mark transaction as processed in transactional_db
             DB::connection('transactional_db')
                 ->table('transactions')
-                ->where('transaction_id', $transaction->transaction_id)
+                ->where('id', $transaction->id)
                 ->update(['inventory_processed' => true]);
 
             DB::connection('inventory')->commit();
