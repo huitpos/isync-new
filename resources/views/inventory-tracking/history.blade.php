@@ -40,14 +40,15 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Product</label>
-                    <select name="product_id" class="form-select" data-control="select2" data-hide-search="true">
-                        <option value="">All Products</option>
-                        @foreach($products as $key => $product)
-                            <option value="{{ $product->id }}" {{ $currentProduct == $product->id ? 'selected' : '' }}>
-                                {{ $product->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <select
+                        name="product_id"
+                        data-control="select2"
+                        data-ajax-url="/ajax/get-products?company_id={{ auth()->user()->company_id }}"
+                        data-placeholder="Select a product"
+                        class="form-control select2-ajax"
+                        data-minimum-input="3"
+                        required
+                    ></select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">
@@ -79,11 +80,22 @@
                         </thead>
                         <tbody>
                             @foreach($logs as $log)
+                                @php
+                                    $description = '';
+                                    if ($log->movement_type == 'transactions') {
+                                        $transaction = DB::select('SELECT * FROM transactional_db.transactions WHERE transaction_id = ? and branch_id = ?', [$log->object_id, $log->branch_id]);
+
+                                        $url = '/'.$company->slug.'/reports/transaction/'.$log->id;
+
+                                        $description = $transaction[0]?->receipt_number ?? '';
+                                        $description = '<a href="'.$url.'" target="_blank">SI #'.$description.'</a>';
+                                    }
+                                @endphp
                                 <tr>
                                     <td>
                                         @if($log->product)
                                             <strong>{{ $log->product->name }}</strong><br>
-                                            <small class="text-muted">#{{ $log->product_id }}</small>
+                                            <small class="text-muted">{!! $description !!}</small>
                                         @else
                                             Product #{{ $log->product_id }}
                                         @endif
