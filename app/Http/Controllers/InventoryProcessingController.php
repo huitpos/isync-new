@@ -11,6 +11,7 @@ use App\Models\{
     InventoryMovementLog,
     Company
 };
+use App\DataTables\InventoryProcessingHistoryDataTable;
 use App\Services\InventoryProcessor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -109,7 +110,11 @@ class InventoryProcessingController extends Controller
         );
 
         if ($result['success']) {
-            return redirect()->route('inventory-tracking.index')
+            return redirect()->route('inventory-tracking.index', array_filter([
+                'type' => $request->input('return_type'),
+                'branch_id' => $request->input('return_branch_id'),
+                'page' => $request->input('return_page'),
+            ]))
                 ->with('success', $result['message']);
         } else {
             return redirect()->back()
@@ -120,8 +125,10 @@ class InventoryProcessingController extends Controller
     /**
      * Display processing history
      */
-    public function history(Request $request)
+    public function history(Request $request, InventoryProcessingHistoryDataTable $dataTable)
     {
+        addVendors(['datatables']);
+
         $user = Auth::user();
         $company = Company::find($user->company_id);
 
@@ -131,39 +138,17 @@ class InventoryProcessingController extends Controller
             ->orderBy('name')
             ->get();
 
-        // get all branch ids for the user's company
         $branchIds = $branches->pluck('id')->toArray();
 
-        $branch_id = $request->input('branch_id');
-        $movement_type = $request->input('movement_type');
-        $product_id = $request->input('product_id');
-        $perPage = $request->input('per_page', 20);
-
-        $query = InventoryMovementLog::with(['branch', 'product', 'processedBy'])
-            ->select('inventory_movement_logs.*');
-
-        if ($branch_id) {
-            $query->where('branch_id', $branch_id);
-        } else {
-            $query->whereIn('branch_id', $branchIds);
-        }
-
-        if ($movement_type) {
-            $query->where('movement_type', $movement_type);
-        }
-
-        if ($product_id) {
-            $query->where('product_id', $product_id);
-        }
-
-        $logs = $query->orderByDesc('processed_at')->paginate($perPage);
-
-        return view('inventory-tracking.history', [
-            'logs' => $logs,
+        return $dataTable->with([
+            'movement_type' => $request->query('movement_type'),
+            'branch_id' => $request->query('branch_id'),
+            'product_id' => $request->query('product_id'),
+            'branch_ids' => $branchIds,
+            'company_slug' => $company->slug,
+            'movement_types' => $this->getMovementTypes(),
+        ])->render('inventory-tracking.history', [
             'types' => $this->getMovementTypes(),
-            'currentBranch' => $branch_id,
-            'currentType' => $movement_type,
-            'currentProduct' => $product_id,
             'branches' => $branches,
             'company' => $company,
         ]);

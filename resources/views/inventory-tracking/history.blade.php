@@ -15,158 +15,46 @@
 
     <div class="card">
         <div class="card-body">
-            <form method="GET" class="row g-3 mb-4">
+            <div class="row g-3 mb-4">
                 <div class="col-md-3">
-                    <label class="form-label">Movement Type</label>
-                    <select name="movement_type" class="form-select">
+                    <label class="form-label" for="movement_type">Movement Type</label>
+                    <select id="movement_type" class="form-select">
                         <option value="">All Types</option>
                         @foreach($types as $key => $label)
-                            <option value="{{ $key }}" {{ $currentType === $key ? 'selected' : '' }}>
-                                {{ $label }}
-                            </option>
+                            <option value="{{ $key }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Branch</label>
-                    <select name="branch_id" class="form-select">
+                    <label class="form-label" for="branch_id">Branch</label>
+                    <select id="branch_id" class="form-select">
                         <option value="">All Branches</option>
-                        @foreach($branches as $key => $branch)
-                            <option value="{{ $branch->id }}" {{ $currentBranch == $branch->id ? 'selected' : '' }}>
-                                {{ $branch->name }}
-                            </option>
+                        @foreach($branches as $branch)
+                            <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">Product</label>
+                <div class="col-md-4">
+                    <label class="form-label" for="product_id">Product</label>
                     <select
-                        name="product_id"
+                        id="product_id"
                         data-control="select2"
                         data-ajax-url="/ajax/get-products?company_id={{ auth()->user()->company_id }}"
-                        data-placeholder="Select a product"
+                        data-placeholder="All Products"
                         class="form-control select2-ajax"
                         data-minimum-input="3"
-                        required
                     ></select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-search"></i> Filter
+                    <button type="button" id="clearFilters" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-redo"></i> Clear Filters
                     </button>
                 </div>
-                @if ($currentType || $currentBranch || $currentProduct)
-                <div class="col-md-1 d-flex align-items-end">
-                    <a href="/inventory-tracking/history/view" class="btn btn-primary w-100">
-                        <i class="fas fa-redo"></i> Clear Filter
-                    </a>
-                </div>
-                @endif
-            </form>
+            </div>
 
-            @if($logs->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Product</th>
-                                <th>Movement Type</th>
-                                <th>Branch</th>
-                                <th>Previous Qty</th>
-                                <th>New Qty</th>
-                                <th>Processed By</th>
-                                <th>Processed At</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($logs as $log)
-                                @php
-                                    $description = '';
-                                    if ($log->movement_type == 'transactions') {
-                                        $transaction = DB::select('SELECT * FROM transactional_db.transactions WHERE transaction_id = ? and branch_id = ?', [$log->object_id, $log->branch_id]);
-
-                                        if (isset($transaction[0])) {
-                                            $url = '/'.$company->slug.'/reports/transaction/'.$transaction[0]?->id;
-
-                                            $description = $transaction[0]?->receipt_number;
-                                            $description = '<a href="'.$url.'" target="_blank">SI #'.$description.'</a>';
-                                        }
-                                    }
-
-                                    if ($log->movement_type == 'purchase_deliveries') {
-                                        $purchaseDelivery = DB::select('SELECT * FROM purchase_deliveries WHERE id = ? and branch_id = ?', [$log->object_id, $log->branch_id]);
-
-                                        if (isset($purchaseDelivery[0])) {
-                                            $url = '/'.$company->slug.'/purchase-deliveries/'.$purchaseDelivery[0]?->id;
-
-                                            $description = $purchaseDelivery[0]?->pd_number;
-                                            $description = '<a href="'.$url.'" target="_blank">PD #'.$description.'</a>';
-                                        }
-                                    }
-                                @endphp
-                                <tr>
-                                    <td>
-                                        @if($log->product)
-                                            <strong>{{ $log->product->name }}</strong><br>
-                                            <small class="text-muted">{!! $description !!}</small>
-                                        @else
-                                            Product #{{ $log->product_id }}
-                                        @endif
-                                    </td>
-                                    <td>
-                                        {{ $types[$log->movement_type] ?? $log->movement_type }}
-                                    </td>
-                                    <td>
-                                        @if($log->branch)
-                                            {{ $log->branch->name }}
-                                        @else
-                                            Branch #{{ $log->branch_id }}
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <span class="text-muted">{{ number_format($log->previous_qty, 2) }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="fw-bold">{{ number_format($log->new_qty, 2) }}</span>
-                                        @php
-                                            $diff = $log->new_qty - $log->previous_qty;
-                                            $sign = $diff >= 0 ? '+' : '';
-                                            $class = $diff >= 0 ? 'text-success' : 'text-danger';
-                                        @endphp
-                                        <br>
-                                        <small class="{{ $class }}">{{ $sign }}{{ number_format($diff, 2) }}</small>
-                                    </td>
-                                    <td>
-                                        @if($log->processedBy)
-                                            {{ $log->processedBy->name }}
-                                        @else
-                                            System
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <small>{{ $log->processed_at->format('M d, Y') }}</small><br>
-                                        <small class="text-muted">{{ $log->processed_at->format('H:i:s') }}</small>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div class="text-muted small">
-                        Showing {{ $logs->firstItem() }} to {{ $logs->lastItem() }} of {{ $logs->total() }} entries
-                    </div>
-                    <div>
-                        {{ $logs->links('pagination::bootstrap-5') }}
-                    </div>
-                </div>
-            @else
-                <div class="alert alert-info" role="alert">
-                    <i class="fas fa-info-circle"></i> No processed inventory movements found.
-                </div>
-            @endif
+            <div class="table-responsive">
+                {{ $dataTable->table() }}
+            </div>
         </div>
     </div>
 </div>
@@ -176,10 +64,78 @@
     .card {
         box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
-    
+
     .table-responsive {
         border-radius: 0.25rem;
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    $(document).ready(function () {
+        var $productSelect = $('#product_id');
+
+        if ($productSelect.length && !$productSelect.data('select2')) {
+            $productSelect.select2({
+                placeholder: $productSelect.data('placeholder') || 'All Products',
+                allowClear: true,
+                ajax: {
+                    url: $productSelect.data('ajax-url'),
+                    dataType: 'json',
+                    delay: 250,
+                    cache: true,
+                    data: function (params) {
+                        return { term: params.term };
+                    }
+                }
+            });
+        }
+
+        var historyTable = $('#inventory-history-table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '{!! route('inventory-tracking.history') !!}',
+                data: function (d) {
+                    d.movement_type = $('#movement_type').val();
+                    d.branch_id = $('#branch_id').val();
+                    d.product_id = $('#product_id').val();
+                }
+            },
+            columnDefs: [
+                {
+                    targets: 0,
+                    visible: false,
+                    searchable: false
+                }
+            ],
+            columns: [
+                { data: 'id' },
+                { data: 'product_display' },
+                { data: 'movement_type' },
+                { data: 'branch.name' },
+                { data: 'previous_qty' },
+                { data: 'new_qty' },
+                { data: 'processed_by_name' },
+                { data: 'processed_at' },
+            ],
+            order: [[7, 'desc']]
+        });
+
+        function reloadHistoryTable() {
+            historyTable.ajax.reload();
+        }
+
+        $('#movement_type, #branch_id').on('change', reloadHistoryTable);
+        $productSelect.on('change', reloadHistoryTable);
+
+        $('#clearFilters').on('click', function () {
+            $('#movement_type').val('').trigger('change');
+            $('#branch_id').val('').trigger('change');
+            $productSelect.val(null).trigger('change');
+        });
+    });
+</script>
 @endpush
 @endsection
