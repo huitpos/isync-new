@@ -83,7 +83,7 @@
                                 @php
                                     $description = '';
                                     if ($log->movement_type == 'transactions') {
-                                        $transaction = DB::select('SELECT * FROM transactional_db.transactions WHERE id = ?', [$log->object_id]);
+                                        $transaction = DB::select('SELECT * FROM transactional_db.transactions WHERE transaction_id = ? and branch_id = ?', [$log->object_id, $log->branch_id]);
 
                                         $url = '/'.$company->slug.'/reports/transaction/'.$log->object_id;
 
