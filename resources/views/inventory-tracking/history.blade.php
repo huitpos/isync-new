@@ -40,14 +40,15 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Product</label>
-                    <select name="product_id" class="form-select" data-control="select2" data-hide-search="true">
-                        <option value="">All Products</option>
-                        @foreach($products as $key => $product)
-                            <option value="{{ $product->id }}" {{ $currentProduct == $product->id ? 'selected' : '' }}>
-                                {{ $product->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <select
+                        name="product_id"
+                        data-control="select2"
+                        data-ajax-url="/ajax/get-products?company_id={{ auth()->user()->company_id }}"
+                        data-placeholder="Select a product"
+                        class="form-control select2-ajax"
+                        data-minimum-input="3"
+                        required
+                    ></select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100">
