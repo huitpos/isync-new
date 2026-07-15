@@ -114,12 +114,12 @@
         background-color: #f8f9fa;
         border-top: 1px solid #dee2e6;
     }
-    
+
     .badge {
         font-size: 0.85rem;
         padding: 0.5em 0.75em;
     }
-    
+
     .btn-sm {
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
@@ -163,7 +163,7 @@
                 currentPage = parseInt(response.page);
                 totalPages = parseInt(response.pages);
 
-                renderTable(response.data, type);
+                renderTable(response.data, type, branchId);
                 updatePagination();
                 
                 document.getElementById('loadingSpinner').style.display = 'none';
@@ -177,7 +177,7 @@
         });
     }
 
-    function renderTable(movements, type) {
+    function renderTable(movements, type, branchId) {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
 
@@ -197,6 +197,11 @@
                 minute: '2-digit'
             });
 
+            const viewParams = new URLSearchParams({
+                type: type,
+                branch_id: branchId,
+                page: currentPage
+            });
             const row = `
                 <tr>
                     <td>
@@ -206,7 +211,7 @@
                     <td>${movement.branch}</td>
                     <td>${createdAt}</td>
                     <td>
-                        <a href="{{ url('inventory-tracking') }}/${movement.type}/${movementId}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ url('inventory-tracking') }}/${movement.type}/${movementId}?${viewParams.toString()}" class="btn btn-sm btn-outline-primary">
                             <i class="fas fa-eye"></i> View
                         </a>
                     </td>
@@ -259,6 +264,22 @@
         document.getElementById('tableContainer').style.display = 'none';
         document.getElementById('loadingSpinner').style.display = 'none';
         currentPage = 1;
+        window.history.replaceState({}, '', '{{ route('inventory-tracking.index') }}');
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        const type = params.get('type');
+        const branchId = params.get('branch_id');
+        const page = parseInt(params.get('page') || '1', 10);
+
+        if (type) {
+            document.getElementById('typeFilter').value = type;
+            if (branchId) {
+                document.getElementById('branchFilter').value = branchId;
+            }
+            loadMovements(page);
+        }
+    });
 </script>
 @endsection

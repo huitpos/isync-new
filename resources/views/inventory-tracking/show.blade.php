@@ -7,7 +7,11 @@
             <h1 class="h3">Process Inventory Movement</h1>
         </div>
         <div class="col-md-4 text-end">
-            <a href="{{ route('inventory-tracking.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('inventory-tracking.index', array_filter([
+                'type' => request('type'),
+                'branch_id' => request('branch_id'),
+                'page' => request('page'),
+            ])) }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Back to List
             </a>
         </div>
@@ -192,6 +196,9 @@
 
                         <form method="POST" action="{{ route('inventory-tracking.process', [$type, $movementId]) }}" onsubmit="return confirm('Are you sure you want to process this movement?');">
                             @csrf
+                            <input type="hidden" name="return_type" value="{{ request('type', $type) }}">
+                            <input type="hidden" name="return_branch_id" value="{{ request('branch_id') }}">
+                            <input type="hidden" name="return_page" value="{{ request('page') }}">
                             <button type="submit" class="btn btn-success w-100 btn-lg">
                                 <i class="fas fa-check"></i> Process Movement
                             </button>
