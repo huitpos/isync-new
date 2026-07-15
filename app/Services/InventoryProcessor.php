@@ -138,17 +138,6 @@ class InventoryProcessor
                     objectId: $delivery->id,
                     processedBy: $userId
                 );
-
-                // Subtract from source
-                $this->updateInventory(
-                    branchId: $delivery->source_branch_id,
-                    productId: $item->product_id,
-                    qty: $item->qty,
-                    operation: 'subtract',
-                    movementType: 'stock_transfer_deliveries_source',
-                    objectId: $delivery->id,
-                    processedBy: $userId
-                );
             }
 
             $delivery->update(['inventory_processed' => true]);
@@ -170,7 +159,7 @@ class InventoryProcessor
     private function processStockTransferOrder(int $id, ?int $userId): array
     {
         $order = StockTransferOrder::find($id);
-        
+
         if (!$order) {
             return ['success' => false, 'message' => 'Stock transfer order not found'];
         }
