@@ -112,13 +112,13 @@
             ],
             columns: [
                 { data: 'id' },
-                { data: 'product_display' },
-                { data: 'movement_type' },
-                { data: 'branch.name' },
-                { data: 'previous_qty' },
-                { data: 'new_qty' },
-                { data: 'processed_by_name' },
-                { data: 'processed_at' },
+                { data: 'product_display', orderable: false, searchable: false },
+                { data: 'movement_type', orderable: false, searchable: false },
+                { data: 'branch.name', orderable: false, searchable: false },
+                { data: 'previous_qty', orderable: false, searchable: false },
+                { data: 'new_qty', orderable: false, searchable: false },
+                { data: 'processed_by_name', orderable: false, searchable: false },
+                { data: 'processed_at', orderable: false, searchable: false },
             ],
             order: [[7, 'desc']]
         });
