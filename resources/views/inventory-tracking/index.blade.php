@@ -3,10 +3,10 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="row mb-4">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h1 class="h3">Inventory Tracking</h1>
         </div>
-        <div class="col-md-4 text-end">
+        <div class="col-md-6 text-end">
             <a href="{{ route('inventory-tracking.history') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-history"></i> View History
             </a>
@@ -20,51 +20,36 @@
         </div>
     @endif
 
-    <div class="card mb-4">
-        <div class="card-header bg-light">
-            <div class="card-title">
-                <h2>Filters</h2>
-            </div>
-        </div>
+    <div class="card">
         <div class="card-body">
-            <form id="filterForm" class="row g-3">
-                <div class="col-md-4">
-                    <label for="typeFilter" class="form-label">Movement Type <span class="text-danger">*</span></label>
-                    <select id="typeFilter" name="type" class="form-select form-select-sm" required onchange="loadMovements()">
+            <div class="row g-3 mb-4">
+                <div class="col-md-5">
+                    <label class="form-label" for="typeFilter">Movement Type <span class="text-danger">*</span></label>
+                    <select id="typeFilter" name="type" class="form-select" required>
                         <option value="">-- Select Movement Type --</option>
                         @foreach($types as $key => $label)
                             <option value="{{ $key }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label for="branchFilter" class="form-label">Branch</label>
-                    <select id="branchFilter" name="branch_id" class="form-select form-select-sm" onchange="loadMovements()">
+                <div class="col-md-5">
+                    <label class="form-label" for="branchFilter">Branch</label>
+                    <select id="branchFilter" name="branch_id" class="form-select">
                         @if ($branches->count() > 1)
-                            <option value="">-- All Branches --</option>
+                            <option value="">All Branches</option>
                         @endif
                         @foreach($branches as $branch)
                             <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="button" class="btn btn-sm btn-outline-secondary w-100" onclick="resetFilters()">
-                        <i class="fas fa-redo"></i> Reset
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" id="clearFilters" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-redo"></i> Clear Filters
                     </button>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-header border-0 pt-6">
-            <div class="card-title">
-                <h2>Unprocessed Movements</h2>
             </div>
-        </div>
-        <div class="card-body">
+
             <div id="noTypeAlert" class="alert alert-info" role="alert">
                 <i class="fas fa-info-circle"></i> Please select a movement type to view items.
             </div>
@@ -78,8 +63,8 @@
 
             <div id="tableContainer" style="display: none;">
                 <div class="table-responsive">
-                    <table id="inventoryTable" class="table table-hover">
-                        <thead class="table-light">
+                    <table id="inventoryTable" class="table table-striped table-hover align-middle">
+                        <thead class="table-dark">
                             <tr>
                                 <th>Type</th>
                                 <th>Description</th>
@@ -93,195 +78,243 @@
                     </table>
                 </div>
 
-                <nav aria-label="Table pagination">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item" id="prevPage">
-                            <a class="page-link" href="#" onclick="previousPage(); return false;">Previous</a>
-                        </li>
-                        <li class="page-item" id="pageInfo">
-                            <span class="page-link">Page 1</span>
-                        </li>
-                        <li class="page-item" id="nextPage">
-                            <a class="page-link" href="#" onclick="nextPage(); return false;">Next</a>
-                        </li>
-                    </ul>
-                </nav>
+                <div class="row mt-3">
+                    <div class="col-sm-12 col-md-5">
+                        <div id="tableInfo" class="dataTables_info"></div>
+                    </div>
+                    <div class="col-sm-12 col-md-7">
+                        <div class="dataTables_paginate paging_simple_numbers float-md-end">
+                            <ul class="pagination" id="pagination"></ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+@push('styles')
 <style>
-    .table th {
-        background-color: #f8f9fa;
-        border-top: 1px solid #dee2e6;
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     }
 
-    .badge {
-        font-size: 0.85rem;
-        padding: 0.5em 0.75em;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
+    .table-responsive {
+        border-radius: 0.25rem;
     }
 </style>
+@endpush
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@push('scripts')
 <script>
-    let currentPage = 1;
-    let totalPages = 1;
-    const perPage = 15;
+    $(document).ready(function () {
+        let currentPage = 1;
+        let totalPages = 1;
+        let totalRecords = 0;
+        const perPage = 15;
 
-    function loadMovements(page = 1) {
-        const type = document.getElementById('typeFilter').value;
-        const branchId = document.getElementById('branchFilter').value;
+        function loadMovements(page = 1) {
+            const type = $('#typeFilter').val();
+            const branchId = $('#branchFilter').val();
 
-        if (!type) {
-            document.getElementById('noTypeAlert').style.display = 'block';
-            document.getElementById('tableContainer').style.display = 'none';
-            document.getElementById('loadingSpinner').style.display = 'none';
-            return;
+            if (!type) {
+                $('#noTypeAlert').show();
+                $('#tableContainer').hide();
+                $('#loadingSpinner').hide();
+                return;
+            }
+
+            $('#noTypeAlert').hide();
+            $('#tableContainer').hide();
+            $('#loadingSpinner').show();
+
+            $.ajax({
+                url: '{{ route("inventory-tracking.ajax-movements") }}',
+                type: 'GET',
+                data: {
+                    type: type,
+                    branch_id: branchId,
+                    page: page,
+                    per_page: perPage
+                },
+                dataType: 'json',
+                success: function (response) {
+                    currentPage = parseInt(response.page);
+                    totalPages = parseInt(response.pages) || 1;
+                    totalRecords = parseInt(response.total) || 0;
+
+                    renderTable(response.data, type, branchId);
+                    updatePagination();
+
+                    $('#loadingSpinner').hide();
+                    $('#tableContainer').show();
+                },
+                error: function (xhr) {
+                    $('#loadingSpinner').hide();
+                    alert('Error loading movements: ' + (xhr.responseJSON?.error || 'Unknown error'));
+                    console.error(xhr);
+                }
+            });
         }
 
-        document.getElementById('noTypeAlert').style.display = 'none';
-        document.getElementById('tableContainer').style.display = 'none';
-        document.getElementById('loadingSpinner').style.display = 'block';
+        function renderTable(movements, type, branchId) {
+            const $tbody = $('#tableBody');
+            $tbody.empty();
 
-        const params = new URLSearchParams({
-            type: type,
-            branch_id: branchId,
-            page: page,
-            per_page: perPage
+            if (movements.length === 0) {
+                $tbody.append('<tr><td colspan="5" class="text-center text-muted py-4">No movements found</td></tr>');
+                return;
+            }
+
+            movements.forEach(function (movement) {
+                const movementId = movement.id;
+                const createdAt = new Date(movement.created_at).toLocaleDateString('en-PH', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const viewParams = new URLSearchParams({
+                    type: type,
+                    branch_id: branchId,
+                    page: currentPage
+                });
+
+                $tbody.append(`
+                    <tr>
+                        <td>${movement.type}</td>
+                        <td>${movement.description || 'N/A'}</td>
+                        <td>${movement.branch}</td>
+                        <td><small>${createdAt}</small></td>
+                        <td>
+                            <a href="{{ url('inventory-tracking') }}/${movement.type}/${movementId}?${viewParams.toString()}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        function getPaginationPages(current, total) {
+            const pages = [];
+
+            if (total <= 7) {
+                for (let i = 1; i <= total; i++) {
+                    pages.push(i);
+                }
+                return pages;
+            }
+
+            pages.push(1);
+
+            if (current <= 4) {
+                for (let i = 2; i <= 5; i++) {
+                    pages.push(i);
+                }
+                pages.push('ellipsis');
+                pages.push(total);
+            } else if (current >= total - 3) {
+                pages.push('ellipsis');
+                for (let i = total - 4; i <= total; i++) {
+                    pages.push(i);
+                }
+            } else {
+                pages.push('ellipsis');
+                for (let i = current - 1; i <= current + 1; i++) {
+                    pages.push(i);
+                }
+                pages.push('ellipsis');
+                pages.push(total);
+            }
+
+            return pages;
+        }
+
+        function updatePagination() {
+            const start = totalRecords === 0 ? 0 : ((currentPage - 1) * perPage) + 1;
+            const end = Math.min(currentPage * perPage, totalRecords);
+
+            $('#tableInfo').text(`Showing ${start} to ${end} of ${totalRecords} entries`);
+
+            const $pagination = $('#pagination');
+            $pagination.empty();
+
+            $pagination.append(`
+                <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>
+                </li>
+            `);
+
+            getPaginationPages(currentPage, totalPages).forEach(function (page) {
+                if (page === 'ellipsis') {
+                    $pagination.append(`
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    `);
+                    return;
+                }
+
+                $pagination.append(`
+                    <li class="page-item ${page === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${page}">${page}</a>
+                    </li>
+                `);
+            });
+
+            $pagination.append(`
+                <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>
+                </li>
+            `);
+        }
+
+        $('#typeFilter, #branchFilter').on('change', function () {
+            currentPage = 1;
+            loadMovements(1);
         });
 
-        $.ajax({
-            url: '{{ route("inventory-tracking.ajax-movements") }}',
-            type: 'GET',
-            data: params.toString(),
-            dataType: 'json',
-            success: function(response) {
-                currentPage = parseInt(response.page);
-                totalPages = parseInt(response.pages);
+        $('#pagination').on('click', 'a.page-link', function (e) {
+            e.preventDefault();
 
-                renderTable(response.data, type, branchId);
-                updatePagination();
-                
-                document.getElementById('loadingSpinner').style.display = 'none';
-                document.getElementById('tableContainer').style.display = 'block';
-            },
-            error: function(xhr) {
-                document.getElementById('loadingSpinner').style.display = 'none';
-                alert('Error loading movements: ' + (xhr.responseJSON?.error || 'Unknown error'));
-                console.error(xhr);
+            const $item = $(this).parent();
+            if ($item.hasClass('disabled') || $item.hasClass('active')) {
+                return;
+            }
+
+            const page = parseInt($(this).data('page'), 10);
+            if (page >= 1 && page <= totalPages) {
+                loadMovements(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
-    }
 
-    function renderTable(movements, type, branchId) {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-
-        if (movements.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No movements found</td></tr>';
-            return;
-        }
-
-        movements.forEach(movement => {
-            const movementId = movement.id;
-            const status = movement.status ? movement.status.charAt(0).toUpperCase() + movement.status.slice(1) : (movement.is_complete ? 'Complete' : 'Pending');
-            const createdAt = new Date(movement.created_at).toLocaleDateString('en-PH', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            const viewParams = new URLSearchParams({
-                type: type,
-                branch_id: branchId,
-                page: currentPage
-            });
-            const row = `
-                <tr>
-                    <td>
-                        ${movement.type}
-                    </td>
-                    <td>${movement.description || 'N/A'}</td>
-                    <td>${movement.branch}</td>
-                    <td>${createdAt}</td>
-                    <td>
-                        <a href="{{ url('inventory-tracking') }}/${movement.type}/${movementId}?${viewParams.toString()}" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-eye"></i> View
-                        </a>
-                    </td>
-                </tr>
-            `;
-            tbody.insertAdjacentHTML('beforeend', row);
+        $('#clearFilters').on('click', function () {
+            $('#typeFilter').val('');
+            $('#branchFilter').val('');
+            $('#noTypeAlert').show();
+            $('#tableContainer').hide();
+            $('#loadingSpinner').hide();
+            currentPage = 1;
+            window.history.replaceState({}, '', '{{ route('inventory-tracking.index') }}');
         });
-    }
 
-    function updatePagination() {
-        const prevBtn = document.getElementById('prevPage');
-        const nextBtn = document.getElementById('nextPage');
-        const pageInfo = document.getElementById('pageInfo');
-
-        pageInfo.innerHTML = `<span class="page-link">Page ${currentPage} of ${totalPages}</span>`;
-
-        if (currentPage <= 1) {
-            prevBtn.classList.add('disabled');
-        } else {
-            prevBtn.classList.remove('disabled');
-        }
-
-        if (currentPage >= totalPages) {
-            nextBtn.classList.add('disabled');
-        } else {
-            nextBtn.classList.remove('disabled');
-        }
-    }
-
-    function nextPage() {
-        if (currentPage < totalPages) {
-            loadMovements(currentPage + 1);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        return false;
-    }
-
-    function previousPage() {
-        if (currentPage > 1) {
-            loadMovements(currentPage - 1);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        return false;
-    }
-
-    function resetFilters() {
-        document.getElementById('typeFilter').value = '';
-        document.getElementById('branchFilter').value = '';
-        document.getElementById('noTypeAlert').style.display = 'block';
-        document.getElementById('tableContainer').style.display = 'none';
-        document.getElementById('loadingSpinner').style.display = 'none';
-        currentPage = 1;
-        window.history.replaceState({}, '', '{{ route('inventory-tracking.index') }}');
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
         const params = new URLSearchParams(window.location.search);
         const type = params.get('type');
         const branchId = params.get('branch_id');
         const page = parseInt(params.get('page') || '1', 10);
 
         if (type) {
-            document.getElementById('typeFilter').value = type;
+            $('#typeFilter').val(type);
             if (branchId) {
-                document.getElementById('branchFilter').value = branchId;
+                $('#branchFilter').val(branchId);
             }
             loadMovements(page);
         }
     });
 </script>
+@endpush
 @endsection
