@@ -32,11 +32,13 @@ class InventoryProcessingController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $companyId = $user->company_id;
+
+        //get branch ids from user
+        $branchIds = $user->branches->pluck('id')->toArray();
 
         // Get all branches for the user's company
         $branches = DB::table('branches')
-            ->where('company_id', $companyId)
+            ->whereIn('id', $branchIds)
             ->get();
 
         return view('inventory-tracking.index', [
@@ -132,13 +134,14 @@ class InventoryProcessingController extends Controller
         $user = Auth::user();
         $company = Company::find($user->company_id);
 
+        $branchIds = $user->branches->pluck('id')->toArray();
+
         $branches = DB::table('branches')
             ->select('id', 'name')
             ->where('company_id', $user->company_id)
+            ->whereIn('id', $branchIds)
             ->orderBy('name')
             ->get();
-
-        $branchIds = $branches->pluck('id')->toArray();
 
         return $dataTable->with([
             'movement_type' => $request->query('movement_type'),

@@ -40,7 +40,9 @@
                 <div class="col-md-4">
                     <label for="branchFilter" class="form-label">Branch</label>
                     <select id="branchFilter" name="branch_id" class="form-select form-select-sm" onchange="loadMovements()">
-                        <option value="">-- All Branches --</option>
+                        @if ($branches->count() > 1)
+                            <option value="">-- All Branches --</option>
+                        @endif
                         @foreach($branches as $branch)
                             <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                         @endforeach
