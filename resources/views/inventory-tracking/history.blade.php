@@ -28,7 +28,9 @@
                 <div class="col-md-3">
                     <label class="form-label" for="branch_id">Branch</label>
                     <select id="branch_id" class="form-select">
-                        <option value="">All Branches</option>
+                        @if ($branches->count() > 1)
+                            <option value="">All Branches</option>
+                        @endif
                         @foreach($branches as $branch)
                             <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                         @endforeach
