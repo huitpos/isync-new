@@ -513,3 +513,29 @@ Breadcrumbs::for('branch.productDisposals.create', function (BreadcrumbTrail $tr
     $trail->parent('branch.productDisposals.index', $company, $branch);
     $trail->push('Create');
 });
+
+// inventory tracking
+Breadcrumbs::for('inventory-tracking.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Inventory Tracking', route('inventory-tracking.index'));
+});
+
+Breadcrumbs::for('inventory-tracking.history', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('inventory-tracking.index', $company);
+    $trail->push('History');
+});
+
+Breadcrumbs::for('inventory-tracking.report', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('inventory-tracking.index', $company);
+    $trail->push('Inventory Report', route('inventory-tracking.report'));
+});
+
+Breadcrumbs::for('inventory-tracking.master-list', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('inventory-tracking.index', $company);
+    $trail->push('Stock Master List', route('inventory-tracking.master-list'));
+});
+
+Breadcrumbs::for('inventory-tracking.show', function (BreadcrumbTrail $trail, $company, $movementLabel) {
+    $trail->parent('inventory-tracking.index', $company);
+    $trail->push($movementLabel);
+});
