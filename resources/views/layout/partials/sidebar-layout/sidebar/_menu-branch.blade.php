@@ -62,8 +62,15 @@
 			'permission' => 'Branch Inventory',
 			'title' => 'Inventory',
 			'icon' => 'fa-solid fa-truck-moving fs-2',
-			'activeRoutes' => ['branch.stock-transfer-requests.*', 'branch.stock-transfer-orders.*', 'branch.stock-transfer-deliveries.*', 'branch.product-physical-counts.*', 'branch.product-disposals.*'],
+			'activeRoutes' => ['branch.stock-transfer-requests.*', 'branch.stock-transfer-orders.*', 'branch.stock-transfer-deliveries.*', 'branch.product-physical-counts.*', 'branch.product-disposals.*', 'inventory-tracking.*'],
 			'children' => [
+				[
+					'permission' => 'Branch Inventory',
+					'title' => 'Inventory Tracking',
+					'route' => 'inventory-tracking.index',
+					'routeParams' => [],
+					'activeRoutes' => ['inventory-tracking.*'],
+				],
 				[
 					'permission' => 'Branch Inventory/Stock Transfer Requests',
 					'title' => 'Stock Transfer Requests',

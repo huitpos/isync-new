@@ -16,8 +16,15 @@
 			'permission' => 'Inventory',
 			'title' => 'Inventory',
 			'icon' => 'fa-solid fa-warehouse fs-2',
-			'activeRoutes' => ['company.branch-inventory.*', 'company.product-physical-counts.*', 'company.product-disposals.*'],
+			'activeRoutes' => ['company.branch-inventory.*', 'company.product-physical-counts.*', 'company.product-disposals.*', 'inventory-tracking.*'],
 			'children' => [
+				[
+					'permission' => 'Inventory',
+					'title' => 'Inventory Tracking',
+					'route' => 'inventory-tracking.index',
+					'routeParams' => [],
+					'activeRoutes' => ['inventory-tracking.*'],
+				],
 				[
 					'permission' => 'Inventory/Products',
 					'title' => 'Products',

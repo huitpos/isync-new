@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Middleware\SetAuthenticatedCompanyContext;
 use App\Http\Middleware\ValidateCompanySlug;
 use App\Http\Middleware\SuperAdminMiddleware;
 
@@ -101,6 +102,7 @@ Route::middleware(['auth'])->prefix('inventory-tracking')->name('inventory-track
     Route::get('/ajax/movements', [InventoryProcessingController::class, 'getMovementsData'])->name('ajax-movements');
     Route::get('/ajax/products', [InventoryProcessingController::class, 'searchProducts'])->name('ajax-products');
     Route::get('/history/view', [InventoryProcessingController::class, 'history'])->name('history');
+    Route::get('/report', [InventoryProcessingController::class, 'inventoryReport'])->name('report');
     Route::get('/{type}/{id}', [InventoryProcessingController::class, 'show'])->name('show');
     Route::post('/{type}/{id}/process', [InventoryProcessingController::class, 'process'])->name('process');
 });

@@ -13,6 +13,7 @@ use App\Models\{
 };
 use App\DataTables\InventoryProcessingHistoryDataTable;
 use App\Services\InventoryProcessor;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,9 +42,12 @@ class InventoryProcessingController extends Controller
             ->whereIn('id', $branchIds)
             ->get();
 
+        $company = Company::find($user->company_id);
+
         return view('inventory-tracking.index', [
             'types' => $this->getMovementTypes(),
             'branches' => $branches,
+            'company' => $company,
         ]);
     }
 
@@ -91,10 +95,13 @@ class InventoryProcessingController extends Controller
             abort(404, 'Movement not found');
         }
 
+        $company = Company::find(Auth::user()->company_id);
+
         return view('inventory-tracking.show', [
             'movement' => $movement,
             'type' => $type,
             'types' => $this->getMovementTypes(),
+            'company' => $company,
         ]);
     }
 
@@ -154,6 +161,62 @@ class InventoryProcessingController extends Controller
             'types' => $this->getMovementTypes(),
             'branches' => $branches,
             'company' => $company,
+        ]);
+    }
+
+    /**
+     * Display branch inventory report (most/least stock, best selling)
+     */
+    public function inventoryReport(Request $request)
+    {
+        $user = Auth::user();
+        $company = Company::find($user->company_id);
+        $branchIds = $user->branches->pluck('id')->toArray();
+
+        $branches = DB::table('branches')
+            ->select('id', 'name')
+            ->where('company_id', $user->company_id)
+            ->whereIn('id', $branchIds)
+            ->orderBy('name')
+            ->get();
+
+        $view = $request->query('view', 'most_stock');
+        if (!in_array($view, ['most_stock', 'least_stock', 'best_selling'], true)) {
+            $view = 'most_stock';
+        }
+
+        $branchId = $request->query('branch_id');
+        $filterBranchIds = $branchId ? [(int) $branchId] : $branchIds;
+
+        if ($branchId && !in_array((int) $branchId, $branchIds, true)) {
+            abort(403);
+        }
+
+        $dateParam = $request->input('date_range');
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            [$startDate, $endDate] = explode(' - ', $dateParam);
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        $products = $this->getInventoryReportData($view, $filterBranchIds, !$branchId, $startDate, $endDate);
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate');
+        $endDateParam = $request->input('endDate');
+
+        return view('inventory-tracking.inventory-report', [
+            'company' => $company,
+            'branches' => $branches,
+            'branchId' => $branchId,
+            'view' => $view,
+            'products' => $products,
+            'aggregateBranches' => !$branchId,
+            'selectedRangeParam' => $selectedRangeParam,
+            'startDateParam' => $startDateParam,
+            'endDateParam' => $endDateParam,
         ]);
     }
 
@@ -351,5 +414,141 @@ class InventoryProcessingController extends Controller
             'product_physical_counts' => 'Physical Counts',
             'transactions' => 'POS Transactions',
         ];
+    }
+
+    private function getInventoryReportData(
+        string $view,
+        array $branchIds,
+        bool $aggregateBranches,
+        string $startDate,
+        string $endDate
+    ): array {
+        if (empty($branchIds)) {
+            return [];
+        }
+
+        $inventoryDb = config('database.connections.inventory.database');
+        $isyncDb = config('database.connections.mysql.database');
+        $branchIdList = implode(',', array_map('intval', $branchIds));
+
+        if ($view === 'best_selling') {
+            return $this->getBestSellingReportData(
+                $inventoryDb,
+                $isyncDb,
+                $branchIdList,
+                $aggregateBranches,
+                $startDate,
+                $endDate
+            );
+        }
+
+        $orderDirection = $view === 'least_stock' ? 'ASC' : 'DESC';
+
+        if ($aggregateBranches) {
+            $query = "
+                SELECT
+                    bp.product_id,
+                    p.name AS product_name,
+                    p.sku,
+                    SUM(bp.stock) AS stock
+                FROM {$inventoryDb}.branch_product bp
+                INNER JOIN {$isyncDb}.products p ON bp.product_id = p.id
+                WHERE bp.branch_id IN ({$branchIdList})
+                GROUP BY bp.product_id, p.name, p.sku
+                ORDER BY stock {$orderDirection}
+                LIMIT 100
+            ";
+        } else {
+            $query = "
+                SELECT
+                    bp.product_id,
+                    p.name AS product_name,
+                    p.sku,
+                    b.name AS branch_name,
+                    bp.stock
+                FROM {$inventoryDb}.branch_product bp
+                INNER JOIN {$isyncDb}.products p ON bp.product_id = p.id
+                INNER JOIN {$isyncDb}.branches b ON bp.branch_id = b.id
+                WHERE bp.branch_id IN ({$branchIdList})
+                ORDER BY bp.stock {$orderDirection}
+                LIMIT 100
+            ";
+        }
+
+        return DB::select($query);
+    }
+
+    private function getBestSellingReportData(
+        string $inventoryDb,
+        string $isyncDb,
+        string $branchIdList,
+        bool $aggregateBranches,
+        string $startDate,
+        string $endDate
+    ): array {
+        $outboundSubquery = "
+            SELECT
+                product_id,
+                branch_id,
+                SUM(CASE WHEN new_qty < previous_qty THEN previous_qty - new_qty ELSE 0 END) AS total_outbound_qty,
+                SUM(CASE WHEN movement_type = 'transactions' AND new_qty < previous_qty
+                    THEN previous_qty - new_qty ELSE 0 END) AS sales_qty,
+                SUM(CASE WHEN movement_type = 'stock_transfer_orders' AND new_qty < previous_qty
+                    THEN previous_qty - new_qty ELSE 0 END) AS transfer_out_qty,
+                SUM(CASE WHEN movement_type = 'product_disposals' AND new_qty < previous_qty
+                    THEN previous_qty - new_qty ELSE 0 END) AS disposal_qty
+            FROM {$inventoryDb}.inventory_movement_logs
+            WHERE movement_type IN ('transactions', 'stock_transfer_orders', 'product_disposals')
+                AND processed_at BETWEEN '{$startDate}' AND '{$endDate}'
+                AND branch_id IN ({$branchIdList})
+            GROUP BY product_id, branch_id
+        ";
+
+        if ($aggregateBranches) {
+            $query = "
+                SELECT
+                    bp.product_id,
+                    p.name AS product_name,
+                    p.sku,
+                    SUM(bp.stock) AS stock,
+                    COALESCE(SUM(outbound.total_outbound_qty), 0) AS total_outbound_qty,
+                    COALESCE(SUM(outbound.sales_qty), 0) AS sales_qty,
+                    COALESCE(SUM(outbound.transfer_out_qty), 0) AS transfer_out_qty,
+                    COALESCE(SUM(outbound.disposal_qty), 0) AS disposal_qty
+                FROM {$inventoryDb}.branch_product bp
+                INNER JOIN {$isyncDb}.products p ON bp.product_id = p.id
+                LEFT JOIN ({$outboundSubquery}) outbound
+                    ON bp.product_id = outbound.product_id
+                    AND bp.branch_id = outbound.branch_id
+                WHERE bp.branch_id IN ({$branchIdList})
+                GROUP BY bp.product_id, p.name, p.sku
+                ORDER BY total_outbound_qty DESC
+                LIMIT 100
+            ";
+        } else {
+            $query = "
+                SELECT
+                    bp.product_id,
+                    p.name AS product_name,
+                    p.sku,
+                    b.name AS branch_name,
+                    bp.stock,
+                    COALESCE(outbound.total_outbound_qty, 0) AS total_outbound_qty,
+                    COALESCE(outbound.sales_qty, 0) AS sales_qty,
+                    COALESCE(outbound.transfer_out_qty, 0) AS transfer_out_qty,
+                    COALESCE(outbound.disposal_qty, 0) AS disposal_qty
+                FROM {$inventoryDb}.branch_product bp
+                INNER JOIN {$isyncDb}.products p ON bp.product_id = p.id
+                INNER JOIN {$isyncDb}.branches b ON bp.branch_id = b.id
+                LEFT JOIN ({$outboundSubquery}) outbound
+                    ON bp.product_id = outbound.product_id
+                    AND bp.branch_id = outbound.branch_id
+                WHERE bp.branch_id IN ({$branchIdList})
+                ORDER BY total_outbound_qty DESC
+                LIMIT 100
+            ";
+        }
+
+        return DB::select($query);
     }
 }
