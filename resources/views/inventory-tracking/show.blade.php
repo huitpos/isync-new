@@ -81,6 +81,7 @@
                 <div class="card-body py-4">
                     @if($isTransaction)
                         @php
+                            $totalItemOrders = 0;
                             $orders = \Illuminate\Support\Facades\DB::connection('transactional_db')
                                 ->table('orders')
                                 ->where('transaction_id', $movement->transaction_id)
@@ -108,6 +109,9 @@
                                                 <td>{{ $order->qty }}</td>
                                                 <td>₱ {{ number_format($order->amount, 2) }}</td>
                                             </tr>
+                                            @php
+                                                $totalItemOrders += $order->qty;
+                                            @endphp
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -172,6 +176,13 @@
                     @php
                         $isProcessed = $isTransaction ? $movement->inventory_processed : $movement->inventory_processed;
                         $canProcess = $isTransaction ? $movement->is_complete : ($movement->status === 'approved');
+
+                        $itemsMissing = false;
+                        if ($isTransaction) {
+                            if ($totalItemOrders != $movement->total_quantity) {
+                                $itemsMissing = true;
+                            }
+                        }
                     @endphp
 
                     @if($isProcessed)
@@ -186,6 +197,13 @@
                             <i class="fa-solid fa-triangle-exclamation fs-2hx text-warning me-4 mb-5 mb-sm-0"></i>
                             <div class="d-flex flex-column pe-0 pe-sm-10">
                                 <span>This movement must be approved/completed before processing.</span>
+                            </div>
+                        </div>
+                    @elseif($itemsMissing)
+                        <div class="alert alert-dismissible bg-light-warning d-flex flex-column flex-sm-row p-5 mb-0">
+                            <i class="fa-solid fa-triangle-exclamation fs-2hx text-warning me-4 mb-5 mb-sm-0"></i>
+                            <div class="d-flex flex-column pe-0 pe-sm-10">
+                                <span>Some items are missing from the transaction. Please wait for the orders to sync before processing.</span>
                             </div>
                         </div>
                     @else

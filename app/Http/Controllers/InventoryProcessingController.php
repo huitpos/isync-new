@@ -380,7 +380,7 @@ class InventoryProcessingController extends Controller
                 ->where('is_complete', true)
                 ->where('transactions.receipt_number', '!=', null)
                 ->where('is_void', false)
-                ->where('is_cut_off', true);
+                ->where('is_back_out', false);
 
             if ($branchIds) {
                 $query->whereIn('branch_id', $branchIds);
