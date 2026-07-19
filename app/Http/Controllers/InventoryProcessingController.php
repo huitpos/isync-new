@@ -11,6 +11,7 @@ use App\Models\{
     InventoryMovementLog,
     Company
 };
+use App\DataTables\BranchProductMasterListDataTable;
 use App\DataTables\InventoryProcessingHistoryDataTable;
 use App\Services\InventoryProcessor;
 use Carbon\Carbon;
@@ -159,6 +160,34 @@ class InventoryProcessingController extends Controller
             'movement_types' => $this->getMovementTypes(),
         ])->render('inventory-tracking.history', [
             'types' => $this->getMovementTypes(),
+            'branches' => $branches,
+            'company' => $company,
+        ]);
+    }
+
+    /**
+     * Display branch product master list with current stock on hand
+     */
+    public function masterList(Request $request, BranchProductMasterListDataTable $dataTable)
+    {
+        addVendors(['datatables']);
+
+        $user = Auth::user();
+        $company = Company::find($user->company_id);
+        $branchIds = $user->branches->pluck('id')->toArray();
+
+        $branches = DB::table('branches')
+            ->select('id', 'name')
+            ->where('company_id', $user->company_id)
+            ->whereIn('id', $branchIds)
+            ->orderBy('name')
+            ->get();
+
+        return $dataTable->with([
+            'branch_id' => $request->query('branch_id'),
+            'branch_ids' => $branchIds,
+            'company_id' => $user->company_id,
+        ])->render('inventory-tracking.master-list', [
             'branches' => $branches,
             'company' => $company,
         ]);
