@@ -110,7 +110,7 @@
                                                 <td>₱ {{ number_format($order->amount, 2) }}</td>
                                             </tr>
                                             @php
-                                                $totalItemOrders += $order->qty;
+                                                $totalItemOrders += abs($order->qty);
                                             @endphp
                                         @endforeach
                                     </tbody>
