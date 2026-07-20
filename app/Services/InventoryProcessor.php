@@ -183,7 +183,7 @@ class InventoryProcessor
                 $this->updateInventory(
                     branchId: $order->source_branch_id,
                     productId: $item->product_id,
-                    qty: $item->qty,
+                    qty: $item->quantity,
                     operation: 'subtract',
                     movementType: 'stock_transfer_orders',
                     objectId: $order->id,
@@ -224,6 +224,7 @@ class InventoryProcessor
         }
 
         $items = $disposal->items;
+
         if ($items->isEmpty()) {
             return ['success' => false, 'message' => 'Disposal has no items'];
         }
@@ -234,7 +235,7 @@ class InventoryProcessor
                 $this->updateInventory(
                     branchId: $disposal->branch_id,
                     productId: $item->product_id,
-                    qty: $item->qty,
+                    qty: $item->quantity,
                     operation: 'subtract',
                     movementType: 'product_disposals',
                     objectId: $disposal->id,
