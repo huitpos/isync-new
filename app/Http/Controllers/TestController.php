@@ -22,18 +22,46 @@ class TestController extends Controller
         $this->productRepository = $productRepository;
     }
 
-    public function test()
+    public function test(Request $request, $branchId)
     {
-        $product = Product::find(1022)
-            ->load('bundledItems', 'rawItems');
+        $branch = Branch::with(['company'])->find($branchId);
 
-        $branch = Branch::findOrFail(1);
+        $productsQuery = $branch->company->products()
+            ->whereHas('itemType', function ($subQuery) {
+                $subQuery->where('show_in_cashier', true);
+            })
+            ->leftJoin('branch_product', function ($join) use ($branchId) {
+                    $join->on('branch_product.product_id', '=', 'products.id')
+                         ->where('branch_product.branch_id', '=', $branchId);
+                })
+            ->addSelect([
+                'products.*',
+                DB::raw('IFNULL(NULLIF(branch_product.price, 0), products.srp) as srp'),
+                DB::raw('IFNULL(NULLIF(branch_product.cost, 0), products.cost) as cost'),
+                DB::raw('IFNULL(NULLIF(branch_product.markup, 0), products.markup) as markup')
+            ])
+            ->with(
+                'itemType',
+                'uom',
+                'itemLocations',
+                'discounts',
+                'bundledItems',
+                'rawItems'
+            )
+            ->where('uom_id', '>', 0)
+            ->whereIn('products.id', [8923, 8924])
+            ->when($request->from_date, function ($q) use ($request) {
+                $q->where(function ($query) use ($request) {
+                    $query->where('updated_at', '>=', $request->from_date)
+                        ->orWhere('created_at', '>=', $request->from_date);
+                });
+            });
 
-        foreach ($product->bundledItems as $bundledItem) {
-            dd($bundledItem->bundled_item->quantity);
-        }
+        // Paginate the products
+        $perPage = $request->get('per_page', 2);
+        $products = $productsQuery->paginate($perPage);
 
-        $this->productRepository->updateBranchQuantity($product, $branch, 1, 'end_of_days', 5, null, 'subtract', $product->uom_id);
+        dd($products);
 
         dd("Test route is working!");
     }

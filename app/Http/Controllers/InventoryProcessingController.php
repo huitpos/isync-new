@@ -13,6 +13,8 @@ use App\Models\{
 };
 use App\DataTables\BranchProductMasterListDataTable;
 use App\DataTables\InventoryProcessingHistoryDataTable;
+use App\Exports\BranchProductMasterListExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Services\InventoryProcessor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -187,10 +189,30 @@ class InventoryProcessingController extends Controller
             'branch_id' => $request->query('branch_id'),
             'branch_ids' => $branchIds,
             'company_id' => $user->company_id,
+            'product_name' => $request->query('product_name'),
         ])->render('inventory-tracking.master-list', [
             'branches' => $branches,
             'company' => $company,
         ]);
+    }
+
+    /**
+     * Export branch product master list to Excel based on current filters
+     */
+    public function masterListExport(Request $request)
+    {
+        $user = Auth::user();
+        $branchIds = $user->branches->pluck('id')->toArray();
+
+        return Excel::download(
+            new BranchProductMasterListExport(
+                $user->company_id,
+                $branchIds,
+                $request->query('branch_id') ? (int) $request->query('branch_id') : null,
+                $request->query('product_name'),
+            ),
+            'Stock Master List - ' . Carbon::now()->format('Y-m-d') . '.xlsx',
+        );
     }
 
     /**
