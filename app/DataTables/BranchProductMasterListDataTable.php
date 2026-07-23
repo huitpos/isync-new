@@ -2,10 +2,9 @@
 
 namespace App\DataTables;
 
-use App\Models\Branch;
-use App\Models\BranchProduct as Model;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
@@ -16,12 +15,7 @@ class BranchProductMasterListDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('product_display', function (Model $branchProduct) {
-                $product = $branchProduct->product;
-                if (!$product) {
-                    return 'Product #' . $branchProduct->product_id;
-                }
-
+            ->addColumn('product_display', function (Product $product) {
                 $html = '<strong>' . e($product->name) . '</strong>';
 
                 if ($product->code) {
@@ -34,45 +28,80 @@ class BranchProductMasterListDataTable extends DataTable
 
                 return $html;
             })
-            ->editColumn('stock', function (Model $branchProduct) {
-                $stock = (float) $branchProduct->stock;
+            ->editColumn('branch_name', function (Product $product) {
+                return e($product->branch_name);
+            })
+            ->editColumn('stock', function (Product $product) {
+                $stock = (float) $product->stock;
                 $class = $stock <= 0 ? 'text-danger' : 'text-success';
 
                 return '<span class="fw-bold ' . $class . '">' . number_format($stock, 2) . '</span>';
             })
+            ->editColumn('cost', fn (Product $product) => number_format((float) $product->cost, 2))
+            ->editColumn('price', fn (Product $product) => number_format((float) $product->price, 2))
             ->filterColumn('product_display', function ($query, $keyword) {
-                $productIds = Product::where('company_id', $this->company_id)
-                    ->where(function ($productQuery) use ($keyword) {
-                        $productQuery->where('name', 'like', '%' . $keyword . '%')
-                            ->orWhere('sku', 'like', '%' . $keyword . '%')
-                            ->orWhere('code', 'like', '%' . $keyword . '%');
-                    })
-                    ->pluck('id');
-
-                $query->whereIn('product_id', $productIds);
+                $query->where(function ($productQuery) use ($keyword) {
+                    $productQuery->where('products.name', 'like', '%' . $keyword . '%')
+                        ->orWhere('products.sku', 'like', '%' . $keyword . '%')
+                        ->orWhere('products.code', 'like', '%' . $keyword . '%');
+                });
             })
-            ->filterColumn('branch.name', function ($query, $keyword) {
-                $branchIds = Branch::whereIn('id', $this->branch_ids)
-                    ->where('name', 'like', '%' . $keyword . '%')
-                    ->pluck('id');
-
-                $query->whereIn('branch_id', $branchIds);
+            ->filterColumn('branch_name', function ($query, $keyword) {
+                $query->where('branches.name', 'like', '%' . $keyword . '%');
             })
             ->rawColumns(['product_display', 'stock']);
     }
 
-    public function query(Model $model): QueryBuilder
+    public function query(Product $model): QueryBuilder
     {
-        $productIds = Product::where('company_id', $this->company_id)->pluck('id');
+        return static::buildMasterListQuery(
+            $model->newQuery(),
+            (int) $this->company_id,
+            $this->branch_id ? [(int) $this->branch_id] : array_map('intval', (array) $this->branch_ids),
+            $this->product_name ?? null,
+        );
+    }
 
-        $query = $model->newQuery()
-            ->with(['branch', 'product.uom'])
-            ->whereIn('product_id', $productIds);
+    public static function buildMasterListQuery(
+        QueryBuilder $query,
+        int $companyId,
+        array $branchIds,
+        ?string $productName = null,
+    ): QueryBuilder {
+        $inventoryDb = config('database.connections.inventory.database');
+        $isyncDb = config('database.connections.mysql.database');
 
-        if ($this->branch_id) {
-            $query->where('branch_id', $this->branch_id);
-        } else {
-            $query->whereIn('branch_id', $this->branch_ids);
+        $query
+            ->select([
+                'products.id',
+                'products.name',
+                'products.code',
+                'products.sku',
+                'branches.id as branch_id',
+                'branches.name as branch_name',
+                DB::raw('COALESCE(inv_bp.stock, sync_bp.stock, 0) as stock'),
+                DB::raw('COALESCE(sync_bp.cost, products.cost, 0) as cost'),
+                DB::raw('COALESCE(sync_bp.price, products.srp, 0) as price'),
+            ])
+            ->join('branches', function ($join) use ($branchIds) {
+                $join->whereIn('branches.id', $branchIds);
+            })
+            ->leftJoin("{$inventoryDb}.branch_product as inv_bp", function ($join) {
+                $join->on('inv_bp.product_id', '=', 'products.id')
+                    ->on('inv_bp.branch_id', '=', 'branches.id');
+            })
+            ->leftJoin("{$isyncDb}.branch_product as sync_bp", function ($join) {
+                $join->on('sync_bp.product_id', '=', 'products.id')
+                    ->on('sync_bp.branch_id', '=', 'branches.id');
+            })
+            ->where('products.company_id', $companyId);
+
+        if ($productName) {
+            $query->where(function ($productQuery) use ($productName) {
+                $productQuery->where('products.name', 'like', '%' . $productName . '%')
+                    ->orWhere('products.sku', 'like', '%' . $productName . '%')
+                    ->orWhere('products.code', 'like', '%' . $productName . '%');
+            });
         }
 
         return $query;
@@ -87,7 +116,7 @@ class BranchProductMasterListDataTable extends DataTable
             ->dom('frt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>>")
             ->addTableClass('table table-striped table-hover align-middle')
             ->setTableHeadClass('table-dark')
-            ->orderBy(4, 'desc');
+            ->orderBy(3, 'desc');
     }
 
     public function getColumns(): array
@@ -95,8 +124,10 @@ class BranchProductMasterListDataTable extends DataTable
         return [
             Column::make('id')->visible(false),
             Column::make('product_display')->title('Product')->orderable(false),
-            Column::make('branch.name')->title('Branch'),
-            Column::make('stock')->title('Stock on Hand')
+            Column::make('branch_name')->title('Branch')->orderable(false),
+            Column::make('stock')->title('Stock on Hand'),
+            Column::make('cost')->title('Cost'),
+            Column::make('price')->title('Price'),
         ];
     }
 

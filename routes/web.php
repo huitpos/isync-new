@@ -92,7 +92,7 @@ Route::get('/download-product-import-template', function () {
 
 Route::get('/map-data', [TestController::class, 'mapData']);
 Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
-Route::get('/test', [TestController::class, 'test']);
+Route::get('/test/{branchId}', [TestController::class, 'test']);
 
 require __DIR__ . '/auth.php';
 
@@ -103,6 +103,7 @@ Route::middleware(['auth'])->prefix('inventory-tracking')->name('inventory-track
     Route::get('/ajax/products', [InventoryProcessingController::class, 'searchProducts'])->name('ajax-products');
     Route::get('/history/view', [InventoryProcessingController::class, 'history'])->name('history');
     Route::get('/master-list', [InventoryProcessingController::class, 'masterList'])->name('master-list');
+    Route::get('/master-list/export', [InventoryProcessingController::class, 'masterListExport'])->name('master-list.export');
     Route::get('/report', [InventoryProcessingController::class, 'inventoryReport'])->name('report');
     Route::get('/{type}/{id}', [InventoryProcessingController::class, 'show'])->name('show');
     Route::post('/{type}/{id}/process', [InventoryProcessingController::class, 'process'])->name('process');

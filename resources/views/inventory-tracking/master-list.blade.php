@@ -45,6 +45,12 @@
                         Clear Filters
                     </button>
                 </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" id="exportMasterList" class="btn btn-primary w-100">
+                        {!! getIcon('file-down', 'fs-2', '', 'i') !!}
+                        Export to Excel
+                    </button>
+                </div>
             </div>
 
             <div class="table-responsive">
@@ -63,6 +69,7 @@
                     url: '{!! route('inventory-tracking.master-list') !!}',
                     data: function (d) {
                         d.branch_id = $('#branch_id').val();
+                        d.product_name = $('#product_name').val();
                     }
                 },
                 columnDefs: [
@@ -75,8 +82,10 @@
                 columns: [
                     { data: 'id' },
                     { data: 'product_display', orderable: false },
-                    { data: 'branch.name', orderable: false },
+                    { data: 'branch_name', orderable: false },
                     { data: 'stock' },
+                    { data: 'cost' },
+                    { data: 'price' },
                 ],
                 order: [[3, 'asc']]
             });
@@ -90,14 +99,30 @@
             $('#product_name').on('keyup', function () {
                 clearTimeout(productNameTimer);
                 productNameTimer = setTimeout(function () {
-                    masterListTable.column(1).search($('#product_name').val()).draw();
+                    masterListTable.ajax.reload();
                 }, 300);
             });
 
             $('#clearFilters').on('click', function () {
                 $('#product_name').val('');
-                masterListTable.column(1).search('');
                 $('#branch_id').val('').trigger('change');
+            });
+
+            $('#exportMasterList').on('click', function () {
+                var params = new URLSearchParams();
+                var branchId = $('#branch_id').val();
+                var productName = $('#product_name').val();
+
+                if (branchId) {
+                    params.set('branch_id', branchId);
+                }
+
+                if (productName) {
+                    params.set('product_name', productName);
+                }
+
+                var exportUrl = '{!! route('inventory-tracking.master-list.export') !!}';
+                window.location.href = params.toString() ? exportUrl + '?' + params.toString() : exportUrl;
             });
         });
     </script>
