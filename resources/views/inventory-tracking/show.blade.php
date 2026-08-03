@@ -87,7 +87,6 @@
                                 ->where('transaction_id', $movement->transaction_id)
                                 ->where('branch_id', $movement->branch_id)
                                 ->where('pos_machine_id', $movement->pos_machine_id)
-                                ->where('is_completed', true)
                                 ->where('is_void', false)
                                 ->where('is_back_out', false)
                                 ->get();
@@ -104,16 +103,22 @@
                                     </thead>
                                     <tbody>
                                         @foreach($orders as $order)
+                                            @php
+                                                if ($order->bundle_order_id || $order->is_completed) {
+                                                    if ($order->qty > 0) {
+                                                        $totalItemOrders += $order->qty;
+                                                    }
+                                                }
+
+                                                if ($order->bundle_order_id) {
+                                                    continue;
+                                                }
+                                            @endphp
                                             <tr>
                                                 <td>{{ $order->name }}</td>
                                                 <td>{{ $order->qty }}</td>
                                                 <td>₱ {{ number_format($order->amount, 2) }}</td>
                                             </tr>
-                                            @php
-                                                if ($order->qty > 0) {
-                                                    $totalItemOrders += $order->qty;
-                                                }
-                                            @endphp
                                         @endforeach
                                     </tbody>
                                 </table>

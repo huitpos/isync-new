@@ -322,7 +322,7 @@ class InventoryProcessor
             return ['success' => false, 'message' => 'Transaction not found'];
         }
 
-        // Get completed orders for this transaction
+        // Get completed orders for this transaction, grouped by product
         $orders = DB::connection('transactional_db')
             ->table('orders')
             ->where('transaction_id', $transaction->transaction_id)
@@ -331,6 +331,8 @@ class InventoryProcessor
             ->where('is_completed', true)
             ->where('is_void', false)
             ->where('is_back_out', false)
+            ->select('product_id', DB::raw('SUM(qty) as qty'))
+            ->groupBy('product_id')
             ->get();
 
         if ($orders->isEmpty()) {

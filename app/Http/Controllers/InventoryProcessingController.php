@@ -118,7 +118,7 @@ class InventoryProcessingController extends Controller
         $result = $this->inventoryProcessor->processMovement(
             type: $type,
             id: $id,
-            userId: Auth::id()
+            userId: Auth::id(),
         );
 
         if ($result['success']) {
@@ -315,7 +315,7 @@ class InventoryProcessingController extends Controller
                 ->join('branches', 'purchase_deliveries.branch_id', '=', 'branches.id')
                 ->select('purchase_deliveries.*', 'branches.name as branch_name')
                 ->where('purchase_deliveries.status', $status);
-            
+
             if ($branchIds) $query->whereIn('branch_id', $branchIds);
 
             $total = $query->count();
