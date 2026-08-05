@@ -110,7 +110,7 @@
                                                     }
                                                 }
 
-                                                if ($order->bundle_order_id) {
+                                                if ($order->bundle_order_id || !$order->is_completed) {
                                                     continue;
                                                 }
                                             @endphp
