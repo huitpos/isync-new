@@ -62,12 +62,21 @@
                     </div>
 
                     @if($isTransaction)
-                    <div class="row mb-5">
-                        <div class="col-md-6">
-                            <label class="form-label">SI</label>
-                            <input value="{{ $movement->receipt_number }}" type="text" readonly class="form-control"/>
-                        </div>
-                    </div>
+                        @if($movement->receipt_number)
+                            <div class="row mb-5">
+                                <div class="col-md-6">
+                                    <label class="form-label">SI</label>
+                                    <input value="{{ $movement->receipt_number }}" type="text" readonly class="form-control"/>
+                                </div>
+                            </div>
+                        @elseif($movement->control_number)
+                            <div class="row mb-5">
+                                <div class="col-md-6">
+                                    <label class="form-label">Control #</label>
+                                    <input value="{{ $movement->control_number }}" type="text" readonly class="form-control"/>
+                                </div>
+                            </div>
+                        @endif
                     @endif
                 </div>
             </div>
