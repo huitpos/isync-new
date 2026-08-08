@@ -401,6 +401,10 @@ class InventoryProcessingController extends Controller
                 ->where('inventory_processed', false)
                 ->where('is_complete', true)
                 ->where('is_void', false)
+                ->where(function ($query) {
+                    $query->where('receipt_number', '!=', null)
+                        ->orWhere('is_account_receivable', true);
+                })
                 ->where('is_back_out', false);
 
             if ($branchIds) {
