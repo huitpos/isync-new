@@ -400,8 +400,11 @@ class InventoryProcessingController extends Controller
                 ->select('transactions.*', 'branches.name as branch_name')
                 ->where('inventory_processed', false)
                 ->where('is_complete', true)
-                ->where('transactions.receipt_number', '!=', null)
                 ->where('is_void', false)
+                ->where(function ($query) {
+                    $query->where('receipt_number', '!=', null)
+                        ->orWhere('is_account_receivable', true);
+                })
                 ->where('is_back_out', false);
 
             if ($branchIds) {
@@ -413,7 +416,7 @@ class InventoryProcessingController extends Controller
                 ->map(fn($t) => [
                     ...(array) $t,
                     'type' => 'transactions',
-                    'description' => "SI #{$t->receipt_number}",
+                    'description' => $t->receipt_number ? "SI #{$t->receipt_number}" : "Control #{$t->control_number}",
                     'created_at' => $t->created_at,
                     'branch' => $t->branch_name ?? 'N/A',
                 ])->toArray();
