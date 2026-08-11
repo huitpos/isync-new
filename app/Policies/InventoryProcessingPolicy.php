@@ -24,6 +24,14 @@ class InventoryProcessingPolicy
     }
 
     /**
+     * Determine whether the user can revert inventory movements
+     */
+    public function revert(User $user): bool
+    {
+        return $user->hasRole(['admin', 'inventory_manager', 'super_admin']);
+    }
+
+    /**
      * Determine whether the user can view history
      */
     public function viewHistory(User $user): bool

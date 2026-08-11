@@ -135,6 +135,89 @@ class InventoryProcessingController extends Controller
     }
 
     /**
+     * Show revert preview for a processed movement
+     */
+    public function showRevert(Request $request, string $movement_type, int $object_id, int $branch_id)
+    {
+        // $this->authorize('revert', InventoryMovementLog::class);
+
+        $branchId = $branch_id;
+
+        $branchIds = Auth::user()->branches->pluck('id')->toArray();
+
+        if (!in_array($branchId, $branchIds, true)) {
+            abort(403);
+        }
+
+        if (!array_key_exists($movement_type, $this->getMovementTypes())) {
+            abort(404);
+        }
+
+        $preview = $this->inventoryProcessor->getRevertPreview($movement_type, $object_id, $branchId);
+
+        if (!$preview['success']) {
+            return redirect()
+                ->route('inventory-tracking.history', array_filter([
+                    'movement_type' => $request->query('return_movement_type'),
+                    'branch_id' => $request->query('return_branch_id'),
+                    'product_id' => $request->query('return_product_id'),
+                ]))
+                ->with('error', $preview['message']);
+        }
+
+        $company = Company::find(Auth::user()->company_id);
+        $branch = DB::table('branches')->where('id', $branchId)->first();
+
+        return view('inventory-tracking.revert', [
+            'movement_type' => $movement_type,
+            'object_id' => $object_id,
+            'branch_id' => $branchId,
+            'branch' => $branch,
+            'items' => $preview['items'],
+            'item_count' => $preview['item_count'],
+            'processed_at' => $preview['processed_at'],
+            'processed_by' => $preview['processed_by'],
+            'reference' => $this->getRevertReference($movement_type, $object_id, $branchId, $company->slug),
+            'types' => $this->getMovementTypeLabels(),
+            'company' => $company,
+            'return_movement_type' => $request->query('return_movement_type'),
+            'return_branch_id' => $request->query('return_branch_id'),
+            'return_product_id' => $request->query('return_product_id'),
+        ]);
+    }
+
+    /**
+     * Revert a processed inventory movement
+     */
+    public function revert(Request $request)
+    {
+        // $this->authorize('revert', InventoryMovementLog::class);
+
+        $validated = $request->validate([
+            'movement_type' => 'required|string',
+            'object_id' => 'required|integer',
+            'branch_id' => 'required|integer',
+        ]);
+
+        $result = $this->inventoryProcessor->revertMovement(
+            type: $validated['movement_type'],
+            objectId: (int) $validated['object_id'],
+            branchId: (int) $validated['branch_id'],
+            userId: Auth::id(),
+        );
+
+        if ($result['success']) {
+            return redirect()->route('inventory-tracking.history', array_filter([
+                'movement_type' => $request->input('return_movement_type'),
+                'branch_id' => $request->input('return_branch_id'),
+                'product_id' => $request->input('return_product_id'),
+            ]))->with('success', $result['message']);
+        }
+
+        return redirect()->back()->with('error', $result['message']);
+    }
+
+    /**
      * Display processing history
      */
     public function history(Request $request, InventoryProcessingHistoryDataTable $dataTable)
@@ -154,12 +237,13 @@ class InventoryProcessingController extends Controller
             ->get();
 
         return $dataTable->with([
-            'movement_type' => $request->query('movement_type'),
-            'branch_id' => $request->query('branch_id'),
-            'product_id' => $request->query('product_id'),
+            'movement_type' => $request->input('movement_type'),
+            'branch_id' => $request->input('branch_id'),
+            'product_id' => $request->input('product_id'),
+            'description' => $request->input('description'),
             'branch_ids' => $branchIds,
             'company_slug' => $company->slug,
-            'movement_types' => $this->getMovementTypes(),
+            'movement_types' => $this->getMovementTypeLabels(),
         ])->render('inventory-tracking.history', [
             'types' => $this->getMovementTypes(),
             'branches' => $branches,
@@ -468,6 +552,58 @@ class InventoryProcessingController extends Controller
             'product_physical_counts' => 'Physical Counts',
             'transactions' => 'POS Transactions',
         ];
+    }
+
+    private function getMovementTypeLabels(): array
+    {
+        return array_merge($this->getMovementTypes(), [
+            'purchase_deliveries_revert' => 'Purchase Deliveries (Revert)',
+            'stock_transfer_deliveries_revert' => 'Transfer Deliveries (Revert)',
+            'stock_transfer_orders_revert' => 'Transfer Orders (Revert)',
+            'product_disposals_revert' => 'Product Disposals (Revert)',
+            'product_physical_counts_revert' => 'Physical Counts (Revert)',
+            'transactions_revert' => 'POS Transactions (Revert)',
+        ]);
+    }
+
+    private function getRevertReference(string $type, int $objectId, int $branchId, string $companySlug): ?string
+    {
+        if ($type === 'transactions') {
+            $transaction = DB::connection('transactional_db')
+                ->table('transactions')
+                ->where('transaction_id', $objectId)
+                ->where('branch_id', $branchId)
+                ->first();
+
+            if ($transaction) {
+                return $transaction->receipt_number
+                    ? "SI #{$transaction->receipt_number}"
+                    : "Control #{$transaction->control_number}";
+            }
+        }
+
+        if ($type === 'purchase_deliveries') {
+            $delivery = PurchaseDelivery::where('id', $objectId)->where('branch_id', $branchId)->first();
+            if ($delivery) {
+                return "PD #{$delivery->pd_number}";
+            }
+        }
+
+        if ($type === 'stock_transfer_deliveries') {
+            $delivery = StockTransferDelivery::find($objectId);
+            if ($delivery) {
+                return "STD #{$delivery->std_number}";
+            }
+        }
+
+        if ($type === 'stock_transfer_orders') {
+            $order = StockTransferOrder::find($objectId);
+            if ($order) {
+                return "STO #{$order->sto_number}";
+            }
+        }
+
+        return null;
     }
 
     private function getInventoryReportData(

@@ -522,7 +522,12 @@ Breadcrumbs::for('inventory-tracking.index', function (BreadcrumbTrail $trail, $
 
 Breadcrumbs::for('inventory-tracking.history', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('inventory-tracking.index', $company);
-    $trail->push('History');
+    $trail->push('History', route('inventory-tracking.history'));
+});
+
+Breadcrumbs::for('inventory-tracking.revert', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('inventory-tracking.history', $company);
+    $trail->push('Revert Movement');
 });
 
 Breadcrumbs::for('inventory-tracking.report', function (BreadcrumbTrail $trail, $company) {

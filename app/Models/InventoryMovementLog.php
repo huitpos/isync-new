@@ -19,12 +19,14 @@ class InventoryMovementLog extends Model
         'new_qty',
         'processed_by',
         'processed_at',
+        'reverted_at',
     ];
 
     protected $casts = [
         'previous_qty' => 'decimal:2',
         'new_qty' => 'decimal:2',
         'processed_at' => 'datetime',
+        'reverted_at' => 'datetime',
     ];
 
     /**
