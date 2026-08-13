@@ -16,6 +16,8 @@ class InventoryProcessingHistoryDataTable extends DataTable
     {
         $companySlug = $this->company_slug;
         $types = $this->movement_types;
+        $user = auth()->user();
+        $canRevert = $user !== null;
 
         return (new EloquentDataTable($query))
             ->addColumn('product_display', function (Model $log) use ($companySlug) {
@@ -43,7 +45,28 @@ class InventoryProcessingHistoryDataTable extends DataTable
                 return '<small>' . $log->processed_at->format('M d, Y') . '</small><br>'
                     . '<small class="text-muted">' . $log->processed_at->format('H:i:s') . '</small>';
             })
-            ->rawColumns(['product_display', 'previous_qty', 'new_qty', 'processed_at']);
+            ->addColumn('actions', function (Model $log) use ($canRevert) {
+                if ($log->reverted_at) {
+                    return '<span class="badge badge-light-warning">Reverted</span><br>'
+                        . '<small class="text-muted">' . $log->reverted_at->format('M d, Y H:i') . '</small>';
+                }
+
+                if (!$canRevert || str_ends_with($log->movement_type, '_revert')) {
+                    return '';
+                }
+
+                $url = route('inventory-tracking.revert.show', array_filter([
+                    'movement_type' => $log->movement_type,
+                    'object_id' => $log->object_id,
+                    'branch_id' => $log->branch_id,
+                    'return_movement_type' => request('movement_type'),
+                    'return_branch_id' => request('branch_id'),
+                    'return_product_id' => request('product_id'),
+                ]));
+
+                return '<a href="' . e($url) . '" class="btn btn-sm btn-light-danger">Revert</a>';
+            })
+            ->rawColumns(['product_display', 'previous_qty', 'new_qty', 'processed_at', 'actions']);
     }
 
     public function query(Model $model): QueryBuilder
@@ -65,9 +88,76 @@ class InventoryProcessingHistoryDataTable extends DataTable
             $query->where('product_id', $this->product_id);
         }
 
+        if ($this->description) {
+            $this->applyDescriptionFilter($query, (string) $this->description);
+        }
+
         $query->orderBy('processed_at', 'desc');
 
         return $query;
+    }
+
+    private function applyDescriptionFilter(QueryBuilder $query, string $description): void
+    {
+        $keyword = trim($description);
+
+        if ($keyword === '') {
+            return;
+        }
+
+        $normalized = preg_replace('/^(SI|PD|STD|STO|CONTROL)\s*#?\s*/i', '', $keyword) ?: $keyword;
+        $transactionalDb = config('database.connections.transactional_db.database');
+        $mysqlDb = config('database.connections.mysql.database');
+
+        $query->where(function (QueryBuilder $outer) use ($keyword, $normalized, $transactionalDb, $mysqlDb) {
+            $outer->whereExists(function ($exists) use ($keyword, $mysqlDb) {
+                $exists->select(DB::raw(1))
+                    ->from("{$mysqlDb}.products as p")
+                    ->whereColumn('p.id', 'inventory_movement_logs.product_id')
+                    ->where('p.name', 'like', '%' . $keyword . '%');
+            })
+            ->orWhere(function (QueryBuilder $sub) use ($normalized, $transactionalDb) {
+                $sub->whereIn('movement_type', ['transactions', 'transactions_revert'])
+                    ->whereExists(function ($exists) use ($normalized, $transactionalDb) {
+                        $exists->select(DB::raw(1))
+                            ->from("{$transactionalDb}.transactions as t")
+                            ->whereColumn('t.transaction_id', 'inventory_movement_logs.object_id')
+                            ->whereColumn('t.branch_id', 'inventory_movement_logs.branch_id')
+                            ->where(function ($tq) use ($normalized) {
+                                $tq->where('t.receipt_number', 'like', '%' . $normalized . '%')
+                                    ->orWhere('t.control_number', 'like', '%' . $normalized . '%');
+                            });
+                    });
+            })
+            ->orWhere(function (QueryBuilder $sub) use ($normalized, $mysqlDb) {
+                $sub->whereIn('movement_type', ['purchase_deliveries', 'purchase_deliveries_revert'])
+                    ->whereExists(function ($exists) use ($normalized, $mysqlDb) {
+                        $exists->select(DB::raw(1))
+                            ->from("{$mysqlDb}.purchase_deliveries as pd")
+                            ->whereColumn('pd.id', 'inventory_movement_logs.object_id')
+                            ->whereColumn('pd.branch_id', 'inventory_movement_logs.branch_id')
+                            ->where('pd.pd_number', 'like', '%' . $normalized . '%');
+                    });
+            })
+            ->orWhere(function (QueryBuilder $sub) use ($normalized, $mysqlDb) {
+                $sub->whereIn('movement_type', ['stock_transfer_deliveries', 'stock_transfer_deliveries_revert'])
+                    ->whereExists(function ($exists) use ($normalized, $mysqlDb) {
+                        $exists->select(DB::raw(1))
+                            ->from("{$mysqlDb}.stock_transfer_deliveries as std")
+                            ->whereColumn('std.id', 'inventory_movement_logs.object_id')
+                            ->where('std.std_number', 'like', '%' . $normalized . '%');
+                    });
+            })
+            ->orWhere(function (QueryBuilder $sub) use ($normalized, $mysqlDb) {
+                $sub->whereIn('movement_type', ['stock_transfer_orders', 'stock_transfer_orders_revert'])
+                    ->whereExists(function ($exists) use ($normalized, $mysqlDb) {
+                        $exists->select(DB::raw(1))
+                            ->from("{$mysqlDb}.stock_transfer_orders as sto")
+                            ->whereColumn('sto.id', 'inventory_movement_logs.object_id')
+                            ->where('sto.sto_number', 'like', '%' . $normalized . '%');
+                    });
+            });
+        });
     }
 
     public function html(): HtmlBuilder
@@ -93,6 +183,13 @@ class InventoryProcessingHistoryDataTable extends DataTable
             Column::make('new_qty')->title('New Qty'),
             Column::make('processed_by_name')->title('Processed By')->orderable(false)->searchable(false),
             Column::make('processed_at')->title('Processed At'),
+            Column::computed('actions')
+                ->title('Actions')
+                ->exportable(false)
+                ->printable(false)
+                ->orderable(false)
+                ->searchable(false)
+                ->width(120),
         ];
     }
 
@@ -103,7 +200,11 @@ class InventoryProcessingHistoryDataTable extends DataTable
 
     private function getMovementDescription(Model $log, string $companySlug): string
     {
-        if ($log->movement_type === 'transactions') {
+        $movementType = str_ends_with($log->movement_type, '_revert')
+            ? substr($log->movement_type, 0, -strlen('_revert'))
+            : $log->movement_type;
+
+        if ($movementType === 'transactions') {
             $transaction = DB::select(
                 'SELECT * FROM transactional_db.transactions WHERE transaction_id = ? and branch_id = ?',
                 [$log->object_id, $log->branch_id]
@@ -117,7 +218,7 @@ class InventoryProcessingHistoryDataTable extends DataTable
             }
         }
 
-        if ($log->movement_type === 'purchase_deliveries') {
+        if ($movementType === 'purchase_deliveries') {
             $purchaseDelivery = DB::select(
                 'SELECT * FROM purchase_deliveries WHERE id = ? and branch_id = ?',
                 [$log->object_id, $log->branch_id]
@@ -128,6 +229,28 @@ class InventoryProcessingHistoryDataTable extends DataTable
                 $pdNumber = e($purchaseDelivery[0]->pd_number);
 
                 return '<a href="' . $url . '" target="_blank">PD #' . $pdNumber . '</a>';
+            }
+        }
+
+        if ($movementType === 'stock_transfer_deliveries') {
+            $delivery = DB::select(
+                'SELECT id, std_number FROM stock_transfer_deliveries WHERE id = ?',
+                [$log->object_id]
+            );
+
+            if (isset($delivery[0])) {
+                return 'STD #' . e($delivery[0]->std_number);
+            }
+        }
+
+        if ($movementType === 'stock_transfer_orders') {
+            $order = DB::select(
+                'SELECT id, sto_number FROM stock_transfer_orders WHERE id = ?',
+                [$log->object_id]
+            );
+
+            if (isset($order[0])) {
+                return 'STO #' . e($order[0]->sto_number);
             }
         }
 

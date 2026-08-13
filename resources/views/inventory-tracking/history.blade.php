@@ -24,7 +24,7 @@
 
         <div class="card-body py-4">
             <div class="row g-3 mb-4">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label" for="movement_type">Movement Type</label>
                     <select id="movement_type" class="form-select form-select-solid">
                         <option value="">All Types</option>
@@ -33,7 +33,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label" for="branch_id">Branch</label>
                     <select id="branch_id" class="form-select form-select-solid">
                         @if ($branches->count() > 1)
@@ -44,7 +44,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label" for="product_id">Product</label>
                     <select
                         id="product_id"
@@ -54,6 +54,15 @@
                         class="form-control form-control-solid select2-ajax"
                         data-minimum-input="3"
                     ></select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="description">Description</label>
+                    <input
+                        type="text"
+                        id="description"
+                        class="form-control form-control-solid"
+                        placeholder="SI #, PD #, product name..."
+                    >
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="button" id="clearFilters" class="btn btn-light w-100">
@@ -90,15 +99,21 @@
                 });
             }
 
+            if ($.fn.DataTable.isDataTable('#inventory-history-table')) {
+                $('#inventory-history-table').DataTable().destroy();
+            }
+
             var historyTable = $('#inventory-history-table').DataTable({
                 processing: true,
                 serverSide: true,
+                searching: false,
                 ajax: {
                     url: '{!! route('inventory-tracking.history') !!}',
                     data: function (d) {
                         d.movement_type = $('#movement_type').val();
                         d.branch_id = $('#branch_id').val();
                         d.product_id = $('#product_id').val();
+                        d.description = $('#description').val();
                     }
                 },
                 columnDefs: [
@@ -117,9 +132,12 @@
                     { data: 'new_qty', orderable: false, searchable: false },
                     { data: 'processed_by_name', orderable: false, searchable: false },
                     { data: 'processed_at', orderable: false, searchable: false },
+                    { data: 'actions', orderable: false, searchable: false },
                 ],
                 order: [[7, 'desc']]
             });
+
+            var descriptionTimer = null;
 
             function reloadHistoryTable() {
                 historyTable.ajax.reload();
@@ -128,7 +146,13 @@
             $('#movement_type, #branch_id').on('change', reloadHistoryTable);
             $productSelect.on('change', reloadHistoryTable);
 
+            $('#description').on('keyup', function () {
+                clearTimeout(descriptionTimer);
+                descriptionTimer = setTimeout(reloadHistoryTable, 300);
+            });
+
             $('#clearFilters').on('click', function () {
+                $('#description').val('');
                 $('#movement_type').val('').trigger('change');
                 $('#branch_id').val('').trigger('change');
                 $productSelect.val(null).trigger('change');
