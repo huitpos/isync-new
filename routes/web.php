@@ -148,6 +148,7 @@ Route::middleware('auth')->group(function () {
     //company
     Route::middleware([ValidateCompanySlug::class])->prefix('{companySlug}')->group(function () {
         Route::get('/', [CompanyPageController::class, 'dashboard'])->name('company.dashboard');
+        Route::get('/dashboard-data', [CompanyPageController::class, 'dashboardData'])->name('company.dashboard.data');
         Route::resource('branches', CompanyBranchController::class, ['as' => 'company']);
         Route::resource('clusters', CompanyClusterController::class, ['as' => 'company']);
         Route::resource('departments', CompanyDepartmentController::class, ['as' => 'company']);
@@ -226,6 +227,7 @@ Route::middleware('auth')->group(function () {
         //branch
         Route::middleware([ValidateCompanySlug::class])->prefix('{branchSlug}')->group(function () {
             Route::get('/', [BranchPageController::class, 'dashboard'])->name('branch.dashboard');
+            Route::get('/dashboard-data', [BranchPageController::class, 'dashboardData'])->name('branch.dashboard.data');
             Route::resource('users', BranchUserController::class, ['as' => 'branch']);
             Route::resource('delivery-locations', BranchDeliveryLocationController::class, ['as' => 'branch']);
             Route::resource('purchase-requests', BranchPurchaseRequestController::class, ['as' => 'branch']);

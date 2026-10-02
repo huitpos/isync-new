@@ -25,45 +25,37 @@ class PageController extends Controller
     public function dashboard(Request $request)
     {
         $company = $request->attributes->get('company');
-        $activebranches = $company->activeBranches;
+        $filters = $this->dashboardFilters($request);
 
-        $branchId = $request->query('branch_id', null);
+        return view('company.dashboard', [
+            'company' => $company,
+            'activebranches' => $company->activeBranches,
+            'branchId' => $filters['branchId'],
+            'selectedRangeParam' => $filters['selectedRangeParam'],
+            'startDateParam' => $filters['startDateParam'],
+            'endDateParam' => $filters['endDateParam'],
+        ]);
+    }
 
-        $selectedRangeParam = $request->input('selectedRange', 'Year to Date');
-        $startDateParam = $request->input('startDate', null);
-        $endDateParam = $request->input('endDate', null);
-
-        $startDate = Carbon::now()->startOfYear()->format('Y-m-d 00:00:00');
-        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
-
-        $dateParam = $request->input('date_range', null);
-
-        if ($dateParam) {
-            list($startDate, $endDate) = explode(" - ", $dateParam);
-
-            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
-            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
-        }
+    public function dashboardData(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $filters = $this->dashboardFilters($request);
+        $branchId = $filters['branchId'];
+        $startDate = $filters['startDate'];
+        $endDate = $filters['endDate'];
 
         $netAmount = $this->companyRepository->getTransactionNetSales($company->id, $startDate, $endDate, $branchId);
         $grossAmount = $this->companyRepository->getTransactionGrossSales($company->id, $startDate, $endDate, $branchId);
         $transactionCount = $this->companyRepository->getTransactionCount($company->id, $startDate, $endDate, $branchId);
         $costAmount = $this->companyRepository->getTransactionCostAmount($company->id, $startDate, $endDate, $branchId);
 
-        // $netAmount = 0;
-        // $grossAmount = 0;
-        // $transactionCount = 0;
-        // $costAmount = 0;
-
-        // today
         $todayStart = Carbon::now()->startOfDay()->format('Y-m-d 00:00:00');
         $todayEnd = Carbon::now()->endOfDay()->format('Y-m-d 23:59:59');
         $todayNetAmount = $this->companyRepository->getTransactionNetSales($company->id, $todayStart, $todayEnd, $branchId);
         $todayGrossAmount = $this->companyRepository->getTransactionGrossSales($company->id, $todayStart, $todayEnd, $branchId);
         $todayTransactionCount = $this->companyRepository->getTransactionCount($company->id, $todayStart, $todayEnd, $branchId);
         $todayCostAmount = $this->companyRepository->getTransactionCostAmount($company->id, $todayStart, $todayEnd, $branchId);
-
-        // $todayNetAmount = $todayGrossAmount = $todayTransactionCount = $todayCostAmount = 0;
 
         $transactions = DB::table('transactional_db.transactions')
             ->select(
@@ -231,28 +223,71 @@ class PageController extends Controller
             $itemSales[] = [$item, $value];
         }
 
-        return view('company.dashboard', [
-            'company' => $company,
-            'netAmount' => $netAmount,
-            'grossAmount' => $grossAmount,
+        return response()->json([
+            'selectedRange' => $filters['selectedRangeParam'],
+            'today' => [
+                'transactionCount' => $todayTransactionCount,
+                'grossAmount' => number_format($todayGrossAmount, 2),
+                'netAmount' => number_format($todayNetAmount, 2),
+                'profit' => number_format($todayGrossAmount - $todayCostAmount, 2),
+            ],
+            'range' => [
+                'transactionCount' => $transactionCount,
+                'grossAmount' => number_format($grossAmount, 2),
+                'netAmount' => number_format($netAmount, 2),
+                'profit' => number_format($grossAmount - $costAmount, 2),
+            ],
             'branches' => $branches,
-            'salesData' => $finalData,
-            'transactionCount' => $transactionCount,
-            'itemSales' => $itemSales,
-            'departmentSales' => $departmentSales,
-            'paymentTypeSales' => $paymentTypeSales,
-            'activebranches' => $activebranches,
+            'salesData' => $this->numericChartRows($finalData),
+            'departmentSales' => $this->numericChartRows($departmentSales),
+            'itemSales' => $this->numericChartRows($itemSales),
+            'paymentTypeSales' => $this->numericChartRows($paymentTypeSales),
+        ]);
+    }
+
+    private function dashboardFilters(Request $request): array
+    {
+        $branchId = $request->input('branch_id') ?: null;
+        $selectedRangeParam = $request->input('selectedRange', 'Year to Date');
+        $startDateParam = $request->input('startDate');
+        $endDateParam = $request->input('endDate');
+        $dateParam = $request->input('date_range');
+
+        $startDate = Carbon::now()->startOfYear()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+
+        if ($dateParam && str_contains($dateParam, ' - ')) {
+            [$rawStart, $rawEnd] = explode(' - ', $dateParam, 2);
+            $startDate = Carbon::parse(trim($rawStart))->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse(trim($rawEnd))->format('Y-m-d 23:59:59');
+        } elseif ($startDateParam && $endDateParam) {
+            $startDate = Carbon::parse($startDateParam)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDateParam)->format('Y-m-d 23:59:59');
+        }
+
+        return [
             'branchId' => $branchId,
             'selectedRangeParam' => $selectedRangeParam,
             'startDateParam' => $startDateParam,
             'endDateParam' => $endDateParam,
-            'dateParam' => $dateParam,
-            'costAmount' => $costAmount,
-            'todayNetAmount' => $todayNetAmount,
-            'todayGrossAmount' => $todayGrossAmount,
-            'todayTransactionCount' => $todayTransactionCount,
-            'todayCostAmount' => $todayCostAmount,
-        ]);
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ];
+    }
+
+    private function numericChartRows(array $rows): array
+    {
+        return array_map(function ($row) {
+            foreach ($row as $index => $value) {
+                if ($index === 0) {
+                    continue;
+                }
+
+                $row[$index] = (float) $value;
+            }
+
+            return $row;
+        }, $rows);
     }
 
     public function getDepartmentProducts(Request $request, $companyId)
