@@ -65,13 +65,6 @@
 			'activeRoutes' => ['branch.stock-transfer-requests.*', 'branch.stock-transfer-orders.*', 'branch.stock-transfer-deliveries.*', 'branch.product-physical-counts.*', 'branch.product-disposals.*', 'inventory-tracking.*'],
 			'children' => [
 				[
-					'permission' => 'Branch Inventory',
-					'title' => 'Inventory Tracking',
-					'route' => 'inventory-tracking.index',
-					'routeParams' => [],
-					'activeRoutes' => ['inventory-tracking.*'],
-				],
-				[
 					'permission' => 'Branch Inventory/Stock Transfer Requests',
 					'title' => 'Stock Transfer Requests',
 					'route' => 'branch.stock-transfer-requests.index',
