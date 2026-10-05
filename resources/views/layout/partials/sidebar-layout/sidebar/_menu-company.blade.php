@@ -19,13 +19,6 @@
 			'activeRoutes' => ['company.branch-inventory.*', 'company.product-physical-counts.*', 'company.product-disposals.*', 'inventory-tracking.*'],
 			'children' => [
 				[
-					'permission' => 'Inventory',
-					'title' => 'Inventory Tracking',
-					'route' => 'inventory-tracking.index',
-					'routeParams' => [],
-					'activeRoutes' => ['inventory-tracking.*'],
-				],
-				[
 					'permission' => 'Inventory/Products',
 					'title' => 'Products',
 					'route' => 'company.branch-inventory.index',
