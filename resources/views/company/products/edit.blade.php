@@ -24,7 +24,7 @@
                         <a class="nav-link {{ empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_1">Product Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch Prices</a>
+                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch Settings</a>
                     </li>
                 </ul>
 
@@ -657,6 +657,7 @@
                                         <th>Cost</th>
                                         <th>Markup</th>
                                         <th>Srp</th>
+                                        <th>Show to Branch</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -670,17 +671,28 @@
                                             $srp = number_format((float)$srp, 4, '.', '');
                                             $cost = number_format((float)$cost, 4, '.', '');
                                             $markup = number_format((float)$markup, 4, '.', '');
+
+                                            $showToBranch = old(
+                                                'show_to_branch.' . $branch->id,
+                                                isset($branch->products[0]) && $branch->products[0]->pivot?->show_to_branch !== null
+                                                    ? (int) $branch->products[0]->pivot->show_to_branch
+                                                    : 1
+                                            );
                                         @endphp
                                         <tr>
                                             <td>{{ $branch->name }}</td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_costs[{{ $branch->id }}]" value="{{ $cost }}" />
+                                                <input type="number" class="form-control branch-cost compute-branch-srp {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_costs[{{ $branch->id }}]" value="{{ $cost }}" />
                                             </td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_markups[{{ $branch->id }}]" value="{{ $markup }}" />
+                                                <input type="number" class="form-control branch-markup compute-branch-srp {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_markups[{{ $branch->id }}]" value="{{ $markup }}" />
                                             </td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_srps[{{ $branch->id }}]" value="{{ $srp }}" />
+                                                <input type="number" class="form-control branch-srp {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_srps[{{ $branch->id }}]" value="{{ $srp }}" data-saved-srp="{{ $srp }}" />
+                                            </td>
+                                            <td>
+                                                <input type="hidden" name="show_to_branch[{{ $branch->id }}]" value="0">
+                                                <input value="1" {{ (int) $showToBranch === 1 ? 'checked' : '' }} name="show_to_branch[{{ $branch->id }}]" class="form-check-input" type="checkbox" id="show_to_branch_{{ $branch->id }}">
                                             </td>
                                         </tr>
                                     @endforeach
@@ -697,6 +709,55 @@
             </form>
         </div>
     </div>
+    @push('scripts')
+        <script>
+            function roundBranchSrp(value) {
+                return Math.round((value + Number.EPSILON) * 10000) / 10000;
+            }
+
+            function computeBranchSrp($row) {
+                var cost = parseFloat($row.find('.branch-cost').val());
+                var markup = parseFloat($row.find('.branch-markup').val());
+                var markupType = $('#markup_type').val();
+                var $srp = $row.find('.branch-srp');
+                var currentSrp = parseFloat($srp.val());
+                var savedSrp = parseFloat($srp.attr('data-saved-srp'));
+
+                if (isNaN(currentSrp)) {
+                    currentSrp = 0;
+                }
+
+                if (isNaN(savedSrp)) {
+                    savedSrp = 0;
+                }
+
+                if (isNaN(cost) || isNaN(markup)) {
+                    return;
+                }
+
+                var srp = cost + markup;
+                if (markupType === 'percentage') {
+                    srp = cost + (cost * (markup / 100));
+                }
+
+                var nextSrp = Math.max(roundBranchSrp(srp), savedSrp);
+
+                if (nextSrp > currentSrp) {
+                    $srp.val(nextSrp.toFixed(4));
+                }
+            }
+
+            $(document).on('input', '.compute-branch-srp', function () {
+                computeBranchSrp($(this).closest('tr'));
+            });
+
+            $('#markup_type').on('change', function () {
+                $('.branch-srp').each(function () {
+                    computeBranchSrp($(this).closest('tr'));
+                });
+            });
+        </script>
+    @endpush
 </x-default-layout>
 
 
