@@ -6,6 +6,15 @@
 
     <div class="card">
         <div class="card-body py-4">
+            @include('company.reports.partials.ar-branch-filter', [
+                'action' => route('company.reports.account-receivable-details', [
+                    'companySlug' => $company->slug,
+                    'customerId' => $customerId,
+                ]),
+                'branches' => $branches,
+                'branchId' => $branchId,
+            ])
+
             <div class="table-responsive">
                 <table class="table table-striped table-row-bordered gy-5">
                     <thead>
@@ -66,6 +75,7 @@
                             <th>Transaction ID</th>
                             <th>SI #</th>
                             <th>Datetime</th>
+                            <th>Branch</th>
                             <th>Item Description</th>
                             <th>Qty</th>
                             <th>UOM</th>
@@ -78,16 +88,16 @@
                         @forelse($transactions as $transaction)
                             <tr>
                                 <td>
-                                    <a target="_blank" href="{{ route('branch.reports.view-transaction', [
+                                    <a target="_blank" href="{{ route('company.reports.view-transaction', [
                                             'companySlug' => $company->slug,
                                             'transactionId' => $transaction->id,
-                                            'branchSlug' => $branch->slug,
                                         ]) }}">
                                         {{ $transaction->id }}
                                     </a>
                                 </td>
                                 <td>{{ $transaction->receipt_number }}</td>
                                 <td>{{ $transaction->completed_at }}</td>
+                                <td>{{ $transaction->branch_name }}</td>
                                 <td>{{ $transaction->item_description }}</td>
                                 <td>{{ $transaction->qty }}</td>
                                 <td>{{ $transaction->uom }}</td>
@@ -97,7 +107,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">No transactions found.</td>
+                                <td colspan="10" class="text-center">No transactions found.</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -6,6 +6,12 @@
 
     <div class="card">
         <div class="card-body py-4">
+            @include('company.reports.partials.ar-branch-filter', [
+                'action' => route('company.reports.account-receivables', ['companySlug' => $company->slug]),
+                'branches' => $branches,
+                'branchId' => $branchId,
+            ])
+
             <div class="table-responsive">
                 <table class="table table-striped table-row-bordered gy-5">
                     <thead>
@@ -20,13 +26,18 @@
                     </thead>
                     <tbody>
                         @forelse($accountReceivables as $ar)
+                            @php
+                                $detailParams = [
+                                    'companySlug' => $company->slug,
+                                    'customerId' => $ar->charge_account_id,
+                                ];
+                                if ($branchId) {
+                                    $detailParams['branch_id'] = $branchId;
+                                }
+                            @endphp
                             <tr>
                                 <td>
-                                    <a target="_blank" href="{{ route('branch.reports.account-receivable-details', [
-                                        'companySlug' => $company->slug,
-                                        'customerId' => $ar->charge_account_id,
-                                        'branchSlug' => $branch->slug,
-                                    ]) }}">
+                                    <a target="_blank" href="{{ route('company.reports.account-receivable-details', $detailParams) }}">
                                         {{ $ar->name }}
                                     </a>
                                 </td>
