@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Middleware\SetAuthenticatedCompanyContext;
 use App\Http\Middleware\ValidateCompanySlug;
 use App\Http\Middleware\SuperAdminMiddleware;
 
@@ -91,7 +92,7 @@ Route::get('/download-product-import-template', function () {
 
 Route::get('/map-data', [TestController::class, 'mapData']);
 Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
-Route::get('/test', [TestController::class, 'test']);
+Route::get('/test/{branchId}', [TestController::class, 'test']);
 
 require __DIR__ . '/auth.php';
 
@@ -101,6 +102,11 @@ Route::middleware(['auth'])->prefix('inventory-tracking')->name('inventory-track
     Route::get('/ajax/movements', [InventoryProcessingController::class, 'getMovementsData'])->name('ajax-movements');
     Route::get('/ajax/products', [InventoryProcessingController::class, 'searchProducts'])->name('ajax-products');
     Route::get('/history/view', [InventoryProcessingController::class, 'history'])->name('history');
+    Route::get('/master-list', [InventoryProcessingController::class, 'masterList'])->name('master-list');
+    Route::get('/master-list/export', [InventoryProcessingController::class, 'masterListExport'])->name('master-list.export');
+    Route::get('/report', [InventoryProcessingController::class, 'inventoryReport'])->name('report');
+    Route::get('/revert/{movement_type}/{object_id}/{branch_id}', [InventoryProcessingController::class, 'showRevert'])->name('revert.show');
+    Route::post('/revert', [InventoryProcessingController::class, 'revert'])->name('revert');
     Route::get('/{type}/{id}', [InventoryProcessingController::class, 'show'])->name('show');
     Route::post('/{type}/{id}/process', [InventoryProcessingController::class, 'process'])->name('process');
 });
@@ -142,6 +148,7 @@ Route::middleware('auth')->group(function () {
     //company
     Route::middleware([ValidateCompanySlug::class])->prefix('{companySlug}')->group(function () {
         Route::get('/', [CompanyPageController::class, 'dashboard'])->name('company.dashboard');
+        Route::get('/dashboard-data', [CompanyPageController::class, 'dashboardData'])->name('company.dashboard.data');
         Route::resource('branches', CompanyBranchController::class, ['as' => 'company']);
         Route::resource('clusters', CompanyClusterController::class, ['as' => 'company']);
         Route::resource('departments', CompanyDepartmentController::class, ['as' => 'company']);
@@ -220,6 +227,7 @@ Route::middleware('auth')->group(function () {
         //branch
         Route::middleware([ValidateCompanySlug::class])->prefix('{branchSlug}')->group(function () {
             Route::get('/', [BranchPageController::class, 'dashboard'])->name('branch.dashboard');
+            Route::get('/dashboard-data', [BranchPageController::class, 'dashboardData'])->name('branch.dashboard.data');
             Route::resource('users', BranchUserController::class, ['as' => 'branch']);
             Route::resource('delivery-locations', BranchDeliveryLocationController::class, ['as' => 'branch']);
             Route::resource('purchase-requests', BranchPurchaseRequestController::class, ['as' => 'branch']);

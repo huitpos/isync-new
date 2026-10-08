@@ -24,24 +24,27 @@ class PageController extends Controller
     {
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
+        $filters = $this->dashboardFilters($request);
+
+        return view('branch.dashboard', [
+            'company' => $company,
+            'branch' => $branch,
+            'branchId' => $branch->id,
+            'selectedRangeParam' => $filters['selectedRangeParam'],
+            'startDateParam' => $filters['startDateParam'],
+            'endDateParam' => $filters['endDateParam'],
+        ]);
+    }
+
+    public function dashboardData(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branch = $request->attributes->get('branch');
+        $filters = $this->dashboardFilters($request);
 
         $branchId = $branch->id;
-
-        $selectedRangeParam = $request->input('selectedRange', 'Year to Date');
-        $startDateParam = $request->input('startDate', null);
-        $endDateParam = $request->input('endDate', null);
-
-        $startDate = Carbon::now()->startOfYear()->format('Y-m-d 00:00:00');
-        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
-
-        $dateParam = $request->input('date_range', null);
-
-        if ($dateParam) {
-            list($startDate, $endDate) = explode(" - ", $dateParam);
-
-            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
-            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
-        }
+        $startDate = $filters['startDate'];
+        $endDate = $filters['endDate'];
 
         $netAmount = $this->companyRepository->getTransactionNetSales($company->id, $startDate, $endDate, $branchId);
         $grossAmount = $this->companyRepository->getTransactionGrossSales($company->id, $startDate, $endDate, $branchId);
@@ -213,22 +216,62 @@ class PageController extends Controller
             $itemSales[] = [$item, $value];
         }
 
-        return view('branch.dashboard', [
-            'company' => $company,
-            'netAmount' => $netAmount,
-            'grossAmount' => $grossAmount,
+        return response()->json([
+            'selectedRange' => $filters['selectedRangeParam'],
+            'range' => [
+                'transactionCount' => $transactionCount,
+                'grossAmount' => number_format($grossAmount, 2),
+                'netAmount' => number_format($netAmount, 2),
+                'profit' => number_format($grossAmount - $costAmount, 2),
+            ],
             'branches' => $branches,
-            'salesData' => $finalData,
-            'transactionCount' => $transactionCount,
-            'itemSales' => $itemSales,
-            'departmentSales' => $departmentSales,
-            'paymentTypeSales' => $paymentTypeSales,
-            'branchId' => $branchId,
+            'salesData' => $this->numericChartRows($finalData),
+            'departmentSales' => $this->numericChartRows($departmentSales),
+            'itemSales' => $this->numericChartRows($itemSales),
+            'paymentTypeSales' => $this->numericChartRows($paymentTypeSales),
+        ]);
+    }
+
+    private function dashboardFilters(Request $request): array
+    {
+        $selectedRangeParam = $request->input('selectedRange', 'Year to Date');
+        $startDateParam = $request->input('startDate');
+        $endDateParam = $request->input('endDate');
+        $dateParam = $request->input('date_range');
+
+        $startDate = Carbon::now()->startOfYear()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+
+        if ($dateParam && str_contains($dateParam, ' - ')) {
+            [$rawStart, $rawEnd] = explode(' - ', $dateParam, 2);
+            $startDate = Carbon::parse(trim($rawStart))->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse(trim($rawEnd))->format('Y-m-d 23:59:59');
+        } elseif ($startDateParam && $endDateParam) {
+            $startDate = Carbon::parse($startDateParam)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDateParam)->format('Y-m-d 23:59:59');
+        }
+
+        return [
             'selectedRangeParam' => $selectedRangeParam,
             'startDateParam' => $startDateParam,
             'endDateParam' => $endDateParam,
-            'dateParam' => $dateParam,
-            'costAmount' => $costAmount
-        ]);
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ];
+    }
+
+    private function numericChartRows(array $rows): array
+    {
+        return array_map(function ($row) {
+            foreach ($row as $index => $value) {
+                if ($index === 0) {
+                    continue;
+                }
+
+                $row[$index] = (float) $value;
+            }
+
+            return $row;
+        }, $rows);
     }
 }

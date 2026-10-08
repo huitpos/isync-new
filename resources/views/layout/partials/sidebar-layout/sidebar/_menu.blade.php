@@ -13,6 +13,11 @@
 				@include('layout.partials.sidebar-layout.sidebar._menu-admin')
 			@endif
 
+			{{-- Admin Level Menu --}}
+			@if (request()->segment(1) == 'inventory-tracking')
+				@include('layout.partials.sidebar-layout.sidebar._menu-inventory-tracking')
+			@endif
+
 			{{-- Switcher for Company and Branch --}}
 			@if (request()->attributes->get('branch') || request()->attributes->get('company'))
 			<div class="mb-5">
