@@ -47,8 +47,12 @@ use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
 
+use App\Http\Controllers\Concerns\AccountReceivableQueries;
+
 class ReportController extends Controller
 {
+    use AccountReceivableQueries;
+
     public function transactions(Request $request, TransactionsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
@@ -2035,5 +2039,79 @@ class ReportController extends Controller
 
         // Default to Custom Range
         return 'Custom Range';
+    }
+
+    public function accountReceivables(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $scope = $this->resolveAccountReceivableBranches($request, $company);
+
+        $accountReceivables = $this->accountReceivableSummaryQuery($company->id, $scope['branchIds'])
+            ->orderBy('charge_accounts.name')
+            ->paginate(25)
+            ->withQueryString();
+
+        $totals = $this->accountReceivableTotals($company->id, $scope['branchIds']);
+
+        return view('company.reports.ar', [
+            'accountReceivables' => $accountReceivables,
+            'totals' => $totals,
+            'company' => $company,
+            'branches' => $scope['branches'],
+            'branchId' => $scope['branchId'],
+        ]);
+    }
+
+    public function accountReceivableDetails(Request $request, $companySlug, $customerId)
+    {
+        $company = $request->attributes->get('company');
+        $customerId = (int) $customerId;
+        $scope = $this->resolveAccountReceivableBranches($request, $company);
+
+        $this->assertChargeAccountBelongsToCompany($company->id, $customerId);
+
+        $summary = $this->accountReceivableSummaryQuery($company->id, $scope['branchIds'], $customerId)->first();
+        $accountReceivables = collect($summary ? [$summary] : []);
+
+        $transactions = $this->accountReceivableTransactionsQuery($scope['branchIds'], $customerId, true)
+            ->paginate(25)
+            ->withQueryString();
+
+        return view('company.reports.arDetails', [
+            'accountReceivables' => $accountReceivables,
+            'company' => $company,
+            'branches' => $scope['branches'],
+            'branchId' => $scope['branchId'],
+            'transactions' => $transactions,
+            'customerId' => $customerId,
+        ]);
+    }
+
+    private function resolveAccountReceivableBranches(Request $request, $company): array
+    {
+        $branches = $company->activeBranches()->orderBy('name')->get();
+        $branchId = $request->query('branch_id');
+
+        if ($branchId === null || $branchId === '') {
+            return [
+                'branches' => $branches,
+                'branchId' => null,
+                'branchIds' => $branches->pluck('id')->all(),
+            ];
+        }
+
+        $selected = $branches->first(function ($branch) use ($branchId) {
+            return (int) $branch->id === (int) $branchId;
+        });
+
+        if (!$selected) {
+            abort(404);
+        }
+
+        return [
+            'branches' => $branches,
+            'branchId' => (int) $selected->id,
+            'branchIds' => [(int) $selected->id],
+        ];
     }
 }
