@@ -503,6 +503,16 @@ Breadcrumbs::for('branch.productPhysicalCount.create', function (BreadcrumbTrail
     $trail->push('Create');
 });
 
+Breadcrumbs::for('branch.productPhysicalCount.edit', function (BreadcrumbTrail $trail, $company, $branch, $count) {
+    $trail->parent('branch.productPhysicalCount.index', $company, $branch);
+    $trail->push($count->pcount_number, route('branch.product-physical-counts.show', [
+        'companySlug' => $company->slug,
+        'branchSlug' => $branch->slug,
+        'product_physical_count' => $count->id,
+    ]));
+    $trail->push('Edit');
+});
+
 Breadcrumbs::for('branch.productDisposals.index', function (BreadcrumbTrail $trail, $company, $branch) {
     $trail->parent('company.dashboard', $company);
     $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
