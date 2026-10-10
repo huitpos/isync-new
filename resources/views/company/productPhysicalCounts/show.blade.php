@@ -16,7 +16,7 @@
                         <input value="{{ ucfirst($count->status) }}" type="text" readonly class="form-control"/>
                     </div>
 
-                    @if ($count->status != 'pending')
+                    @if (!in_array($count->status, ['pending', 'draft']))
                     <div class="col-md-6">
                         <label class="form-label">Approved/Rejected By</label>
                         <input value="{{ ucfirst($count->actionBy?->name) }}" type="text" readonly class="form-control"/>

@@ -50,6 +50,10 @@ class ProductPhysicalCountsDataTable extends DataTable
             ])
             ->whereHas('branch', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
+            })
+            ->where(function ($query) {
+                $query->where('status', '!=', 'draft')
+                    ->orWhere('created_by', auth()->id());
             });
 
         if ($this->status) {
