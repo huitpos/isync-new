@@ -23,6 +23,7 @@ use App\Exports\VatSalesReportExport;
 use App\Exports\XReadingReportExport;
 use App\Exports\ZReadingReportExport;
 use App\Exports\SalesInvoicesReportExport;
+use App\Exports\PaymentSummaryReportExport;
 use App\Exports\DiscountsReportExport;
 use App\Exports\ItemSalesReportExport;
 use App\Exports\AuditTrailReportExport;
@@ -127,6 +128,273 @@ class ReportController extends Controller
         $endDateParam = $request->input('endDate', null);
 
         return view('company.reports.salesInvoicesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+    }
+
+    public function paymentSummaryReport(Request $request)
+    {
+        $company = $request->attributes->get('company');
+
+        $branches = $company->activeBranches;
+
+        $branchId = $request->query('branch_id', $branches->first()->id);
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        $payments = $this->paymentSummaryQuery($company, $branchId, $startDate, $endDate);
+
+        if ($request->isMethod('post')) {
+            $branch = Branch::find($branchId);
+
+            return Excel::download(
+                new PaymentSummaryReportExport($payments, $branch, $startDate, $endDate),
+                "$branch->name - Payment Summary Report.xlsx"
+            );
+        }
+
+        $selectedRangeParam = $request->input('selectedRange', 'Today');
+        $startDateParam = $request->input('startDate', null);
+        $endDateParam = $request->input('endDate', null);
+
+        return view('company.reports.paymentSummaryReport', compact('company', 'branches', 'payments', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+    }
+
+    private function paymentSummaryQuery($company, $branchId, $startDate, $endDate)
+    {
+        return DB::table('transactional_db.transactions')
+            ->select(
+                DB::raw('payments.payment_type_name as payment_type'),
+                DB::raw('COUNT(*) as qty'),
+                DB::raw('SUM(payments.amount) as amount')
+            )
+            ->join('branches', function ($join) use ($company, $branchId) {
+                $join->on('transactions.branch_id', '=', 'branches.id')
+                    ->where('branches.company_id', '=', $company->id);
+
+                if ($branchId) {
+                    $join->where('branches.id', '=', $branchId);
+                }
+            })
+            ->join('transactional_db.payments', function ($join) use ($company, $branchId) {
+                $join->on('transactions.transaction_id', '=', 'payments.transaction_id')
+                    ->on('transactions.branch_id', '=', 'payments.branch_id')
+                    ->on('transactions.pos_machine_id', '=', 'payments.pos_machine_id')
+                    ->where('branches.company_id', '=', $company->id);
+
+                if ($branchId) {
+                    $join->where('branches.id', '=', $branchId);
+                }
+            })
+            ->where('transactions.is_complete', true)
+            ->where('transactions.is_void', false)
+            ->whereBetween('transactions.completed_at', [$startDate, $endDate])
+            ->groupBy('payments.payment_type_name')
+            ->orderByDesc('amount')
+            ->get();
+    }
+
+    public function paymentSummaryDetails(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $branches = $company->activeBranches;
+
+        if (!$request->has('payment_type')) {
+            abort(404);
+        }
+
+        $paymentType = $request->query('payment_type');
+        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branch = $branches->firstWhere('id', (int) $branchId);
+
+        if (!$branch) {
+            abort(404);
+        }
+
+        $dateParam = $request->input('date_range', null);
+
+        $startDate = Carbon::now()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::now()->format('Y-m-d 23:59:59');
+        if ($dateParam) {
+            list($startDate, $endDate) = explode(" - ", $dateParam);
+
+            $startDate = Carbon::parse($startDate)->format('Y-m-d 00:00:00');
+            $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
+        }
+
+        if ($request->ajax()) {
+            return $this->paymentSummaryDetailsData($company, $branchId, $startDate, $endDate, $paymentType, $request);
+        }
+
+        return view('company.reports.paymentSummaryDetails', compact('company', 'branch', 'paymentType', 'startDate', 'endDate'));
+    }
+
+    private function paymentSummaryDetailsData($company, $branchId, $startDate, $endDate, $paymentType, Request $request)
+    {
+        $base = $this->paymentSummaryDetailsBaseQuery($company, $branchId, $startDate, $endDate, $paymentType);
+        $filtered = clone $base;
+
+        $search = trim((string) $request->input('search.value', ''));
+        if ($search !== '') {
+            $like = '%' . addcslashes($search, '%_\\') . '%';
+            $filtered->where(function ($query) use ($like, $branchId) {
+                $query->where('transactions.receipt_number', 'like', $like)
+                    ->orWhere('transactions.cashier_name', 'like', $like)
+                    ->orWhere('transactions.shift_number', 'like', $like)
+                    ->orWhere('pos_machines.machine_number', 'like', $like)
+                    ->orWhere('transactions.completed_at', 'like', $like)
+                    ->orWhereExists(function ($details) use ($like, $branchId) {
+                        $details->select(DB::raw(1))
+                            ->from('transactional_db.payment_other_informations as payment_details')
+                            ->whereColumn('payment_details.payment_id', 'payments.payment_id')
+                            ->whereColumn('payment_details.pos_machine_id', 'payments.pos_machine_id')
+                            ->whereColumn('payment_details.transaction_id', 'payments.transaction_id')
+                            ->where('payment_details.branch_id', $branchId)
+                            ->where('payment_details.is_void', false)
+                            ->where(function ($fields) use ($like) {
+                                $fields->where('payment_details.name', 'like', $like)
+                                    ->orWhere('payment_details.value', 'like', $like);
+                            });
+                    });
+            });
+        }
+
+        $totals = (clone $base)
+            ->cloneWithout(['columns', 'orders'])
+            ->selectRaw('COUNT(*) as row_count, COALESCE(SUM(payments.amount), 0) as amount_total')
+            ->first();
+
+        if ($search === '') {
+            $recordsFiltered = (int) $totals->row_count;
+            $totalAmount = (float) $totals->amount_total;
+        } else {
+            $filteredTotals = (clone $filtered)
+                ->cloneWithout(['columns', 'orders'])
+                ->selectRaw('COUNT(*) as row_count, COALESCE(SUM(payments.amount), 0) as amount_total')
+                ->first();
+            $recordsFiltered = (int) $filteredTotals->row_count;
+            $totalAmount = (float) $filteredTotals->amount_total;
+        }
+
+        $orderColumns = [
+            0 => 'transactions.completed_at',
+            1 => 'pos_machines.machine_number',
+            2 => 'transactions.receipt_number',
+            3 => 'transactions.cashier_name',
+            4 => 'transactions.shift_number',
+            6 => 'payments.amount',
+        ];
+        $orderIndex = (int) $request->input('order.0.column', 0);
+        $orderColumn = $orderColumns[$orderIndex] ?? 'transactions.completed_at';
+        $orderDirection = $request->input('order.0.dir') === 'desc' ? 'desc' : 'asc';
+
+        $start = max(0, (int) $request->input('start', 0));
+        $length = (int) $request->input('length', 25);
+        if ($length < 1 || $length > 100) {
+            $length = 25;
+        }
+
+        $rows = (clone $filtered)
+            ->orderBy($orderColumn, $orderDirection)
+            ->offset($start)
+            ->limit($length)
+            ->get();
+
+        $details = $this->paymentSummaryDetailFields($rows, $branchId);
+
+        $data = $rows->map(function ($payment) use ($details) {
+            $key = $payment->payment_id . '-' . $payment->pos_machine_id . '-' . $payment->transaction_id;
+            $lines = $details->get($key, collect())->map(function ($detail) {
+                return '<div>' . e($detail->name) . ': ' . e($detail->value) . '</div>';
+            })->implode('');
+
+            return [
+                'date' => Carbon::parse($payment->completed_at)->format('Y-m-d h:i A'),
+                'machine_number' => $payment->machine_number,
+                'receipt_number' => $payment->receipt_number,
+                'cashier_name' => $payment->cashier_name,
+                'shift_number' => $payment->shift_number,
+                'details' => $lines,
+                'amount' => number_format($payment->amount, 2),
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => (int) $totals->row_count,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+            'totalAmount' => number_format($totalAmount, 2),
+        ]);
+    }
+
+    private function paymentSummaryDetailsBaseQuery($company, $branchId, $startDate, $endDate, $paymentType)
+    {
+        return DB::table('transactional_db.transactions')
+            ->select(
+                'transactions.completed_at',
+                'transactions.receipt_number',
+                'transactions.cashier_name',
+                'transactions.shift_number',
+                'pos_machines.machine_number',
+                'payments.amount',
+                'payments.payment_id',
+                'payments.transaction_id',
+                'payments.branch_id',
+                'payments.pos_machine_id'
+            )
+            ->join('branches', function ($join) use ($company, $branchId) {
+                $join->on('transactions.branch_id', '=', 'branches.id')
+                    ->where('branches.company_id', '=', $company->id)
+                    ->where('branches.id', '=', $branchId);
+            })
+            ->join('transactional_db.payments', function ($join) use ($company, $branchId) {
+                $join->on('transactions.transaction_id', '=', 'payments.transaction_id')
+                    ->on('transactions.branch_id', '=', 'payments.branch_id')
+                    ->on('transactions.pos_machine_id', '=', 'payments.pos_machine_id')
+                    ->where('branches.company_id', '=', $company->id)
+                    ->where('branches.id', '=', $branchId);
+            })
+            ->leftJoin('pos_machines', 'transactions.pos_machine_id', '=', 'pos_machines.id')
+            ->where('transactions.is_complete', true)
+            ->where('transactions.is_void', false)
+            ->whereBetween('transactions.completed_at', [$startDate, $endDate])
+            ->when(
+                $paymentType === null || $paymentType === '',
+                function ($query) {
+                    $query->whereNull('payments.payment_type_name');
+                },
+                function ($query) use ($paymentType) {
+                    $query->where('payments.payment_type_name', $paymentType);
+                }
+            );
+    }
+
+    private function paymentSummaryDetailFields($payments, $branchId)
+    {
+        $paymentIds = $payments->pluck('payment_id')->filter()->unique()->values();
+
+        if ($paymentIds->isEmpty()) {
+            return collect();
+        }
+
+        return DB::table('transactional_db.payment_other_informations')
+            ->where('branch_id', $branchId)
+            ->where('is_void', false)
+            ->whereIn('payment_id', $paymentIds)
+            ->whereIn('transaction_id', $payments->pluck('transaction_id')->unique()->values())
+            ->orderBy('payment_other_information_id')
+            ->get()
+            ->groupBy(function ($detail) {
+                return $detail->payment_id . '-' . $detail->pos_machine_id . '-' . $detail->transaction_id;
+            });
     }
 
     public function salesTransactionReport(Request $request)
@@ -1749,69 +2017,177 @@ class ReportController extends Controller
             $endDate = Carbon::parse($endDate)->format('Y-m-d 23:59:59');
         }
 
+        $limit = $request->input('limit') === 'all' ? 'all' : '100';
+
         if ($request->isMethod('post')) {
             return Excel::download(
-                new TopPerformingProductsExport($branchId, $startDate, $endDate),
+                new TopPerformingProductsExport($branchId, $startDate, $endDate, $limit),
                 "Top Performing Products Report - $startDate to $endDate.xlsx"
             );
         }
 
-        $query = "SELECT
-                    products.name AS `description`,
-                    products.sku,
-                    departments.name AS `department`,
-                    categories.name AS `category`,
-                    subcategories.name AS `sub_category`,
-                    SUM(transactional_db.orders.qty) AS `quantity_sold`,
-                    0 AS `ar_unpaid_quantity`,
-                    SUM(transactional_db.orders.qty * products.cost) AS `total_unit_cost`,
-                    SUM(transactional_db.discount_details.discount_amount) AS `discount_sales`,
-                    SUM(transactional_db.orders.total) AS `regular_sales`,
-                    (SUM(transactional_db.orders.total) / (SELECT SUM(total) FROM transactional_db.orders WHERE branch_id = $branchId) * 100) AS `sales_percentage`
-                FROM transactional_db.transactions
-                INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
-                    AND transactions.branch_id = orders.branch_id
-                    AND transactions.pos_machine_id = orders.pos_machine_id
-                    AND orders.is_void = FALSE
-                    AND orders.is_completed = TRUE
-                    AND orders.is_back_out = FALSE
-                    AND orders.is_return = FALSE
-                LEFT JOIN transactional_db.discount_details ON orders.order_id = discount_details.order_id
-                    AND orders.branch_id = discount_details.branch_id
-                    AND orders.pos_machine_id = discount_details.pos_machine_id
-                INNER JOIN isync.products ON orders.product_id = products.id
-                INNER JOIN isync.departments ON products.department_id = departments.id
-                LEFT JOIN isync.categories ON products.category_id = categories.id
-                LEFT JOIN isync.subcategories ON products.subcategory_id = subcategories.id
-                WHERE transactions.is_complete = TRUE
-                    AND transactions.branch_id = $branchId
-                    AND transactions.is_void = FALSE
-                    AND transactions.is_back_out = FALSE
-                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
-                GROUP BY orders.product_id
-                ORDER BY `regular_sales` DESC
-                LIMIT 100";
-
-        $topProducts = DB::select($query);
-
-        // Convert the array of objects into a collection
-        $topProducts = collect($topProducts);
+        if ($request->ajax()) {
+            return $this->topPerformingProductsData($request, (int) $branchId, $startDate, $endDate, $limit);
+        }
 
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
         return view('company.reports.topPerformingProducts', compact(
-            'company', 
-            'branches', 
+            'company',
+            'branches',
             'branch',
-            'branchId', 
-            'dateParam', 
-            'topProducts', 
-            'selectedRangeParam', 
-            'startDateParam', 
+            'branchId',
+            'limit',
+            'selectedRangeParam',
+            'startDateParam',
             'endDateParam'
         ));
+    }
+
+    private function topPerformingProductsData(Request $request, int $branchId, string $startDate, string $endDate, string $limit)
+    {
+        [$query, $bindings] = $this->topPerformingProductsQuery($branchId, $startDate, $endDate, $limit);
+        $rows = collect(DB::select($query, $bindings));
+        $recordsTotal = $rows->count();
+
+        $search = trim((string) $request->input('search.value', ''));
+        if ($search !== '') {
+            $needle = mb_strtolower($search);
+            $rows = $rows->filter(function ($row) use ($needle) {
+                $haystack = mb_strtolower(implode(' ', [
+                    (string) $row->description,
+                    (string) $row->sku,
+                    (string) $row->department,
+                    (string) $row->category,
+                    (string) $row->sub_category,
+                ]));
+
+                return str_contains($haystack, $needle);
+            })->values();
+        }
+
+        $recordsFiltered = $rows->count();
+
+        $orderColumns = [
+            0 => 'description',
+            1 => 'sku',
+            2 => 'department',
+            3 => 'category',
+            4 => 'sub_category',
+            5 => 'quantity_sold',
+            6 => 'ar_unpaid_quantity',
+            7 => 'total_unit_cost',
+            8 => 'discount_sales',
+            9 => 'regular_sales',
+            10 => 'sales_percentage',
+        ];
+        $numericColumns = [
+            'quantity_sold',
+            'ar_unpaid_quantity',
+            'total_unit_cost',
+            'discount_sales',
+            'regular_sales',
+            'sales_percentage',
+        ];
+        $orderIndex = (int) $request->input('order.0.column', 9);
+        $orderColumn = $orderColumns[$orderIndex] ?? 'regular_sales';
+        $descending = $request->input('order.0.dir') !== 'asc';
+
+        $rows = $rows->sortBy(function ($row) use ($orderColumn, $numericColumns) {
+            $value = $row->{$orderColumn} ?? null;
+
+            if (in_array($orderColumn, $numericColumns, true)) {
+                return (float) $value;
+            }
+
+            return mb_strtolower((string) $value);
+        }, SORT_REGULAR, $descending)->values();
+
+        $start = max(0, (int) $request->input('start', 0));
+        $length = (int) $request->input('length', 25);
+        if ($length < 1 || $length > 100) {
+            $length = 25;
+        }
+
+        $data = $rows->slice($start, $length)->values()->map(function ($product) {
+            return [
+                'description' => $product->description,
+                'sku' => $product->sku,
+                'department' => $product->department,
+                'category' => $product->category,
+                'sub_category' => $product->sub_category,
+                'quantity_sold' => number_format($product->quantity_sold, 0),
+                'ar_unpaid_quantity' => number_format($product->ar_unpaid_quantity, 0),
+                'total_unit_cost' => number_format($product->total_unit_cost, 2),
+                'discount_sales' => number_format($product->discount_sales, 2),
+                'regular_sales' => number_format($product->regular_sales, 2),
+                'sales_percentage' => number_format($product->sales_percentage, 0) . '%',
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+    private function topPerformingProductsQuery(int $branchId, string $startDate, string $endDate, string $limit): array
+    {
+        $transactionalDb = config('database.connections.transactional_db.database');
+        $mainDb = config('database.connections.mysql.database');
+        $limitSql = $limit === 'all' ? '' : 'LIMIT 100';
+
+        $query = "SELECT
+                    COALESCE(products.name, orders_agg.product_name) AS `description`,
+                    products.sku,
+                    departments.name AS `department`,
+                    categories.name AS `category`,
+                    subcategories.name AS `sub_category`,
+                    orders_agg.quantity_sold,
+                    0 AS `ar_unpaid_quantity`,
+                    orders_agg.total_unit_cost,
+                    orders_agg.discount_sales,
+                    orders_agg.regular_sales,
+                    CASE
+                        WHEN SUM(orders_agg.regular_sales) OVER () = 0 THEN 0
+                        ELSE orders_agg.regular_sales / SUM(orders_agg.regular_sales) OVER () * 100
+                    END AS `sales_percentage`
+                FROM (
+                    SELECT
+                        orders.product_id,
+                        MAX(orders.name) AS product_name,
+                        SUM(orders.qty) AS quantity_sold,
+                        SUM(orders.total_cost) AS total_unit_cost,
+                        SUM(orders.discount_amount) AS discount_sales,
+                        SUM(orders.total) AS regular_sales
+                    FROM {$transactionalDb}.transactions
+                    INNER JOIN {$transactionalDb}.orders
+                        ON orders.branch_id = transactions.branch_id
+                        AND orders.transaction_id = transactions.transaction_id
+                        AND orders.pos_machine_id = transactions.pos_machine_id
+                        AND orders.is_void = 0
+                        AND orders.is_completed = 1
+                        AND orders.is_back_out = 0
+                        AND orders.is_return = 0
+                    WHERE transactions.branch_id = ?
+                        AND transactions.is_complete = 1
+                        AND transactions.is_void = 0
+                        AND transactions.is_back_out = 0
+                        AND transactions.treg BETWEEN ? AND ?
+                    GROUP BY orders.product_id
+                ) AS orders_agg
+                LEFT JOIN {$mainDb}.products ON products.id = orders_agg.product_id
+                LEFT JOIN {$mainDb}.departments ON departments.id = products.department_id
+                LEFT JOIN {$mainDb}.categories ON categories.id = products.category_id
+                LEFT JOIN {$mainDb}.subcategories ON subcategories.id = products.subcategory_id
+                ORDER BY orders_agg.regular_sales DESC
+                {$limitSql}";
+
+        return [$query, [$branchId, $startDate, $endDate]];
     }
 
     public function monthlySalesSummaryReport(Request $request)
