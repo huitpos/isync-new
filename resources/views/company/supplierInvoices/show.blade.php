@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('company.supplier-invoices.accept', ['companySlug' => $company->slug, 'id' => $invoice->id]) }}">
+            <form method="POST" action="{{ route('company.supplier-invoices.accept', ['companySlug' => $company->slug, 'id' => $invoice->id]) }}" onsubmit="return confirm('Accept this supplier invoice for payment?');">
                 @csrf
                 <div class="mt-7">
                     <h2>Items</h2>

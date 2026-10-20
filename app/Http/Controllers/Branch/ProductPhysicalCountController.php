@@ -11,6 +11,7 @@ use App\DataTables\Branch\ProductPhysicalCountsDataTable;
 use App\Models\PurchaseOrder;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Services\FifoCostService;
+use App\Support\DocumentLineRules;
 
 class ProductPhysicalCountController extends Controller
 {
@@ -68,18 +69,9 @@ class ProductPhysicalCountController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $request->validate(array_merge([
             'department_id' => 'required',
-            'pr_items' => 'required',
-            'pr_items.*.product_id' => 'required',
-            'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
-            'pr_items.*.uom_id' => 'required_with:pr_items.*.product_id',
-        ],
-        [
-            'pr_items' => 'Product is required',
-            'pr_items.*.quantity' => 'Quantity field required',
-            'pr_items.*.uom_id' => 'The product you selected has no UOM. Please assign a UOM first before continuing'
-        ]);
+        ], DocumentLineRules::itemRules()), DocumentLineRules::itemMessages());
 
         $branch = $request->attributes->get('branch');
         $company = $request->attributes->get('company');
@@ -116,7 +108,7 @@ class ProductPhysicalCountController extends Controller
 
         $physicalCount->items()->createMany($postData['pr_items']);
 
-        return redirect()->route('branch.product-physical-counts.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Stock Transfer Request has been created.');
+        return redirect()->route('branch.product-physical-counts.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Physical count has been created.');
     }
 
     /**

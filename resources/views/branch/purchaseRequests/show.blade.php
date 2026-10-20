@@ -187,10 +187,10 @@
                                     No supplier was selected. The company will request quotations before a purchase order is created.
                                 @endif
                             </div>
-                            <button type="submit" class="btn btn-danger disable-on-click" data-button-link="#status" value="rejected">Reject</button>
+                            <button type="submit" class="btn btn-danger disable-on-click" data-button-link="#status" value="rejected" data-confirm="Reject this purchase request?">Reject</button>
                         @else
-                            <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
-                            <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                            <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved" data-confirm="Approve this purchase request and create a purchase order?">Approve</button>
+                            <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected" data-confirm="Reject this purchase request?">Reject</button>
                         @endif
                     </div>
                     @endif

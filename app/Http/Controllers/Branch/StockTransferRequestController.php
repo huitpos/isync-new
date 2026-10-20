@@ -11,6 +11,7 @@ use App\Models\StockTransferRequest;
 use App\Models\StockTransferOrder;
 
 use App\DataTables\Branch\StockTransferRequestsDataTable;
+use App\Support\DocumentLineRules;
 
 class StockTransferRequestController extends Controller
 {
@@ -82,20 +83,17 @@ class StockTransferRequestController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $branch = $request->attributes->get('branch');
+
+        $request->validate(array_merge([
             'department_id' => 'required',
             'delivery_location_id' => 'required',
-            'source_branch_id' => 'required',
-            'pr_items' => 'required',
-            'pr_items.*.product_id' => 'required',
-            'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
-            'pr_items.*.uom_id' => 'required_with:pr_items.*.product_id',
-        ],
-        [
-            'pr_items' => 'Product is required',
-            'pr_items.*.quantity' => 'Quantity field required',
-            'pr_items.*.uom_id' => 'The product you selected has no UOM. Please assign a UOM first before continuing',
-        ]);
+            'source_branch_id' => ['required', function ($attribute, $value, $fail) use ($branch) {
+                if ((string) $value === (string) $branch->id) {
+                    $fail('Source branch must be a different branch.');
+                }
+            }],
+        ], DocumentLineRules::itemRules()), DocumentLineRules::itemMessages());
 
         $branch = $request->attributes->get('branch');
         $company = $request->attributes->get('company');

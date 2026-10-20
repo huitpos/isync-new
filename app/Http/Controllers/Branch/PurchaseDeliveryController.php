@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Branch;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseDelivery;
@@ -75,50 +77,92 @@ class PurchaseDeliveryController extends Controller
             'purchase_order_id' => 'required|exists:purchase_orders,id',
             'sales_invoice_number' => 'nullable|string|max:255',
             'delivery_number' => 'required',
-            'items.*.unit_price' => 'required',
-            'items.*.qty' => 'required',
-        ], [
-            'items.*.unit_price.required' => 'The unit price field is required.',
-            'items.*.qty.required' => 'The quantity field is required.',
+            'items' => 'required|array',
+            'items.*.unit_price' => 'nullable|numeric|min:0',
+            'items.*.qty' => 'nullable|numeric|min:0',
         ]);
 
-        // update PO
-        $po = PurchaseOrder::with('items')->findOrFail($request->purchase_order_id);
-        $po->total = $request->grandtotal;
-        if ($request->is_closed == "1") {
-            $po->is_closed = 1;
-        };
-        $po->save();
+        $po = PurchaseOrder::with('items')->where('branch_id', $branch->id)->findOrFail($request->purchase_order_id);
 
-        //update PO items
-        foreach ($request->items as $item) {
-            $poItem = $po->items->where('id', $item['purchase_order_item_id'])->first();
-            $poItem->balance = $item['balance'];
-            $poItem->save();
-        }
+        DB::transaction(function () use ($request, $po, $branch) {
+            $lines = [];
+            $totalQty = 0;
+            $totalAmount = 0;
 
-        $poCount = PurchaseDelivery::where([
-            'branch_id' => $branch->id
-        ])->count();
+            foreach ($request->items as $index => $item) {
+                $poItem = $po->items->firstWhere('id', $item['purchase_order_item_id'] ?? null);
+                if (!$poItem) {
+                    throw ValidationException::withMessages([
+                        'items' => 'A line does not belong to this purchase order.',
+                    ]);
+                }
 
-        $branchCode = strtoupper($branch->code);
-        $date = date('Ymd');
-        $counter = str_pad($poCount+1, 4, '0', STR_PAD_LEFT);
-        $pdNumber = "MRI$branchCode$date$counter";
+                $qty = round((float) ($item['qty'] ?? 0), 4);
+                if ($qty <= 0) {
+                    continue;
+                }
 
-        $pdData = [
-            'purchase_order_id' => $request->purchase_order_id,
-            'sales_invoice_number' => $request->sales_invoice_number ?: null,
-            'delivery_number' => $request->delivery_number,
-            'total_qty' => $request->total_qty,
-            'total_amount' => $request->total_amount,
-            'pd_number' => $pdNumber,
-            'branch_id' => $branch->id,
-        ];
+                $balance = round((float) $poItem->balance, 4);
+                if ($qty > $balance) {
+                    throw ValidationException::withMessages([
+                        "items.$index.qty" => 'Receive quantity cannot be more than the balance of ' . $balance . '.',
+                    ]);
+                }
 
-        $pd = PurchaseDelivery::create($pdData);
+                if (!isset($item['unit_price']) || $item['unit_price'] === '') {
+                    throw ValidationException::withMessages([
+                        "items.$index.unit_price" => 'Unit price is required when receiving a quantity.',
+                    ]);
+                }
 
-        $pd->items()->createMany($request->items);
+                $unitPrice = round((float) $item['unit_price'], 4);
+                $poItem->balance = round($balance - $qty, 4);
+                $poItem->save();
+
+                $totalQty += $qty;
+                $totalAmount += $qty * $unitPrice;
+                $lines[] = [
+                    'purchase_order_item_id' => $poItem->id,
+                    'product_id' => $poItem->product_id,
+                    'uom_id' => $poItem->uom_id,
+                    'qty' => $qty,
+                    'unit_price' => $unitPrice,
+                    'po_unit_price' => $poItem->unit_price,
+                ];
+            }
+
+            if (!$lines) {
+                throw ValidationException::withMessages([
+                    'items' => 'Enter a receive quantity for at least one item.',
+                ]);
+            }
+
+            if ($request->is_closed == '1') {
+                $po->is_closed = 1;
+                $po->save();
+            }
+
+            $poCount = PurchaseDelivery::where([
+                'branch_id' => $branch->id
+            ])->count();
+
+            $branchCode = strtoupper($branch->code);
+            $date = date('Ymd');
+            $counter = str_pad($poCount + 1, 4, '0', STR_PAD_LEFT);
+            $pdNumber = "MRI$branchCode$date$counter";
+
+            $pd = PurchaseDelivery::create([
+                'purchase_order_id' => $po->id,
+                'sales_invoice_number' => $request->sales_invoice_number ?: null,
+                'delivery_number' => $request->delivery_number,
+                'total_qty' => $totalQty,
+                'total_amount' => round($totalAmount, 4),
+                'pd_number' => $pdNumber,
+                'branch_id' => $branch->id,
+            ]);
+
+            $pd->items()->createMany($lines);
+        });
 
         return redirect()->route('branch.purchase-deliveries.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug])->with('success', 'Data has been updated successfully!');
     }

@@ -115,12 +115,16 @@ $(document).ready(function () {
             url: '/ajax/get-product-details', // Replace with your actual endpoint
             method: 'GET',
             data: {
-              product_id: selectedValue
+              product_id: selectedValue,
+              branch_id: element.closest('form').data('branch-id') || ''
             },
             success: function(response) {
                 granparentElem.find('.barcode').val(response.barcode);
                 granparentElem.find('.barcode-text').text(response.barcode || '—');
                 granparentElem.find('.unit_price').val(response.cost);
+                if (response.on_hand !== undefined && response.on_hand !== null) {
+                    granparentElem.find('.on-hand').val(response.on_hand);
+                }
                 computeTotal(granparentElem);
             },
             error: function(xhr, status, error) {
@@ -133,52 +137,13 @@ $(document).ready(function () {
         computeSrp();
     });
 
-    $('.compute-srp').on('keyup', function() {
+    $(document).on('input change', '.compute-srp', function() {
         computeSrp();
     });
 
-    $('#product-name').on('input', function () {
-        var name = $(this).val();
-
-        // remove vowels
-        var abbreviation = name.replace(/[aeiou]/gi, '');
-
-        // limit to 25 chars
-        abbreviation = abbreviation.substring(0, 25);
-
-        // first uppercase, rest lowercase
-        if (abbreviation.length > 0) {
-            abbreviation = abbreviation.charAt(0).toUpperCase() + abbreviation.slice(1).toLowerCase();
-        }
-
-        $('#abbreviation').val(abbreviation);
-    });
-
-    // Prevent vowels when editing abbreviation
-    $('#abbreviation').on('input', function (e) {
-        var char = String.fromCharCode(e.which);
-        if (/[aeiouAEIOU]/.test(char)) {
-            e.preventDefault(); // block vowels
-        }
-    });
-
-    // Optional: still enforce rules when user pastes text
-    $('#abbreviation').on('input', function () {
-        var val = $(this).val();
-
-        // remove vowels
-        val = val.replace(/[aeiou]/gi, '');
-
-        // limit to 25 chars
-        val = val.substring(0, 25);
-
-        // first uppercase, rest lowercase
-        if (val.length > 0) {
-            val = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
-        }
-
-        $(this).val(val);
-    });
+    if ($('#srp').length) {
+        computeSrp(!!$('#srp').prop('readonly'));
+    }
 
     $('#delivery_location_id').on('change', function() {
         var selectedOption = $(this).find('option:selected');
@@ -189,23 +154,37 @@ $(document).ready(function () {
         $address.toggleClass('d-none', !address);
     });
 
-    function computeSrp()
+    function computeSrp(overwrite)
     {
+        if (overwrite === undefined) {
+            overwrite = true;
+        }
+
         var cost  = parseFloat($('#cost').val());
         var markUpType = $('#markup_type').val();
         var markUpValue = parseFloat($('#markup').val());
+        var formula = $('#srp-formula');
 
         if (isNaN(cost) || isNaN(markUpValue)) {
-            $('#srp').val(0);
+            if ($('#srp').prop('readonly')) {
+                $('#srp').val('');
+            }
+            formula.text('Enter cost and markup to see the selling price.');
             return false;
         }
 
         var srp = cost + markUpValue;
+        var text = cost + ' + ' + markUpValue + ' = ';
         if (markUpType == 'percentage') {
             srp = cost + (cost * (markUpValue / 100));
+            text = cost + ' + ' + markUpValue + '% = ';
         }
 
-        $('#srp').val(srp);
+        srp = Math.round(srp * 10000) / 10000;
+        if (overwrite || $('#srp').prop('readonly')) {
+            $('#srp').val(srp);
+        }
+        formula.text(text + srp);
     }
 
     $('.department-category-selector').on('change', function() {

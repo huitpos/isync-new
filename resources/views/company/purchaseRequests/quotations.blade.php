@@ -256,6 +256,7 @@
                         @enderror
                         @foreach ($pr->items as $item)
                             <div class="fw-semibold mb-2">{{ $item->product->name }} <span class="text-gray-600 fw-normal">requested {{ $item->quantity }} {{ $item->uom->name }}</span></div>
+                            <div class="award-running mb-2" data-requested="{{ $item->quantity }}">Awarded: <span class="award-sum">0</span> of {{ $item->quantity }}</div>
                             <div class="table-responsive mb-5">
                                 <table class="table table-row-bordered align-middle gs-3 mb-0">
                                     <thead>
@@ -283,7 +284,7 @@
                                                         step="0.0001"
                                                         name="awards[{{ $item->id }}][{{ $quotation->id }}]"
                                                         value="{{ old('awards.' . $item->id . '.' . $quotation->id) }}"
-                                                        class="form-control form-control-sm"
+                                                        class="form-control form-control-sm award-qty"
                                                     >
                                                 </td>
                                             </tr>
@@ -295,6 +296,49 @@
                     </div>
 
                     <button type="submit" class="btn btn-success">Award and create purchase orders</button>
+                    <script>
+                        (function () {
+                            var form = document.currentScript.closest('form');
+                            function refreshAwards() {
+                                form.querySelectorAll('.award-running').forEach(function (row) {
+                                    var sum = 0;
+                                    var table = row.nextElementSibling;
+                                    if (table) {
+                                        table.querySelectorAll('.award-qty').forEach(function (input) {
+                                            sum += Number(input.value) || 0;
+                                        });
+                                    }
+                                    var requested = Number(row.dataset.requested);
+                                    var label = row.querySelector('.award-sum');
+                                    label.textContent = sum;
+                                    row.classList.toggle('text-danger', Math.abs(sum - requested) > 0.0001);
+                                });
+                            }
+                            form.querySelectorAll('.award-qty').forEach(function (input) {
+                                input.addEventListener('input', refreshAwards);
+                            });
+                            refreshAwards();
+                            form.addEventListener('submit', function (event) {
+                                var split = document.getElementById('award_mode_split');
+                                if (split && split.checked) {
+                                    var mismatch = false;
+                                    form.querySelectorAll('.award-running').forEach(function (row) {
+                                        if (row.classList.contains('text-danger')) {
+                                            mismatch = true;
+                                        }
+                                    });
+                                    if (mismatch) {
+                                        event.preventDefault();
+                                        window.alert('Each item total must equal the requested quantity before you award.');
+                                        return;
+                                    }
+                                }
+                                if (!window.confirm('Award and create purchase orders? This cannot be undone.')) {
+                                    event.preventDefault();
+                                }
+                            });
+                        })();
+                    </script>
                 </form>
             </div>
         </div>

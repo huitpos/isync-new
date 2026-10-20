@@ -9,6 +9,7 @@
         $oldBranchSrps = old('branch_srps', []);
 
         $branchCostsErrors = $errors->get('branch_costs.*', []);
+        $branchPriceErrors = $branchSrpsErrors + $branchCostsErrors + $errors->get('branch_markups.*', []);
 
         // dd($errors);
     @endphp
@@ -21,15 +22,15 @@
 
                 <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
                     <li class="nav-item">
-                        <a class="nav-link {{ empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_1">Product Settings</a>
+                        <a class="nav-link {{ empty($branchPriceErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_1">Product Settings</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ !empty($branchSrpsErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch Prices</a>
+                        <a class="nav-link {{ !empty($branchPriceErrors) ? 'active' : '' }}" data-bs-toggle="tab" href="#kt_tab_pane_2">Branch Prices</a>
                     </li>
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane fade {{ empty($branchSrpsErrors) ? 'show active' : '' }}" id="kt_tab_pane_1" role="tabpanel">
+                    <div class="tab-pane fade {{ empty($branchPriceErrors) ? 'show active' : '' }}" id="kt_tab_pane_1" role="tabpanel">
                         <div class="mb-4">
                             <label class="form-label">Status</label>
                             <select id="status" name="status" class="form-control @error('status') is-invalid @enderror" required>
@@ -89,13 +90,14 @@
         
                         <div class="mb-4">
                             <label class="form-label">Uom</label>
-                            <select id="uom_id" name="uom_id" data-control="select2" data-placeholder="select OUM" class="form-select @error('uom_id') is-invalid @enderror uom-conversion-selector" required>
+                            <select id="uom_id" name="uom_id" data-control="select2" data-placeholder="Select a UOM" class="form-select @error('uom_id') is-invalid @enderror uom-conversion-selector" required>
                                 <option value=""></option>
                                 @foreach ($company->unitOfMeasurements as $uom)
                                     <option value="{{ $uom->id }}" {{ $uom->id == old('uom_id') || $uom->id == $product->uom_id ? 'selected' : '' }}>{{ $uom->name }}</option>
                                 @endforeach
                             </select>
         
+                            <div class="form-text">Selling unit used at the POS and on stock counts.</div>
                             @error('uom_id')
                                 <div class="invalid-feedback"> {{ $message }}</div>
                             @enderror
@@ -103,7 +105,7 @@
         
                         <div class="mb-4">
                             <label class="form-label">Delivery Uom</label>
-                            <select id="delivery_converion_id" name="delivery_uom_id" data-control="select2" data-placeholder="select OUM" class="form-select @error('uom_id') is-invalid @enderror" required>
+                            <select id="delivery_converion_id" name="delivery_uom_id" data-control="select2" data-placeholder="Select a UOM" class="form-select @error('uom_id') is-invalid @enderror" required>
                                 <option value="{{ $product->uom?->id }}">{{ $product->uom?->name }}</option>
                                 @foreach ($product->uom?->conversionsTo ?? [] as $uom)
                                 {{$uom}}
@@ -111,6 +113,7 @@
                                 @endforeach
                             </select>
         
+                            <div class="form-text">Unit used when receiving from a supplier. It can differ from the selling unit.</div>
                             @error('delivery_uom_id')
                                 <div class="invalid-feedback"> {{ $message }}</div>
                             @enderror
@@ -118,7 +121,8 @@
 
                         <div class="mb-4">
                             <label class="form-label">UOM Cost</label>
-                            <input value="{{ old('uom_cost') ?? $product->uom_cost }}" name="uom_cost" type="number" class="form-control @error('uom_cost') is-invalid @enderror" placeholder="UOM Cost" required/>
+                            <input value="{{ old('uom_cost') ?? $product->uom_cost }}" name="uom_cost" type="number" min="0" step="0.0001" class="form-control @error('uom_cost') is-invalid @enderror" placeholder="UOM Cost" required/>
+                            <div class="form-text">Cost of one delivery unit.</div>
         
                             @error('uom_cost')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -187,7 +191,7 @@
         
                         <div class="mb-4">
                             <label class="form-label">Catalog cost</label>
-                            <input id="cost" value="{{ old('cost') ?? $product->cost }}" name="cost" type="text" class="form-control @error('cost') is-invalid @enderror compute-srp" placeholder="Cost" required/>
+                            <input id="cost" value="{{ old('cost') ?? $product->cost }}" name="cost" type="number" min="0" step="0.0001" class="form-control @error('cost') is-invalid @enderror compute-srp" placeholder="Cost" required/>
                             <div class="form-text">Used to compute SRP. The cost sent to the POS is the oldest FIFO layer on each branch.</div>
         
                             @error('cost')
@@ -198,8 +202,8 @@
                         <div class="mb-4">
                             <label class="form-label">Markup Type</label>
                             <select id="markup_type" name="markup_type" class="form-control @error('status') is-invalid @enderror compute-srp" required>
-                                <option value="fixed" {{ old('status') == 'fixed' || $product->markup_type == 'fixed' ? 'selected' : '' }}>Fixed Amount</option>
-                                <option value="percentage" {{ old('status') == 'percentage' || $product->markup_type == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                                <option value="fixed" {{ old('markup_type', $product->markup_type) == 'fixed' ? 'selected' : '' }}>Fixed Amount</option>
+                                <option value="percentage" {{ old('markup_type', $product->markup_type) == 'percentage' ? 'selected' : '' }}>Percentage</option>
                             </select>
         
                             @error('status')
@@ -209,7 +213,8 @@
         
                         <div class="mb-4 mt-7">
                             <label class="form-label">Mark Up</label>
-                            <input id="markup" value="{{ old('markup') ?? $product->markup }}" name="markup" type="text" class="form-control @error('markup') is-invalid @enderror compute-srp" placeholder="markup" required/>
+                            <input id="markup" value="{{ old('markup') ?? $product->markup }}" name="markup" type="number" min="0" step="0.0001" class="form-control @error('markup') is-invalid @enderror compute-srp" placeholder="markup" required/>
+                            <div class="form-text">Fixed amount is added to cost. Percentage is a percent of cost. Example: cost 100 and 20% becomes 120.</div>
         
                             @error('markup')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -219,6 +224,7 @@
                         <div class="mb-4">
                             <label class="form-label">SRP</label>
                             <input id="srp" value="{{ old('srp') ?? $product->srp }}" name="srp" type="text" class="form-control @error('srp') is-invalid @enderror" placeholder="SRP" required/>
+                            <div id="srp-formula" class="form-text">Enter cost and markup to see the selling price.</div>
         
                             @error('srp')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -227,8 +233,8 @@
         
                         <div class="mb-4 mt-6">
                             <div class="form-check">
-                                <input {{ $product->vat_exempt ? 'checked' : '' }} class="form-check-input" name="vat_exempt" type="checkbox" value="1"/>
-                                <label>
+                                <input id="vat_exempt" {{ old('vat_exempt', $product->vat_exempt) ? 'checked' : '' }} class="form-check-input" name="vat_exempt" type="checkbox" value="1"/>
+                                <label for="vat_exempt">
                                     Vat exempt
                                 </label>
                             </div>
@@ -240,8 +246,8 @@
         
                         <div class="mb-4 mt-6">
                             <div class="form-check">
-                                <input {{ $product->discount_exempt ? 'checked' : '' }} class="form-check-input" name="discount_exempt" type="checkbox" value="1"/>
-                                <label>
+                                <input id="discount_exempt" {{ old('discount_exempt', $product->discount_exempt) ? 'checked' : '' }} class="form-check-input" name="discount_exempt" type="checkbox" value="1"/>
+                                <label for="discount_exempt">
                                     Discount Exempt (SC/PWD)
                                 </label>
                             </div>
@@ -253,8 +259,8 @@
         
                         <div class="mb-4 mt-6">
                             <div class="form-check">
-                                <input {{ $product->open_price ? 'checked' : '' }} class="form-check-input" name="open_price" type="checkbox" value="1"/>
-                                <label>
+                                <input id="open_price" {{ old('open_price', $product->open_price) ? 'checked' : '' }} class="form-check-input" name="open_price" type="checkbox" value="1"/>
+                                <label for="open_price">
                                     Open Price
                                 </label>
                             </div>
@@ -266,8 +272,8 @@
         
                         <div class="mb-4 mt-6">
                             <div class="form-check">
-                                <input {{ $product->with_serial ? 'checked' : '' }} class="form-check-input" name="with_serial" type="checkbox" value="1"/>
-                                <label>
+                                <input id="with_serial" {{ old('with_serial', $product->with_serial) ? 'checked' : '' }} class="form-check-input" name="with_serial" type="checkbox" value="1"/>
+                                <label for="with_serial">
                                     With Serial
                                 </label>
                             </div>
@@ -374,7 +380,7 @@
         
                         <div class="mb-4 mt-7">
                             <label class="form-label">Min. Stock Level</label>
-                            <input value="{{ old('minimum_stock_level') ?? $product->minimum_stock_level }}" name="minimum_stock_level" type="text" class="form-control @error('minimum_stock_level') is-invalid @enderror" placeholder="Min. Stock Level" required/>
+                            <input value="{{ old('minimum_stock_level') ?? $product->minimum_stock_level }}" name="minimum_stock_level" type="number" min="0" step="0.0001" class="form-control @error('minimum_stock_level') is-invalid @enderror" placeholder="Min. Stock Level" required/>
         
                             @error('minimum_stock_level')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -383,7 +389,8 @@
         
                         <div class="mb-4">
                             <label class="form-label">Max. Stock Level</label>
-                            <input value="{{ old('maximum_stock_level') ?? $product->maximum_stock_level }}" name="maximum_stock_level" type="text" class="form-control @error('maximum_stock_level') is-invalid @enderror" placeholder="Max. Stock Level" required/>
+                            <input value="{{ old('maximum_stock_level') ?? $product->maximum_stock_level }}" name="maximum_stock_level" type="number" min="0" step="0.0001" class="form-control @error('maximum_stock_level') is-invalid @enderror" placeholder="Max. Stock Level" required/>
+                            <div class="form-text">Must be greater than the minimum stock level.</div>
         
                             @error('maximum_stock_level')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -648,7 +655,7 @@
                         </div>
                     </div>
 
-                    <div class="tab-pane fade {{ !empty($branchSrpsErrors) ? 'show active' : '' }}" id="kt_tab_pane_2" role="tabpanel">
+                    <div class="tab-pane fade {{ !empty($branchPriceErrors) ? 'show active' : '' }}" id="kt_tab_pane_2" role="tabpanel">
                         <div class="table-responsive">
                             <h2>SRP</h2>
                             <table class="table table-row-dashed table-row-gray-500 gy-7">

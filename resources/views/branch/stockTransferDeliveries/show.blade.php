@@ -91,15 +91,15 @@
                     @if($std->status == 'pending')
                     <div class="mt-8">
                         <input type="hidden" name="status" id="status">
-                        <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="for_review">Submit For Approval</button>
+                        <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="for_review" data-confirm="Submit this stock transfer delivery for approval?">Submit For Approval</button>
                     </div>
                     @endif
 
                     @if($std->status == 'for_review')
                     <div class="mt-8">
                         <input type="hidden" name="status" id="status">
-                        <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
-                        <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                        <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved" data-confirm="Approve this stock transfer delivery? Stock will move between branches. This cannot be undone.">Approve</button>
+                        <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected" data-confirm="Reject this stock transfer delivery?">Reject</button>
                     </div>
                     @endif
                 </div>

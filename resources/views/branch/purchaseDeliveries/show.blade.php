@@ -144,8 +144,8 @@
                         @if($pd->status == 'pending')
                             <div class="form-group">
                                 <input type="hidden" name="status" id="status">
-                                <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
-                                <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                                <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved" data-confirm="Approve this delivery? Received stock will be added. This cannot be undone.">Approve</button>
+                                <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected" data-confirm="Reject this delivery? Received quantities will be returned to the purchase order balance.">Reject</button>
                             </div>
                         @endif
                     </div>

@@ -37,7 +37,7 @@
                         <label class="form-label">Department</label>
                         <select id="department_id" name="department_id" class="form-select pr_department_id @error('department_id') is-invalid @enderror" required>
                             <option value="">Select Department</option>
-                            <option value="all">All Department</option>
+                            <option value="all">All departments — products from every department</option>
                             @foreach($departments as $department)
                                 <option value="{{ $department->id }}" {{ $department->id == old('department_id') ? 'selected' : '' }}>{{ $department->name }}</option>
                             @endforeach
@@ -67,7 +67,7 @@
                                 @php
                                     $address = $deliveryLocation->unit_floor_number . ' ' . $deliveryLocation->street . ', ' . $deliveryLocation->barangay->name . ', ' . $deliveryLocation->city->name . ', ' . $deliveryLocation->province->name . ', ' . $deliveryLocation->region->name;
                                 @endphp
-                                <option data-address="{{ $address }}" value="{{ $deliveryLocation->id }}">{{ $deliveryLocation->name }}</option>
+                                <option data-address="{{ $address }}" value="{{ $deliveryLocation->id }}" {{ (string) old('delivery_location_id') === (string) $deliveryLocation->id ? 'selected' : '' }}>{{ $deliveryLocation->name }}</option>
                             @endforeach
                         </select>
                         <input id="delivery_address" type="text" readonly tabindex="-1" class="form-control-plaintext form-control-sm px-0 mt-1 text-gray-600 d-none">
@@ -132,7 +132,7 @@
                                             </div>
                                             <div class="col-md-1">
                                                 <label class="form-label">Qty</label>
-                                                <input name="quantity" value="0" type="number" min="0" step="1" class="form-control pr_quantity">
+                                                <input name="quantity" value="" type="number" min="0.0001" step="0.0001" class="form-control pr_quantity" required>
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label">Unit Price</label>
@@ -191,7 +191,7 @@
                                                 </div>
                                                 <div class="col-md-1">
                                                     <label class="form-label">Qty</label>
-                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="number" min="0" step="1" class="form-control pr_quantity @error('pr_items.' . $key . '.quantity') is-invalid @enderror">
+                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="number" min="0.0001" step="0.0001" class="form-control pr_quantity @error('pr_items.' . $key . '.quantity') is-invalid @enderror" required>
                                                     @error('pr_items.' . $key . '.quantity')
                                                         <div class="invalid-feedback d-block">{{ $message }}</div>
                                                     @enderror

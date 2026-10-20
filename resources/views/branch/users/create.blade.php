@@ -23,8 +23,9 @@
                 <div class="mb-4">
                     <label class="form-label">Role</label>
                     <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
+                        <option value="">Select a role</option>
                         @foreach($company->roles as $role)
-                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                            <option value="{{ $role->id }}" {{ (string) old('role') === (string) $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
                         @endforeach
                     </select>
 
@@ -70,6 +71,14 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Confirm password</label>
+                    <input class="form-control @error('password_confirmation') is-invalid @enderror" type="password" placeholder="Confirm password" required name="password_confirmation" autocomplete="off" />
+                    @error('password_confirmation')
+                        <div class="invalid-feedback"> {{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="mb-4">

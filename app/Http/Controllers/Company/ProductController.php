@@ -17,6 +17,7 @@ use App\DataTables\Company\ValuationDataTable;
 use App\DataTables\Company\InventoryProductsDataTable;
 use App\DataTables\Company\ProductCountHistoryDataTable;
 
+use App\Imports\ProductImportPreview;
 use App\Imports\ProductsImport;
 use App\Jobs\ProcessExcelJob;
 use Maatwebsite\Excel\Facades\Excel;
@@ -143,21 +144,27 @@ class ProductController extends Controller
             'uom_id' => 'required',
             'delivery_uom_id' => 'required',
             'item_type_id' => 'required',
-            'sku' => 'nullable|unique:products,sku,NULL,id,company_id,' . $company->id,
-            'barcode' => 'nullable|unique:products,barcode,NULL,id,company_id,' . $company->id,
-            'srp' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'markup' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'sku' => 'required|unique:products,sku,NULL,id,company_id,' . $company->id,
+            'barcode' => 'required|unique:products,barcode,NULL,id,company_id,' . $company->id,
+            'part_number' => 'required',
+            'uom_cost' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'srp' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'markup' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'status' => 'required',
-            'minimum_stock_level' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'maximum_stock_level' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'minimum_stock_level' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'maximum_stock_level' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,4})?$/', function ($attribute, $value, $fail) use ($request) {
+                if ($request->filled('minimum_stock_level') && (float) $value <= (float) $request->input('minimum_stock_level')) {
+                    $fail('Maximum stock must be greater than minimum stock.');
+                }
+            }],
             'raw_items.*.product_id' => 'nullable',
             'raw_items.*.quantity' => 'required_with:raw_items.*.product_id',
             'raw_items.*.uom_id' => 'required_with:raw_items.*.product_id',
             'bundled_items.*.product_id' => 'nullable',
             'bundled_items.*.quantity' => 'required_with:bundled_items.*.product_id',
             'max_discount' => [
-                'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                'numeric', 'regex:/^\d+(\.\d{1,4})?$/',
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value < $request->input('cost')) {
                         $fail('The ' . $attribute . ' must be greater than cost.');
@@ -166,7 +173,7 @@ class ProductController extends Controller
             ],
             'branch_srps' => 'nullable|array',
             'branch_srps.*' => [
-                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                'nullable', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/',
                 // function ($attribute, $value, $fail) use ($request) {
                 //     if ($value > 0 && $value < $request->input('cost')) {
                 //         $fail("Must be greater than or equal to cost.");
@@ -175,11 +182,11 @@ class ProductController extends Controller
             ],
             'branch_costs' => 'nullable|array',
             'branch_costs.*' => [
-                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+                'nullable', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'
             ],
             'branch_markups' => 'nullable|array',
             'branch_markups.*' => [
-                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+                'nullable', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'
             ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
@@ -399,18 +406,24 @@ class ProductController extends Controller
             'delivery_uom_id' => 'required',
             'item_type_id' => 'required',
             'sku' => 'nullable|unique:products,sku,' . $productId . ',id,company_id,' . $company->id,
-            'barcode' => 'nullable|unique:products,barcode,' . $productId . ',id,company_id,' . $company->id,
-            'srp' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'cost' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'markup' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'barcode' => 'required|unique:products,barcode,' . $productId . ',id,company_id,' . $company->id,
+            'part_number' => 'required',
+            'uom_cost' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'srp' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'cost' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'markup' => ['required', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'],
             'status' => 'required',
-            'minimum_stock_level' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
-            'maximum_stock_level' => ['required', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'],
+            'minimum_stock_level' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,4})?$/'],
+            'maximum_stock_level' => ['required', 'numeric', 'min:0', 'regex:/^\d+(\.\d{1,4})?$/', function ($attribute, $value, $fail) use ($request) {
+                if ($request->filled('minimum_stock_level') && (float) $value <= (float) $request->input('minimum_stock_level')) {
+                    $fail('Maximum stock must be greater than minimum stock.');
+                }
+            }],
             'raw_items.*.product_id' => 'nullable',
             'raw_items.*.quantity' => 'required_with:raw_items.*.product_id',
             'raw_items.*.uom_id' => 'required_with:raw_items.*.product_id',
             'max_discount' => [
-                'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                'numeric', 'regex:/^\d+(\.\d{1,4})?$/',
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value < $request->input('cost')) {
                         $fail('The ' . $attribute . ' must be greater than cost.');
@@ -419,7 +432,7 @@ class ProductController extends Controller
             ],
             'branch_srps' => 'nullable|array',
             'branch_srps.*' => [
-                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/',
+                'nullable', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/',
                 // function ($attribute, $value, $fail) use ($request) {
                 //     if ($value > 0 && $value < $request->input('cost')) {
                 //         $fail("Must be greater than or equal to cost.");
@@ -428,11 +441,11 @@ class ProductController extends Controller
             ],
             'branch_costs' => 'nullable|array',
             'branch_costs.*' => [
-                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+                'nullable', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'
             ],
             'branch_markups' => 'nullable|array',
             'branch_markups.*' => [
-                'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
+                'nullable', 'numeric', 'regex:/^\d+(\.\d{1,4})?$/'
             ],
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
@@ -573,17 +586,122 @@ class ProductController extends Controller
     {
         $company = $request->attributes->get('company');
 
+        if ($request->boolean('confirm')) {
+            $path = (string) $request->input('stored_path');
+            if (!preg_match('#^uploads/[A-Za-z0-9]+\.xlsx$#', $path) || !Storage::disk('local')->exists($path)) {
+                return redirect()->route('company.products.index', ['companySlug' => $company->slug])
+                    ->with('error', 'The import file expired. Choose the file again.');
+            }
+
+            ProcessExcelJob::dispatch($path, $company->id, auth()->user()->id);
+
+            return redirect()->route('company.products.index', ['companySlug' => $company->slug])
+                ->with('success', 'Products import started. New products appear after the import finishes.');
+        }
+
         $request->validate([
             'file' => 'required|mimes:xlsx',
         ]);
 
-        $file = $request->file('file');
-        $path = $file->store('uploads');
-
-        ProcessExcelJob::dispatch($path, $company->id, auth()->user()->id);
+        $path = $request->file('file')->store('uploads');
 
         return redirect()->route('company.products.index', ['companySlug' => $company->slug])
-                ->with('success', 'Products import started');
+            ->with('import_preview', $this->previewProductImport($path, $company->id))
+            ->with('import_path', $path);
+    }
+
+    private function previewProductImport(string $path, int $companyId): array
+    {
+        $sheets = Excel::toCollection(new ProductImportPreview(), Storage::disk('local')->path($path));
+        $rows = $sheets->first() ?? collect();
+
+        $names = [];
+        $barcodes = [];
+        $blankNames = 0;
+        $issues = [];
+
+        foreach ($rows as $index => $row) {
+            $name = trim((string) ($row[1] ?? ''));
+            $barcode = trim((string) ($row[7] ?? ''));
+            $rowNumber = $index + 2;
+
+            if ($name === '' && $barcode === '' && trim((string) ($row[0] ?? '')) === '') {
+                continue;
+            }
+
+            if ($name === '') {
+                $blankNames++;
+                if (count($issues) < 20) {
+                    $issues[] = 'Row ' . $rowNumber . ' has no product name.';
+                }
+                continue;
+            }
+
+            $key = mb_strtolower($name);
+            $names[$key] = ($names[$key] ?? 0) + 1;
+            if ($barcode !== '') {
+                $barcodes[$barcode] = ($barcodes[$barcode] ?? 0) + 1;
+            }
+        }
+
+        $filled = 0;
+        foreach ($names as $count) {
+            $filled += $count;
+        }
+
+        $duplicateNames = [];
+        foreach ($names as $name => $count) {
+            if ($count > 1) {
+                $duplicateNames[] = $name;
+            }
+        }
+
+        $duplicateBarcodes = [];
+        foreach ($barcodes as $barcode => $count) {
+            if ($count > 1) {
+                $duplicateBarcodes[] = $barcode;
+            }
+        }
+
+        $existingNames = Product::where('company_id', $companyId)
+            ->pluck('name')
+            ->filter(function ($name) use ($names) {
+                return isset($names[mb_strtolower(trim((string) $name))]);
+            })
+            ->map(fn ($name) => mb_strtolower(trim((string) $name)))
+            ->values()
+            ->all();
+
+        $existingBarcodes = [];
+        if ($barcodes) {
+            $existingBarcodes = Product::where('company_id', $companyId)
+                ->whereIn('barcode', array_keys($barcodes))
+                ->pluck('barcode')
+                ->all();
+        }
+
+        foreach (array_slice($duplicateNames, 0, 10) as $name) {
+            $issues[] = 'Duplicate name in the file: ' . $name;
+        }
+        foreach (array_slice($duplicateBarcodes, 0, 10) as $barcode) {
+            $issues[] = 'Duplicate barcode in the file: ' . $barcode;
+        }
+        foreach (array_slice($existingNames, 0, 10) as $name) {
+            $issues[] = 'Name already exists and will be updated: ' . $name;
+        }
+        foreach (array_slice($existingBarcodes, 0, 10) as $barcode) {
+            $issues[] = 'Barcode already exists: ' . $barcode;
+        }
+
+        return [
+            'rows' => $filled + $blankNames,
+            'blank_names' => $blankNames,
+            'duplicate_names' => count($duplicateNames),
+            'duplicate_barcodes' => count($duplicateBarcodes),
+            'existing_names' => count($existingNames),
+            'existing_barcodes' => count($existingBarcodes),
+            'issues' => array_slice($issues, 0, 20),
+        ];
     }
 
     public function showForm(Request $request)

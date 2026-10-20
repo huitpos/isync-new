@@ -60,13 +60,13 @@ class UserController extends Controller
 
         $request->validate([
             'username' => 'required|unique:users,username',
-            'password' => 'required',
+            'password' => 'required|confirmed|min:8',
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'nullable|email|unique:users,email',
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['password_confirmation']);
         $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
         $data['company_id'] = $company->id;
         $data['branches'][] = $branch->id;

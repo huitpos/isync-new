@@ -92,8 +92,8 @@
                 </div>
 
                 <div class="mb-4 mt-5">
-                    <input value="1" name="is_manual" class="form-check-input" type="checkbox" id="is_zero_rated">
-                    <label class="form-check-label" for="is_zero_rated">
+                    <input value="1" name="is_manual" class="form-check-input" type="checkbox" id="is_manual">
+                    <label class="form-check-label" for="is_manual">
                         Is Manual
                     </label>
                 </div>

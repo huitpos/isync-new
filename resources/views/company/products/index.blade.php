@@ -16,6 +16,27 @@
         </div>
     @endif
 
+    @if (session('import_preview'))
+        @php $preview = session('import_preview'); @endphp
+        <div class="alert alert-warning">
+            <div class="fw-bold mb-2">Review this file before importing</div>
+            <div>{{ $preview['rows'] }} data row(s). Blank names: {{ $preview['blank_names'] }}. Duplicate names in the file: {{ $preview['duplicate_names'] }}. Duplicate barcodes in the file: {{ $preview['duplicate_barcodes'] }}. Names already in the catalog: {{ $preview['existing_names'] }}. Barcodes already in the catalog: {{ $preview['existing_barcodes'] }}.</div>
+            @if (!empty($preview['issues']))
+                <ul class="mb-3 mt-3">
+                    @foreach ($preview['issues'] as $issue)
+                        <li>{{ $issue }}</li>
+                    @endforeach
+                </ul>
+            @endif
+            <form method="POST" action="{{ route('company.products.import', ['companySlug' => $company->slug]) }}" class="mt-3" onsubmit="return confirm('Start the import for {{ $preview['rows'] }} row(s)? Existing names may be updated.');">
+                @csrf
+                <input type="hidden" name="confirm" value="1">
+                <input type="hidden" name="stored_path" value="{{ session('import_path') }}">
+                <button type="submit" class="btn btn-primary">Import these rows</button>
+            </form>
+        </div>
+    @endif
+
     <div class="card" data-dt-card>
         <div class="card-header border-0 pt-6">
             <div class="card-title">
@@ -64,7 +85,7 @@
             @csrf
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title"></h3>
+                    <h3 class="modal-title">Import products</h3>
 
                     <!--begin::Close-->
                     <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
@@ -74,14 +95,14 @@
                 </div>
 
                 <div class="modal-body">
-                    <input type="file" name="file">
-
+                    <input type="file" name="file" accept=".xlsx" required>
+                    <div class="form-text mt-3">Check the file first. You will see the row count, blank names, and duplicates before anything is imported.</div>
                     <a href="/download-product-import-template">Download template</a>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary disable-on-click">Import</button>
+                    <button type="submit" class="btn btn-primary disable-on-click">Check file</button>
                 </div>
             </div>
         </form>

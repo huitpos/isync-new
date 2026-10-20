@@ -14,7 +14,7 @@
 
     <div class="card">
         <div class="card-body py-4">
-            <form class="mt-3" action="{{ route('branch.product-physical-counts.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
+            <form class="mt-3" data-branch-id="{{ $branch->id }}" action="{{ route('branch.product-physical-counts.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
                 @csrf
 
                 <div class="row mb-5">
@@ -27,7 +27,7 @@
                         <label class="form-label">Department</label>
                         <select id="department_id" name="department_id" class="form-select pr_department_id @error('department_id') is-invalid @enderror" required>
                             <option value="">Select Department</option>
-                            <option value="all">All Department</option>
+                            <option value="all">All departments — products from every department</option>
                             @foreach($departments as $department)
                                 <option value="{{ $department->id }}" {{ $department->id == old('department_id') ? 'selected' : '' }}>{{ $department->name }}</option>
                             @endforeach
@@ -42,7 +42,7 @@
                 <div class="row mb-5">
                     <div class="col-md-12 mb-5">
                         <label class="form-label">Remarks</label>
-                        <textarea name="remarks" class="form-control"></textarea>
+                        <textarea name="remarks" class="form-control">{{ old('remarks') }}</textarea>
                     </div>
                 </div>
 
@@ -87,8 +87,13 @@
                                             </div>
 
                                             <div class="col-md-2">
-                                                <label class="form-label">Quantity:</label>
-                                                <input name="quantity" value="0" type="text" class="form-control"/>
+                                                <label class="form-label">On hand:</label>
+                                                <input readonly type="text" class="form-control on-hand" value="—"/>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label class="form-label">Counted:</label>
+                                                <input name="quantity" value="" type="number" min="0.0001" step="0.0001" class="form-control" required/>
                                             </div>
 
                                             <div class="col-md-12 mt-3">
@@ -150,8 +155,13 @@
                                                 </div>
 
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Quantity:</label>
-                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="text" class="form-control @error('pr_items.' . $key . '.quantity') is-invalid @enderror"/>
+                                                    <label class="form-label">On hand:</label>
+                                                    <input readonly type="text" class="form-control on-hand" value="—"/>
+                                                </div>
+
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Counted:</label>
+                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="number" min="0.0001" step="0.0001" class="form-control @error('pr_items.' . $key . '.quantity') is-invalid @enderror" required/>
 
                                                     <div class="invalid-feedback">
                                                         @error('pr_items.' . $key . '.quantity')

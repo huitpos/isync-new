@@ -89,7 +89,7 @@
 
                             <div class="col-md-2">
                                 <label class="form-label">Unit Price:</label>
-                                <input name="items[{{ $key }}][po_unit_price]"  value="{{ $item->unit_price }}" type="hidden" readonly class="form-control"/>
+                                <input name="items[{{ $key }}][po_unit_price]"  value="{{ $item->unit_price }}" type="hidden" readonly class="form-control po_unit_price"/>
                                 <input
                                     name="items[{{ $key }}][unit_price]"
                                     value="{{ $old[$key]['unit_price'] ?? $item->unit_price }}"
@@ -109,6 +109,8 @@
                                     name="items[{{ $key }}][qty]"
                                     placeholder="0"
                                     type="number"
+                                    min="0"
+                                    step="0.0001"
                                     class="form-control text-end @error('items.' . $key. '.qty') is-invalid @enderror receive_quantity"
                                 />
 
@@ -122,13 +124,15 @@
                     <div class="row mb-5">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <button type="submit" value="1" class="btn btn-flex btn-light-warning disable-on-click" data-button-link="#is_closed">
-                                    Receive and close PO
-                                </button>
-
-                                <button type="submit" value="0" class="btn btn-flex btn-light-success ms-5 disable-on-click" data-button-link="#is_closed">
+                                <button type="submit" value="0" class="btn btn-flex btn-light-success disable-on-click receive-btn" data-button-link="#is_closed" data-confirm="Receive these quantities?">
                                     Receive
                                 </button>
+
+                                <button type="submit" value="1" class="btn btn-flex btn-light-warning ms-5 disable-on-click receive-close-btn" data-button-link="#is_closed" data-confirm="Receive these quantities and close the purchase order? Any remaining balance can no longer be received.">
+                                    Receive and close PO
+                                </button>
+                                <div class="form-text mt-3">Leave receive quantity blank for items that did not arrive. A price that differs from the purchase order is called out before you save.</div>
+                                <div id="receive-warning" class="text-danger mt-2"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -156,39 +160,60 @@
 
            function recalculate()
            {
-                total = 0;
-                grandTotal = 0;
-                totalQty = 0;
+                var total = 0;
+                var totalQty = 0;
+                var blocked = false;
+                var priceDiff = false;
+                var blockMessage = 'Enter a receive quantity for at least one item.';
+
                 $('.receive_quantity').each(function() {
-                    var quantity = $(this).val();
-                    var grandparentElement = $(this).parent().parent();
+                    var raw = $(this).val();
+                    var qty = raw === '' ? 0 : parseFloat(raw);
+                    var row = $(this).parent().parent();
+                    var original = parseFloat(row.find('.original_balance').val()) || 0;
+                    var price = parseFloat(row.find('.unit_price').val());
+                    var poPrice = parseFloat(row.find('.po_unit_price').val());
 
-                    if (grandparentElement.find('.unit_price').val() == '') {
-                        return
+                    if (isNaN(qty) || qty < 0) {
+                        blocked = true;
+                        blockMessage = 'Receive quantity cannot be negative.';
+                        $(this).addClass('is-invalid');
+                        qty = 0;
+                    } else if (qty > original + 0.0000001) {
+                        blocked = true;
+                        blockMessage = 'Receive quantity cannot be more than the balance.';
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
                     }
 
-                    grandTotal += grandparentElement.find('.unit_price').val() * grandparentElement.find('.quantity').val();
+                    row.find('.balance').val((original - qty).toFixed(4));
 
-                    if (quantity == '') {
-                        return
+                    if (qty > 0) {
+                        totalQty += qty;
+                        if (!isNaN(price)) {
+                            total += qty * price;
+                        }
+                        if (!isNaN(poPrice) && !isNaN(price) && Math.abs(price - poPrice) > 0.0001) {
+                            priceDiff = true;
+                        }
                     }
-
-                    totalQty += parseInt(quantity);
-
-                    var balanceElem = grandparentElement.find('.balance');
-                    var originalBalanceElem = grandparentElement.find('.original_balance');
-
-                    var balance = originalBalanceElem.val() - quantity;
-                    balanceElem.val(balance);
-
-                    total += quantity * grandparentElement.find('.unit_price').val();
-                    
                 });
+
+                if (totalQty <= 0) {
+                    blocked = true;
+                }
 
                 $('.total').text(total.toFixed(2));
                 $('.total').val(total.toFixed(2));
-                $('#grandTotal').val(grandTotal.toFixed(2));
-                $('#total_qty').val(totalQty.toFixed(2));
+                $('#total_qty').val(totalQty.toFixed(4));
+
+                var priceNote = priceDiff ? ' Some prices differ from the purchase order.' : '';
+                $('.receive-btn').attr('data-confirm', 'Receive ' + totalQty + ' in total?' + priceNote);
+                $('.receive-close-btn').attr('data-confirm', 'Receive ' + totalQty + ' and close this purchase order? Any remaining balance can no longer be received.' + priceNote);
+                $('.receive-btn, .receive-close-btn').attr('data-blocked', blocked ? '1' : '0');
+                $('.receive-btn, .receive-close-btn').attr('data-blocked-message', blockMessage);
+                $('#receive-warning').text(priceDiff ? 'A unit price is different from the purchase order.' : '');
            }
         </script>
     @endpush

@@ -9,6 +9,7 @@ use App\DataTables\Branch\PurchaseOrdersDataTable;
 
 use App\Models\PurchaseOrder;
 use App\Services\ThreeWayMatchService;
+use App\Support\PurchaseOrderStatus;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -82,9 +83,18 @@ class PurchaseOrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $companySlug, string $branchSlug, string $id)
     {
-        //
+        $branch = $request->attributes->get('branch');
+        $po = PurchaseOrder::where('branch_id', $branch->id)->findOrFail($id);
+
+        $validated = $request->validate([
+            'status' => 'required|in:approved,rejected',
+        ]);
+
+        PurchaseOrderStatus::apply($po, $validated['status'], auth()->id());
+
+        return redirect()->back()->with('success', 'Purchase order ' . $validated['status'] . '.');
     }
 
     /**

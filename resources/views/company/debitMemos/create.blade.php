@@ -77,6 +77,7 @@
                         </div>
                     @endforeach
 
+                    <div id="debit-line-count" class="text-gray-700 mb-4">Lines with a quantity: 0</div>
                     <button type="submit" class="btn btn-primary">Issue debit memo</button>
                 </form>
             </div>
@@ -85,6 +86,38 @@
 
     @push('scripts')
         <script>
+            var debitForm = document.querySelector('form[method="POST"], form[method="post"]');
+            var debitCount = document.getElementById('debit-line-count');
+            function debitLineCount() {
+                var count = 0;
+                document.querySelectorAll('input[name$="[qty]"]').forEach(function (input) {
+                    if (Number(input.value) > 0) {
+                        count++;
+                    }
+                });
+                if (debitCount) {
+                    debitCount.textContent = 'Lines with a quantity: ' + count;
+                }
+                return count;
+            }
+            document.querySelectorAll('input[name$="[qty]"]').forEach(function (input) {
+                input.addEventListener('input', debitLineCount);
+            });
+            debitLineCount();
+            if (debitForm) {
+                debitForm.addEventListener('submit', function (event) {
+                    var count = debitLineCount();
+                    if (!count) {
+                        event.preventDefault();
+                        window.alert('Enter a quantity for at least one line.');
+                        return;
+                    }
+                    if (!window.confirm('Issue a debit memo for ' + count + ' line(s)? Lines left blank are not included.')) {
+                        event.preventDefault();
+                    }
+                });
+            }
+
             document.querySelectorAll('.debit-return').forEach(function (select) {
                 var apply = function () {
                     var option = select.options[select.selectedIndex];

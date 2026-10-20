@@ -166,9 +166,14 @@ class AjaxController extends Controller
         return response()->json($responseData);
     }
 
-    public function getProductDetails()
+    public function getProductDetails(Request $request)
     {
-        $product = Product::find(request()->product_id);
+        $product = Product::find($request->product_id);
+
+        if ($product && $request->filled('branch_id')) {
+            $branchProduct = $product->branches()->where('branches.id', $request->branch_id)->first();
+            $product->on_hand = $branchProduct?->pivot->stock ?? 0;
+        }
 
         return response()->json($product);
     }

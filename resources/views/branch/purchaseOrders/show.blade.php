@@ -11,7 +11,7 @@
     <div class="alert alert-primary">Purchase order {{ $po->po_number }} is {{ $po->status }}. Receiving and stock happen on the delivery.</div>
 
     <div class="card">
-        <form class="mt-3" action="{{ route('company.purchase-requests.update', ['companySlug' => $company->slug, 'purchase_request' => $po->id]) }}" method="POST" novalidate enctype="multipart/form-data">
+        <form class="mt-3" action="{{ route('branch.purchase-orders.update', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'purchase_order' => $po->id]) }}" method="POST" novalidate enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -171,8 +171,8 @@
                     @if($po->status == 'pending')
                         <div class="mt-8">
                             <input type="hidden" name="status" id="status">
-                            <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
-                            <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                            <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved" data-confirm="Approve purchase order {{ $po->po_number }}?">Approve</button>
+                            <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected" data-confirm="Reject purchase order {{ $po->po_number }}? This cannot be undone.">Reject</button>
                         </div>
                     @endif
                 </div>

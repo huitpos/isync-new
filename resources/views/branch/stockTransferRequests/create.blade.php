@@ -27,7 +27,7 @@
                         <label class="form-label">Department</label>
                         <select id="department_id" name="department_id" class="form-select pr_department_id @error('department_id') is-invalid @enderror" required>
                             <option value="">Select Department</option>
-                            <option value="all">All Department</option>
+                            <option value="all">All departments — products from every department</option>
                             @foreach($departments as $department)
                                 <option value="{{ $department->id }}" {{ $department->id == old('department_id') ? 'selected' : '' }}>{{ $department->name }}</option>
                             @endforeach
@@ -49,7 +49,7 @@
                                     $address = $deliveryLocation->unit_floor_number . ' ' . $deliveryLocation->street . ', ' . $deliveryLocation->barangay->name . ', ' . $deliveryLocation->city->name . ', ' . $deliveryLocation->province->name . ', ' . $deliveryLocation->region->name;
                                 @endphp
 
-                                <option data-address="{{ $address }}" value="{{ $deliveryLocation->id }}">{{ $deliveryLocation->name }}</option>
+                                <option data-address="{{ $address }}" value="{{ $deliveryLocation->id }}" {{ (string) old('delivery_location_id') === (string) $deliveryLocation->id ? 'selected' : '' }}>{{ $deliveryLocation->name }}</option>
                             @endforeach
                         </select>
 
@@ -63,11 +63,13 @@
                         <select id="source_branch_id" name="source_branch_id" class="form-select @error('source_branch_id') is-invalid @enderror" required>
                             <option value="">Source Branch</option>
 
-                            @foreach($branches as $branch)
-                                <option value="{{ $branch->id }}" {{ $branch->id == old('source_branch_id') ? 'selected' : '' }}>{{ $branch->name }}</option>
+                            @foreach($branches as $sourceBranch)
+                                @continue($sourceBranch->id == $branch->id)
+                                <option value="{{ $sourceBranch->id }}" {{ (string) $sourceBranch->id === (string) old('source_branch_id') ? 'selected' : '' }}>{{ $sourceBranch->name }}</option>
                             @endforeach
                         </select>
 
+                        <div class="form-text">The current branch is not listed. Stock is requested from another branch.</div>
                         @error('source_branch_id')
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
@@ -82,7 +84,7 @@
                 <div class="row mb-5">
                     <div class="col-md-12 mb-5">
                         <label class="form-label">Remarks</label>
-                        <textarea name="remarks" class="form-control"></textarea>
+                        <textarea name="remarks" class="form-control">{{ old('remarks') }}</textarea>
                     </div>
                 </div>
 
@@ -133,7 +135,7 @@
 
                                             <div class="col-md-2">
                                                 <label class="form-label">Quantity:</label>
-                                                <input name="quantity" value="0" type="text" class="form-control pr_quantity"/>
+                                                <input name="quantity" value="" type="number" min="0.0001" step="0.0001" class="form-control pr_quantity" required/>
                                             </div>
 
                                             <div class="col-md-2">
@@ -206,7 +208,7 @@
 
                                                 <div class="col-md-2">
                                                     <label class="form-label">Quantity:</label>
-                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="text" class="form-control @error('pr_items.' . $key . '.quantity') is-invalid @enderror pr_quantity"/>
+                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="number" min="0.0001" step="0.0001" class="form-control @error('pr_items.' . $key . '.quantity') is-invalid @enderror pr_quantity" required/>
 
                                                     <div class="invalid-feedback">
                                                         @error('pr_items.' . $key . '.quantity')

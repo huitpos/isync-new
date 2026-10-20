@@ -77,7 +77,7 @@
             @enderror
 
             @if ($memo->status === 'issued')
-                <form method="POST" action="{{ route('company.debit-memos.void', ['companySlug' => $company->slug, 'id' => $memo->id]) }}">
+                <form method="POST" action="{{ route('company.debit-memos.void', ['companySlug' => $company->slug, 'id' => $memo->id]) }}" onsubmit="return confirm('Void this debit memo? This cannot be undone.');">
                     @csrf
                     <button type="submit" class="btn btn-light-danger">Void</button>
                 </form>

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 use App\DataTables\Company\UsersDataTable;
+use App\Models\Role;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 
 class UserController extends Controller
@@ -45,21 +46,29 @@ class UserController extends Controller
         $company = $request->attributes->get('company');
 
         $request->validate([
+            'role' => ['required', function ($attribute, $value, $fail) use ($company) {
+                if (!Role::where('company_id', $company->id)->where('id', $value)->exists()) {
+                    $fail('Select a role.');
+                }
+            }],
             'username' => 'required|unique:users,username',
-            'password' => 'required',
+            'password' => 'required|confirmed|min:8',
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'nullable|email|unique:users,email',
             'branches' => [
                 Rule::requiredIf(function () use ($request) {
-                    return $request->role === 'branch_user';
+                    $role = Role::find($request->input('role'));
+
+                    return $role && $role->permissions()->where('level', 'branch_user')->exists();
                 }),
             ],
         ], [
-            'branches.required' => 'At least one branch is required for users with the role "Branch User".',
+            'branches.required' => 'Select at least one branch for a role that works in a branch.',
+            'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
-        $postData = $request->all();
+        $postData = $request->except(['password_confirmation']);
         $postData['company_id'] = $company->id;
         $postData['name'] = $postData['first_name'] . ' ' . $postData['last_name'];
         if ($this->userRepository->create($postData)) {
@@ -107,11 +116,13 @@ class UserController extends Controller
             'email' => 'nullable|email|unique:users,email,' . $id,
             'branches' => [
                 Rule::requiredIf(function () use ($request) {
-                    return $request->role === 'branch_user';
+                    $role = Role::find($request->input('role'));
+
+                    return $role && $role->permissions()->where('level', 'branch_user')->exists();
                 }),
             ],
         ], [
-            'branches.required' => 'At least one branch is required for users with the role "Branch User".',
+            'branches.required' => 'Select at least one branch for a role that works in a branch.',
         ]);
 
         $postData = $request->all();

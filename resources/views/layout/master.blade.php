@@ -57,6 +57,114 @@
 @foreach(getGlobalAssets() as $path)
     {!! sprintf('<script src="%s"></script>', asset($path)) !!}
 @endforeach
+<script>
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest('.disable-on-click');
+        if (!button) {
+            return;
+        }
+        if (button.dataset.confirmed === '1') {
+            button.dataset.confirmed = '';
+            return;
+        }
+        if (button.getAttribute('data-blocked') === '1') {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            window.alert(button.getAttribute('data-blocked-message') || 'Fix the highlighted quantities before saving.');
+            return;
+        }
+        var message = button.getAttribute('data-confirm');
+        if (!message) {
+            return;
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (window.confirm(message)) {
+            button.dataset.confirmed = '1';
+            button.click();
+        }
+    }, true);
+
+    document.addEventListener('change', function (event) {
+        var toggle = event.target;
+        if (!toggle.classList || !toggle.classList.contains('status-toggle')) {
+            return;
+        }
+        if (toggle.dataset.inactiveConfirmed === '1') {
+            toggle.dataset.inactiveConfirmed = '';
+            return;
+        }
+        if (toggle.checked) {
+            return;
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (window.confirm('Set this to inactive? It will no longer be available for new transactions.')) {
+            toggle.dataset.inactiveConfirmed = '1';
+            toggle.dispatchEvent(new Event('change', { bubbles: true }));
+        } else {
+            toggle.checked = true;
+        }
+    }, true);
+
+    $(function () {
+        $('#product-name').off('input');
+        $('#abbreviation').off('input');
+        $('.compute-srp').off('keyup');
+        $('#markup_type').off('change');
+
+        function computeSrp(overwrite) {
+            var cost = parseFloat($('#cost').val());
+            var markUpType = $('#markup_type').val();
+            var markUpValue = parseFloat($('#markup').val());
+            var formula = $('#srp-formula');
+            if (isNaN(cost) || isNaN(markUpValue)) {
+                if ($('#srp').prop('readonly')) {
+                    $('#srp').val('');
+                }
+                formula.text('Enter cost and markup to see the selling price.');
+                return;
+            }
+            var srp = cost + markUpValue;
+            var text = cost + ' + ' + markUpValue + ' = ';
+            if (markUpType === 'percentage') {
+                srp = cost + (cost * (markUpValue / 100));
+                text = cost + ' + ' + markUpValue + '% = ';
+            }
+            srp = Math.round(srp * 10000) / 10000;
+            if (overwrite || $('#srp').prop('readonly')) {
+                $('#srp').val(srp);
+            }
+            formula.text(text + srp);
+        }
+
+        $(document).on('input change', '.compute-srp', function () {
+            computeSrp(true);
+        });
+        $('#markup_type').on('change', function () {
+            computeSrp(true);
+        });
+        if ($('#srp').length) {
+            computeSrp(!!$('#srp').prop('readonly'));
+        }
+
+        $(document).on('change', '.pr_product_id', function () {
+            var branchId = $(this).closest('form').data('branch-id');
+            if (!branchId) {
+                return;
+            }
+            var row = $(this).closest('.form-group');
+            $.get('/ajax/get-product-details', {
+                product_id: $(this).val(),
+                branch_id: branchId
+            }, function (response) {
+                if (response && response.on_hand !== undefined && response.on_hand !== null) {
+                    row.find('.on-hand').val(response.on_hand);
+                }
+            });
+        });
+    });
+</script>
 <!--end::Global Javascript Bundle-->
 
 <!--begin::Vendors Javascript(used by this page)-->

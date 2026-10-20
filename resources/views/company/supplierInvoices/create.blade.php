@@ -111,6 +111,29 @@
                     });
             });
 
+            document.querySelector('form').addEventListener('submit', function (event) {
+                if (!document.querySelector('input[name^="items"]')) {
+                    event.preventDefault();
+                    window.alert('Select a purchase order with received items first.');
+                    return;
+                }
+
+                var differences = 0;
+                document.querySelectorAll('.variance-note').forEach(function (note) {
+                    if (note.textContent.trim() !== '') {
+                        differences++;
+                    }
+                });
+
+                var message = differences
+                    ? differences + ' line(s) differ from the purchase order. Save the invoice with those variances?'
+                    : 'Save this supplier invoice?';
+
+                if (!window.confirm(message)) {
+                    event.preventDefault();
+                }
+            });
+
             poSelect.addEventListener('change', function () {
                 const selected = this.options[this.selectedIndex];
                 supplierInput.value = selected.dataset.supplier || '';
