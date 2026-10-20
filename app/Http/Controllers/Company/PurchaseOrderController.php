@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\DataTables\Company\PurchaseOrdersDataTable;
 
 use App\Models\PurchaseOrder;
+use App\Services\ThreeWayMatchService;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -61,10 +62,12 @@ class PurchaseOrderController extends Controller
         ])->findOrFail($id);
 
         $company = $request->attributes->get('company');
+        $matchLines = app(ThreeWayMatchService::class)->purchaseOrderSummary($po);
 
         return view('company.purchaseOrders.show', [
             'po' => $po,
             'company' => $company,
+            'matchLines' => $matchLines,
         ]);
     }
 

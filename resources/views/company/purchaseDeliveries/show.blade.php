@@ -38,13 +38,23 @@
 
                 <div class="row mb-5">
                     <div class="col-md-6">
-                        <label class="form-label">Sales Invoice Number</label>
+                        <label class="form-label">Supplier Reference</label>
                         <input value="{{ $pd->sales_invoice_number }}" type="text" readonly class="form-control"/>
                     </div>
 
                     <div class="col-md-6">
                         <label class="form-label">Delivery Number</label>
                         <input value="{{ $pd->delivery_number }}" type="text" readonly class="form-control"/>
+                    </div>
+                </div>
+
+                <div class="row mb-5">
+                    <div class="col-md-6">
+                        <label class="form-label">Billing Status</label>
+                        <input value="{{ ucfirst($billingStatus) }}" type="text" readonly class="form-control"/>
+                        @if ($pd->is_legacy_billed)
+                            <div class="form-text">This delivery was billed before supplier invoices. It is excluded from open quantity.</div>
+                        @endif
                     </div>
                 </div>
 
@@ -72,6 +82,11 @@
                             <div class="col-md-2">
                                 <label class="form-label">Balance:</label>
                                 <input value="{{ $item->purchaseOrderItem->balance }}" type="text" readonly class="form-control"/>
+                            </div>
+
+                            <div class="col-md-2">
+                                <label class="form-label">PO Unit Price:</label>
+                                <input value="{{ $item->po_unit_price }}" type="text" readonly class="form-control text-end"/>
                             </div>
 
                             <div class="col-md-2">

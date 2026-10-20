@@ -317,6 +317,11 @@ Breadcrumbs::for('company.purchaseRequests.show', function (BreadcrumbTrail $tra
     $trail->push($pr->pr_number);
 });
 
+Breadcrumbs::for('company.purchaseRequests.quotations', function (BreadcrumbTrail $trail, $company, $pr) {
+    $trail->parent('company.purchaseRequests.show', $company, $pr);
+    $trail->push('Quotations', route('company.purchase-requests.quotations', ['companySlug' => $company->slug, 'id' => $pr->id]));
+});
+
 Breadcrumbs::for('company.purchaseOrders.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
     $trail->push('Purchase Orders', route('company.purchase-orders.index', ['companySlug' => $company->slug]));
@@ -335,6 +340,36 @@ Breadcrumbs::for('company.purchaseDeliveries.index', function (BreadcrumbTrail $
 Breadcrumbs::for('company.purchaseDeliveries.show', function (BreadcrumbTrail $trail, $company, $pd) {
     $trail->parent('company.purchaseDeliveries.index', $company);
     $trail->push($pd->pd_number);
+});
+
+Breadcrumbs::for('company.supplierInvoices.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Supplier Invoices', route('company.supplier-invoices.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.supplierInvoices.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.supplierInvoices.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.supplierInvoices.show', function (BreadcrumbTrail $trail, $company, $invoice) {
+    $trail->parent('company.supplierInvoices.index', $company);
+    $trail->push($invoice->invoice_number);
+});
+
+Breadcrumbs::for('company.debitMemos.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Debit Memos', route('company.debit-memos.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.debitMemos.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.debitMemos.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.debitMemos.show', function (BreadcrumbTrail $trail, $company, $memo) {
+    $trail->parent('company.debitMemos.index', $company);
+    $trail->push($memo->memo_number);
 });
 
 Breadcrumbs::for('company.paymentTerms.index', function (BreadcrumbTrail $trail, $company) {
@@ -457,6 +492,22 @@ Breadcrumbs::for('branch.purchaseDeliveries.index', function (BreadcrumbTrail $t
 Breadcrumbs::for('branch.purchaseDeliveries.show', function (BreadcrumbTrail $trail, $company, $branch, $pd) {
     $trail->parent('branch.purchaseDeliveries.index', $company, $branch);
     $trail->push($pd->pd_number);
+});
+
+Breadcrumbs::for('branch.purchaseReturns.index', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+    $trail->push('Purchase Returns', route('branch.purchase-returns.index', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
+});
+
+Breadcrumbs::for('branch.purchaseReturns.create', function (BreadcrumbTrail $trail, $company, $branch) {
+    $trail->parent('branch.purchaseReturns.index', $company, $branch);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('branch.purchaseReturns.show', function (BreadcrumbTrail $trail, $company, $branch, $purchaseReturn) {
+    $trail->parent('branch.purchaseReturns.index', $company, $branch);
+    $trail->push($purchaseReturn->return_number);
 });
 
 Breadcrumbs::for('branch.stockTransferRequests.index', function (BreadcrumbTrail $trail, $company, $branch) {

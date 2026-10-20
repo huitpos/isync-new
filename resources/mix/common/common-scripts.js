@@ -21,9 +21,16 @@ $(document).ready(function () {
 
         $('.grandtotal').html(sum);
         $('#pr_total').val(sum);
+        updateItemCount();
     }
 
-    $(document).on('keyup', '.pr_quantity', function (e) {
+    function updateItemCount()
+    {
+        var count = $('.repeater [data-repeater-item]:visible').length;
+        $('.pr-item-count').text(count + (count === 1 ? ' item' : ' items'));
+    }
+
+    $(document).on('keyup input', '.pr_quantity', function (e) {
         var granparentElem = $(this).parent().parent();
 
         computeTotal(granparentElem);
@@ -112,7 +119,9 @@ $(document).ready(function () {
             },
             success: function(response) {
                 granparentElem.find('.barcode').val(response.barcode);
+                granparentElem.find('.barcode-text').text(response.barcode || '—');
                 granparentElem.find('.unit_price').val(response.cost);
+                computeTotal(granparentElem);
             },
             error: function(xhr, status, error) {
                 console.error('Error:', error);
@@ -173,9 +182,11 @@ $(document).ready(function () {
 
     $('#delivery_location_id').on('change', function() {
         var selectedOption = $(this).find('option:selected');
-        var address = selectedOption.data('address');
+        var address = selectedOption.data('address') || '';
+        var $address = $('#delivery_address');
 
-        $('#delivery_address').val(address)
+        $address.val(address);
+        $address.toggleClass('d-none', !address);
     });
 
     function computeSrp()
@@ -423,11 +434,13 @@ $(document).ready(function () {
             $('.repeater').find('.select2-ajax').removeAttr("data-kt-initialized");
 
             initConditionsSelect2();
+            updateItemCount();
         },
         hide: function (deleteElement) {
-            // if(confirm('Are you sure you want to delete this element?')) {
-                $(this).slideUp(deleteElement);
-            // }
+            $(this).slideUp(function () {
+                deleteElement();
+                updateItemCount();
+            });
         },
         isFirstItemUndeletable: false,
         repeaters: [{
@@ -436,6 +449,8 @@ $(document).ready(function () {
             selector: '.inner-repeater'
         }]
     });
+
+    updateItemCount();
 });
 
 $(document).on('click', '.button-ajax', function (e) {

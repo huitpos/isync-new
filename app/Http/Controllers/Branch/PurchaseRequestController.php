@@ -90,7 +90,7 @@ class PurchaseRequestController extends Controller
                 },
             ],
             'delivery_location_id' => 'required',
-            'supplier_id' => 'required',
+            'supplier_id' => 'nullable|exists:suppliers,id',
             'pr_items' => 'required',
             'pr_items.*.product_id' => 'required',
             'pr_items.*.quantity' => 'required_with:pr_items.*.product_id',
@@ -122,6 +122,7 @@ class PurchaseRequestController extends Controller
         unset($prData['pr_items']);
 
         $prData['department_id'] = $postData['department_id'] == 'all' ? null : $postData['department_id'];
+        $prData['supplier_id'] = $request->filled('supplier_id') ? $request->input('supplier_id') : null;
 
         //save the purchase request and its items using model
         $purchaseRequest = new PurchaseRequest();
@@ -143,7 +144,8 @@ class PurchaseRequestController extends Controller
             'items',
             'createdBy',
             'supplier',
-            'actionBy'
+            'actionBy',
+            'quotations',
         ])->findOrFail($id);
 
         $company = $request->attributes->get('company');
@@ -191,6 +193,14 @@ class PurchaseRequestController extends Controller
             'supplier_term_id' => 'required',
             'status' => 'required',
         ]);
+
+        if ($request->status === 'approved' && $pr->quotations()->exists()) {
+            return redirect()->back()->with('error', 'This request has supplier quotations. Award it from the company Quotations page.');
+        }
+
+        if ($request->status === 'approved' && empty($pr->supplier_id)) {
+            return redirect()->back()->with('error', 'This request has no supplier. The company will request quotations before a purchase order is created.');
+        }
 
         $data = $validatedData;
         $data['action_by'] = auth()->user()->id;

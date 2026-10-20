@@ -133,6 +133,24 @@
                             <input value="{{ $item->total }}" type="text" readonly class="form-control text-end"/>
                         </div>
 
+                        @php $match = $matchLines[$item->id] ?? ['received' => 0, 'billed' => 0, 'open' => 0]; @endphp
+                        <div class="col-md-2 mt-3">
+                            <label class="form-label">Received:</label>
+                            <input value="{{ $match['received'] }}" type="text" readonly class="form-control"/>
+                        </div>
+                        <div class="col-md-2 mt-3">
+                            <label class="form-label">Billed:</label>
+                            <input value="{{ $match['billed'] }}" type="text" readonly class="form-control"/>
+                        </div>
+                        <div class="col-md-2 mt-3">
+                            <label class="form-label">Returned:</label>
+                            <input value="{{ $match['returned'] ?? 0 }}" type="text" readonly class="form-control"/>
+                        </div>
+                        <div class="col-md-2 mt-3">
+                            <label class="form-label">Open to Bill:</label>
+                            <input value="{{ $match['open'] }}" type="text" readonly class="form-control"/>
+                        </div>
+
                         <div class="col-md-12 mt-3">
                             <label class="form-label">Remarks:</label>
                             <textarea readonly class="form-control">{{ $item->pr_remarks }}</textarea>

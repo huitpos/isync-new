@@ -12,6 +12,7 @@ use App\Models\Branch;
 use App\DataTables\Branch\PurchaseDeliveriesDataTable;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\ThreeWayMatchService;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -68,7 +69,7 @@ class PurchaseDeliveryController extends Controller
 
         $request->validate([
             'purchase_order_id' => 'required|exists:purchase_orders,id',
-            'sales_invoice_number' => 'required|unique:purchase_deliveries,sales_invoice_number',
+            'sales_invoice_number' => 'nullable|string|max:255',
             'delivery_number' => 'required',
             'items.*.unit_price' => 'required',
             'items.*.qty' => 'required',
@@ -89,7 +90,6 @@ class PurchaseDeliveryController extends Controller
         foreach ($request->items as $item) {
             $poItem = $po->items->where('id', $item['purchase_order_item_id'])->first();
             $poItem->balance = $item['balance'];
-            $poItem->unit_price = $item['unit_price'];
             $poItem->save();
         }
 
@@ -104,7 +104,7 @@ class PurchaseDeliveryController extends Controller
 
         $pdData = [
             'purchase_order_id' => $request->purchase_order_id,
-            'sales_invoice_number' => $request->sales_invoice_number,
+            'sales_invoice_number' => $request->sales_invoice_number ?: null,
             'delivery_number' => $request->delivery_number,
             'total_qty' => $request->total_qty,
             'total_amount' => $request->total_amount,
@@ -128,8 +128,9 @@ class PurchaseDeliveryController extends Controller
 
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
+        $billingStatus = app(ThreeWayMatchService::class)->deliveryBillingStatus($pd);
 
-        return view('branch.purchaseDeliveries.show', compact('pd', 'company', 'branch'));
+        return view('branch.purchaseDeliveries.show', compact('pd', 'company', 'branch', 'billingStatus'));
     }
 
     /**

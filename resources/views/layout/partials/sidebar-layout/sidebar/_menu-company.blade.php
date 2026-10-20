@@ -79,6 +79,20 @@
 			],
 		],
 		[
+			'title' => 'Supplier Invoices',
+			'icon' => 'fa-solid fa-file-invoice-dollar fs-2',
+			'route' => 'company.supplier-invoices.index',
+			'routeParams' => ['companySlug' => $companySlug],
+			'activeRoutes' => ['company.supplier-invoices.*'],
+		],
+		[
+			'title' => 'Debit Memos',
+			'icon' => 'fa-solid fa-file-circle-minus fs-2',
+			'route' => 'company.debit-memos.index',
+			'routeParams' => ['companySlug' => $companySlug],
+			'activeRoutes' => ['company.debit-memos.*'],
+		],
+		[
 			'permission' => 'Company Access Level',
 			'title' => 'Access Level',
 			'icon' => 'fa-solid fa-id-card fs-2',

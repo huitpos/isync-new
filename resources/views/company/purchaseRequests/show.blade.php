@@ -16,9 +16,12 @@
                         <input value="{{ $pr->pr_number }}" type="text" readonly class="form-control"/>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label">Status</label>
                         <input value="{{ ucfirst($pr->status) }}" type="text" readonly class="form-control"/>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <a href="{{ route('company.purchase-requests.quotations', ['companySlug' => $company->slug, 'id' => $pr->id]) }}" class="btn btn-light-primary w-100">Quotations</a>
                     </div>
                 </div>
 
@@ -63,7 +66,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Supplier</label>
-                        <input value="{{ $pr->supplier->name }}" type="text" readonly class="form-control"/>
+                        <input value="{{ $pr->supplier->name ?? ($pr->status == 'approved' ? 'Split award' : 'To be quoted') }}" type="text" readonly class="form-control"/>
                     </div>
 
                     <div class="col-md-12">

@@ -36,4 +36,9 @@ class PurchaseDeliveryItem extends Model
     {
         return $this->belongsTo(PurchaseOrderItem::class);
     }
+
+    public function purchaseDelivery()
+    {
+        return $this->belongsTo(PurchaseDelivery::class);
+    }
 }

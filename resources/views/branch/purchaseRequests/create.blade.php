@@ -12,17 +12,27 @@
         <div class="alert alert-danger">Select at least 1 item</div>
     @enderror
 
-    <div class="card">
-        <div class="card-body py-4">
-            <form class="mt-3" action="{{ route('branch.purchase-requests.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
-                @csrf
+    <form action="{{ route('branch.purchase-requests.store', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
+        @csrf
+        <input type="hidden" name="type" value="for_po">
 
+        <div class="card mb-5">
+            <div class="card-header">
+                <h3 class="card-title">Request</h3>
+            </div>
+            <div class="card-body">
                 <div class="row mb-5">
                     <div class="col-md-6">
                         <label class="form-label">Requested By</label>
-                        <input value="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}" type="text" disabled class="form-control"/>
+                        <div class="fw-semibold fs-6 text-gray-800">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Type</label>
+                        <div><span class="badge badge-light-primary">For PO</span></div>
+                    </div>
+                </div>
 
+                <div class="row mb-5">
                     <div class="col-md-6">
                         <label class="form-label">Department</label>
                         <select id="department_id" name="department_id" class="form-select pr_department_id @error('department_id') is-invalid @enderror" required>
@@ -32,37 +42,24 @@
                                 <option value="{{ $department->id }}" {{ $department->id == old('department_id') ? 'selected' : '' }}>{{ $department->name }}</option>
                             @endforeach
                         </select>
-
                         @error('department_id')
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
                     </div>
-                </div>
-
-                <div class="row mb-5">
-                    <div class="col-md-6">
-                        <label class="form-label">Type</label>
-                        <select id="type" name="type" class="form-control" required>
-                            <option value="for_po">For PO</option>
-                        </select>
-
-                        @error('status')
-                            <div class="invalid-feedback"> {{ $message }}</div>
-                        @enderror
-                    </div>
-
                     <div class="col-md-6">
                         <label class="form-label">Date Needed</label>
-                        <input data-min-date="today" value="{{ old('date_needed') }}" name="date_needed" type="text" class="form-control @error('date_needed') is-invalid @enderror flatpack-picker" placeholder="Date Needed" required/>
-
+                        <div class="position-relative">
+                            <input data-min-date="today" value="{{ old('date_needed') }}" name="date_needed" type="text" class="form-control pe-10 @error('date_needed') is-invalid @enderror flatpack-picker" placeholder="Select a date" required/>
+                            <i class="fa-solid fa-calendar position-absolute top-50 end-0 translate-middle-y me-4 text-gray-500 pe-none"></i>
+                        </div>
                         @error('date_needed')
-                            <div class="invalid-feedback"> {{ $message }}</div>
+                            <div class="invalid-feedback d-block"> {{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
                 <div class="row mb-5">
-                    <div class="col-md-6 mb-5">
+                    <div class="col-md-6">
                         <label class="form-label">Delivery Location</label>
                         <select id="delivery_location_id" name="delivery_location_id" class="form-select @error('delivery_location_id') is-invalid @enderror" required>
                             <option value="">Select Location</option>
@@ -70,226 +67,198 @@
                                 @php
                                     $address = $deliveryLocation->unit_floor_number . ' ' . $deliveryLocation->street . ', ' . $deliveryLocation->barangay->name . ', ' . $deliveryLocation->city->name . ', ' . $deliveryLocation->province->name . ', ' . $deliveryLocation->region->name;
                                 @endphp
-
                                 <option data-address="{{ $address }}" value="{{ $deliveryLocation->id }}">{{ $deliveryLocation->name }}</option>
                             @endforeach
                         </select>
-
+                        <input id="delivery_address" type="text" readonly tabindex="-1" class="form-control-plaintext form-control-sm px-0 mt-1 text-gray-600 d-none">
                         @error('delivery_location_id')
-                            <div class="invalid-feedback"> {{ $message }}</div>
+                            <div class="invalid-feedback d-block"> {{ $message }}</div>
                         @enderror
                     </div>
-
                     <div class="col-md-6">
                         <label class="form-label">Supplier</label>
-                        <select id="supplier_id" name="supplier_id" class="form-select @error('supplier_id') is-invalid @enderror" required>
+                        <select id="supplier_id" name="supplier_id" class="form-select @error('supplier_id') is-invalid @enderror">
                             <option value="">Select Supplier</option>
-
                             @foreach($suppliers as $supplier)
                                 <option value="{{ $supplier->id }}" {{ $supplier->id == old('supplier_id') ? 'selected' : '' }}>{{ $supplier->name }}</option>
                             @endforeach
                         </select>
-
+                        <div class="form-text">Leave blank if the company will request quotations.</div>
                         @error('supplier_id')
                             <div class="invalid-feedback"> {{ $message }}</div>
                         @enderror
                     </div>
-
-                    <div class="col-md-12">
-                        <label class="form-label">Delivery Address</label>
-                        <input id="delivery_address" type="text" disabled class="form-control"/>
-                    </div>
                 </div>
 
-                <div class="row mb-5">
-                    <div class="col-md-12 mb-5">
-                        <label class="form-label">Remarks</label>
-                        <textarea name="remarks" class="form-control"></textarea>
-                    </div>
+                <div>
+                    <label class="form-label">Remarks</label>
+                    <textarea name="remarks" rows="2" class="form-control">{{ old('remarks') }}</textarea>
                 </div>
+            </div>
+        </div>
 
-                <div class="mt-7">
-                    <label class="form-label">Items</label>
-                    <hr>
-                    <!--begin::Repeater-->
-                    <div class="repeater" data-init-empty="{{ empty(old('pr_items')) }}">
-                        <!--begin::Form group-->
-                        <div class="form-group">
-                            <div data-repeater-list="pr_items">
-                                @if (empty(old('pr_items')))
-                                    <div data-repeater-item>
-                                        <div class="form-group row mb-5">
-                                            <div class="col-md-2">
-                                                <label class="form-label">Product:</label>
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Items</h3>
+            </div>
+            <div class="card-body">
+                <div class="repeater" data-init-empty="{{ empty(old('pr_items')) }}">
+                    <div class="form-group">
+                        <div data-repeater-list="pr_items">
+                            @if (empty(old('pr_items')))
+                                <div data-repeater-item>
+                                    <div class="border border-gray-300 rounded p-4 mb-4">
+                                        <div class="form-group row g-3 align-items-start">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Product</label>
                                                 <select
                                                     name="product_id"
                                                     data-control="select2"
                                                     data-ajax-url="/ajax/get-products"
                                                     data-placeholder="Select a product"
-                                                    class="form-control @error('company_id') is-invalid @enderror select2-ajax pr_product_id"
+                                                    class="form-control select2-ajax pr_product_id"
                                                     data-param-name="department_id"
                                                     data-param-link="#department_id"
                                                     required
                                                 ></select>
-
                                                 <input name="pr_selected_product_text" type="hidden" class="pr_selected_product_text">
+                                                <input name="barcode" type="hidden" class="barcode">
+                                                <div class="form-text">Barcode: <span class="barcode-text">—</span></div>
                                             </div>
-
                                             <div class="col-md-2">
-                                                <label class="form-label">UOM:</label>
-                                                <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control @error('company_id') is-invalid @enderror select2-ajax pr_uom_id" required>
-                                                </select>
-
+                                                <label class="form-label">UOM</label>
+                                                <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control select2-ajax pr_uom_id" required></select>
                                                 <input name="pr_selected_uom_text" type="hidden" class="pr_selected_uom_text">
                                             </div>
-
+                                            <div class="col-md-1">
+                                                <label class="form-label">Qty</label>
+                                                <input name="quantity" value="0" type="number" min="0" step="1" class="form-control pr_quantity">
+                                            </div>
                                             <div class="col-md-2">
-                                                <label class="form-label">Barcode:</label>
-                                                <input readonly name="barcode" type="text" class="form-control barcode"/>
+                                                <label class="form-label">Unit Price</label>
+                                                <input readonly name="unit_price" type="text" class="form-control unit_price">
                                             </div>
-
                                             <div class="col-md-2">
-                                                <label class="form-label">Unit Price:</label>
-                                                <input readonly name="unit_price" type="text" class="form-control unit_price"/>
+                                                <label class="form-label">Total</label>
+                                                <input readonly name="total" value="0" type="text" class="form-control pr_item_total text-end">
                                             </div>
-
-                                            <div class="col-md-2">
-                                                <label class="form-label">Quantity:</label>
-                                                <input name="quantity" value="0" type="text" class="form-control pr_quantity"/>
-                                            </div>
-
-                                            <div class="col-md-2">
-                                                <label class="form-label">Total:</label>
-                                                <input readonly name="total" value="0" type="text" class="form-control pr_item_total text-end"/>
-                                            </div>
-
-                                            <div class="col-md-12 mt-3">
-                                                <label class="form-label">Remarks:</label>
-                                                <textarea name="remarks" class="form-control"></textarea>
-                                            </div>
-
-                                            <div class="col-md-12">
-                                                <a href="javascript:;" data-repeater-delete class="btn btn-sm btn-flex btn-light-danger mt-3">
-                                                    Remove Item
+                                            <div class="col-md-1">
+                                                <label class="form-label d-block">&nbsp;</label>
+                                                <a href="javascript:;" data-repeater-delete class="btn btn-icon btn-sm btn-light-danger" title="Remove item">
+                                                    <i class="fa-solid fa-xmark"></i>
                                                 </a>
                                             </div>
                                         </div>
-
-                                        <hr>
+                                        <div class="mt-3">
+                                            <input name="remarks" type="text" class="form-control" placeholder="Item note">
+                                        </div>
                                     </div>
-                                @else
-                                    @foreach (old('pr_items') as $key => $item)
-                                        <div data-repeater-item>
-                                            <div class="form-group row mb-5">
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Product:</label>
+                                </div>
+                            @else
+                                @foreach (old('pr_items') as $key => $item)
+                                    <div data-repeater-item>
+                                        <div class="border border-gray-300 rounded p-4 mb-4">
+                                            <div class="form-group row g-3 align-items-start">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Product</label>
                                                     <select
                                                         name="product_id"
                                                         data-control="select2"
                                                         data-ajax-url="/ajax/get-products"
                                                         data-placeholder="Select a product"
-                                                        class="form-control @error('company_id') is-invalid @enderror select2-ajax pr_product_id"
+                                                        class="form-control select2-ajax pr_product_id @error('pr_items.' . $key . '.product_id') is-invalid @enderror"
                                                         data-param-name="department_id"
                                                         data-param-link="#department_id"
                                                         required
                                                     >
                                                         <option value="{{ $item['product_id'] ?? '' }}" selected="selected">{{ $item['pr_selected_product_text'] ?? '' }}</option>
                                                     </select>
-
-                                                    <input name="pr_selected_product_text" value="{{ $item['pr_selected_product_text'] }}" type="hidden" class="pr_selected_product_text">
+                                                    <input name="pr_selected_product_text" value="{{ $item['pr_selected_product_text'] ?? '' }}" type="hidden" class="pr_selected_product_text">
+                                                    <input name="barcode" value="{{ $item['barcode'] ?? '' }}" type="hidden" class="barcode">
+                                                    <div class="form-text">Barcode: <span class="barcode-text">{{ $item['barcode'] ?: '—' }}</span></div>
                                                 </div>
-
                                                 <div class="col-md-2">
-                                                    <label class="form-label">UOM:</label>
-                                                    <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control @error('pr_items.' . $key . '.uom_id') is-invalid @enderror select2-ajax pr_uom_id" required>
+                                                    <label class="form-label">UOM</label>
+                                                    <select data-control="select2" name="uom_id" data-placeholder="Select UOM" class="form-control select2-ajax pr_uom_id @error('pr_items.' . $key . '.uom_id') is-invalid @enderror" required>
                                                         @if (!empty($item['uom_id']))
-                                                        <option value="{{ $item['uom_id'] }}" selected="selected">{{ $item['pr_selected_uom_text'] }}</option>
+                                                            <option value="{{ $item['uom_id'] }}" selected="selected">{{ $item['pr_selected_uom_text'] }}</option>
                                                         @endif
                                                     </select>
-    
-                                                    <input name="pr_selected_uom_text" value="{{ $item['pr_selected_uom_text'] }}" type="hidden" class="pr_selected_uom_text">
-
-                                                    <div class="invalid-feedback">
-                                                        @error('pr_items.' . $key . '.uom_id')
-                                                            <p>{{ $message }}</p>
-                                                        @enderror
-                                                    </div>
+                                                    <input name="pr_selected_uom_text" value="{{ $item['pr_selected_uom_text'] ?? '' }}" type="hidden" class="pr_selected_uom_text">
+                                                    @error('pr_items.' . $key . '.uom_id')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
-
+                                                <div class="col-md-1">
+                                                    <label class="form-label">Qty</label>
+                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="number" min="0" step="1" class="form-control pr_quantity @error('pr_items.' . $key . '.quantity') is-invalid @enderror">
+                                                    @error('pr_items.' . $key . '.quantity')
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Barcode:</label>
-                                                    <input readonly value="{{ $item['barcode'] }}" name="barcode" type="text" class="form-control barcode"/>
+                                                    <label class="form-label">Unit Price</label>
+                                                    <input readonly name="unit_price" value="{{ $item['unit_price'] }}" type="text" class="form-control unit_price">
                                                 </div>
-
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Unit Price:</label>
-                                                    <input readonly value="{{ $item['unit_price'] }}" name="unit_price" type="text" class="form-control unit_price"/>
+                                                    <label class="form-label">Total</label>
+                                                    <input readonly name="total" value="{{ $item['total'] }}" type="text" class="form-control pr_item_total text-end">
                                                 </div>
-
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Quantity:</label>
-                                                    <input name="quantity" value="{{ $item['quantity'] }}" type="text" class="form-control pr_quantity @error('pr_items.' . $key . '.quantity') is-invalid @enderror"/>
-
-                                                    <div class="invalid-feedback">
-                                                        @error('pr_items.' . $key . '.quantity')
-                                                            <p>{{ $message }}</p>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Total:</label>
-                                                    <input readonly name="total" value="{{ $item['total'] }}" type="text" class="form-control pr_item_total text-end"/>
-                                                </div>
-
-                                                <div class="col-md-12 mt-3">
-                                                    <label class="form-label">Remarks:</label>
-                                                    <textarea name="remarks" class="form-control">{{ $item['remarks'] }}</textarea>
-                                                </div>
-    
-                                                <div class="col-md-12">
-                                                    <a href="javascript:;" data-repeater-delete class="btn btn-sm btn-flex btn-light-danger mt-3">
-                                                        Remove Item
+                                                <div class="col-md-1">
+                                                    <label class="form-label d-block">&nbsp;</label>
+                                                    <a href="javascript:;" data-repeater-delete class="btn btn-icon btn-sm btn-light-danger" title="Remove item">
+                                                        <i class="fa-solid fa-xmark"></i>
                                                     </a>
                                                 </div>
                                             </div>
-
-                                            <hr>
+                                            <div class="mt-3">
+                                                <input name="remarks" value="{{ $item['remarks'] ?? '' }}" type="text" class="form-control" placeholder="Item note">
+                                            </div>
                                         </div>
-                                    @endforeach
-                                @endif
-                            </div>
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
-                        <!--end::Form group-->
-
-                        <!--begin::Form group-->
-                        <div class="row mb-5">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a href="javascript:;" data-repeater-create class="btn btn-flex btn-light-primary">
-                                        <i class="ki-duotone ki-plus fs-3"></i>
-                                        Add Item
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group float-end">
-                                    <input type="hidden" name="total" id="pr_total" value="{{ old('total') ?? 0 }}">
-                                    <h2>TOTAL: <span class="grandtotal"> {{ old('total') ??  '0.00' }}</span></h2>
-                                </div>
-                            </div>
-                        </div>
-                        <!--end::Form group-->
                     </div>
-                    <!--end::Repeater-->
+
+                    <a href="javascript:;" data-repeater-create class="btn btn-flex btn-light-primary">
+                        <i class="ki-duotone ki-plus fs-3"></i>
+                        Add Item
+                    </a>
                 </div>
 
-
-                <div class="mt-8">
-                    <button type="submit" class="btn btn-primary disable-on-click">Submit</button>
-                    <a href="{{ url()->previous() }}" class="btn btn-label-secondary waves-effect">Cancel</a>
+                <div class="d-flex flex-wrap justify-content-between align-items-center border-top pt-5 mt-6 gap-4">
+                    <div class="text-gray-600 pr-item-count">0 items</div>
+                    <div class="d-flex flex-wrap align-items-center gap-4">
+                        <div class="text-end">
+                            <input type="hidden" name="total" id="pr_total" value="{{ old('total') ?? 0 }}">
+                            <div class="text-gray-600 fs-7">Total</div>
+                            <div class="fs-2 fw-bold grandtotal">{{ old('total') ?? '0.00' }}</div>
+                        </div>
+                        <a href="{{ url()->previous() }}" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn btn-primary disable-on-click">Submit</button>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
-    </div>
+    </form>
+
+    @push('scripts')
+        <script>
+            function updatePrItemCount() {
+                var count = $('.repeater [data-repeater-item]:visible').length;
+                $('.pr-item-count').text(count + (count === 1 ? ' item' : ' items'));
+            }
+
+            $(document).on('keyup input', '.pr_quantity', function () {
+                setTimeout(updatePrItemCount, 0);
+            });
+
+            $(document).on('click', '[data-repeater-create], [data-repeater-delete]', function () {
+                setTimeout(updatePrItemCount, 450);
+            });
+
+            $(updatePrItemCount);
+        </script>
+    @endpush
 </x-default-layout>

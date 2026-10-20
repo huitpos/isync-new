@@ -9,6 +9,7 @@ use App\DataTables\Company\PurchaseDeliveriesDataTable;
 
 use App\Models\PurchaseDelivery;
 use App\Models\Branch;
+use App\Services\ThreeWayMatchService;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -61,11 +62,13 @@ class PurchaseDeliveryController extends Controller
     {
         $company = $request->attributes->get('company');
 
-        $pd = PurchaseDelivery::with(['purchaseOrder'])->findOrFail($id);
+        $pd = PurchaseDelivery::with(['purchaseOrder', 'items'])->findOrFail($id);
+        $billingStatus = app(ThreeWayMatchService::class)->deliveryBillingStatus($pd);
 
         return view('company.purchaseDeliveries.show', [
             'company' => $company,
             'pd' => $pd,
+            'billingStatus' => $billingStatus,
         ]);
     }
 

@@ -67,7 +67,7 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Supplier</label>
-                        <input value="{{ $pr->supplier->name }}" type="text" readonly class="form-control"/>
+                        <input value="{{ $pr->supplier->name ?? 'To be quoted' }}" type="text" readonly class="form-control"/>
                     </div>
 
                     <div class="col-md-12">
@@ -103,13 +103,14 @@
 
                     <div class="col-md-6">
                         <label class="form-label">Supplier Terms</label>
-                        <select {{ !empty($pr->supplier->supplier_term_id) ? 'disabled' : '' }} {{ $pr->status != 'pending' ? 'disabled' : '' }} name="{{ !empty($pr->supplier->supplier_term_id) ? '' : 'supplier_term_id' }}" id="" class="form-select @error('supplier_term_id') is-invalid @enderror">
+                        @php $supplierTermId = $pr->supplier->supplier_term_id ?? null; @endphp
+                        <select {{ !empty($supplierTermId) ? 'disabled' : '' }} {{ $pr->status != 'pending' ? 'disabled' : '' }} name="{{ !empty($supplierTermId) ? '' : 'supplier_term_id' }}" id="" class="form-select @error('supplier_term_id') is-invalid @enderror">
                             @foreach($supplierTerms as $supplierTerm)
-                                <option value="{{ $supplierTerm->id }}" {{ ($pr->status != 'pending' && $pr->supplier_term_id == $supplierTerm->id) || ($pr->status == 'pending' && $pr->supplier->supplier_term_id == $supplierTerm->id) ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
+                                <option value="{{ $supplierTerm->id }}" {{ ($pr->status != 'pending' && $pr->supplier_term_id == $supplierTerm->id) || ($pr->status == 'pending' && $supplierTermId == $supplierTerm->id) ? 'selected' : '' }}>{{ $supplierTerm->name }}</option>
                             @endforeach
                         </select>
 
-                        <input name="{{ empty($pr->supplier->supplier_term_id) ? '' : 'supplier_term_id' }}" value="{{ $pr->supplier->supplier_term_id }}" type="hidden" readonly class="form-control"/>
+                        <input name="{{ empty($supplierTermId) ? '' : 'supplier_term_id' }}" value="{{ $supplierTermId }}" type="hidden" readonly class="form-control"/>
 
                         @error('supplier_term_id')
                             <div class="invalid-feedback"> {{ $message }}</div>
@@ -178,8 +179,19 @@
                     @if($pr->status == 'pending')
                     <div class="mt-8">
                         <input type="hidden" name="status" id="status">
-                        <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
-                        <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                        @if($pr->quotations->isNotEmpty() || empty($pr->supplier_id))
+                            <div class="alert alert-info">
+                                @if($pr->quotations->isNotEmpty())
+                                    Supplier quotations are being compared. The company will award this request and create the purchase orders.
+                                @else
+                                    No supplier was selected. The company will request quotations before a purchase order is created.
+                                @endif
+                            </div>
+                            <button type="submit" class="btn btn-danger disable-on-click" data-button-link="#status" value="rejected">Reject</button>
+                        @else
+                            <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>
+                            <button type="submit" class="btn btn-danger disable-on-click ms-4" data-button-link="#status" value="rejected">Reject</button>
+                        @endif
                     </div>
                     @endif
                 </div>

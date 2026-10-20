@@ -12,11 +12,16 @@ class PurchaseDelivery extends Model
     use HasFactory;
     use CreatedUpdatedBy;
 
+    protected $casts = [
+        'is_legacy_billed' => 'boolean',
+    ];
+
     protected $fillable = [
         'branch_id',
         'purchase_order_id',
         'pd_number',
         'sales_invoice_number',
+        'is_legacy_billed',
         'delivery_number',
         'total_qty',
         'total_amount',

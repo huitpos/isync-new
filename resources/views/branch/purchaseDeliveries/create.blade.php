@@ -32,8 +32,9 @@
 
                 <div class="row mb-5">
                     <div class="col-md-6">
-                        <label class="form-label">Sales Invoice Number</label>
+                        <label class="form-label">Supplier Reference</label>
                         <input value="" name="sales_invoice_number" type="text" class="form-control @error('sales_invoice_number') is-invalid @enderror"/>
+                        <div class="form-text">Optional. The supplier bill is encoded later as a Supplier Invoice.</div>
 
                         @error('sales_invoice_number')
                             <div class="invalid-feedback"> {{ $message }}</div>

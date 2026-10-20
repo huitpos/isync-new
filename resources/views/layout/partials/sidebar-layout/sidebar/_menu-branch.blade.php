@@ -59,6 +59,13 @@
 			],
 		],
 		[
+			'title' => 'Purchase Returns',
+			'icon' => 'fa-solid fa-rotate-left fs-2',
+			'route' => 'branch.purchase-returns.index',
+			'routeParams' => $routeParams,
+			'activeRoutes' => ['branch.purchase-returns.*'],
+		],
+		[
 			'permission' => 'Branch Inventory',
 			'title' => 'Inventory',
 			'icon' => 'fa-solid fa-truck-moving fs-2',

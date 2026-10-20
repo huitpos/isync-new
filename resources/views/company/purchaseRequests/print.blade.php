@@ -70,7 +70,7 @@
             <td>Delivery Location</td>
             <td>{{ $pr->deliveryLocation->name }}</td>
             <td>Supplier</td>
-            <td>{{ $pr->supplier->name }}</td>
+            <td>{{ $pr->supplier->name ?? ($pr->status == 'approved' ? 'Split award' : 'To be quoted') }}</td>
         </tr>
         <tr>
             <td>Delivery Address</td>
