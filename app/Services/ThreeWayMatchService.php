@@ -197,6 +197,8 @@ class ThreeWayMatchService
             $invoice->accepted_at = now();
             $invoice->save();
 
+            app(\App\Services\Gl\DocumentJournalService::class)->postSupplierInvoice($invoice);
+
             return $invoice;
         });
     }
@@ -215,12 +217,25 @@ class ThreeWayMatchService
             ]);
         }
 
-        $invoice->status = 'void';
-        $invoice->voided_by = $userId;
-        $invoice->voided_at = now();
-        $invoice->save();
+        return DB::transaction(function () use ($invoice, $userId) {
+            $wasAccepted = $invoice->status === 'accepted';
+            $invoice->loadMissing('branch');
 
-        return $invoice;
+            $invoice->status = 'void';
+            $invoice->voided_by = $userId;
+            $invoice->voided_at = now();
+            $invoice->save();
+
+            if ($wasAccepted) {
+                app(\App\Services\Gl\DocumentJournalService::class)->voidIfPosted(
+                    (int) $invoice->branch->company_id,
+                    'supplier_invoice',
+                    (string) $invoice->id
+                );
+            }
+
+            return $invoice;
+        });
     }
 
     public function returnDebitOpen(PurchaseOrder $po): array

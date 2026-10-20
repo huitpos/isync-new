@@ -39,6 +39,12 @@ use App\Http\Controllers\Company\ProductPhysicalCountController as CompanyProduc
 use App\Http\Controllers\Company\RoleController as CompanyRoleController;
 use App\Http\Controllers\Company\ItemLocationController as CompanyItemLocationController;
 use App\Http\Controllers\Company\ChangePriceReasonController as CompanyChangePriceReasonController;
+use App\Http\Controllers\Company\AccountController as CompanyAccountController;
+use App\Http\Controllers\Company\AccountMappingController as CompanyAccountMappingController;
+use App\Http\Controllers\Company\JournalEntryController as CompanyJournalEntryController;
+use App\Http\Controllers\Company\FiscalPeriodController as CompanyFiscalPeriodController;
+use App\Http\Controllers\Company\SalesPostingController as CompanySalesPostingController;
+use App\Http\Controllers\Company\GlReportController as CompanyGlReportController;
 
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\ClusterController as AdminClusterController;
@@ -210,6 +216,39 @@ Route::middleware('auth')->group(function () {
         Route::resource('roles', CompanyRoleController::class, ['as' => 'company']);
         Route::resource('item-locations', CompanyItemLocationController::class, ['as' => 'company']);
         Route::resource('change-price-reasons', CompanyChangePriceReasonController::class, ['as' => 'company']);
+
+        Route::post('/accounting/accounts/starter', [CompanyAccountController::class, 'starter'])->name('company.accounts.starter');
+        Route::get('/accounting/accounts', [CompanyAccountController::class, 'index'])->name('company.accounts.index');
+        Route::get('/accounting/accounts/create', [CompanyAccountController::class, 'create'])->name('company.accounts.create');
+        Route::post('/accounting/accounts', [CompanyAccountController::class, 'store'])->name('company.accounts.store');
+        Route::get('/accounting/accounts/{id}/edit', [CompanyAccountController::class, 'edit'])->name('company.accounts.edit');
+        Route::put('/accounting/accounts/{id}', [CompanyAccountController::class, 'update'])->name('company.accounts.update');
+
+        Route::get('/accounting/mappings', [CompanyAccountMappingController::class, 'edit'])->name('company.account-mappings.edit');
+        Route::put('/accounting/mappings', [CompanyAccountMappingController::class, 'update'])->name('company.account-mappings.update');
+
+        Route::get('/accounting/journals', [CompanyJournalEntryController::class, 'index'])->name('company.journals.index');
+        Route::get('/accounting/journals/create', [CompanyJournalEntryController::class, 'create'])->name('company.journals.create');
+        Route::post('/accounting/journals', [CompanyJournalEntryController::class, 'store'])->name('company.journals.store');
+        Route::get('/accounting/journals/{id}', [CompanyJournalEntryController::class, 'show'])->name('company.journals.show');
+        Route::get('/accounting/journals/{id}/edit', [CompanyJournalEntryController::class, 'edit'])->name('company.journals.edit');
+        Route::put('/accounting/journals/{id}', [CompanyJournalEntryController::class, 'update'])->name('company.journals.update');
+        Route::post('/accounting/journals/{id}/post', [CompanyJournalEntryController::class, 'post'])->name('company.journals.post');
+        Route::post('/accounting/journals/{id}/void', [CompanyJournalEntryController::class, 'void'])->name('company.journals.void');
+
+        Route::get('/accounting/periods', [CompanyFiscalPeriodController::class, 'index'])->name('company.fiscal-periods.index');
+        Route::post('/accounting/periods', [CompanyFiscalPeriodController::class, 'store'])->name('company.fiscal-periods.store');
+        Route::post('/accounting/periods/{id}/close', [CompanyFiscalPeriodController::class, 'close'])->name('company.fiscal-periods.close');
+        Route::post('/accounting/periods/{id}/reopen', [CompanyFiscalPeriodController::class, 'reopen'])->name('company.fiscal-periods.reopen');
+
+        Route::get('/accounting/sales-posting', [CompanySalesPostingController::class, 'index'])->name('company.sales-posting.index');
+        Route::post('/accounting/sales-posting/sales', [CompanySalesPostingController::class, 'postSales'])->name('company.sales-posting.sales');
+        Route::post('/accounting/sales-posting/cogs', [CompanySalesPostingController::class, 'postCogs'])->name('company.sales-posting.cogs');
+
+        Route::get('/accounting/reports/ledger', [CompanyGlReportController::class, 'ledger'])->name('company.gl.ledger');
+        Route::get('/accounting/reports/trial-balance', [CompanyGlReportController::class, 'trialBalance'])->name('company.gl.trial-balance');
+        Route::get('/accounting/reports/income-statement', [CompanyGlReportController::class, 'incomeStatement'])->name('company.gl.income-statement');
+        Route::get('/accounting/reports/balance-sheet', [CompanyGlReportController::class, 'balanceSheet'])->name('company.gl.balance-sheet');
 
         Route::prefix('reports')->group(function () {
             Route::get('/transactions', [CompanyReportController::class, 'transactions'])->name('company.reports.transactions');

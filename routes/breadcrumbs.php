@@ -372,6 +372,76 @@ Breadcrumbs::for('company.debitMemos.show', function (BreadcrumbTrail $trail, $c
     $trail->push($memo->memo_number);
 });
 
+Breadcrumbs::for('company.accounts.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Chart of Accounts', route('company.accounts.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.accounts.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.accounts.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.accounts.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.accounts.index', $company);
+    $trail->push('Edit');
+});
+
+Breadcrumbs::for('company.accountMappings.edit', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Account Mapping', route('company.account-mappings.edit', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.journals.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Journals', route('company.journals.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.journals.create', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.journals.index', $company);
+    $trail->push('Create');
+});
+
+Breadcrumbs::for('company.journals.show', function (BreadcrumbTrail $trail, $company, $entry) {
+    $trail->parent('company.journals.index', $company);
+    $trail->push($entry->number, route('company.journals.show', ['companySlug' => $company->slug, 'id' => $entry->id]));
+});
+
+Breadcrumbs::for('company.journals.edit', function (BreadcrumbTrail $trail, $company, $entry) {
+    $trail->parent('company.journals.show', $company, $entry);
+    $trail->push('Edit');
+});
+
+Breadcrumbs::for('company.fiscalPeriods.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Fiscal Periods', route('company.fiscal-periods.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.salesPosting.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Post Sales Day', route('company.sales-posting.index', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.gl.ledger', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Account Ledger', route('company.gl.ledger', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.gl.trialBalance', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Trial Balance', route('company.gl.trial-balance', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.gl.incomeStatement', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Income Statement', route('company.gl.income-statement', ['companySlug' => $company->slug]));
+});
+
+Breadcrumbs::for('company.gl.balanceSheet', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Balance Sheet', route('company.gl.balance-sheet', ['companySlug' => $company->slug]));
+});
+
 Breadcrumbs::for('company.paymentTerms.index', function (BreadcrumbTrail $trail, $company) {
     $trail->parent('company.dashboard', $company);
     $trail->push('Payment Terms', route('company.payment-terms.index', ['companySlug' => $company->slug]));

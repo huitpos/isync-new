@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\DataTables\Company\DebitMemosDataTable;
 use App\Models\DebitMemo;
 use App\Models\SupplierInvoice;
+use App\Services\Gl\DocumentJournalService;
 use App\Services\ThreeWayMatchService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -184,6 +185,7 @@ class DebitMemoController extends Controller
                 'status' => 'issued',
             ]);
             $memo->items()->createMany($lines);
+            app(DocumentJournalService::class)->postDebitMemo($memo);
 
             return $memo;
         });
@@ -218,10 +220,18 @@ class DebitMemoController extends Controller
             ]);
         }
 
-        $memo->status = 'void';
-        $memo->voided_by = auth()->user()->id;
-        $memo->voided_at = now();
-        $memo->save();
+        DB::transaction(function () use ($memo) {
+            $memo->status = 'void';
+            $memo->voided_by = auth()->user()->id;
+            $memo->voided_at = now();
+            $memo->save();
+
+            app(DocumentJournalService::class)->voidIfPosted(
+                (int) $memo->branch->company_id,
+                'debit_memo',
+                (string) $memo->id
+            );
+        });
 
         return redirect()->back()->with('success', 'Debit memo voided.');
     }

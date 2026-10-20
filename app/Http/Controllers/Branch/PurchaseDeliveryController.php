@@ -15,6 +15,7 @@ use App\DataTables\Branch\PurchaseDeliveriesDataTable;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Services\FifoCostService;
+use App\Services\Gl\DocumentJournalService;
 use App\Services\ThreeWayMatchService;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -199,34 +200,39 @@ class PurchaseDeliveryController extends Controller
         $branch = Branch::findOrFail($pd->branch_id);
 
         $status = $request->input('status');
-        $pd->status = $status;
-        $pd->action_by = auth()->user()->id;
-        $pd->save();
 
-        if ($status == 'rejected') {
-            foreach ($pd->items as $item) {
-                $poItem = $item->purchaseOrderItem;
-                $poItem->balance = $poItem->balance + $item->qty;
-                $poItem->save();
-            }
+        DB::transaction(function () use ($pd, $branch, $status, $id) {
+            $pd->status = $status;
+            $pd->action_by = auth()->user()->id;
+            $pd->save();
 
-            $pd->purchaseOrder->is_closed = 0;
-            $pd->purchaseOrder->save();
-        } else {
-            foreach ($pd->items as $item) {
-                $product = $item->product;
-
-                $srp = $product->markup_type == 'percentage' ? $item->unit_price + ($item->unit_price * ($product->markup / 100)) : $item->unit_price + $product->markup;
-
-                $product->srp = $srp;
-                $product->save();
-
-                $moved = $this->productRepository->updateBranchQuantity($product, $branch, $id, 'purchase_deliveries', $item->qty, $srp, 'add', $item->uom_id);
-                if ($moved) {
-                    $this->fifoCost->receiveDocument($branch, $product, $item->qty, $item->uom_id, (float) $item->unit_price, 'purchase_deliveries', $id);
+            if ($status == 'rejected') {
+                foreach ($pd->items as $item) {
+                    $poItem = $item->purchaseOrderItem;
+                    $poItem->balance = $poItem->balance + $item->qty;
+                    $poItem->save();
                 }
+
+                $pd->purchaseOrder->is_closed = 0;
+                $pd->purchaseOrder->save();
+            } else {
+                foreach ($pd->items as $item) {
+                    $product = $item->product;
+
+                    $srp = $product->markup_type == 'percentage' ? $item->unit_price + ($item->unit_price * ($product->markup / 100)) : $item->unit_price + $product->markup;
+
+                    $product->srp = $srp;
+                    $product->save();
+
+                    $moved = $this->productRepository->updateBranchQuantity($product, $branch, $id, 'purchase_deliveries', $item->qty, $srp, 'add', $item->uom_id);
+                    if ($moved) {
+                        $this->fifoCost->receiveDocument($branch, $product, $item->qty, $item->uom_id, (float) $item->unit_price, 'purchase_deliveries', $id);
+                    }
+                }
+
+                app(DocumentJournalService::class)->postPurchaseDelivery($pd->fresh(['items', 'branch']));
             }
-        }
+        });
 
         return redirect()->back()->with('success', 'Purchase delivery status updated successfully');
     }

@@ -110,6 +110,18 @@ class PermissionSeeder extends Seeder
             ['name' => 'Procurement/Stock Transfer Requests/View', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.stock-transfer-requests.show', 'parent' => 'Procurement/Stock Transfer Requests'],
             ['name' => 'Procurement/Supplier Invoices', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.supplier-invoices.index', 'parent' => 'Procurement'],
             ['name' => 'Procurement/Debit Memos', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.debit-memos.index', 'parent' => 'Procurement'],
+
+            ['name' => 'Accounting', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => null],
+            ['name' => 'Accounting/Chart of Accounts', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.accounts.index', 'parent' => 'Accounting'],
+            ['name' => 'Accounting/Account Mapping', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.account-mappings.edit', 'parent' => 'Accounting'],
+            ['name' => 'Accounting/Journals', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.journals.index', 'parent' => 'Accounting'],
+            ['name' => 'Accounting/Post Sales', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.sales-posting.index', 'parent' => 'Accounting'],
+            ['name' => 'Accounting/Fiscal Periods', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.fiscal-periods.index', 'parent' => 'Accounting'],
+            ['name' => 'Accounting/Reports', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => 'Accounting'],
+            ['name' => 'Accounting/Reports/Account Ledger', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.gl.ledger', 'parent' => 'Accounting/Reports'],
+            ['name' => 'Accounting/Reports/Trial Balance', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.gl.trial-balance', 'parent' => 'Accounting/Reports'],
+            ['name' => 'Accounting/Reports/Income Statement', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.gl.income-statement', 'parent' => 'Accounting/Reports'],
+            ['name' => 'Accounting/Reports/Balance Sheet', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.gl.balance-sheet', 'parent' => 'Accounting/Reports'],
             
             // Company Access Level
             ['name' => 'Company Access Level', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => null],
