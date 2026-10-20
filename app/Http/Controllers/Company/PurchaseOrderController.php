@@ -24,7 +24,7 @@ class PurchaseOrderController extends Controller
         $permissions = $request->attributes->get('permissionNames');
 
         return $dataTable->with([
-            'branch_id' => $request->query('branch_id', null),
+            'branch_id' => $request->input('branch_id', null),
             'search' => $request->query('search', null),
             'company_id' => $company->id,
             'company_slug' => $company->slug,

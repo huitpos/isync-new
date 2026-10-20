@@ -16,18 +16,12 @@
         </div>
     @endif
 
-    <div class="card">
+    <div class="card" data-dt-card>
         <div class="card-header align-items-center py-5 gap-2 gap-md-5">
             <!--begin::Card title-->
             <div class="card-title">
                 <!--begin::Search-->
-                <div class="d-flex align-items-center position-relative my-1">
-                    <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4">
-                        <span class="path1"></span>
-                        <span class="path2"></span>
-                    </i>
-                    <input type="text" id="searchBar" class="form-control form-control-solid w-250px ps-12" placeholder="Search" />
-                </div>
+                
                 <!--end::Search-->
                 <!--begin::Export buttons-->
                 <div id="kt_ecommerce_report_returns_export" class="d-none"></div>
@@ -40,7 +34,7 @@
                 <input class="form-control form-control-solid w-100 mw-250px flatpack-picker d-none" placeholder="Date From" id="date_from" />
                 <input class="form-control form-control-solid w-100 mw-250px flatpack-picker d-none" placeholder="Date To" id="date_to" />
 
-                <select id="status" class="form-select form-control-solid w-100 mw-250px">
+                <select id="status" class="form-select form-control-solid w-100 mw-250px" data-dt-filter="status">
                     @foreach ($branches as $branch)
                         <option value="{{ $branch->id }}" {{ $branchId == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
                     @endforeach
@@ -69,9 +63,7 @@
     @push('scripts')
         {{ $dataTable->scripts() }}
         <script>
-            document.getElementById('searchBar').addEventListener('keyup', function () {
-                window.LaravelDataTables['clusters-table'].search(this.value).draw();
-            });
+            
 
             document.getElementById('status').addEventListener('change', function() {
                 var selectedValue = this.value;

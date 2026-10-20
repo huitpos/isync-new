@@ -23,8 +23,8 @@ class ProductPhysicalCountController extends Controller
         ])->get();
 
         return $dataTable->with([
-            'status' => $request->query('status', null),
-            'branch_id' => $request->query('branch_id', null),
+            'status' => $request->input('status', null),
+            'branch_id' => $request->input('branch_id', null),
             'company_slug' => $company->slug,
             'company_id' => $company->id,
             'permissions' => $permissions

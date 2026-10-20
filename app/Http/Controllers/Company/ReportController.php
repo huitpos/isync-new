@@ -16,6 +16,15 @@ use App\Models\Branch;
 use App\Models\Product;
 
 use App\DataTables\Company\Reports\TransactionsDataTable;
+use App\DataTables\Reports\AuditTrailReportDataTable;
+use App\DataTables\Reports\BirDiscountBookDataTable;
+use App\DataTables\Reports\BirSalesSummaryReportDataTable;
+use App\DataTables\Reports\DiscountsReportDataTable;
+use App\DataTables\Reports\ItemSalesReportDataTable;
+use App\DataTables\Reports\SalesInvoicesReportDataTable;
+use App\DataTables\Reports\SalesTransactionsReportDataTable;
+use App\DataTables\Reports\VatSalesReportDataTable;
+use App\DataTables\Reports\VoidTransactionsReportDataTable;
 use App\Exports\TestExport;
 use App\Exports\SalesTransactionReportExport;
 use App\Exports\VoidTransactionsReportExport;
@@ -88,13 +97,13 @@ class ReportController extends Controller
         return Excel::download(new TestExport($startDate, $endDate), 'custom_users.xlsx');
     }
 
-    public function salesInvoicesReport(Request $request)
+    public function salesInvoicesReport(Request $request, SalesInvoicesReportDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -115,25 +124,24 @@ class ReportController extends Controller
             return Excel::download(new SalesInvoicesReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Invoices Report.xlsx");
         }
 
-        $transactions = Transaction::where('branch_id', $branchId)
-            ->where('is_complete', true)
-            ->whereBetween('completed_at', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.salesInvoicesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        return $dataTable->with([
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+            'link_area' => 'company',
+        ])->render('company.reports.salesInvoicesReport', compact('company', 'branches', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
-    public function salesTransactionReport(Request $request)
+    public function salesTransactionReport(Request $request, SalesTransactionsReportDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
         $branches = $company->activeBranches;
 
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -151,27 +159,25 @@ class ReportController extends Controller
             return Excel::download(new SalesTransactionReportExport($branchId, $startDate, $endDate), "$branch->name - Sales Transaction Report.xlsx");
         }
 
-        $transactions = Transaction::where('branch_id', $branchId)
-            ->where('is_complete', true)
-            ->where('is_void', false)
-            ->whereBetween('completed_at', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.salesTransactionReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        return $dataTable->with([
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+            'link_area' => 'company',
+        ])->render('company.reports.salesTransactionReport', compact('company', 'branches', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
-    public function voidTransactionsReport(Request $request)
+    public function voidTransactionsReport(Request $request, VoidTransactionsReportDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
         $branches = $company->activeBranches;
 
-        $branchId = $request->query('branch_id', $branches->first()->id);
-        $paymentTypeId = $request->query('payment_type_id', null);
+        $branchId = $request->input('branch_id', $branches->first()->id);
+        $paymentTypeId = $request->input('payment_type', $request->input('payment_type_id'));
 
         $dateParam = $request->input('date_range', null);
 
@@ -196,42 +202,24 @@ class ReportController extends Controller
             ->orderBy('name')
             ->get();
 
-        $query = Transaction::where([
-            'transactions.branch_id' => $branchId,
-            'transactions.is_void' => true,
-        ])
-        ->whereBetween('transactions.treg', [$startDate, $endDate]);
-
-        if ($paymentTypeId) {
-            // Join payments if paymentTypeId is provided
-            $query->join('payments', function($join) {
-                $join->on('transactions.transaction_id', '=', 'payments.transaction_id');
-                $join->on('transactions.branch_id', '=', 'payments.branch_id');
-                $join->on('transactions.pos_machine_id', '=', 'payments.pos_machine_id');
-            });
-
-            $query->where('payments.payment_type_id', $paymentTypeId);
-
-            $query->groupBy('transactions.id');
-        }
-
-        // Fetch the results
-        $transactions = $query->select('transactions.*')->get(); // Ensure you're selecting valid columns
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.voidTransactionsReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam', 'paymentTypes', 'paymentTypeId'));
+        return $dataTable->with([
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+            'link_area' => 'company',
+        ])->render('company.reports.voidTransactionsReport', compact('company', 'branches', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam', 'paymentTypes', 'paymentTypeId'));
     }
 
-    public function vatSalesReport(Request $request)
+    public function vatSalesReport(Request $request, VatSalesReportDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
         $branches = $company->activeBranches;
 
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -249,17 +237,15 @@ class ReportController extends Controller
             return Excel::download(new VatSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Vat Sales Report.xlsx");
         }
 
-        $transactions = Transaction::where('branch_id', $branchId)
-            ->where('is_complete', true)
-            ->where('is_void', false)
-            ->whereBetween('treg', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.vatSalesReport', compact('company', 'branches', 'transactions', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        return $dataTable->with([
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+            'link_area' => 'company',
+        ])->render('company.reports.vatSalesReport', compact('company', 'branches', 'branchId', 'dateParam', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function xReadingReport(Request $request)
@@ -268,7 +254,7 @@ class ReportController extends Controller
 
         $branches = $company->activeBranches;
 
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -313,7 +299,7 @@ class ReportController extends Controller
 
         $branches = $company->activeBranches;
 
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -353,7 +339,7 @@ class ReportController extends Controller
         return view('company/reports/zReadingReport', compact('company', 'branches', 'branchId', 'dateParam', 'paymentTypes', 'discountTypes', 'endOfDays', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
-    public function discountsReport(Request $request)
+    public function discountsReport(Request $request, DiscountsReportDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
@@ -383,46 +369,21 @@ class ReportController extends Controller
             return Excel::download(new DiscountsReportExport($branchId, $startDate, $endDate, $filterDiscountTypes), "$branch->name - Discounts Report.xlsx");
         }
 
-        $discounts = Discount::select([
-                'transactions.completed_at as date',
-                'transactions.receipt_number',
-                'transactions.gross_sales',
-                'transactions.net_sales',
-                'discounts.discount_name',
-                'discounts.discount_amount',
-                'discounts.discount_id',
-                'discounts.pos_machine_id',
-                'discounts.branch_id',
-                'transactions.cashier_name',
-                'pos_machines.machine_number',
-                'transactions.id as transaction_id'
-            ])
-            ->join('transactions', function($join) {
-                $join->on('transactions.transaction_id', '=', 'discounts.transaction_id');
-                $join->on('transactions.branch_id', '=', 'discounts.branch_id');
-                $join->on('transactions.pos_machine_id', '=', 'discounts.pos_machine_id');
-            })
-            ->join('isync.pos_machines', 'transactions.pos_machine_id', '=', 'pos_machines.id')
-            ->whereBetween('discounts.treg', [$startDate, $endDate])
-            ->where('discounts.is_void', false)
-            ->where('transactions.is_void', false)
-            ->where('transactions.is_complete', true)
-            ->whereIn('discounts.discount_type_id', $filterDiscountTypes)
-            ->where('discounts.branch_id', $branchId)
-            ->get();
-
         $startDateParam = $startDate;
         $endDateParam = $endDate;
 
         $selectedRangeParam = $this->determineSelectedRange($startDateParam, $endDateParam);
 
-        return view('company.reports.discountsReport', compact('company', 'branches', 'branchId', 'dateParam', 'discountTypes', 'discounts', 'filterDiscountTypes', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        return $dataTable->with([
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+            'link_area' => 'company',
+            'discount_type_ids' => $filterDiscountTypes,
+        ])->render('company.reports.discountsReport', compact('company', 'branches', 'branchId', 'dateParam', 'discountTypes', 'filterDiscountTypes', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
-    public function itemSales(Request $request)
+    public function itemSales(Request $request, ItemSalesReportDataTable $dataTable)
     {
-        $transactionalDbName = config('database.connections.transactional_db.database');
-
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
 
@@ -444,49 +405,15 @@ class ReportController extends Controller
             return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
         }
 
-        $fifoUnitCost = app(FifoCostService::class)->unitCostExpression((int) $branchId, $startDate, $endDate);
-
-        $query = "SELECT
-                    $transactionalDbName.orders.product_id,
-                    products.name AS `product_name`,
-                    products.sku,
-                    $fifoUnitCost AS cost,
-                    products.srp,
-                    departments.name AS `department`,
-                    SUM($transactionalDbName.orders.gross) AS gross,
-                    SUM($transactionalDbName.orders.qty) AS qty,
-                    SUM($transactionalDbName.discount_details.discount_amount) AS `discount`,
-                    SUM($transactionalDbName.orders.total) AS `net`
-                FROM $transactionalDbName.transactions
-                INNER JOIN $transactionalDbName.orders ON transactions.transaction_id = orders.transaction_id
-                    AND transactions.branch_id = orders.branch_id
-                    AND transactions.pos_machine_id = orders.pos_machine_id
-                    AND orders.is_void = FALSE
-                    AND orders.is_completed = TRUE
-                    AND orders.is_back_out = FALSE
-                    AND orders.is_return = FALSE
-                LEFT JOIN $transactionalDbName.discount_details ON orders.order_id = discount_details.order_id
-                    AND orders.branch_id = discount_details.branch_id
-                    AND orders.pos_machine_id = discount_details.pos_machine_id
-                INNER JOIN isync.products ON orders.product_id = products.id
-                INNER JOIN isync.departments on products.department_id = departments.id
-                WHERE transactions.is_complete = TRUE
-                    AND transactions.branch_id = $branchId
-                    AND transactions.is_void = FALSE
-                    AND transactions.is_back_out = FALSE
-                    AND transactions.treg BETWEEN '$startDate' AND '$endDate'
-                GROUP BY orders.product_id";
-
-        $itemSales = DB::select($query);
-
-        // Convert the array of objects into a collection
-        $itemSales = collect($itemSales);
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
+        $itemTotals = $dataTable->with(['branch_id' => $branchId])->totals();
 
-        return view('company.reports.itemSales', compact('company', 'branches', 'branchId', 'dateParam', 'itemSales', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
+        return $dataTable->with([
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+        ])->render('company.reports.itemSales', compact('company', 'branches', 'branchId', 'dateParam', 'itemTotals', 'selectedRangeParam', 'startDateParam', 'endDateParam'));
     }
 
     public function stockCard(Request $request)
@@ -713,7 +640,7 @@ class ReportController extends Controller
         ));
     }
 
-    public function auditTrail(Request $request)
+    public function auditTrail(Request $request, AuditTrailReportDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
@@ -746,17 +673,15 @@ class ReportController extends Controller
             return Excel::download(new AuditTrailReportExport($machineId, $startDate, $endDate), "$machine->name - Audit Trail.xlsx");
         }
 
-        $trails = AuditTrail::where('pos_machine_id', $machineId)
-            ->whereBetween('treg', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.auditTrail', compact(
+        return $dataTable->with([
+            'machine_id' => $machineId,
+            'company_slug' => $company->slug,
+        ])->render('company.reports.auditTrail', compact(
             'company',
-            'trails',
             'machines',
             'selectedRangeParam',
             'startDateParam',
@@ -765,13 +690,13 @@ class ReportController extends Controller
         ));
     }
 
-    public function birSalesSummaryReport(Request $request)
+    public function birSalesSummaryReport(Request $request, BirSalesSummaryReportDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
         $branches = $company->activeBranches;
 
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -789,16 +714,14 @@ class ReportController extends Controller
             return Excel::download(new BirSalesSummaryReportExport($branchId, $startDate, $endDate), "$branch->name - SALES SUMMARY  REPORT - $startDate - $endDate.xlsx");
         }
 
-        $endOfDays = EndOfDay::where('branch_id', $branchId)
-            ->whereBetween('treg', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.birSalesSummaryReport', compact(
-            'endOfDays',
+        return $dataTable->with([
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+        ])->render('company.reports.birSalesSummaryReport', compact(
             'branches',
             'branchId',
             'selectedRangeParam',
@@ -807,11 +730,11 @@ class ReportController extends Controller
         ));
     }
 
-    public function birSeniorCitizenSalesReport(Request $request)
+    public function birSeniorCitizenSalesReport(Request $request, BirDiscountBookDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
         $dateParam = $request->input('date_range', null);
 
         $startDate = Carbon::now()->format('Y-m-d 00:00:00');
@@ -828,32 +751,29 @@ class ReportController extends Controller
             return Excel::download(new BirSeniorSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Senior Citizen Sales Book Report - $startDate - $endDate.xlsx");
         }
 
-        $discounts = Discount::where('discount_type_id', 4)
-            ->where('branch_id', $branchId)
-            ->where('is_void', false)
-            ->whereBetween('treg', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.birSeniorCitizenSalesReport', compact(
+        return $dataTable->with([
+            'book' => 'senior',
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+        ])->render('company.reports.birSeniorCitizenSalesReport', compact(
             'company',
             'branches',
             'branchId',
             'selectedRangeParam',
             'startDateParam',
-            'endDateParam',
-            'discounts'
+            'endDateParam'
         ));
     }
 
-    public function birPwdSalesReport(Request $request)
+    public function birPwdSalesReport(Request $request, BirDiscountBookDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
         $dateParam = $request->input('date_range', null);
 
         $startDate = Carbon::now()->format('Y-m-d 00:00:00');
@@ -870,32 +790,29 @@ class ReportController extends Controller
             return Excel::download(new BirPwdSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Persons with Disability Sales Book Report - $startDate - $endDate.xlsx");
         }
 
-        $discounts = Discount::where('discount_type_id', 5)
-            ->where('branch_id', $branchId)
-            ->where('is_void', false)
-            ->whereBetween('treg', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.birPwdSalesReport', compact(
+        return $dataTable->with([
+            'book' => 'pwd',
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+        ])->render('company.reports.birPwdSalesReport', compact(
             'company',
             'branches',
             'branchId',
             'selectedRangeParam',
             'startDateParam',
-            'endDateParam',
-            'discounts'
+            'endDateParam'
         ));
     }
 
-    public function birNaacSalesReport(Request $request)
+    public function birNaacSalesReport(Request $request, BirDiscountBookDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
         $dateParam = $request->input('date_range', null);
 
         $startDate = Carbon::now()->format('Y-m-d 00:00:00');
@@ -912,34 +829,31 @@ class ReportController extends Controller
             return Excel::download(new BirNaacSalesReportExport($branchId, $startDate, $endDate), "$branch->name - NAAC Sales Book Report - $startDate - $endDate.xlsx");
         }
 
-        $discounts = Discount::where('discount_type_id', 29)
-            ->where('branch_id', $branchId)
-            ->where('is_void', false)
-            ->whereBetween('treg', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.birNaacSalesReport', compact(
+        return $dataTable->with([
+            'book' => 'naac',
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+        ])->render('company.reports.birNaacSalesReport', compact(
             'company',
             'branches',
             'branchId',
             'selectedRangeParam',
             'startDateParam',
-            'endDateParam',
-            'discounts'
+            'endDateParam'
         ));
     }
 
-    public function birSoloParentSalesReport(Request $request)
+    public function birSoloParentSalesReport(Request $request, BirDiscountBookDataTable $dataTable)
     {
         $discountTypeId = 11;
 
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
         $dateParam = $request->input('date_range', null);
 
         $startDate = Carbon::now()->format('Y-m-d 00:00:00');
@@ -956,24 +870,21 @@ class ReportController extends Controller
             return Excel::download(new BirSoloParentSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Solo Parent Sales Book Report - $startDate - $endDate.xlsx");
         }
 
-        $discounts = Discount::where('discount_type_id', $discountTypeId)
-            ->where('branch_id', $branchId)
-            ->where('is_void', false)
-            ->whereBetween('treg', [$startDate, $endDate])
-            ->get();
-
         $selectedRangeParam = $request->input('selectedRange', 'Today');
         $startDateParam = $request->input('startDate', null);
         $endDateParam = $request->input('endDate', null);
 
-        return view('company.reports.birSoloParentSalesReport', compact(
+        return $dataTable->with([
+            'book' => 'solo',
+            'branch_id' => $branchId,
+            'company_slug' => $company->slug,
+        ])->render('company.reports.birSoloParentSalesReport', compact(
             'company',
             'branches',
             'branchId',
             'selectedRangeParam',
             'startDateParam',
-            'endDateParam',
-            'discounts'
+            'endDateParam'
         ));
     } 
     
@@ -982,7 +893,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -1063,7 +974,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -1147,7 +1058,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -1220,7 +1131,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -1302,7 +1213,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -1390,7 +1301,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
         $branch = Branch::find($branchId);
         $branchName = $branch->name;
 
@@ -1589,7 +1500,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -1677,7 +1588,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
 
         $dateParam = $request->input('date_range', null);
 
@@ -1825,7 +1736,7 @@ class ReportController extends Controller
         $company = $request->attributes->get('company');
         $branches = $company->activeBranches;
         
-        $branchId = $request->query('branch_id', $branches->first()->id);
+        $branchId = $request->input('branch_id', $branches->first()->id);
         $branch = Branch::find($branchId);
         $branchName = $branch->name;
 

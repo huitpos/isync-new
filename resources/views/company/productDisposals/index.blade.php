@@ -8,27 +8,21 @@
         {{-- {{ Breadcrumbs::render('branch.productDisposals.index', $company, $branch) }} --}}
     @endsection
 
-    <div class="card">
+    <div class="card" data-dt-card>
         <div class="card-header align-items-center py-5 gap-2 gap-md-5">
             <div class="card-title">
-                <div class="d-flex align-items-center position-relative my-1">
-                    <i class="ki-duotone ki-magnifier fs-3 position-absolute ms-4">
-                        <span class="path1"></span>
-                        <span class="path2"></span>
-                    </i>
-                    <input type="text" id="searchBar" class="form-control form-control-solid w-250px ps-12" placeholder="Search" />
-                </div>
+                
             </div>
 
             <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
-                <select id="branch_id" class="form-control form-control-solid w-100 mw-250px">
+                <select id="branch_id" class="form-control form-control-solid w-100 mw-250px" data-dt-filter="branch_id">
                     <option value="">Branch</option>
                     @foreach ($branches as $branch)
                         <option value="{{ $branch->id }}">{{ $branch->name }}</option>
                     @endforeach
                 </select>
 
-                <select id="status" class="form-control form-control-solid w-100 mw-250px">
+                <select id="status" class="form-control form-control-solid w-100 mw-250px" data-dt-filter="status">
                     <option value="">Status</option>
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
@@ -45,51 +39,14 @@
     </div>
 
     @push('scripts')
-        {{-- {{ $dataTable->scripts() }} --}}
+        {{ $dataTable->scripts() }}
+        
         <script>
-            document.getElementById('searchBar').addEventListener('keyup', function () {
-                window.LaravelDataTables['clusters-table'].search(this.value).draw();
-            });
+            
 
-            var table = $('#clusters-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '{!! route('company.product-disposals.index', ['companySlug' => $company->slug]) !!}',
-                    data: function (d) {
-                        d.branch_id = $('#branch_id').val();
-                        d.status = $('#status').val();
-                    }
-                },
-                columnDefs: [
-                    {
-                        target: 0,
-                        visible: false,
-                        searchable: false
-                    }
-                ],
-                columns: [
-                    { data: 'id' },
-                    { data: 'sto_number' },
-                    { data: 'branch.name' },
-                    { data: 'created_by.name' },
-                    { data: 'status' },
-                    {
-                        data: 'created_at',
-                        render: function(data, type, row) {
-                            return moment(data).format("YYYY-MM-DD hh:mm A");
-                        }
-                    }
-                ]
-            });
+            
 
-            function reloadDataTable() {
-                table.ajax.reload(); // This will trigger the DataTable to reload its data
-            }
-
-            $('#date_from, #branch_id, #status').on('change', function() {
-                reloadDataTable(); // Reload DataTable when either date input changes
-            });
+            
         </script>
     @endpush
 

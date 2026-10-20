@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Company;
 
+use App\DataTables\Concerns\UniformAjaxTable;
 use App\Models\PaymentType as Model;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
 class PaymentTypesDataTable extends DataTable
 {
+    use UniformAjaxTable;
+
     /**
      * Build the DataTable class.
      *
@@ -18,7 +21,7 @@ class PaymentTypesDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        return (new EloquentDataTable($query))
+        return $this->withRelationSearch((new EloquentDataTable($query))
             ->addColumn('name', function (Model $data) {
                 if (in_array('Settings/Payment Types/View', $this->permissions)) {
                     if ($data->id != 1) {
@@ -46,9 +49,8 @@ class PaymentTypesDataTable extends DataTable
                 } else {
                     return '';
                 }
-            });
+            }));
     }
-
 
     /**
      * Get the query source of dataTable.
@@ -67,18 +69,7 @@ class PaymentTypesDataTable extends DataTable
     /**
      * Optional method if you want to use the html builder.
      */
-    public function html(): HtmlBuilder
-    {
-        return $this->builder()
-            ->setTableId('clusters-table')
-            ->columns($this->getColumns())
-            ->minifiedAjax()
-            ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>i>",)
-            ->addTableClass('table align-middle table-striped table-row-bordered fs-6 gy-5 gs-7 dataTable no-footer text-gray-600 fw-semibold')
-            ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(0, 'asc')
-            ->drawCallback("function() {" . file_get_contents(resource_path('views/datatables/_common-scripts.js')) . "}");
-    }
+    
 
     /**
      * Get the dataTable columns definition.

@@ -4,7 +4,7 @@
         Discounts Report
     @endsection
 
-    <div class="card">
+    <div class="card" data-dt-card>
         <div class="card-body py-4">
             <form class="mt-3" method="POST" novalidate>
                 @csrf
@@ -13,7 +13,7 @@
                     <div class="col-md-3">
                         <label class="form-label">Branch</label>
 
-                        <select id="branch_id" name="branch_id" class="form-select @error('branch') is-invalid @enderror" required>
+                        <select id="branch_id" name="branch_id" class="form-select @error('branch') is-invalid @enderror" required data-dt-filter="branch_id">
                             @foreach ($branches as $branch)
                                 <option value="{{ $branch->id }}" {{ $branch->id == $branchId ? 'selected' : '' }}>{{ $branch->name }}</option>
                             @endforeach
@@ -23,7 +23,7 @@
                     <div class="col-md-3">
                         <label class="form-label">Discount Type</label>
 
-                        <select multiple data-control="select2" name="discount_types[]" class="form-select @error('branch') is-invalid @enderror" required>
+                        <select multiple data-control="select2" name="discount_types[]" class="form-select @error('branch') is-invalid @enderror" required data-dt-filter="discount_types">
                             @foreach ($discountTypes as $discountType)
                                 <option value="{{ $discountType->id }}" {{ in_array($discountType->id, $filterDiscountTypes) ? 'selected' : ''}}>{{ $discountType->name }}</option>
                             @endforeach
@@ -42,7 +42,7 @@
                             type="text" 
                             class="form-control"
                             data-kt-daterangepicker-opens="right"
-                        />
+                         data-dt-filter="date_range">
                     </div>
 
                     <div class="col-md-2">
@@ -54,51 +54,11 @@
             </form>
 
             <div class="table-responsive">
-                <table id="kt_datatable_zero_configuration" class="table table-striped table-row-bordered gy-5">
-                    <thead>
-                        <tr class="fw-semibold fs-6 text-muted">
-                            <td>Date</td>
-                            <td>Machine Number</td>
-                            <td>Sales Invoice No.</td>
-                            <td>Name</td>
-                            <td>OSCA/SC/PWD ID</td>
-                            <td>Gross Sales</td>
-                            <td>Sales Discount Granted</td>
-                            <td>Cashier Name</td>
-                            <td>Net Sales</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($discounts as $discount)
-                            <tr>
-                                <td>{{ $discount->date }}</td>
-                                <td>{{ $discount->machine_number }}</td>
-                                <td>
-                                    <a href="{{ route('company.reports.view-transaction', [
-                                            'transactionId' => $discount->transaction_id,
-                                            'companySlug' => $company->slug,
-                                        ]) }}"
-                                        target="_blank"
-                                    >
-                                        {{ $discount->transaction_id }}
-                                        {{ $discount->receipt_number }}
-                                    </a>
-                                </td>
-                                <td>{{ $discount->discount_name }}</td>
-                                <td>
-                                    @foreach ($discount->otherInfo as $otherInfo)
-                                        {{ $otherInfo->name }}: {{ $otherInfo->value }}<br>
-                                    @endforeach
-                                </td>
-                                <td>{{ number_format($discount->gross_sales, 2) }}</td>
-                                <td>{{ $discount->discount_amount }}</td>
-                                <td>{{ $discount->cashier_name }}</td>
-                                <td>{{ number_format($discount->net_sales, 2) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                {{ $dataTable->table() }}
             </div>
         </div>
     </div>
+    @push('scripts')
+        {{ $dataTable->scripts() }}
+    @endpush
 </x-default-layout>

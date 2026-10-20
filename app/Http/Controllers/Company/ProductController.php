@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Storage;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\Interfaces\SubcategoryRepositoryInterface;
+use App\DataTables\Company\LowStockDataTable;
 use App\DataTables\Company\ProductsDataTable;
+use App\DataTables\Company\ValuationDataTable;
 use App\DataTables\Company\InventoryProductsDataTable;
 use App\DataTables\Company\ProductCountHistoryDataTable;
 
@@ -652,55 +654,27 @@ class ProductController extends Controller
         ]);
     }
 
-    public function lowStock(Request $request)
+    public function lowStock(Request $request, LowStockDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
-        $rows = DB::table('branch_product')
-            ->join('products', 'products.id', '=', 'branch_product.product_id')
-            ->join('branches', 'branches.id', '=', 'branch_product.branch_id')
-            ->where('branches.company_id', $company->id)
-            ->where('products.minimum_stock_level', '>', 0)
-            ->whereColumn('branch_product.stock', '<=', 'products.minimum_stock_level')
-            ->orderBy('branches.name')
-            ->orderBy('products.name')
-            ->get([
-                'branches.name as branch_name',
-                'products.name as product_name',
-                'products.sku',
-                'branch_product.stock',
-                'products.minimum_stock_level',
-                'branch_product.cost',
-            ]);
 
-        return view('company.products.low_stock', [
+        return $dataTable->with([
+            'company_id' => $company->id,
+        ])->render('company.products.low_stock', [
             'company' => $company,
-            'rows' => $rows,
         ]);
     }
 
-    public function valuation(Request $request)
+    public function valuation(Request $request, ValuationDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
-        $rows = DB::table('inventory_cost_layers')
-            ->join('products', 'products.id', '=', 'inventory_cost_layers.product_id')
-            ->join('branches', 'branches.id', '=', 'inventory_cost_layers.branch_id')
-            ->where('branches.company_id', $company->id)
-            ->where('inventory_cost_layers.qty_remaining', '>', 0)
-            ->groupBy('branches.id', 'branches.name', 'products.id', 'products.name', 'products.sku')
-            ->orderBy('branches.name')
-            ->orderBy('products.name')
-            ->get([
-                'branches.name as branch_name',
-                'products.name as product_name',
-                'products.sku',
-                DB::raw('SUM(inventory_cost_layers.qty_remaining) as qty'),
-                DB::raw('SUM(inventory_cost_layers.qty_remaining * inventory_cost_layers.unit_cost) as value'),
-            ]);
+        $dataTable->company_id = $company->id;
 
-        return view('company.products.valuation', [
+        return $dataTable->with([
+            'company_id' => $company->id,
+        ])->render('company.products.valuation', [
             'company' => $company,
-            'rows' => $rows,
-            'total' => $rows->sum('value'),
+            'total' => $dataTable->total(),
         ]);
     }
 

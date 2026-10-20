@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Branch;
 use App\Models\DebitMemoItem;
 use App\Models\PurchaseOrder;
+use App\DataTables\Branch\PurchaseReturnsDataTable;
 use App\Models\PurchaseReturn;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
 use App\Services\FifoCostService;
@@ -23,35 +24,18 @@ class PurchaseReturnController extends Controller
     ) {
     }
 
-    public function index(Request $request, string $companySlug, string $branchSlug)
+    public function index(Request $request, string $companySlug, string $branchSlug, PurchaseReturnsDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
 
-        $returns = PurchaseReturn::with(['supplier', 'purchaseOrder', 'createdBy'])
-            ->where('branch_id', $branch->id)
-            ->when($request->query('status'), function ($query, $status) {
-                $query->where('status', $status);
-            })
-            ->when($request->query('search'), function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('return_number', 'like', '%' . $search . '%')
-                        ->orWhereHas('purchaseOrder', function ($query) use ($search) {
-                            $query->where('po_number', 'like', '%' . $search . '%');
-                        })
-                        ->orWhereHas('supplier', function ($query) use ($search) {
-                            $query->where('name', 'like', '%' . $search . '%');
-                        });
-                });
-            })
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->withQueryString();
-
-        return view('branch.purchaseReturns.index', [
+        return $dataTable->with([
+            'branch_id' => $branch->id,
+            'company_slug' => $company->slug,
+            'branch_slug' => $branch->slug,
+        ])->render('branch.purchaseReturns.index', [
             'company' => $company,
             'branch' => $branch,
-            'returns' => $returns,
         ]);
     }
 

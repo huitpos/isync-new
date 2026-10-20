@@ -7,7 +7,7 @@
         {{ Breadcrumbs::render('admin.clients.show', $company->company_name) }}
     @endsection
 
-    <div class="card">
+    <div class="card" data-dt-card>
         <div class="card-body">
             <h3>Company Registered Name</h3>
 
@@ -127,10 +127,7 @@
             <!--end::Card title-->
             <!--begin::Card toolbar-->
             <div class="card-toolbar">
-                <div class="d-flex align-items-center position-relative my-1">
-                    {!! getIcon('magnifier', 'fs-3 position-absolute ms-5') !!}
-                    <input type="text" data-kt-user-table-filter="search" class="form-control form-control-solid w-250px ps-13" placeholder="Search" id="searchBar"/>
-                </div>
+                
             </div>
         </div>
 
@@ -143,10 +140,6 @@
 
     @push('scripts')
         {{ $dataTable->scripts() }}
-        <script>
-            document.getElementById('searchBar').addEventListener('keyup', function () {
-                window.LaravelDataTables['company-branch-table'].search(this.value).draw();
-            });
-        </script>
+        
     @endpush
 </x-default-layout>

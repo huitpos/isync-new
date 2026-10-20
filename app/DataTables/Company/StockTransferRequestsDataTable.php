@@ -2,6 +2,8 @@
 
 namespace App\DataTables\Company;
 
+
+use App\DataTables\Concerns\UniformAjaxTable;
 use App\Models\StockTransferRequest as Model;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
@@ -11,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
 class StockTransferRequestsDataTable extends DataTable
 {
+    use UniformAjaxTable;
+
     /**
      * Build the DataTable class.
      *
@@ -21,7 +25,16 @@ class StockTransferRequestsDataTable extends DataTable
         $branchSlug = $this->branch_slug;
         $companySlug = $this->company_slug;
 
-        return (new EloquentDataTable($query))
+        return $this->withRelationSearch((new EloquentDataTable($query))
+            ->editColumn('str_number', function (Model $data) use ($companySlug) {
+                return view('company.datatables._link', [
+                    'url' => route('company.stock-transfer-requests.show', [
+                        'companySlug' => $companySlug,
+                        'stock_transfer_request' => $data->id,
+                    ]),
+                    'text' => $data->str_number,
+                ]);
+            })
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;
             })
@@ -30,7 +43,7 @@ class StockTransferRequestsDataTable extends DataTable
                     'companySlug' => $companySlug,
                     'stock_transfer_request' => $data->id
                 ]);
-            });
+            }));
     }
 
 
@@ -43,7 +56,8 @@ class StockTransferRequestsDataTable extends DataTable
         $query = $model->newQuery()
         ->with([
             'createdBy',
-            'branch'
+            'branch',
+            'sourceBranch',
         ])
         ->whereHas('branch.company', function ($query) use ($companyId) {
             $query->where('companies.id', $companyId);
@@ -63,18 +77,7 @@ class StockTransferRequestsDataTable extends DataTable
     /**
      * Optional method if you want to use the html builder.
      */
-    public function html(): HtmlBuilder
-    {
-        return $this->builder()
-            ->setTableId('clusters-table')
-            ->columns($this->getColumns())
-            ->minifiedAjax()
-            ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>i>",)
-            ->addTableClass('table align-middle table-striped table-row-bordered fs-6 gy-5 gs-7 dataTable no-footer text-gray-600 fw-semibold')
-            ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(0, 'asc')
-            ->drawCallback("function() {" . file_get_contents(resource_path('views/datatables/_common-scripts.js')) . "}");
-    }
+    
 
     /**
      * Get the dataTable columns definition.
@@ -83,10 +86,10 @@ class StockTransferRequestsDataTable extends DataTable
     {
         return [
             Column::make('id')->visible(false),
-            Column::make('pr_number'),
-            Column::make('branch.name'),
-            Column::make('date_needed'),
-            Column::make('created_by.name', 'createdBy.name')->title('created by'),
+            Column::make('str_number')->title('STR Number'),
+            Column::make('source_branch.name', 'sourceBranch.name')->title('Source Branch'),
+            Column::make('branch.name')->title('Destination Branch'),
+            Column::make('created_by.name', 'createdBy.name')->title('Created By'),
             Column::make('status'),
             Column::make('created_at'),
         ];

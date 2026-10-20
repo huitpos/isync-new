@@ -2,6 +2,8 @@
 
 namespace App\DataTables;
 
+
+use App\DataTables\Concerns\UniformAjaxTable;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
@@ -12,9 +14,16 @@ use Yajra\DataTables\Services\DataTable;
 
 class BranchProductMasterListDataTable extends DataTable
 {
-    public function dataTable(QueryBuilder $query): EloquentDataTable
+    use UniformAjaxTable;
+
+    
+    protected function defaultOrder(): array
     {
-        return (new EloquentDataTable($query))
+        return [3, 'desc'];
+    }
+public function dataTable(QueryBuilder $query): EloquentDataTable
+    {
+        return $this->withRelationSearch((new EloquentDataTable($query))
             ->addColumn('product_display', function (Product $product) {
                 $html = '<strong>' . e($product->name) . '</strong>';
 
@@ -49,7 +58,7 @@ class BranchProductMasterListDataTable extends DataTable
             ->filterColumn('branch_name', function ($query, $keyword) {
                 $query->where('branches.name', 'like', '%' . $keyword . '%');
             })
-            ->rawColumns(['product_display', 'stock']);
+            ->rawColumns(['product_display', 'stock']));
     }
 
     public function query(Product $model): QueryBuilder
@@ -107,17 +116,7 @@ class BranchProductMasterListDataTable extends DataTable
         return $query;
     }
 
-    public function html(): HtmlBuilder
-    {
-        return $this->builder()
-            ->setTableId('branch-product-master-list-table')
-            ->columns($this->getColumns())
-            ->minifiedAjax()
-            ->dom('frt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>>")
-            ->addTableClass('table table-striped table-hover align-middle')
-            ->setTableHeadClass('table-dark')
-            ->orderBy(3, 'desc');
-    }
+    
 
     public function getColumns(): array
     {

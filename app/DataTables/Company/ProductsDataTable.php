@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Company;
 
+use App\DataTables\Concerns\UniformAjaxTable;
 use App\Models\Product;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
 class ProductsDataTable extends DataTable
 {
+    use UniformAjaxTable;
+
     /**
      * Build the DataTable class.
      *
@@ -18,7 +21,7 @@ class ProductsDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        return (new EloquentDataTable($query))
+        return $this->withRelationSearch((new EloquentDataTable($query))
             ->addColumn('name', function (Product $data) {
                 if (in_array('Settings/Products/View', $this->permissions)) {
                     return view('company.datatables._link', [
@@ -47,9 +50,8 @@ class ProductsDataTable extends DataTable
                 } else {
                     return '';
                 }
-            });
+            }));
     }
-
 
     /**
      * Get the query source of dataTable.
@@ -69,18 +71,7 @@ class ProductsDataTable extends DataTable
     /**
      * Optional method if you want to use the html builder.
      */
-    public function html(): HtmlBuilder
-    {
-        return $this->builder()
-            ->setTableId('clusters-table')
-            ->columns($this->getColumns())
-            ->minifiedAjax()
-            ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>i>",)
-            ->addTableClass('table align-middle table-striped table-row-bordered fs-6 gy-5 gs-7 dataTable no-footer text-gray-600 fw-semibold')
-            ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(0, 'asc')
-            ->drawCallback("function() {" . file_get_contents(resource_path('views/datatables/_common-scripts.js')) . "}");
-    }
+    
 
     /**
      * Get the dataTable columns definition.
@@ -91,13 +82,13 @@ class ProductsDataTable extends DataTable
             Column::make('id')->visible(false),
             Column::make('name')->title('Product Name'),
             Column::make('description'),
-            Column::make('item_type.name', 'itemType.name')->title('Item Type')->searchable(false),
-            Column::make('uom.name')->title('UOM')->searchable(false),
-            Column::make('delivery_uom.name', 'deliveryUom.name')->title('Delivery UOM')->searchable(false),
-            Column::make('code')->title('Item Code')->searchable(false),
-            Column::make('cost')->title('cost')->searchable(false),
-            Column::make('srp')->title('srp')->searchable(false),
-            Column::make('created_by.name', 'createdBy.name')->title('created by')->searchable(false),
+            Column::make('item_type.name', 'itemType.name')->title('Item Type'),
+            Column::make('uom.name')->title('UOM'),
+            Column::make('delivery_uom.name', 'deliveryUom.name')->title('Delivery UOM'),
+            Column::make('code')->title('Item Code'),
+            Column::make('cost')->title('cost'),
+            Column::make('srp')->title('srp'),
+            Column::make('created_by.name', 'createdBy.name')->title('created by'),
             Column::make('status'),
             Column::computed('actions')
                 ->exportable(false)

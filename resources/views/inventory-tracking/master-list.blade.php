@@ -8,7 +8,7 @@
         {{ Breadcrumbs::render('inventory-tracking.master-list', $company) }}
     @endsection
 
-    <div class="card">
+    <div class="card" data-dt-card>
         <div class="card-header border-0 pt-6">
             <div class="card-title">
                 <h2>Stock Master List</h2>
@@ -26,7 +26,7 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label" for="branch_id">Branch</label>
-                    <select id="branch_id" class="form-select form-select-solid">
+                    <select id="branch_id" class="form-select form-select-solid" data-dt-filter="branch_id">
                         @if ($branches->count() > 1)
                             <option value="">All Branches</option>
                         @endif
@@ -37,7 +37,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="product_name">Product Name</label>
-                    <input type="text" id="product_name" class="form-control form-control-solid" placeholder="Search product name...">
+                    <input type="text" id="product_name" class="form-control form-control-solid" placeholder="Search product name..." data-dt-filter="product_name">
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="button" id="clearFilters" class="btn btn-light w-100">
@@ -60,49 +60,9 @@
     </div>
 
     @push('scripts')
+        {{ $dataTable->scripts() }}
     <script>
         $(document).ready(function () {
-            var masterListTable = $('#branch-product-master-list-table').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: '{!! route('inventory-tracking.master-list') !!}',
-                    data: function (d) {
-                        d.branch_id = $('#branch_id').val();
-                        d.product_name = $('#product_name').val();
-                    }
-                },
-                columnDefs: [
-                    {
-                        targets: 0,
-                        visible: false,
-                        searchable: false
-                    }
-                ],
-                columns: [
-                    { data: 'id' },
-                    { data: 'product_display', orderable: false },
-                    { data: 'branch_name', orderable: false },
-                    { data: 'stock' },
-                    { data: 'cost' },
-                    { data: 'price' },
-                ],
-                order: [[3, 'asc']]
-            });
-
-            var productNameTimer = null;
-
-            $('#branch_id').on('change', function () {
-                masterListTable.ajax.reload();
-            });
-
-            $('#product_name').on('keyup', function () {
-                clearTimeout(productNameTimer);
-                productNameTimer = setTimeout(function () {
-                    masterListTable.ajax.reload();
-                }, 300);
-            });
-
             $('#clearFilters').on('click', function () {
                 $('#product_name').val('');
                 $('#branch_id').val('').trigger('change');

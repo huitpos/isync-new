@@ -43,7 +43,7 @@ class PurchaseDeliveryController extends Controller
             'branch_id' => $branch->id,
             'branch_slug' => $branch->slug,
             'company_slug' => $company->slug,
-            'status' => $request->query('status', null),
+            'status' => $request->input('status', null),
             'search' => $search,
         ])->render('branch.purchaseDeliveries.index', [
             'company' => $company,

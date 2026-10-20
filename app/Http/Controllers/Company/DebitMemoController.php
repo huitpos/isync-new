@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\DataTables\Company\DebitMemosDataTable;
 use App\Models\DebitMemo;
 use App\Models\SupplierInvoice;
 use App\Services\ThreeWayMatchService;
@@ -17,39 +18,16 @@ class DebitMemoController extends Controller
     {
     }
 
-    public function index(Request $request, string $companySlug)
+    public function index(Request $request, string $companySlug, DebitMemosDataTable $dataTable)
     {
         $company = $request->attributes->get('company');
 
-        $memos = DebitMemo::with(['supplier', 'supplierInvoice', 'branch', 'createdBy'])
-            ->whereHas('branch', function ($query) use ($company) {
-                $query->where('company_id', $company->id);
-            })
-            ->when($request->query('status'), function ($query, $status) {
-                $query->where('status', $status);
-            })
-            ->when($request->query('branch_id'), function ($query, $branchId) {
-                $query->where('branch_id', $branchId);
-            })
-            ->when($request->query('search'), function ($query, $search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('memo_number', 'like', '%' . $search . '%')
-                        ->orWhereHas('supplierInvoice', function ($query) use ($search) {
-                            $query->where('invoice_number', 'like', '%' . $search . '%');
-                        })
-                        ->orWhereHas('supplier', function ($query) use ($search) {
-                            $query->where('name', 'like', '%' . $search . '%');
-                        });
-                });
-            })
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->withQueryString();
-
-        return view('company.debitMemos.index', [
+        return $dataTable->with([
+            'company_id' => $company->id,
+            'company_slug' => $company->slug,
+        ])->render('company.debitMemos.index', [
             'company' => $company,
             'branches' => $company->branches,
-            'memos' => $memos,
         ]);
     }
 

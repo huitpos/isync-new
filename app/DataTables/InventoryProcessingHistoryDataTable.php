@@ -2,6 +2,8 @@
 
 namespace App\DataTables;
 
+
+use App\DataTables\Concerns\UniformAjaxTable;
 use App\Models\InventoryMovementLog as Model;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
@@ -12,14 +14,21 @@ use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
 class InventoryProcessingHistoryDataTable extends DataTable
 {
-    public function dataTable(QueryBuilder $query): EloquentDataTable
+    use UniformAjaxTable;
+
+    
+    protected function defaultOrder(): array
+    {
+        return [7, 'desc'];
+    }
+public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         $companySlug = $this->company_slug;
         $types = $this->movement_types;
         $user = auth()->user();
         $canRevert = $user !== null;
 
-        return (new EloquentDataTable($query))
+        return $this->withRelationSearch((new EloquentDataTable($query))
             ->addColumn('product_display', function (Model $log) use ($companySlug) {
                 $description = $this->getMovementDescription($log, $companySlug);
 
@@ -66,7 +75,7 @@ class InventoryProcessingHistoryDataTable extends DataTable
 
                 return '<a href="' . e($url) . '" class="btn btn-sm btn-light-danger">Revert</a>';
             })
-            ->rawColumns(['product_display', 'previous_qty', 'new_qty', 'processed_at', 'actions']);
+            ->rawColumns(['product_display', 'previous_qty', 'new_qty', 'processed_at', 'actions']));
     }
 
     public function query(Model $model): QueryBuilder
@@ -160,17 +169,7 @@ class InventoryProcessingHistoryDataTable extends DataTable
         });
     }
 
-    public function html(): HtmlBuilder
-    {
-        return $this->builder()
-            ->setTableId('inventory-history-table')
-            ->columns($this->getColumns())
-            ->minifiedAjax()
-            ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>>")
-            ->addTableClass('table table-striped table-hover align-middle')
-            ->setTableHeadClass('table-dark')
-            ->orderBy(7, 'desc');
-    }
+    
 
     public function getColumns(): array
     {

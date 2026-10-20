@@ -2,6 +2,8 @@
 
 namespace App\DataTables\Company;
 
+
+use App\DataTables\Concerns\UniformAjaxTable;
 use App\Models\SupplierInvoice as Model;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -11,11 +13,18 @@ use Yajra\DataTables\Services\DataTable;
 
 class SupplierInvoicesDataTable extends DataTable
 {
-    public function dataTable(QueryBuilder $query): EloquentDataTable
+    use UniformAjaxTable;
+
+    
+    protected function defaultOrder(): array
+    {
+        return [0, 'desc'];
+    }
+public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         $companySlug = $this->company_slug;
 
-        return (new EloquentDataTable($query))
+        return $this->withRelationSearch((new EloquentDataTable($query))
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;
             })
@@ -24,7 +33,7 @@ class SupplierInvoicesDataTable extends DataTable
                     'companySlug' => $companySlug,
                     'supplier_invoice' => $data->id,
                 ]);
-            });
+            }));
     }
 
     public function query(Model $model): QueryBuilder
@@ -44,14 +53,15 @@ class SupplierInvoicesDataTable extends DataTable
             $query->where('branch_id', $this->branch_id);
         }
 
-        if ($this->search) {
-            $query->where(function ($query) {
-                $query->where('invoice_number', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('purchaseOrder', function ($query) {
-                        $query->where('po_number', 'like', '%' . $this->search . '%');
+        $search = $this->search;
+        if (is_string($search) && $search !== '') {
+            $query->where(function ($query) use ($search) {
+                $query->where('invoice_number', 'like', '%' . $search . '%')
+                    ->orWhereHas('purchaseOrder', function ($query) use ($search) {
+                        $query->where('po_number', 'like', '%' . $search . '%');
                     })
-                    ->orWhereHas('supplier', function ($query) {
-                        $query->where('name', 'like', '%' . $this->search . '%');
+                    ->orWhereHas('supplier', function ($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%');
                     });
             });
         }
@@ -59,18 +69,7 @@ class SupplierInvoicesDataTable extends DataTable
         return $query;
     }
 
-    public function html(): HtmlBuilder
-    {
-        return $this->builder()
-            ->setTableId('supplier-invoices-table')
-            ->columns($this->getColumns())
-            ->minifiedAjax()
-            ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>i>",)
-            ->addTableClass('table align-middle table-striped table-row-bordered fs-6 gy-5 gs-7 dataTable no-footer text-gray-600 fw-semibold')
-            ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(0, 'desc')
-            ->drawCallback("function() {" . file_get_contents(resource_path('views/datatables/_common-scripts.js')) . "}");
-    }
+    
 
     public function getColumns(): array
     {

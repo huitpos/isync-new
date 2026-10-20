@@ -270,10 +270,10 @@ class InventoryProcessingController extends Controller
             ->get();
 
         return $dataTable->with([
-            'branch_id' => $request->query('branch_id'),
+            'branch_id' => $request->input('branch_id'),
             'branch_ids' => $branchIds,
             'company_id' => $user->company_id,
-            'product_name' => $request->query('product_name'),
+            'product_name' => $request->input('product_name'),
         ])->render('inventory-tracking.master-list', [
             'branches' => $branches,
             'company' => $company,
@@ -292,7 +292,7 @@ class InventoryProcessingController extends Controller
             new BranchProductMasterListExport(
                 $user->company_id,
                 $branchIds,
-                $request->query('branch_id') ? (int) $request->query('branch_id') : null,
+                $request->input('branch_id') ? (int) $request->input('branch_id') : null,
                 $request->query('product_name'),
             ),
             'Stock Master List - ' . Carbon::now()->format('Y-m-d') . '.xlsx',
@@ -320,7 +320,7 @@ class InventoryProcessingController extends Controller
             $view = 'most_stock';
         }
 
-        $branchId = $request->query('branch_id');
+        $branchId = $request->input('branch_id');
         $filterBranchIds = $branchId ? [(int) $branchId] : $branchIds;
 
         if ($branchId && !in_array((int) $branchId, $branchIds, true)) {

@@ -74,6 +74,9 @@
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/index.js"></script>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+<script>
+{!! file_get_contents(resource_path('views/datatables/_column-filters.js')) !!}
+</script>
 @stack('scripts')
 <!--end::Javascript-->
 

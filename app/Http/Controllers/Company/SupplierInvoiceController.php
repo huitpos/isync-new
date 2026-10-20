@@ -23,8 +23,8 @@ class SupplierInvoiceController extends Controller
         $company = $request->attributes->get('company');
 
         return $dataTable->with([
-            'branch_id' => $request->query('branch_id', null),
-            'status' => $request->query('status', null),
+            'branch_id' => $request->input('branch_id', null),
+            'status' => $request->input('status', null),
             'search' => $request->query('search', null),
             'company_id' => $company->id,
             'company_slug' => $company->slug,
@@ -124,7 +124,7 @@ class SupplierInvoiceController extends Controller
     public function openPurchaseOrders(Request $request, string $companySlug)
     {
         $company = $request->attributes->get('company');
-        $branch = Branch::where('company_id', $company->id)->findOrFail($request->query('branch_id'));
+        $branch = Branch::where('company_id', $company->id)->findOrFail($request->input('branch_id'));
 
         $orders = $this->matchService->openPurchaseOrders($branch->id)->map(function (PurchaseOrder $po) {
             return [

@@ -166,13 +166,13 @@
         <div class="col-12 mt-10">
             <div class="table-responsive">
                 <h2 id="sales_breakdown_title"></h2>
-                <table id="kt_datatable_zero_configuration" class="table table-striped table-row-bordered gy-5">
+                <table id="kt_datatable_zero_configuration" class="table align-middle table-striped table-row-bordered fs-6 gy-5">
                     <thead>
                         <tr class="fw-semibold fs-6 text-muted">
-                            <td>Product</td>
-                            <td>Qty</td>
-                            <td>Net Sales</td>
-                            <td>%</td>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Net Sales</th>
+                            <th>%</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -437,7 +437,13 @@
 
         $(function () {
             salesTable = $('#kt_datatable_zero_configuration').DataTable({
-                order: []
+                order: [],
+                dom: "rt<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>i>",
+                initComplete: function () {
+                    if (window.initColumnFilters) {
+                        window.initColumnFilters(this.api());
+                    }
+                }
             });
 
             $('#search-btn').on('click', function () {

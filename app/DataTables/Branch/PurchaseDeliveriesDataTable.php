@@ -2,6 +2,8 @@
 
 namespace App\DataTables\Branch;
 
+
+use App\DataTables\Concerns\UniformAjaxTable;
 use App\Models\PurchaseDelivery as Model;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\EloquentDataTable;
@@ -11,6 +13,8 @@ use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
 class PurchaseDeliveriesDataTable extends DataTable
 {
+    use UniformAjaxTable;
+
     /**
      * Build the DataTable class.
      *
@@ -21,7 +25,7 @@ class PurchaseDeliveriesDataTable extends DataTable
         $branchSlug = $this->branch_slug;
         $companySlug = $this->company_slug;
 
-        return (new EloquentDataTable($query))
+        return $this->withRelationSearch((new EloquentDataTable($query))
             ->editColumn('created_at', function (Model $data) {
                 return $data->created_at;
             })
@@ -32,7 +36,14 @@ class PurchaseDeliveriesDataTable extends DataTable
                     'purchase_delivery' => $data->id
                 ]) . '">' . $data->pd_number . '</a>';
             })
-            ->rawColumns(['pd_number']);
+            ->addColumn('view_url', function (Model $data) use ($companySlug, $branchSlug) {
+                return route('branch.purchase-deliveries.show', [
+                    'companySlug' => $companySlug,
+                    'branchSlug' => $branchSlug,
+                    'purchase_delivery' => $data->id,
+                ]);
+            })
+            ->rawColumns(['pd_number']));
     }
 
 
@@ -56,14 +67,14 @@ class PurchaseDeliveriesDataTable extends DataTable
             $query->where('status', $this->status);
         }
 
-        if ($this->search) {
-            //wrap all in a or group
-            $query->where(function ($query) {
-                $query->where('pd_number', 'like', '%' . $this->search . '%')
-                    ->orWhere('sales_invoice_number', 'like', '%' . $this->search . '%')
-                    ->orWhere('delivery_number', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('purchaseOrder', function ($query) {
-                        $query->where('po_number', 'like', '%' . $this->search . '%');
+        $search = $this->search;
+        if (is_string($search) && $search !== '') {
+            $query->where(function ($query) use ($search) {
+                $query->where('pd_number', 'like', '%' . $search . '%')
+                    ->orWhere('sales_invoice_number', 'like', '%' . $search . '%')
+                    ->orWhere('delivery_number', 'like', '%' . $search . '%')
+                    ->orWhereHas('purchaseOrder', function ($query) use ($search) {
+                        $query->where('po_number', 'like', '%' . $search . '%');
                     });
             });
         }
@@ -74,18 +85,7 @@ class PurchaseDeliveriesDataTable extends DataTable
     /**
      * Optional method if you want to use the html builder.
      */
-    public function html(): HtmlBuilder
-    {
-        return $this->builder()
-            ->setTableId('clusters-table')
-            ->columns($this->getColumns())
-            ->minifiedAjax()
-            ->dom('rt' . "<'row'<'col-sm-12 col-md-5'l><'col-sm-12 col-md-7'p>i>",)
-            ->addTableClass('table align-middle table-striped table-row-bordered fs-6 gy-5 gs-7 dataTable no-footer text-gray-600 fw-semibold')
-            ->setTableHeadClass('text-start text-muted fw-bold fs-7 text-uppercase gs-0')
-            ->orderBy(0, 'asc')
-            ->drawCallback("function() {" . file_get_contents(resource_path('views/datatables/_common-scripts.js')) . "}");
-    }
+    
 
     /**
      * Get the dataTable columns definition.
