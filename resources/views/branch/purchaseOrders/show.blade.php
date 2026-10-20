@@ -8,6 +8,8 @@
         {{ Breadcrumbs::render('branch.purchaseOrders.show', $company, $branch, $po) }}
     @endsection
 
+    <div class="alert alert-primary">Purchase order {{ $po->po_number }} is {{ $po->status }}. Receiving and stock happen on the delivery.</div>
+
     <div class="card">
         <form class="mt-3" action="{{ route('company.purchase-requests.update', ['companySlug' => $company->slug, 'purchase_request' => $po->id]) }}" method="POST" novalidate enctype="multipart/form-data">
             @csrf

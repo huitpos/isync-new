@@ -95,6 +95,8 @@ class PermissionSeeder extends Seeder
             ['name' => 'Inventory/Product Disposal/View', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.product-disposals.show', 'parent' => 'Inventory/Product Disposal'],
             ['name' => 'Inventory/Product Physical Count', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.product-physical-counts.index', 'parent' => 'Inventory'],
             ['name' => 'Inventory/Product Physical Count/View', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.product-physical-counts.show', 'parent' => 'Inventory/Product Physical Count'],
+            ['name' => 'Inventory/Low Stock', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.inventory.low-stock', 'parent' => 'Inventory'],
+            ['name' => 'Inventory/Valuation', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.inventory.valuation', 'parent' => 'Inventory'],
             
             // Procurement
             ['name' => 'Procurement', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => null],
@@ -106,6 +108,8 @@ class PermissionSeeder extends Seeder
             ['name' => 'Procurement/Purchase Deliveries/View', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.purchase-deliveries.show', 'parent' => 'Procurement/Purchase Deliveries'],
             ['name' => 'Procurement/Stock Transfer Requests', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.stock-transfer-requests.index', 'parent' => 'Procurement'],
             ['name' => 'Procurement/Stock Transfer Requests/View', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.stock-transfer-requests.show', 'parent' => 'Procurement/Stock Transfer Requests'],
+            ['name' => 'Procurement/Supplier Invoices', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.supplier-invoices.index', 'parent' => 'Procurement'],
+            ['name' => 'Procurement/Debit Memos', 'guard_name' => 'web', 'level' => 'company_user', 'route' => 'company.debit-memos.index', 'parent' => 'Procurement'],
             
             // Company Access Level
             ['name' => 'Company Access Level', 'guard_name' => 'web', 'level' => 'company_user', 'parent' => null],
@@ -218,6 +222,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Branch Procurement/Purchase Requests', 'guard_name' => 'web', 'level' => 'branch_user', 'route' => 'branch.purchase-requests.index', 'parent' => 'Branch Procurement'],
             ['name' => 'Branch Procurement/Purchase Orders', 'guard_name' => 'web', 'level' => 'branch_user', 'route' => 'branch.purchase-orders.index', 'parent' => 'Branch Procurement'],
             ['name' => 'Branch Procurement/Purchase Deliveries', 'guard_name' => 'web', 'level' => 'branch_user', 'route' => 'branch.purchase-deliveries.index', 'parent' => 'Branch Procurement'],
+            ['name' => 'Branch Procurement/Purchase Returns', 'guard_name' => 'web', 'level' => 'branch_user', 'route' => 'branch.purchase-returns.index', 'parent' => 'Branch Procurement'],
             ['name' => 'Branch Inventory', 'guard_name' => 'web', 'level' => 'branch_user', 'parent' => null],
             ['name' => 'Branch Inventory/Stock Transfer Requests', 'guard_name' => 'web', 'level' => 'branch_user', 'route' => 'branch.stock-transfer-requests.index', 'parent' => 'Branch Inventory'],
             ['name' => 'Branch Inventory/Stock Transfer Orders', 'guard_name' => 'web', 'level' => 'branch_user', 'route' => 'branch.stock-transfer-orders.index', 'parent' => 'Branch Inventory'],

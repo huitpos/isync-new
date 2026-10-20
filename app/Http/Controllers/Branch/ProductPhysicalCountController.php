@@ -125,7 +125,8 @@ class ProductPhysicalCountController extends Controller
     public function show(Request $request, string $companySlug, string $branchSlug, string $id)
     {
         $count = ProductPhysicalCount::with([
-            'items',
+            'items.product.branches',
+            'items.uom',
             'createdBy'
         ])->findOrFail($id);
 

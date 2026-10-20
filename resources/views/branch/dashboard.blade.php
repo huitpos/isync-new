@@ -35,6 +35,8 @@
     </div>
 </form>
 
+    @include('partials.work-queue', ['items' => $workItems])
+
     <div id="dashboard-widgets" class="row g-1 g-xl-5 mb-1 mb-xl-5">
         <div class="col-3">
             @include('partials/widgets/small_card', [

@@ -186,8 +186,9 @@
                         </div>
         
                         <div class="mb-4">
-                            <label class="form-label">Cost</label>
+                            <label class="form-label">Catalog cost</label>
                             <input id="cost" value="{{ old('cost') ?? $product->cost }}" name="cost" type="text" class="form-control @error('cost') is-invalid @enderror compute-srp" placeholder="Cost" required/>
+                            <div class="form-text">Used to compute SRP. The cost sent to the POS is the oldest FIFO layer on each branch.</div>
         
                             @error('cost')
                                 <div class="invalid-feedback"> {{ $message }}</div>
@@ -654,7 +655,7 @@
                                 <thead>
                                     <tr class="fw-bold fs-6 text-gray-800">
                                         <th>Branch</th>
-                                        <th>Cost</th>
+                                        <th>FIFO cost</th>
                                         <th>Markup</th>
                                         <th>Srp</th>
                                     </tr>
@@ -674,7 +675,7 @@
                                         <tr>
                                             <td>{{ $branch->name }}</td>
                                             <td>
-                                                <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_costs[{{ $branch->id }}]" value="{{ $cost }}" />
+                                                <input type="number" readonly class="form-control" name="branch_costs[{{ $branch->id }}]" value="{{ $cost }}" />
                                             </td>
                                             <td>
                                                 <input type="number" class="form-control {{ $branchSrpsError ? 'is-invalid' : '' }}" name="branch_markups[{{ $branch->id }}]" value="{{ $markup }}" />

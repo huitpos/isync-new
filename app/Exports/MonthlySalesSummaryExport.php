@@ -20,6 +20,7 @@ use Carbon\CarbonPeriod;
 
 use App\Models\Branch;
 use App\Services\FifoCostService;
+use App\Services\SalesSummaryQuery;
 
 class MonthlySalesSummaryExport implements FromCollection, WithEvents, WithCustomStartCell, ShouldAutoSize
 {
@@ -60,6 +61,9 @@ class MonthlySalesSummaryExport implements FromCollection, WithEvents, WithCusto
     public function collection()
     {
         // Get monthly sales data
+        $paymentJoin = SalesSummaryQuery::paymentJoin();
+        $paymentColumns = SalesSummaryQuery::paymentColumns();
+
         $monthlySalesQuery = "
             SELECT 
                 YEAR(t.treg) as year,
@@ -72,11 +76,7 @@ class MonthlySalesSummaryExport implements FromCollection, WithEvents, WithCusto
                 SUM(t.vatable_sales) as vat_sales,
                 SUM(t.vat_exempt_sales) as vat_exempt_sales,
                 SUM(t.vat_amount) as vat_amount,
-                SUM(CASE WHEN p.payment_type_name = 'cash' THEN p.amount ELSE 0 END) as cash_sales,
-                SUM(CASE WHEN p.payment_type_name = 'card' THEN p.amount ELSE 0 END) as card_sales,
-                SUM(CASE WHEN p.payment_type_name = 'mobile' THEN p.amount ELSE 0 END) as mobile_sales,
-                SUM(CASE WHEN p.payment_type_name = 'ar' THEN p.amount ELSE 0 END) as ar_sales,
-                SUM(CASE WHEN p.payment_type_name = 'online' THEN p.amount ELSE 0 END) as online_sales,
+                {$paymentColumns},
                 SUM(t.total_unit_cost) as unit_cost,
                 SUM(t.service_charge) as service_charge,
                 SUM(t.net_sales - t.total_unit_cost) as gross_profit,
@@ -85,7 +85,7 @@ class MonthlySalesSummaryExport implements FromCollection, WithEvents, WithCusto
                     ELSE 0
                 END as gross_profit_percentage
             FROM transactional_db.transactions t
-            LEFT JOIN transactional_db.payments p ON p.transaction_id = t.id
+            {$paymentJoin}
             WHERE t.is_complete = TRUE
                 AND t.branch_id = {$this->branchId}
                 AND t.is_void = FALSE

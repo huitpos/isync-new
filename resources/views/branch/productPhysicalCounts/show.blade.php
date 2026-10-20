@@ -68,8 +68,29 @@
                         </div>
 
                         <div class="col-md-2">
-                            <label class="form-label">Quantity:</label>
+                            <label class="form-label">Counted:</label>
                             <input value="{{ $item->quantity }}" type="text" readonly class="form-control"/>
+                        </div>
+
+                        @php
+                            $systemQty = (float) ($item->product->branches->firstWhere('id', $branch->id)?->pivot->stock ?? 0);
+                            $countedQty = $item->uom_id == $item->product->uom_id
+                                ? (float) $item->quantity
+                                : app(\App\Services\FifoCostService::class)->stockQty($item->product, $item->quantity, $item->uom_id);
+                            $variance = $countedQty - $systemQty;
+                            $unitCost = (float) ($item->product->branches->firstWhere('id', $branch->id)?->pivot->cost ?? 0);
+                        @endphp
+                        <div class="col-md-3 mt-3">
+                            <label class="form-label">System stock</label>
+                            <input value="{{ number_format($systemQty, 2) }}" type="text" readonly class="form-control"/>
+                        </div>
+                        <div class="col-md-3 mt-3">
+                            <label class="form-label">Variance</label>
+                            <input value="{{ number_format($variance, 2) }}" type="text" readonly class="form-control"/>
+                        </div>
+                        <div class="col-md-3 mt-3">
+                            <label class="form-label">Variance value</label>
+                            <input value="{{ number_format($variance * $unitCost, 2) }}" type="text" readonly class="form-control"/>
                         </div>
 
                         <div class="col-md-12 mt-3">

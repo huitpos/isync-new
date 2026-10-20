@@ -10,6 +10,7 @@ use App\Repositories\Interfaces\BranchRepositoryInterface;
 use Carbon\Carbon;
 
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
+use App\Services\WorkQueueService;
 use Illuminate\Support\Facades\DB;
 
 class PageController extends Controller
@@ -26,6 +27,9 @@ class PageController extends Controller
         $branch = $request->attributes->get('branch');
         $filters = $this->dashboardFilters($request);
 
+        $work = app(WorkQueueService::class)->counts($company->id, $branch->id);
+        $params = ['companySlug' => $company->slug, 'branchSlug' => $branch->slug];
+
         return view('branch.dashboard', [
             'company' => $company,
             'branch' => $branch,
@@ -33,6 +37,13 @@ class PageController extends Controller
             'selectedRangeParam' => $filters['selectedRangeParam'],
             'startDateParam' => $filters['startDateParam'],
             'endDateParam' => $filters['endDateParam'],
+            'workItems' => [
+                ['label' => 'Purchase requests', 'count' => $work['pending_requests'], 'url' => route('branch.purchase-requests.index', $params)],
+                ['label' => 'Deliveries to approve', 'count' => $work['pending_deliveries'], 'url' => route('branch.purchase-deliveries.index', $params)],
+                ['label' => 'Open to bill', 'count' => $work['open_to_bill'], 'url' => route('branch.purchase-deliveries.index', $params)],
+                ['label' => 'Returns without debit memo', 'count' => $work['returns_without_debit'], 'url' => route('branch.purchase-returns.index', $params)],
+                ['label' => 'Low stock', 'count' => $work['low_stock'], 'url' => route('company.inventory.low-stock', ['companySlug' => $company->slug])],
+            ],
         ]);
     }
 

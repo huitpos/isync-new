@@ -46,6 +46,8 @@
     </div>
 
 
+    @include('partials.work-queue', ['items' => $workItems])
+
     <div id="dashboard-widgets" class="row g-1 g-xl-5 mb-1 mb-xl-5">
         <div class="card">
             <div class="border-0 p-1">

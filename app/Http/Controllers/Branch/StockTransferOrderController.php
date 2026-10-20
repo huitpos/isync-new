@@ -68,7 +68,9 @@ class StockTransferOrderController extends Controller
     {
         $sto = StockTransferOrder::with([
             'items',
-            'createdBy'
+            'createdBy',
+            'sourceBranch',
+            'branch',
         ])->findOrFail($id);
 
         $company = $request->attributes->get('company');

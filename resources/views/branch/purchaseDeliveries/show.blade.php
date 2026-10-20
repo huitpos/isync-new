@@ -8,6 +8,8 @@
         {{ Breadcrumbs::render('branch.purchaseDeliveries.show', $company, $branch, $pd) }}
     @endsection
 
+    <div class="alert alert-primary">Delivery {{ $pd->pd_number }} is {{ $pd->status }}. Approving adds a FIFO cost layer and updates the selling price.</div>
+
     <div class="card">
         <form class="mt-3" action="{{ route('branch.purchase-deliveries.update', ['companySlug' => $company->slug, 'purchase_delivery' => $pd->id, 'branchSlug' => $branch->slug]) }}" method="POST" novalidate enctype="multipart/form-data">
             @csrf

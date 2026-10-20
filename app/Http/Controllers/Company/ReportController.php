@@ -44,6 +44,7 @@ use App\Exports\HourlyTransactionReportExport;
 use App\Models\AuditTrail;
 use App\Models\PosMachine;
 use App\Services\FifoCostService;
+use App\Services\SalesSummaryQuery;
 use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
@@ -1430,6 +1431,9 @@ class ReportController extends Controller
         $salesData = collect(DB::select($hourlySalesQuery));
         
         // Get daily summary data
+        $paymentJoin = SalesSummaryQuery::paymentJoin();
+        $paymentColumns = SalesSummaryQuery::paymentColumns();
+
         $daySummaryQuery = "
             SELECT 
                 DATE(t.treg) as sale_date,
@@ -1440,11 +1444,7 @@ class ReportController extends Controller
                 SUM(t.vatable_sales) as vat_sales,
                 SUM(t.vat_exempt_sales) as vat_exempt_sales,
                 SUM(t.vat_amount) as vat_amount,
-                SUM(CASE WHEN p.payment_type_name = 'cash' THEN p.amount ELSE 0 END) as cash_sales,
-                SUM(CASE WHEN p.payment_type_name = 'card' THEN p.amount ELSE 0 END) as card_sales,
-                SUM(CASE WHEN p.payment_type_name = 'mobile' THEN p.amount ELSE 0 END) as mobile_sales,
-                SUM(CASE WHEN p.payment_type_name = 'ar' THEN p.amount ELSE 0 END) as ar_sales,
-                SUM(CASE WHEN p.payment_type_name = 'online' THEN p.amount ELSE 0 END) as online_sales,
+                {$paymentColumns},
                 SUM(t.total_unit_cost) as unit_cost,
                 SUM(t.service_charge) as service_charge,
                 SUM(t.net_sales - t.total_unit_cost) as gross_profit,
@@ -1453,7 +1453,7 @@ class ReportController extends Controller
                     ELSE 0
                 END as gross_profit_percentage
             FROM transactional_db.transactions t
-            LEFT JOIN transactional_db.payments p ON p.transaction_id = t.id
+            {$paymentJoin}
             WHERE t.is_complete = TRUE
                 AND t.branch_id = $branchId
                 AND t.is_void = FALSE
@@ -1850,6 +1850,9 @@ class ReportController extends Controller
         }
 
         // Get monthly sales data
+        $paymentJoin = SalesSummaryQuery::paymentJoin();
+        $paymentColumns = SalesSummaryQuery::paymentColumns();
+
         $monthlySalesQuery = "
             SELECT 
                 YEAR(t.treg) as year,
@@ -1862,11 +1865,7 @@ class ReportController extends Controller
                 SUM(t.vatable_sales) as vat_sales,
                 SUM(t.vat_exempt_sales) as vat_exempt_sales,
                 SUM(t.vat_amount) as vat_amount,
-                SUM(CASE WHEN p.payment_type_name = 'cash' THEN p.amount ELSE 0 END) as cash_sales,
-                SUM(CASE WHEN p.payment_type_name = 'card' THEN p.amount ELSE 0 END) as card_sales,
-                SUM(CASE WHEN p.payment_type_name = 'mobile' THEN p.amount ELSE 0 END) as mobile_sales,
-                SUM(CASE WHEN p.payment_type_name = 'ar' THEN p.amount ELSE 0 END) as ar_sales,
-                SUM(CASE WHEN p.payment_type_name = 'online' THEN p.amount ELSE 0 END) as online_sales,
+                {$paymentColumns},
                 SUM(t.total_unit_cost) as unit_cost,
                 SUM(t.service_charge) as service_charge,
                 SUM(t.net_sales - t.total_unit_cost) as gross_profit,
@@ -1875,7 +1874,7 @@ class ReportController extends Controller
                     ELSE 0
                 END as gross_profit_percentage
             FROM transactional_db.transactions t
-            LEFT JOIN transactional_db.payments p ON p.transaction_id = t.id
+            {$paymentJoin}
             WHERE t.is_complete = TRUE
                 AND t.branch_id = {$branchId}
                 AND t.is_void = FALSE

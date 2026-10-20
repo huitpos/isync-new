@@ -94,9 +94,11 @@ Route::get('/download-product-import-template', function () {
     return Response::download($filePath);
 });
 
-Route::get('/map-data', [TestController::class, 'mapData']);
-Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
-Route::get('/test/{branchId}', [TestController::class, 'test']);
+Route::middleware(['auth', \App\Http\Middleware\SuperAdminMiddleware::class])->group(function () {
+    Route::get('/map-data', [TestController::class, 'mapData']);
+    Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
+    Route::get('/test/{branchId}', [TestController::class, 'test']);
+});
 
 require __DIR__ . '/auth.php';
 
@@ -168,6 +170,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('product-disposal-reasons', CompanyProductDisposalReasonController::class, ['as' => 'company']);
 
         Route::resource('products', CompanyProductController::class, ['as' => 'company']);
+        Route::get('/inventory/branches', [CompanyProductController::class, 'inventoryBranches'])->name('company.branch-inventory.branches');
+        Route::get('/inventory/low-stock', [CompanyProductController::class, 'lowStock'])->name('company.inventory.low-stock');
+        Route::get('/inventory/valuation', [CompanyProductController::class, 'valuation'])->name('company.inventory.valuation');
         Route::get('/branch/{branchId}/inventory', [CompanyProductController::class, 'inventory'])->name('company.branch-inventory.index');
         Route::get('/branch/{branchId}/inventory/{productId}', [CompanyProductController::class, 'inventoryProduct'])->name('company.branch-inventory.show');
         Route::get('/branch/{branchId}/inventory-download', [CompanyProductController::class, 'inventoryDownload'])->name('company.branch-inventory.download');
@@ -189,9 +194,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/purchase-requests/{id}/quotations', [CompanyPurchaseRequestQuotationController::class, 'store'])->name('company.purchase-requests.quotations.store');
         Route::put('/purchase-requests/{id}/quotations', [CompanyPurchaseRequestQuotationController::class, 'update'])->name('company.purchase-requests.quotations.update');
         Route::post('/purchase-requests/{id}/quotations/award', [CompanyPurchaseRequestQuotationController::class, 'award'])->name('company.purchase-requests.quotations.award');
-        Route::resource('purchase-requests', CompanyPurchaseRequestController::class, ['as' => 'company']);
-        Route::resource('purchase-orders', CompanyPurchaseOrderController::class, ['as' => 'company']);
-        Route::resource('purchase-deliveries', CompanyPurchaseDeliveryController::class, ['as' => 'company']);
+        Route::resource('purchase-requests', CompanyPurchaseRequestController::class, ['as' => 'company'])->except(['create', 'store', 'edit', 'destroy']);
+        Route::resource('purchase-orders', CompanyPurchaseOrderController::class, ['as' => 'company'])->except(['create', 'store', 'edit', 'destroy']);
+        Route::resource('purchase-deliveries', CompanyPurchaseDeliveryController::class, ['as' => 'company'])->except(['create', 'store', 'edit', 'destroy']);
         Route::resource('stock-transfer-requests', CompanyStockTransferRequestController::class, ['as' => 'company']);
         Route::get('/stock-transfer-requests/{id}/print', [CompanyStockTransferRequestController::class, 'print'])->name('company.stock-transfer-requests.print');
         Route::resource('product-disposals', CompanyProductDisposalController::class, ['as' => 'company']);
@@ -200,7 +205,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/purchase-requests/{id}/print', [CompanyPurchaseRequestController::class, 'print'])->name('company.purchase-requests.print');
         Route::get('/purchase-orders/{id}/print', [CompanyPurchaseOrderController::class, 'print'])->name('company.purchase-orders.print');
         Route::get('/product-disposals/{id}/print', [CompanyProductDisposalController::class, 'print'])->name('company.product-disposals.print');
-        Route::get('/stock-transfer-requests/{id}/print', [CompanyStockTransferRequestController::class, 'print'])->name('company.stock-transfer-requests.print');
         Route::get('/purchase-deliveries/{id}/print', [CompanyPurchaseDeliveryController::class, 'print'])->name('company.purchase-deliveries.print');
 
         Route::resource('roles', CompanyRoleController::class, ['as' => 'company']);

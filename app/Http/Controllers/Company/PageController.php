@@ -9,6 +9,7 @@ use App\Models\Department;
 use Illuminate\Http\Request;
 
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
+use App\Services\WorkQueueService;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,9 @@ class PageController extends Controller
         $company = $request->attributes->get('company');
         $filters = $this->dashboardFilters($request);
 
+        $work = app(WorkQueueService::class)->counts($company->id);
+        $slug = $company->slug;
+
         return view('company.dashboard', [
             'company' => $company,
             'activebranches' => $company->activeBranches,
@@ -34,6 +38,14 @@ class PageController extends Controller
             'selectedRangeParam' => $filters['selectedRangeParam'],
             'startDateParam' => $filters['startDateParam'],
             'endDateParam' => $filters['endDateParam'],
+            'workItems' => [
+                ['label' => 'Purchase requests', 'count' => $work['pending_requests'], 'url' => route('company.purchase-requests.index', ['companySlug' => $slug, 'status' => 'pending'])],
+                ['label' => 'Deliveries to approve', 'count' => $work['pending_deliveries'], 'url' => route('company.purchase-deliveries.index', ['companySlug' => $slug, 'status' => 'pending'])],
+                ['label' => 'Open to bill', 'count' => $work['open_to_bill'], 'url' => route('company.supplier-invoices.index', ['companySlug' => $slug])],
+                ['label' => 'Invoices in progress', 'count' => $work['open_invoices'], 'url' => route('company.supplier-invoices.index', ['companySlug' => $slug])],
+                ['label' => 'Returns without debit memo', 'count' => $work['returns_without_debit'], 'url' => route('company.debit-memos.index', ['companySlug' => $slug])],
+                ['label' => 'Low stock', 'count' => $work['low_stock'], 'url' => route('company.inventory.low-stock', ['companySlug' => $slug])],
+            ],
         ]);
     }
 

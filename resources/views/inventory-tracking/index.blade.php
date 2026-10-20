@@ -8,6 +8,8 @@
         {{ Breadcrumbs::render('inventory-tracking.index', $company) }}
     @endsection
 
+    <div class="alert alert-primary">This page is the movement history. The quantity the POS uses is the branch stock under Inventory, Products.</div>
+
     <div class="card">
         <div class="card-header border-0 pt-6">
             <div class="card-title">

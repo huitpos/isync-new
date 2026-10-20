@@ -33,7 +33,7 @@
 			'title' => 'Procurement',
 			'permission' => 'Branch Procurement',
 			'icon' => 'fa-solid fa-boxes-stacked fs-2',
-			'activeRoutes' => ['branch.purchase-requests.*', 'branch.purchase-orders.*', 'branch.purchase-deliveries.*', 'branch.purchase-delivery.*'],
+			'activeRoutes' => ['branch.purchase-requests.*', 'branch.purchase-orders.*', 'branch.purchase-deliveries.*', 'branch.purchase-delivery.*', 'branch.purchase-returns.*'],
 			'children' => [
 				[
 					'permission' => 'Branch Procurement/Purchase Requests',
@@ -56,14 +56,14 @@
 					'routeParams' => $routeParams,
 					'activeRoutes' => ['branch.purchase-deliveries.*', 'branch.purchase-delivery.*'],
 				],
+				[
+					'permission' => 'Branch Procurement/Purchase Returns',
+					'title' => 'Purchase Returns',
+					'route' => 'branch.purchase-returns.index',
+					'routeParams' => $routeParams,
+					'activeRoutes' => ['branch.purchase-returns.*'],
+				],
 			],
-		],
-		[
-			'title' => 'Purchase Returns',
-			'icon' => 'fa-solid fa-rotate-left fs-2',
-			'route' => 'branch.purchase-returns.index',
-			'routeParams' => $routeParams,
-			'activeRoutes' => ['branch.purchase-returns.*'],
 		],
 		[
 			'permission' => 'Branch Inventory',

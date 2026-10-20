@@ -8,6 +8,8 @@
         {{ Breadcrumbs::render('company.purchaseOrders.index', $company) }}
     @endsection
 
+    <div class="alert alert-primary">This is the status of every branch. The purchase order is created when the branch approves the request, or when the company awards quotations.</div>
+
     <div class="card">
         <div class="card-header align-items-center py-5 gap-2 gap-md-5">
             <div class="card-title">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
@@ -18,6 +19,7 @@ use App\Imports\ProductsImport;
 use App\Jobs\ProcessExcelJob;
 use Maatwebsite\Excel\Facades\Excel;
 
+use App\Models\InventoryCostLayer;
 use App\Models\Product;
 use App\Models\Branch;
 use App\Models\DiscountType;
@@ -615,6 +617,17 @@ class ProductController extends Controller
         $product = $this->productRepository->find($productId);
 
         $branch = Branch::find($branchId);
+        $layers = InventoryCostLayer::where('branch_id', $branchId)
+            ->where('product_id', $productId)
+            ->where('qty_remaining', '>', 0)
+            ->orderBy('received_at')
+            ->orderBy('id')
+            ->get();
+        $branchCost = DB::table('branch_product')
+            ->where('branch_id', $branchId)
+            ->where('product_id', $productId)
+            ->value('cost');
+
         return $dataTable->with('company_id', $company->id)
             ->with('branch_id', $branchId)
             ->with('product_id', $productId)
@@ -623,8 +636,72 @@ class ProductController extends Controller
                 'branches' => $branches,
                 'branchId' => $branchId,
                 'branch' => $branch,
-                'product' => $product
+                'product' => $product,
+                'layers' => $layers,
+                'branchCost' => $branchCost,
             ]);
+    }
+
+    public function inventoryBranches(Request $request)
+    {
+        $company = $request->attributes->get('company');
+
+        return view('company.products.inventory_branches', [
+            'company' => $company,
+            'branches' => $company->activeBranches,
+        ]);
+    }
+
+    public function lowStock(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $rows = DB::table('branch_product')
+            ->join('products', 'products.id', '=', 'branch_product.product_id')
+            ->join('branches', 'branches.id', '=', 'branch_product.branch_id')
+            ->where('branches.company_id', $company->id)
+            ->where('products.minimum_stock_level', '>', 0)
+            ->whereColumn('branch_product.stock', '<=', 'products.minimum_stock_level')
+            ->orderBy('branches.name')
+            ->orderBy('products.name')
+            ->get([
+                'branches.name as branch_name',
+                'products.name as product_name',
+                'products.sku',
+                'branch_product.stock',
+                'products.minimum_stock_level',
+                'branch_product.cost',
+            ]);
+
+        return view('company.products.low_stock', [
+            'company' => $company,
+            'rows' => $rows,
+        ]);
+    }
+
+    public function valuation(Request $request)
+    {
+        $company = $request->attributes->get('company');
+        $rows = DB::table('inventory_cost_layers')
+            ->join('products', 'products.id', '=', 'inventory_cost_layers.product_id')
+            ->join('branches', 'branches.id', '=', 'inventory_cost_layers.branch_id')
+            ->where('branches.company_id', $company->id)
+            ->where('inventory_cost_layers.qty_remaining', '>', 0)
+            ->groupBy('branches.id', 'branches.name', 'products.id', 'products.name', 'products.sku')
+            ->orderBy('branches.name')
+            ->orderBy('products.name')
+            ->get([
+                'branches.name as branch_name',
+                'products.name as product_name',
+                'products.sku',
+                DB::raw('SUM(inventory_cost_layers.qty_remaining) as qty'),
+                DB::raw('SUM(inventory_cost_layers.qty_remaining * inventory_cost_layers.unit_cost) as value'),
+            ]);
+
+        return view('company.products.valuation', [
+            'company' => $company,
+            'rows' => $rows,
+            'total' => $rows->sum('value'),
+        ]);
     }
 
     public function inventoryDownload (Request $request, $companySlug, $branchId)

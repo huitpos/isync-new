@@ -8,6 +8,8 @@
         {{ Breadcrumbs::render('company.purchaseDeliveries.index', $company) }}
     @endsection
 
+    <div class="alert alert-primary">This is the status of every branch. Record and approve the delivery on the branch.</div>
+
     <div class="card">
         <div class="card-header align-items-center py-5 gap-2 gap-md-5">
             <div class="card-title">

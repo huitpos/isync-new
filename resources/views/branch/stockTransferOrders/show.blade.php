@@ -54,8 +54,13 @@
                     </div>
 
                     <div class="col-md-6 mb-5">
-                        <label class="form-label">Source Branch</label>
+                        <label class="form-label">From</label>
                         <input value="{{ $sto->sourceBranch->name }}" type="text" readonly class="form-control"/>
+                    </div>
+
+                    <div class="col-md-6 mb-5">
+                        <label class="form-label">To</label>
+                        <input value="{{ $sto->branch->name }}" type="text" readonly class="form-control"/>
                     </div>
 
                     <div class="col-md-12">
@@ -129,6 +134,10 @@
                     @endif
 
                     @if($sto->status == 'for_review')
+                        <div class="alert alert-warning">
+                            Approving subtracts stock from {{ $sto->sourceBranch->name }} and sends it to {{ $sto->branch->name }}.
+                            You are logged in at {{ $branch->name }}.
+                        </div>
                     <div class="mt-8">
                         <input type="hidden" name="status" id="status">
                         <button type="submit" class="btn btn-success disable-on-click" data-button-link="#status" value="approved">Approve</button>

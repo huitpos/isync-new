@@ -80,8 +80,9 @@
             </div>
 
             <div class="pb-1 fs-6 mt-2">
-                <div class="fw-bold">Cost</div>
+                <div class="fw-bold">Catalog cost</div>
                 <div class="text-gray-600">{{ $product->cost }}</div>
+                <div class="text-muted fs-7">POS cost is the oldest FIFO layer on the branch.</div>
             </div>
 
             <div class="pb-1 fs-6 mt-2">

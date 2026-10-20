@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Department;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseOrder;
+use App\Support\DocumentNumbers;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -210,14 +211,7 @@ class PurchaseRequestController extends Controller
                 $pr = PurchaseRequest::findOrFail($id);
                 $branch = $pr->branch;
 
-                $poCount = PurchaseOrder::where([
-                    'branch_id' => $branch->id
-                ])->count();
-
-                $branchCode = strtoupper($branch->code);
-                $date = date('Ymd');
-                $counter = str_pad($poCount+1, 4, '0', STR_PAD_LEFT);
-                $poNumber = "PO$branchCode$date$counter";
+                $poNumber = DocumentNumbers::purchaseOrder($branch);
 
                 $poData = [
                     'branch_id' => $pr->branch_id,

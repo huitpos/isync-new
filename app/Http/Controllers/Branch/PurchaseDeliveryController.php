@@ -172,8 +172,6 @@ class PurchaseDeliveryController extends Controller
             foreach ($pd->items as $item) {
                 $product = $item->product;
 
-                $product->cost = $item->unit_price;
-
                 $srp = $product->markup_type == 'percentage' ? $item->unit_price + ($item->unit_price * ($product->markup / 100)) : $item->unit_price + $product->markup;
 
                 $product->srp = $srp;

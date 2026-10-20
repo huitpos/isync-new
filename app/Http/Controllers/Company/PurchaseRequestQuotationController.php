@@ -180,7 +180,7 @@ class PurchaseRequestQuotationController extends Controller
             $poNumbers = [];
 
             foreach ($linesBySupplier as $supplierId => $lines) {
-                $poNumber = $this->nextPoNumber($pr->branch);
+                $poNumber = \App\Support\DocumentNumbers::purchaseOrder($pr->branch);
                 $poTotal = 0;
                 foreach ($lines as $line) {
                     $poTotal += $line['total'];
@@ -399,10 +399,4 @@ class PurchaseRequestQuotationController extends Controller
         return $formatted === '' ? '0' : $formatted;
     }
 
-    private function nextPoNumber($branch): string
-    {
-        $poCount = PurchaseOrder::where('branch_id', $branch->id)->count();
-
-        return 'PO' . strtoupper($branch->code) . date('Ymd') . str_pad($poCount + 1, 4, '0', STR_PAD_LEFT);
-    }
 }
