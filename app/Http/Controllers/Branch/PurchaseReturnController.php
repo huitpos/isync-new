@@ -8,6 +8,7 @@ use App\Models\DebitMemoItem;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseReturn;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\FifoCostService;
 use App\Services\ThreeWayMatchService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,8 @@ class PurchaseReturnController extends Controller
 {
     public function __construct(
         private ProductRepositoryInterface $productRepository,
-        private ThreeWayMatchService $matchService
+        private ThreeWayMatchService $matchService,
+        private FifoCostService $fifoCost
     ) {
     }
 
@@ -230,6 +232,8 @@ class PurchaseReturnController extends Controller
                         'status' => 'Stock for this return was already posted.',
                     ]);
                 }
+
+                $this->fifoCost->consume($branch, $item->product, $item->qty, $item->uom_id, 'purchase_returns', $locked->id);
             }
 
             $locked->status = 'approved';
@@ -301,6 +305,8 @@ class PurchaseReturnController extends Controller
                         'status' => 'Stock for this return was already restored.',
                     ]);
                 }
+
+                $this->fifoCost->receiveFromMovement($branch, $item->product, $item->qty, $item->uom_id, 'purchase_returns', $locked->id, 'purchase_returns_void', $locked->id);
             }
 
             $locked->status = 'void';

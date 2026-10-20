@@ -43,6 +43,7 @@ use App\Exports\SafekeepingReportExport;
 use App\Exports\HourlyTransactionReportExport;
 use App\Models\AuditTrail;
 use App\Models\PosMachine;
+use App\Services\FifoCostService;
 use Illuminate\Support\Facades\DB;
 
 use Carbon\Carbon;
@@ -442,11 +443,13 @@ class ReportController extends Controller
             return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
         }
 
+        $fifoUnitCost = app(FifoCostService::class)->unitCostExpression((int) $branchId, $startDate, $endDate);
+
         $query = "SELECT
                     $transactionalDbName.orders.product_id,
                     products.name AS `product_name`,
                     products.sku,
-                    products.cost,
+                    $fifoUnitCost AS cost,
                     products.srp,
                     departments.name AS `department`,
                     SUM($transactionalDbName.orders.gross) AS gross,
@@ -546,7 +549,7 @@ class ReportController extends Controller
                     AND transactions.treg BETWEEN '$startDate' AND '$endDate'
                 ";
 
-            $transactions = DB::select($transactionQuery);
+            $transactions = app(FifoCostService::class)->allocateSaleLines((int) $branchId, (int) $productId, $startDate, $endDate, DB::select($transactionQuery));
 
             $physicalCountQuery = "
                     SELECT
@@ -1461,6 +1464,7 @@ class ReportController extends Controller
         ";
         
         $summaryData = collect(DB::select($daySummaryQuery));
+        $fifoByDate = app(FifoCostService::class)->endOfDayCostsByDate((int) $branchId, $startDate, $endDate);
         
         // Organize data by date and hour
         $salesByHour = [];
@@ -1491,6 +1495,10 @@ class ReportController extends Controller
         }
         
         foreach ($summaryData as $summary) {
+            if (array_key_exists($summary->sale_date, $fifoByDate)) {
+                app(FifoCostService::class)->applySummaryCost($summary, $fifoByDate[$summary->sale_date]);
+            }
+
             $daySummary[$summary->sale_date] = [
                 'transactions' => $summary->transactions,
                 'gross_sales' => $summary->gross_sales,
@@ -1752,6 +1760,8 @@ class ReportController extends Controller
             );
         }
 
+        $fifoTotalCost = app(FifoCostService::class)->totalCostExpression((int) $branchId, $startDate, $endDate);
+
         $query = "SELECT
                     products.name AS `description`,
                     products.sku,
@@ -1760,7 +1770,7 @@ class ReportController extends Controller
                     subcategories.name AS `sub_category`,
                     SUM(transactional_db.orders.qty) AS `quantity_sold`,
                     0 AS `ar_unpaid_quantity`,
-                    SUM(transactional_db.orders.qty * products.cost) AS `total_unit_cost`,
+                    $fifoTotalCost AS `total_unit_cost`,
                     SUM(transactional_db.discount_details.discount_amount) AS `discount_sales`,
                     SUM(transactional_db.orders.total) AS `regular_sales`,
                     (SUM(transactional_db.orders.total) / (SELECT SUM(total) FROM transactional_db.orders WHERE branch_id = $branchId) * 100) AS `sales_percentage`
@@ -1876,6 +1886,7 @@ class ReportController extends Controller
         ";
         
         $summaryData = collect(DB::select($monthlySalesQuery));
+        $fifoByMonth = app(FifoCostService::class)->endOfDayCostsByMonth((int) $branchId, $startDate, $endDate);
         
         // Process data and calculate totals
         $monthlySales = [];
@@ -1899,6 +1910,11 @@ class ReportController extends Controller
         ];
         
         foreach ($summaryData as $summary) {
+            $monthKey = sprintf('%d-%02d', $summary->year, $summary->month);
+            if (array_key_exists($monthKey, $fifoByMonth)) {
+                app(FifoCostService::class)->applySummaryCost($summary, $fifoByMonth[$monthKey]);
+            }
+
             $monthlySales[] = [
                 'year' => $summary->year,
                 'month' => $summary->month,

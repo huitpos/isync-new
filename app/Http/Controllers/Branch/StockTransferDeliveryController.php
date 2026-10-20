@@ -11,15 +11,19 @@ use App\DataTables\Branch\StockTransferDeliveriesDataTable;
 use App\Models\StockTransferDelivery;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\FifoCostService;
 
 class StockTransferDeliveryController extends Controller
 {
     protected $productRepository;
+    protected $fifoCost;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        FifoCostService $fifoCost
     ) {
         $this->productRepository = $productRepository;
+        $this->fifoCost = $fifoCost;
     }
 
     /**
@@ -110,7 +114,10 @@ class StockTransferDeliveryController extends Controller
             foreach ($std->items as $item) {
                 $product = $item->product;
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_deliveries', $item->qty, null, 'add', $item->uom_id);
+                $moved = $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_deliveries', $item->qty, null, 'add', $item->uom_id);
+                if ($moved) {
+                    $this->fifoCost->receiveFromMovement($branch, $product, $item->qty, $item->uom_id, 'stock_transfer_orders', $std->stock_transfer_order_id, 'stock_transfer_deliveries', $id);
+                }
             }
         }
 

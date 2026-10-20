@@ -10,15 +10,19 @@ use App\Models\ProductDisposal;
 use App\DataTables\Branch\ProductDisposalsDataTable;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\FifoCostService;
 
 class ProductDisposalController extends Controller
 {
     protected $productRepository;
+    protected $fifoCost;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        FifoCostService $fifoCost
     ) {
         $this->productRepository = $productRepository;
+        $this->fifoCost = $fifoCost;
     }
 
     /**
@@ -168,7 +172,10 @@ class ProductDisposalController extends Controller
             foreach ($disposal->items as $item) {
                 $product = $item->product;
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_disposals', $item->quantity, null, 'subtract', $item->uom_id);
+                $moved = $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_disposals', $item->quantity, null, 'subtract', $item->uom_id);
+                if ($moved) {
+                    $this->fifoCost->consume($branch, $product, $item->quantity, $item->uom_id, 'product_disposals', $id);
+                }
             }
         }
 

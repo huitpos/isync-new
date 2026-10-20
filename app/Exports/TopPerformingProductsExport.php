@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Carbon\Carbon;
 use App\Models\Branch;
+use App\Services\FifoCostService;
 
 class TopPerformingProductsExport implements FromCollection, WithHeadings, ShouldAutoSize, WithMapping, WithCustomStartCell, WithTitle, WithStyles
 {
@@ -31,6 +32,8 @@ class TopPerformingProductsExport implements FromCollection, WithHeadings, Shoul
 
     public function collection()
     {
+        $fifoTotalCost = app(FifoCostService::class)->totalCostExpression((int) $this->branchId, $this->startDate, $this->endDate);
+
         $query = "SELECT
                     products.name AS `description`,
                     products.sku,
@@ -39,7 +42,7 @@ class TopPerformingProductsExport implements FromCollection, WithHeadings, Shoul
                     subcategories.name AS `sub_category`,
                     SUM(transactional_db.orders.qty) AS `quantity_sold`,
                     0 AS `ar_unpaid_quantity`,
-                    SUM(transactional_db.orders.qty * products.cost) AS `total_unit_cost`,
+                    $fifoTotalCost AS `total_unit_cost`,
                     SUM(transactional_db.discount_details.discount_amount) AS `discount_sales`,
                     SUM(transactional_db.orders.total) AS `regular_sales`,
                     (SUM(transactional_db.orders.total) / (SELECT SUM(total) FROM transactional_db.orders WHERE branch_id = {$this->branchId}) * 100) AS `sales_percentage`

@@ -16,6 +16,7 @@ use App\Models\Product;
 use App\Models\PosMachine;
 use App\Models\AuditTrail;
 
+use App\Services\FifoCostService;
 use Carbon\Carbon;
 
 use App\Exports\SalesTransactionReportExport;
@@ -470,11 +471,13 @@ class ReportController extends Controller
             return Excel::download(new ItemSalesReportExport($branchId, $startDate, $endDate), "$branch->name - Item Sales Report - $startDate - $endDate.xlsx");
         }
 
+        $fifoUnitCost = app(FifoCostService::class)->unitCostExpression((int) $branchId, $startDate, $endDate);
+
         $query = "SELECT
                     transactional_db.orders.product_id,
                     products.name AS `product_name`,
                     products.sku,
-                    products.cost,
+                    $fifoUnitCost AS cost,
                     products.srp,
                     departments.name AS `department`,
                     SUM(transactional_db.orders.gross) AS gross,
@@ -572,7 +575,7 @@ class ReportController extends Controller
                     AND transactions.treg BETWEEN '$startDate' AND '$endDate'
                 ";
 
-            $transactions = DB::select($transactionQuery);
+            $transactions = app(FifoCostService::class)->allocateSaleLines((int) $branchId, (int) $productId, $startDate, $endDate, DB::select($transactionQuery));
 
             $physicalCountQuery = "
                     SELECT

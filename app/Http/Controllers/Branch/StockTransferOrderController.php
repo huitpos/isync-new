@@ -12,15 +12,19 @@ use App\Models\StockTransferOrder;
 use App\Models\StockTransferDelivery;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\FifoCostService;
 
 class StockTransferOrderController extends Controller
 {
     protected $productRepository;
+    protected $fifoCost;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        FifoCostService $fifoCost
     ) {
         $this->productRepository = $productRepository;
+        $this->fifoCost = $fifoCost;
     }
 
     /**
@@ -111,7 +115,10 @@ class StockTransferOrderController extends Controller
             foreach ($sto->items as $item) {
                 $product = $item->product;
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_orders', $item->quantity, null, 'subtract', $item->uom_id);
+                $moved = $this->productRepository->updateBranchQuantity($product, $branch, $id, 'stock_transfer_orders', $item->quantity, null, 'subtract', $item->uom_id);
+                if ($moved) {
+                    $this->fifoCost->consume($branch, $product, $item->quantity, $item->uom_id, 'stock_transfer_orders', $id);
+                }
             }
 
             $sto = StockTransferOrder::with([

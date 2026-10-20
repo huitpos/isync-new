@@ -10,15 +10,19 @@ use App\Models\ProductPhysicalCount;
 use App\DataTables\Branch\ProductPhysicalCountsDataTable;
 use App\Models\PurchaseOrder;
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\FifoCostService;
 
 class ProductPhysicalCountController extends Controller
 {
     protected $productRepository;
+    protected $fifoCost;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        FifoCostService $fifoCost
     ) {
         $this->productRepository = $productRepository;
+        $this->fifoCost = $fifoCost;
     }
 
     /**
@@ -163,7 +167,10 @@ class ProductPhysicalCountController extends Controller
             foreach ($count->items as $item) {
                 $product = $item->product;
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_physical_counts', $item->quantity, null, 'replace', $item->uom_id);
+                $moved = $this->productRepository->updateBranchQuantity($product, $branch, $id, 'product_physical_counts', $item->quantity, null, 'replace', $item->uom_id);
+                if ($moved) {
+                    $this->fifoCost->applyPhysicalCount($branch, $product, $item->quantity, $item->uom_id, $id);
+                }
             }
         }
 

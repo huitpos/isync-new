@@ -48,6 +48,7 @@ use App\Models\TakeOrderOrder;
 use App\Models\BranchProduct;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\FifoCostService;
 
 use Carbon\Carbon;
 
@@ -55,11 +56,14 @@ use Carbon\Carbon;
 class MiscController extends BaseController
 {
     protected $productRepository;
+    protected $fifoCost;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        FifoCostService $fifoCost
     ) {
         $this->productRepository = $productRepository;
+        $this->fifoCost = $fifoCost;
     }
 
     public function cashDenominations()
@@ -1535,19 +1539,32 @@ class MiscController extends BaseController
                     'is_complete' => $endOfDay['is_complete'] ?? null,
                 ];
 
+                $businessDate = !empty($endOfDay['treg'])
+                    ? Carbon::parse($endOfDay['treg'])->toDateString()
+                    : Carbon::now()->toDateString();
+
                 if (isset($endOfDay['products'])) {
                     foreach ($endOfDay['products'] as $reqProduct) {
                         $product = Product::find($reqProduct['productId']);
 
                         if ($product) {
-                            $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
+                            $sold = $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
+                            if ($sold) {
+                                $this->fifoCost->consume($branch, $product, $reqProduct['qty'], $product->uom_id, 'end_of_days', $reqProduct['endOfDayId'], $businessDate);
+                            }
 
                             foreach ($product->bundledItems as $bundledItem) {
-                                $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
+                                $sold = $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
+                                if ($sold) {
+                                    $this->fifoCost->consume($branch, $bundledItem, $reqProduct['qty'] * $bundledItem->bundled_item->quantity, $bundledItem->uom_id, 'end_of_days', $reqProduct['endOfDayId'], $businessDate);
+                                }
                             }
 
                             foreach ($product->rawItems as $rawItem) {
-                                $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
+                                $sold = $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
+                                if ($sold) {
+                                    $this->fifoCost->consume($branch, $rawItem, $reqProduct['qty'] * $rawItem->bundled_item->quantity, $rawItem->uom_id, 'end_of_days', $reqProduct['endOfDayId'], $businessDate);
+                                }
                             }
                         }
                     }

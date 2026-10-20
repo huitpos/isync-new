@@ -23,6 +23,7 @@ use App\Models\DiscountType;
 use App\Models\Payment;
 use App\Models\Discount;
 use App\Models\Transaction;
+use App\Services\FifoCostService;
 
 class ItemSalesReportExport implements FromCollection, WithHeadings, WithMapping, WithCustomStartCell, WithEvents, ShouldAutoSize
 {
@@ -66,11 +67,13 @@ class ItemSalesReportExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
+        $fifoUnitCost = app(FifoCostService::class)->unitCostExpression((int) $this->branchId, $this->startDate, $this->endDate);
+
         $query = "SELECT
                     transactional_db.orders.product_id,
                     products.name AS `product_name`,
                     products.sku,
-                    products.cost,
+                    $fifoUnitCost AS cost,
                     products.srp,
                     departments.name AS `department`,
                     SUM(transactional_db.orders.gross) AS gross,

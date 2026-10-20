@@ -15,6 +15,7 @@ use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use App\Services\FifoCostService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
@@ -137,6 +138,7 @@ class HourlySalesSummaryExport implements FromCollection, WithEvents, WithCustom
         ";
         
         $summaryData = collect(DB::select($daySummaryQuery));
+        $fifoByDate = app(FifoCostService::class)->endOfDayCostsByDate((int) $this->branchId, $this->startDate, $this->endDate);
         
         // Organize data by date and hour
         foreach ($salesData as $sale) {
@@ -145,6 +147,10 @@ class HourlySalesSummaryExport implements FromCollection, WithEvents, WithCustom
         }
         
         foreach ($summaryData as $summary) {
+            if (array_key_exists($summary->sale_date, $fifoByDate)) {
+                app(FifoCostService::class)->applySummaryCost($summary, $fifoByDate[$summary->sale_date]);
+            }
+
             $this->daySummary[$summary->sale_date] = [
                 'transactions' => $summary->transactions,
                 'gross_sales' => $summary->gross_sales,

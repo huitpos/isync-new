@@ -12,6 +12,7 @@ use App\Models\Branch;
 use App\DataTables\Branch\PurchaseDeliveriesDataTable;
 
 use App\Repositories\Interfaces\ProductRepositoryInterface;
+use App\Services\FifoCostService;
 use App\Services\ThreeWayMatchService;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -19,11 +20,14 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class PurchaseDeliveryController extends Controller
 {
     protected $productRepository;
+    protected $fifoCost;
 
     public function __construct(
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        FifoCostService $fifoCost
     ) {
         $this->productRepository = $productRepository;
+        $this->fifoCost = $fifoCost;
     }
 
     /**
@@ -175,7 +179,10 @@ class PurchaseDeliveryController extends Controller
                 $product->srp = $srp;
                 $product->save();
 
-                $this->productRepository->updateBranchQuantity($product, $branch, $id, 'purchase_deliveries', $item->qty, $srp, 'add', $item->uom_id);
+                $moved = $this->productRepository->updateBranchQuantity($product, $branch, $id, 'purchase_deliveries', $item->qty, $srp, 'add', $item->uom_id);
+                if ($moved) {
+                    $this->fifoCost->receiveDocument($branch, $product, $item->qty, $item->uom_id, (float) $item->unit_price, 'purchase_deliveries', $id);
+                }
             }
         }
 

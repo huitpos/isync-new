@@ -19,6 +19,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
 use App\Models\Branch;
+use App\Services\FifoCostService;
 
 class MonthlySalesSummaryExport implements FromCollection, WithEvents, WithCustomStartCell, ShouldAutoSize
 {
@@ -95,9 +96,15 @@ class MonthlySalesSummaryExport implements FromCollection, WithEvents, WithCusto
         ";
         
         $summaryData = collect(DB::select($monthlySalesQuery));
+        $fifoByMonth = app(FifoCostService::class)->endOfDayCostsByMonth((int) $this->branchId, $this->startDate, $this->endDate);
         
         // Process data and calculate totals
         foreach ($summaryData as $summary) {
+            $monthKey = sprintf('%d-%02d', $summary->year, $summary->month);
+            if (array_key_exists($monthKey, $fifoByMonth)) {
+                app(FifoCostService::class)->applySummaryCost($summary, $fifoByMonth[$monthKey]);
+            }
+
             $this->monthlySales[] = [
                 'year' => $summary->year,
                 'month' => $summary->month,
