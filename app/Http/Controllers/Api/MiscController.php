@@ -1609,6 +1609,13 @@ class MiscController extends BaseController
             return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
+        $log = new ApiRequestLog();
+        $log->type = 'saveEndOfDays';
+        $log->method = $request->method();
+        $log->request = json_encode($data);
+        $log->response = json_encode($failedRequests);
+        $log->save();
+
         return $this->sendResponse([
             'failed_requests' => array_values($failedRequests)
         ], 'End of Days processed successfully.');
