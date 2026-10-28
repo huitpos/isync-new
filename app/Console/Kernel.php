@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
 
     protected $commands = [
         \App\Console\Commands\FixEndOfDayReadingNumbers::class,
+        \App\Console\Commands\RevertZreadingCount::class,
         \App\Console\Commands\CopyCompanyData::class,
         \App\Console\Commands\UpdateProductAbbreviation::class,
     ];
