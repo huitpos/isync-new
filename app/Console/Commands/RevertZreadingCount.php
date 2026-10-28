@@ -9,7 +9,7 @@ use App\Models\CutOff;
 use App\Models\Order;
 use App\Models\ProductCountLog;
 use App\Models\BranchProduct;
-
+use Illuminate\Support\Facades\DB;
 class RevertZreadingCount extends Command
 {
     /**
@@ -17,7 +17,7 @@ class RevertZreadingCount extends Command
      *
      * @var string
      */
-    protected $signature = 'command:revert-zreading-count {--branch-id= : Revert zreading count for a specific branch only}';
+    protected $signature = 'command:revert-zreading-count';
 
     /**
      * The console command description.
@@ -31,29 +31,48 @@ class RevertZreadingCount extends Command
      */
     public function handle()
     {
+        $branchId = 10;
         $endOfDayControl = EndOfDay::where('id', 2800)->orderBy('end_of_day_id', 'desc')->first();
 
-        $endOfDays = EndOfDay::where('branch_id', $this->option('branch-id'))
+        $endOfDays = EndOfDay::where('branch_id', $branchId)
             ->where('id', '>', $endOfDayControl->id)
             ->get();
 
+        $processedProducts = [];
         foreach ($endOfDays as $endOfDay) {
-            if ($endOfDay->treg > $endOfDayControl->treg) {
+            $this->info("Reverting zreading count for end of day: " . $endOfDay->treg . " - " . $endOfDay->end_of_day_id);
+
+            if ($endOfDay->treg < $endOfDayControl->treg) {
                 $logs = ProductCountLog::where('object_id', $endOfDay->end_of_day_id)
-                    ->where('branch_id', $this->option('branch-id'))
+                    ->where('branch_id', $branchId)
                     ->where('object_type', 'end_of_days')
                     ->get();
 
                 foreach ($logs as $log) {
-                    $branchProduct = BranchProduct::where('branch_id', $this->option('branch-id'))
+                    if (in_array($log->product_id, $processedProducts)) {
+                        continue;
+                    }
+
+                    $processedProducts[] = $log->product_id;
+
+                    $latestCorrectLog = ProductCountLog::where('branch_id', $branchId)
                         ->where('product_id', $log->product_id)
+                        ->where('created_at', '<', '2026-10-28 00:00:00')
+                        ->orderBy('id', 'desc')
                         ->first();
 
-                    $branchProduct->stock = $branchProduct->stock - ($log->new_quantity - $log->old_quantity);
+                    if (!$latestCorrectLog) {
+                        $qty = 0;
+                    } else {
+                        $qty = $latestCorrectLog->new_quantity;
+                    }
 
-                    dd($branchProduct);
+                    $updateQuery = "UPDATE branch_product SET stock = ? WHERE branch_id = ? AND product_id = ?";
+                    $updateParams = [$qty, $branchId, $log->product_id];
 
-                    $branchProduct->save();
+                    DB::update($updateQuery, $updateParams);
+
+                    $this->info("Reverted zreading count for product ID: " . $log->product_id . " to " . $qty);
                 }
             }
         }
