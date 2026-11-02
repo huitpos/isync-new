@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\PosDevice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 
 use App\Repositories\Interfaces\PosMachineRepositoryInterface;
 
@@ -166,5 +168,27 @@ class MachineController extends BaseController
         $machine = $this->posMachineRepository->getWithActivationData(['product_key' => $validatedData['product_key']])->first();
 
         return $this->sendResponse($machine, 'Device activated successfully');
+    }
+
+    public function posAppVersion(Request $request)
+    {
+        $versionCode = 2;
+        $versionName = '1.3.0';
+        $apkPath = 'pos/isyncpos-' . $versionName . '.apk';
+        $apkUrl = 'https://isync-bucket.s3.ap-southeast-1.amazonaws.com/' . $apkPath;
+
+        $sha256 = '1270733D6E31A425F89924138CC6A9487022ED74BA945A68D2177218780FC51B';
+        return response()->json([
+            'success' => true,
+            'message' => 'ok',
+            'code' => '200',
+            'data' => [
+                'version_code' => $versionCode,
+                'version_name' => $versionName,
+                'apk_url' => $apkUrl,
+                'sha256' => $sha256,
+                'mandatory' => false,
+            ],
+        ]);
     }
 }
