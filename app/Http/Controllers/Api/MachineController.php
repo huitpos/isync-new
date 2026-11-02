@@ -177,7 +177,7 @@ class MachineController extends BaseController
         $apkPath = 'pos/isyncpos-' . $versionName . '.apk';
         $apkUrl = 'https://isync-bucket.s3.ap-southeast-1.amazonaws.com/' . $apkPath;
 
-        $sha256 = '1270733D6E31A425F89924138CC6A9487022ED74BA945A68D2177218780FC51B';
+        $sha256 = '0B4C78DAF5C69A46CF91BAF0A257513DDC92FD26FF7F773854DAFB25A087B7D9';
         return response()->json([
             'success' => true,
             'message' => 'ok',
