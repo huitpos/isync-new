@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\BarangayController;
 use App\Http\Controllers\Api\MachineController;
 use App\Http\Controllers\Api\MiscController;
+use App\Http\Controllers\Api\CrashReportController;
 
 use App\Http\Middleware\MachineValidationMiddleware;
 
@@ -150,6 +151,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/audit-trails', [MiscController::class, 'saveAuditTrails']);
         Route::get('/audit-trails', [MiscController::class, 'getAuditTrails']);
+
+        Route::post('/crash-reports', [CrashReportController::class, 'store']);
 
         Route::get('/cut-off-products', [MiscController::class, 'getCutOffProducts']);
         Route::post('/cut-off-products', [MiscController::class, 'saveCutOffProducts']);
