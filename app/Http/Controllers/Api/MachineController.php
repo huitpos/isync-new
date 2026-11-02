@@ -172,12 +172,12 @@ class MachineController extends BaseController
 
     public function posAppVersion(Request $request)
     {
-        $versionCode = 2;
+        $versionCode = 3;
         $versionName = '1.3.0';
         $apkPath = 'pos/isyncpos-' . $versionName . '.apk';
         $apkUrl = 'https://isync-bucket.s3.ap-southeast-1.amazonaws.com/' . $apkPath;
 
-        $sha256 = '0B4C78DAF5C69A46CF91BAF0A257513DDC92FD26FF7F773854DAFB25A087B7D9';
+        $sha256 = '281921CB94978FF5844610E3769498ED7B5D0B3557CE8AD78B4A4B3D00F2F388';
         return response()->json([
             'success' => true,
             'message' => 'ok',
