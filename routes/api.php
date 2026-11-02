@@ -35,6 +35,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+Route::post('/pos-app-version', [MachineController::class, 'posAppVersion']);
+
 Route::middleware('auth:sanctum')->group(function () {
     // Route::apiResource('users', UsersController::class);
 
