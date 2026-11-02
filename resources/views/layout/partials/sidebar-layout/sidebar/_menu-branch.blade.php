@@ -185,6 +185,12 @@
 					'routeParams' => $routeParams,
 					'activeRoutes' => ['branch.reports.audit-trail'],
 				],
+				[
+					'title' => 'Account Receivables',
+					'route' => 'branch.reports.account-receivables',
+					'routeParams' => $routeParams,
+					'activeRoutes' => ['branch.reports.account-receivables'],
+				],
 			],
 		],
 		[

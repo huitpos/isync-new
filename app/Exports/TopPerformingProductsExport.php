@@ -19,55 +19,73 @@ class TopPerformingProductsExport implements FromCollection, WithHeadings, Shoul
     protected $branchId;
     protected $startDate;
     protected $endDate;
+    protected $limit;
     protected $branch;
 
-    public function __construct($branchId, $startDate, $endDate)
+    public function __construct($branchId, $startDate, $endDate, $limit = '100')
     {
         $this->branchId = $branchId;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
+        $this->limit = $limit === 'all' ? 'all' : '100';
         $this->branch = Branch::find($branchId);
     }
 
     public function collection()
     {
+        $transactionalDb = config('database.connections.transactional_db.database');
+        $mainDb = config('database.connections.mysql.database');
+        $branchId = (int) $this->branchId;
+
+        $limitSql = $this->limit === 'all' ? '' : 'LIMIT 100';
+
         $query = "SELECT
-                    products.name AS `description`,
+                    COALESCE(products.name, orders_agg.product_name) AS `description`,
                     products.sku,
                     departments.name AS `department`,
                     categories.name AS `category`,
                     subcategories.name AS `sub_category`,
-                    SUM(transactional_db.orders.qty) AS `quantity_sold`,
+                    orders_agg.quantity_sold,
                     0 AS `ar_unpaid_quantity`,
-                    SUM(transactional_db.orders.qty * products.cost) AS `total_unit_cost`,
-                    SUM(transactional_db.discount_details.discount_amount) AS `discount_sales`,
-                    SUM(transactional_db.orders.total) AS `regular_sales`,
-                    (SUM(transactional_db.orders.total) / (SELECT SUM(total) FROM transactional_db.orders WHERE branch_id = {$this->branchId}) * 100) AS `sales_percentage`
-                FROM transactional_db.transactions
-                INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
-                    AND transactions.branch_id = orders.branch_id
-                    AND transactions.pos_machine_id = orders.pos_machine_id
-                    AND orders.is_void = FALSE
-                    AND orders.is_completed = TRUE
-                    AND orders.is_back_out = FALSE
-                    AND orders.is_return = FALSE
-                LEFT JOIN transactional_db.discount_details ON orders.order_id = discount_details.order_id
-                    AND orders.branch_id = discount_details.branch_id
-                    AND orders.pos_machine_id = discount_details.pos_machine_id
-                INNER JOIN isync.products ON orders.product_id = products.id
-                INNER JOIN isync.departments ON products.department_id = departments.id
-                LEFT JOIN isync.categories ON products.category_id = categories.id
-                LEFT JOIN isync.subcategories ON products.subcategory_id = subcategories.id
-                WHERE transactions.is_complete = TRUE
-                    AND transactions.branch_id = {$this->branchId}
-                    AND transactions.is_void = FALSE
-                    AND transactions.is_back_out = FALSE
-                    AND transactions.treg BETWEEN '{$this->startDate}' AND '{$this->endDate}'
-                GROUP BY orders.product_id
-                ORDER BY `regular_sales` DESC
-                LIMIT 100";
+                    orders_agg.total_unit_cost,
+                    orders_agg.discount_sales,
+                    orders_agg.regular_sales,
+                    CASE
+                        WHEN SUM(orders_agg.regular_sales) OVER () = 0 THEN 0
+                        ELSE orders_agg.regular_sales / SUM(orders_agg.regular_sales) OVER () * 100
+                    END AS `sales_percentage`
+                FROM (
+                    SELECT
+                        orders.product_id,
+                        MAX(orders.name) AS product_name,
+                        SUM(orders.qty) AS quantity_sold,
+                        SUM(orders.total_cost) AS total_unit_cost,
+                        SUM(orders.discount_amount) AS discount_sales,
+                        SUM(orders.total) AS regular_sales
+                    FROM {$transactionalDb}.transactions
+                    INNER JOIN {$transactionalDb}.orders
+                        ON orders.branch_id = transactions.branch_id
+                        AND orders.transaction_id = transactions.transaction_id
+                        AND orders.pos_machine_id = transactions.pos_machine_id
+                        AND orders.is_void = 0
+                        AND orders.is_completed = 1
+                        AND orders.is_back_out = 0
+                        AND orders.is_return = 0
+                    WHERE transactions.branch_id = ?
+                        AND transactions.is_complete = 1
+                        AND transactions.is_void = 0
+                        AND transactions.is_back_out = 0
+                        AND transactions.treg BETWEEN ? AND ?
+                    GROUP BY orders.product_id
+                ) AS orders_agg
+                LEFT JOIN {$mainDb}.products ON products.id = orders_agg.product_id
+                LEFT JOIN {$mainDb}.departments ON departments.id = products.department_id
+                LEFT JOIN {$mainDb}.categories ON categories.id = products.category_id
+                LEFT JOIN {$mainDb}.subcategories ON subcategories.id = products.subcategory_id
+                ORDER BY orders_agg.regular_sales DESC
+                {$limitSql}";
 
-        return collect(DB::select($query));
+        return collect(DB::select($query, [$branchId, $this->startDate, $this->endDate]));
     }
 
     public function headings(): array

@@ -278,7 +278,7 @@
 					'permission' => 'Company Reports/Sales Reports',
 					'title' => 'Sales Reports',
 					'isSubmenu' => true,
-					'activeRoutes' => ['company.reports.sales-invoices-report', 'company.reports.sales-transaction-report', 'company.reports.void-transactions-report', 'company.reports.vat-sales-report', 'company.reports.x-reading-report', 'company.reports.z-reading-report', 'company.reports.discounts-report', 'company.reports.item-sales-report', 'company.reports.bir-sales-summary-report', 'company.reports.bir-senior-citizen-sales-report', 'company.reports.bir-pwd-sales-report', 'company.reports.bir-naac-sales-report', 'company.reports.bir-solo-parent-sales-report'],
+					'activeRoutes' => ['company.reports.sales-invoices-report', 'company.reports.payment-summary-report', 'company.reports.payment-summary-details', 'company.reports.sales-transaction-report', 'company.reports.void-transactions-report', 'company.reports.vat-sales-report', 'company.reports.x-reading-report', 'company.reports.z-reading-report', 'company.reports.discounts-report', 'company.reports.item-sales-report', 'company.reports.bir-sales-summary-report', 'company.reports.bir-senior-citizen-sales-report', 'company.reports.bir-pwd-sales-report', 'company.reports.bir-naac-sales-report', 'company.reports.bir-solo-parent-sales-report', 'company.reports.account-receivables'],
 					'children' => [
 						[
 							'permission' => 'Company Reports/Sales Reports/Sales Invoices Report',
@@ -286,6 +286,12 @@
 							'route' => 'company.reports.sales-invoices-report',
 							'routeParams' => ['companySlug' => $companySlug],
 							'activeRoutes' => ['company.reports.sales-invoices-report'],
+						],
+						[
+							'title' => 'Payment Summary Report',
+							'route' => 'company.reports.payment-summary-report',
+							'routeParams' => ['companySlug' => $companySlug],
+							'activeRoutes' => ['company.reports.payment-summary-report', 'company.reports.payment-summary-details'],
 						],
 						[
 							'permission' => 'Company Reports/Sales Reports/Sales Transaction Report',
@@ -363,6 +369,12 @@
 							'routeParams' => ['companySlug' => $companySlug],
 							'activeRoutes' => ['company.reports.bir-solo-parent-sales-report'],
 						],
+						[
+							'title' => 'Account Receivables',
+							'route' => 'company.reports.account-receivables',
+							'routeParams' => ['companySlug' => $companySlug],
+							'activeRoutes' => ['company.reports.account-receivables'],
+						]
 					],
 				],
 				[

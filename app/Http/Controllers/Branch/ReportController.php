@@ -33,8 +33,12 @@ use Maatwebsite\Excel\Facades\Excel;
 
 use Illuminate\Support\Facades\DB;
 
+use App\Http\Controllers\Concerns\AccountReceivableQueries;
+
 class ReportController extends Controller
 {
+    use AccountReceivableQueries;
+
     /**
      * Determine the selected range based on start and end dates
      *
@@ -799,28 +803,18 @@ class ReportController extends Controller
     {
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
+        $branchIds = [$branch->id];
 
-        $query = "
-                SELECT
-                    transactions.charge_account_id,
-                    isync.charge_accounts.`name`,
-                    isync.charge_accounts.address,
-                    SUM(transactions.gross_sales) AS `total_sales`,
-                    SUM(CASE WHEN transactions.is_account_receivable_redeem = TRUE THEN transactions.gross_sales ELSE 0 END) AS `redeemed_sales`,
-                    SUM(CASE WHEN transactions.is_account_receivable_redeem = FALSE THEN transactions.gross_sales ELSE 0 END) AS `not_redeemed_sales`
-                FROM transactional_db.transactions
-                INNER JOIN isync.charge_accounts ON transactions.charge_account_id = charge_accounts.id
-                WHERE transactions.is_account_receivable = TRUE
-                AND transactions.is_void = FALSE
-                AND transactions.is_back_out = FALSE
-                AND transactions.is_complete = TRUE
-                GROUP BY transactions.charge_account_id;
-            ";
+        $accountReceivables = $this->accountReceivableSummaryQuery($company->id, $branchIds)
+            ->orderBy('charge_accounts.name')
+            ->paginate(25)
+            ->withQueryString();
 
-        $accountReceivables = DB::select($query);
+        $totals = $this->accountReceivableTotals($company->id, $branchIds);
 
         return view('branch.reports.ar', compact(
             'accountReceivables',
+            'totals',
             'company',
             'branch'
         ));
@@ -830,52 +824,17 @@ class ReportController extends Controller
     {
         $company = $request->attributes->get('company');
         $branch = $request->attributes->get('branch');
+        $customerId = (int) $customerId;
+        $branchIds = [$branch->id];
 
-        $query = "
-                SELECT
-                    transactions.charge_account_id,
-                    isync.charge_accounts.`name`,
-                    isync.charge_accounts.address,
-                    SUM(transactions.gross_sales) AS `total_sales`,
-                    SUM(CASE WHEN transactions.is_account_receivable_redeem = TRUE THEN transactions.gross_sales ELSE 0 END) AS `redeemed_sales`,
-                    SUM(CASE WHEN transactions.is_account_receivable_redeem = FALSE THEN transactions.gross_sales ELSE 0 END) AS `not_redeemed_sales`
-                FROM transactional_db.transactions
-                INNER JOIN isync.charge_accounts ON transactions.charge_account_id = charge_accounts.id
-                WHERE transactions.is_account_receivable = TRUE
-                AND transactions.is_void = FALSE
-                AND transactions.is_back_out = FALSE
-                AND transactions.is_complete = TRUE
-                AND transactions.charge_account_id = $customerId;
-            ";
+        $this->assertChargeAccountBelongsToCompany($company->id, $customerId);
 
-        $accountReceivables = DB::select($query);
+        $summary = $this->accountReceivableSummaryQuery($company->id, $branchIds, $customerId)->first();
+        $accountReceivables = collect($summary ? [$summary] : []);
 
-        $transactionsQuery = "
-                SELECT
-	                transactions.id,
-                    transactions.receipt_number,
-                    transactions.completed_at,
-                    orders.`description` AS `item_description`,
-                    orders.qty,
-                    unit_of_measurements.name AS `uom`,
-                    orders.gross,
-                    orders.discount_amount,
-                    transactions.cashier_name
-                FROM
-                    transactional_db.transactions
-                    INNER JOIN transactional_db.orders ON transactions.transaction_id = orders.transaction_id
-                    AND orders.branch_id = transactions.branch_id
-                    AND transactions.pos_machine_id = orders.pos_machine_id
-                    LEFT JOIN isync.unit_of_measurements ON orders.unit_id = unit_of_measurements.id
-                WHERE
-                    transactions.is_account_receivable = TRUE
-                    AND transactions.is_void = FALSE
-                    AND transactions.is_back_out = FALSE
-                    AND transactions.is_complete = TRUE
-                    AND transactions.charge_account_id = $customerId
-            ";
-
-        $transactions = DB::select($transactionsQuery);
+        $transactions = $this->accountReceivableTransactionsQuery($branchIds, $customerId)
+            ->paginate(25)
+            ->withQueryString();
 
         return view('branch.reports.arDetails', compact(
             'accountReceivables',

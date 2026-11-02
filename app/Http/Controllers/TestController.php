@@ -49,7 +49,12 @@ class TestController extends Controller
                 'rawItems'
             )
             ->where('uom_id', '>', 0)
-            ->whereIn('products.id', [8923, 8924])
+            ->whereIn('products.id', [85])
+            ->where(function ($q) {
+                    $q->whereNull('branch_product.id')
+                        ->orWhere('branch_product.show_to_branch', 1)
+                        ->orWhereNull('branch_product.show_to_branch');
+                })
             ->when($request->from_date, function ($q) use ($request) {
                 $q->where(function ($query) use ($request) {
                     $query->where('updated_at', '>=', $request->from_date)

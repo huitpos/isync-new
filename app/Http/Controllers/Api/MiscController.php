@@ -172,6 +172,11 @@ class MiscController extends BaseController
                     DB::raw('IFNULL(NULLIF(branch_product.cost, 0), products.cost) as cost'),
                     DB::raw('IFNULL(NULLIF(branch_product.markup, 0), products.markup) as markup')
                 ])
+                ->where(function ($q) {
+                    $q->whereNull('branch_product.id')
+                        ->orWhere('branch_product.show_to_branch', 1)
+                        ->orWhereNull('branch_product.show_to_branch');
+                })
                 ->with(
                     'itemType',
                     'uom',
@@ -218,6 +223,11 @@ class MiscController extends BaseController
                 DB::raw('IFNULL(NULLIF(branch_product.cost, 0), products.cost) as cost'),
                 DB::raw('IFNULL(NULLIF(branch_product.markup, 0), products.markup) as markup')
             ])
+            ->where(function ($q) {
+                $q->whereNull('branch_product.id')
+                    ->orWhere('branch_product.show_to_branch', 1)
+                    ->orWhereNull('branch_product.show_to_branch');
+            })
             ->with(
                 'itemType',
                 'uom',
@@ -1598,6 +1608,13 @@ class MiscController extends BaseController
             DB::rollBack();
             return $this->sendError('Database Error', $e->getMessage(), 500);
         }
+
+        $log = new ApiRequestLog();
+        $log->type = 'saveEndOfDays';
+        $log->method = $request->method();
+        $log->request = json_encode($data);
+        $log->response = json_encode($failedRequests);
+        $log->save();
 
         return $this->sendResponse([
             'failed_requests' => array_values($failedRequests)

@@ -6,12 +6,8 @@
 
     <div class="card">
         <div class="card-body py-4">
-            <form class="mt-3" method="POST" novalidate>
-                @csrf
-            </form>
-
             <div class="table-responsive">
-                <table id="kt_datatable_zero_configuration" class="table table-striped table-row-bordered gy-5">
+                <table class="table table-striped table-row-bordered gy-5">
                     <thead>
                         <tr class="fw-semibold fs-6 text-muted">
                             <th>Customer Name</th>
@@ -23,46 +19,41 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
-                            $totalSales = 0;
-                            $totalRedeemedSales = 0;
-                            $totalNotRedeemedSales = 0;
-                        @endphp
-                        @foreach($accountReceivables as $ar)
-                            @php
-                                $totalSales += $ar->total_sales;
-                                $totalRedeemedSales += $ar->redeemed_sales;
-                                $totalNotRedeemedSales += $ar->not_redeemed_sales;
-                            @endphp
+                        @forelse($accountReceivables as $ar)
                             <tr>
                                 <td>
                                     <a target="_blank" href="{{ route('branch.reports.account-receivable-details', [
                                         'companySlug' => $company->slug,
                                         'customerId' => $ar->charge_account_id,
                                         'branchSlug' => $branch->slug,
-                                    ]) }}"
-                                >
-                                    {{ $ar->name }}
-                                </a>
+                                    ]) }}">
+                                        {{ $ar->name }}
+                                    </a>
                                 </td>
                                 <td>{{ $ar->address }}</td>
                                 <td>{{ number_format($ar->total_sales, 2) }}</td>
                                 <td>{{ number_format($ar->redeemed_sales, 2) }}</td>
-                                <td>{{ number_format($ar->not_redeemed_sales) }}</td>
-                                <td>{{ number_format($ar->not_redeemed_sales / $ar->total_sales * 100) }}</td>
+                                <td>{{ number_format($ar->not_redeemed_sales, 2) }}</td>
+                                <td>{{ number_format($ar->total_sales > 0 ? ($ar->not_redeemed_sales / $ar->total_sales * 100) : 0, 2) }}</td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">No account receivables found.</td>
+                            </tr>
+                        @endforelse
                         <tr>
                             <td></td>
-                            <td><strong>Total</strong></td>
-                            <td>{{ number_format($totalSales, 2) }}</td>
-                            <td>{{ number_format($totalRedeemedSales, 2) }}</td>
-                            <td>{{ number_format($totalNotRedeemedSales, 2) }}</td>
-                            <td>{{ number_format($totalNotRedeemedSales / $totalSales * 100, 2) }}</td>
-                        
+                            <td><strong>Grand Total</strong></td>
+                            <td>{{ number_format($totals->total_sales, 2) }}</td>
+                            <td>{{ number_format($totals->redeemed_sales, 2) }}</td>
+                            <td>{{ number_format($totals->not_redeemed_sales, 2) }}</td>
+                            <td>{{ number_format($totals->total_sales > 0 ? ($totals->not_redeemed_sales / $totals->total_sales * 100) : 0, 2) }}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
+
+            @include('reports.partials.pagination', ['paginator' => $accountReceivables])
         </div>
     </div>
 </x-default-layout>

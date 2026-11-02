@@ -20,7 +20,7 @@
                         <input value="{{ ucfirst($count->status) }}" type="text" readonly class="form-control"/>
                     </div>
 
-                    @if ($count->status != 'pending')
+                    @if (!in_array($count->status, ['pending', 'draft']))
                     <div class="col-md-6">
                         <label class="form-label">Approved/Rejected By</label>
                         <input value="{{ ucfirst($count->actionBy?->name) }}" type="text" readonly class="form-control"/>
@@ -78,6 +78,12 @@
                         </div>
                     </div>
                     @endforeach
+
+                    @if($count->status == 'draft' && (int) $count->created_by === (int) Auth::id())
+                    <div class="mt-8">
+                        <a href="{{ route('branch.product-physical-counts.edit', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug, 'product_physical_count' => $count->id]) }}" class="btn btn-primary">Edit Draft</a>
+                    </div>
+                    @endif
 
                     @if($count->status == 'pending')
                     <div class="mt-8">

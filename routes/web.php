@@ -199,6 +199,8 @@ Route::middleware('auth')->group(function () {
 
             Route::match(['get', 'post'], 'sales-transaction-report', [CompanyReportController::class, 'salesTransactionReport'])->name('company.reports.sales-transaction-report');
             Route::match(['get', 'post'], 'sales-invoices-report', [CompanyReportController::class, 'salesInvoicesReport'])->name('company.reports.sales-invoices-report');
+            Route::match(['get', 'post'], 'payment-summary-report', [CompanyReportController::class, 'paymentSummaryReport'])->name('company.reports.payment-summary-report');
+            Route::get('payment-summary-report/details', [CompanyReportController::class, 'paymentSummaryDetails'])->name('company.reports.payment-summary-details');
             Route::match(['get', 'post'], 'void-transactions-report', [CompanyReportController::class, 'voidTransactionsReport'])->name('company.reports.void-transactions-report');
             Route::match(['get', 'post'], 'vat-sales-report', [CompanyReportController::class, 'vatSalesReport'])->name('company.reports.vat-sales-report');
             Route::match(['get', 'post'], 'x-reading-report', [CompanyReportController::class, 'xReadingReport'])->name('company.reports.x-reading-report');
@@ -222,6 +224,9 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'monthly-sales-summary-report', [CompanyReportController::class, 'monthlySalesSummaryReport'])->name('company.reports.monthly-sales-summary-report');
             Route::match(['get', 'post'], 'hourly-transaction-report', [CompanyReportController::class, 'hourlyTransactionReport'])->name('company.reports.hourly-transaction-report');
             Route::match(['get', 'post'], 'safekeeping-report', [CompanyReportController::class, 'safekeepingReport'])->name('company.reports.safekeeping-report');
+
+            Route::get('account-receivables', [CompanyReportController::class, 'accountReceivables'])->name('company.reports.account-receivables');
+            Route::get('account-receivables/{customerId}', [CompanyReportController::class, 'accountReceivableDetails'])->name('company.reports.account-receivable-details');
         });
 
         //branch
@@ -273,7 +278,6 @@ Route::middleware('auth')->group(function () {
 
                 Route::get('account-receivables', [BranchReportController::class, 'accountReceivables'])->name('branch.reports.account-receivables');
                 Route::get('account-receivables/{customerId}', [BranchReportController::class, 'accountReceivableDetails'])->name('branch.reports.account-receivable-details');
-                
             });
         });
     });
