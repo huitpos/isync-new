@@ -9,6 +9,12 @@ Breadcrumbs::for('admin.dashboard', function (BreadcrumbTrail $trail) {
     $trail->push('Admin', route('admin.dashboard'));
 });
 
+//app details
+Breadcrumbs::for('admin.app-details.edit', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.dashboard');
+    $trail->push('POS App Details', route('admin.app-details.edit'));
+});
+
 //clients
 Breadcrumbs::for('admin.clients.index', function (BreadcrumbTrail $trail) {
     $trail->parent('admin.dashboard');

@@ -34,3 +34,12 @@
 		<span class="menu-title">Branches</span>
 	</a>
 </div>
+
+<div class="menu-item">
+	<a class="menu-link {{ request()->routeIs('admin.app-details.*') ? 'active' : '' }}" href="{{ route('admin.app-details.edit') }}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-mobile-screen-button fs-2"></i>
+		</span>
+		<span class="menu-title">POS App Details</span>
+	</a>
+</div>

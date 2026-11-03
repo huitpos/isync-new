@@ -1545,24 +1545,6 @@ class MiscController extends BaseController
                     'is_complete' => $endOfDay['is_complete'] ?? null,
                 ];
 
-                if (isset($endOfDay['products'])) {
-                    foreach ($endOfDay['products'] as $reqProduct) {
-                        $product = Product::find($reqProduct['productId']);
-
-                        if ($product) {
-                            $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
-
-                            foreach ($product->bundledItems as $bundledItem) {
-                                $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
-                            }
-
-                            foreach ($product->rawItems as $rawItem) {
-                                $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
-                            }
-                        }
-                    }
-                }
-
                 $existingEndOfDay = EndOfDay::where([
                     'end_of_day_id' => $endOfDay['end_of_day_id'],
                     'pos_machine_id' => $endOfDay['pos_machine_id'],
@@ -1576,6 +1558,24 @@ class MiscController extends BaseController
                     ];
                 } else {
                     $toInsert[] = $postData;
+
+                    if (isset($endOfDay['products'])) {
+                        foreach ($endOfDay['products'] as $reqProduct) {
+                            $product = Product::find($reqProduct['productId']);
+
+                            if ($product) {
+                                $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
+
+                                foreach ($product->bundledItems as $bundledItem) {
+                                    $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
+                                }
+
+                                foreach ($product->rawItems as $rawItem) {
+                                    $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Clean up take order data for this branch
