@@ -4705,7 +4705,7 @@ class MiscController extends BaseController
             'product_id' => 'required',
             'qty' => 'required',
             'is_sent_to_server' => 'required',
-            'treg' => 'required'
+            // 'treg' => 'required'
         ];
 
         $toInsert = [];
