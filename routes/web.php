@@ -44,6 +44,7 @@ use App\Http\Controllers\Admin\MachineController as AdminMachineController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
 use App\Http\Controllers\Admin\DeviceController as AdminDeviceController;
+use App\Http\Controllers\Admin\PosSqliteImportController as AdminPosSqliteImportController;
 
 use App\Http\Controllers\Branch\PageController as BranchPageController;
 use App\Http\Controllers\Branch\UserController as BranchUserController;
@@ -137,6 +138,10 @@ Route::middleware('auth')->group(function () {
             Route::resource('clients', AdminClientController::class, ['as' => 'admin']);
             Route::resource('clusters', AdminClusterController::class, ['as' => 'admin']);
             Route::resource('branches', AdminBranchController::class, ['as' => 'admin']);
+
+            Route::get('x7k2-pos-sqlite-import', [AdminPosSqliteImportController::class, 'index'])->name('admin.pos-sqlite-import.index');
+            Route::post('x7k2-pos-sqlite-import/verify-table', [AdminPosSqliteImportController::class, 'verifyTable'])->name('admin.pos-sqlite-import.verify-table');
+            Route::post('x7k2-pos-sqlite-import/import-table', [AdminPosSqliteImportController::class, 'importTable'])->name('admin.pos-sqlite-import.import-table');
 
             Route::prefix('branches/{branchId}')->group(function () {
                 Route::resource('machines', AdminMachineController::class, ['as' => 'admin']);
