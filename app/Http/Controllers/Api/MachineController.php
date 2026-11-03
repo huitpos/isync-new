@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppDetail;
 use App\Models\PosDevice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -172,22 +173,26 @@ class MachineController extends BaseController
 
     public function posAppVersion(Request $request)
     {
-        $versionCode = 5;
-        $versionName = '1.3.0';
-        $apkPath = 'pos/isyncpos-' . $versionName . '.apk';
-        $apkUrl = 'https://isync-bucket.s3.ap-southeast-1.amazonaws.com/' . $apkPath;
+        $appDetail = AppDetail::where('app', 'pos')->first();
 
-        $sha256 = '0DC8CAFB2DF78C4902EE99A2160892AC3984A0EDAF7DA01EDD4241B8B01E3948';
+        if (!$appDetail) {
+            return response()->json([
+                'success' => false,
+                'message' => 'App details not found',
+                'code' => '404',
+            ], 404);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'ok',
             'code' => '200',
             'data' => [
-                'version_code' => $versionCode,
-                'version_name' => $versionName,
-                'apk_url' => $apkUrl,
-                'sha256' => $sha256,
-                'mandatory' => false,
+                'version_code' => $appDetail->version_code,
+                'version_name' => $appDetail->version_name,
+                'apk_url' => $appDetail->apk_url,
+                'sha256' => $appDetail->sha256,
+                'mandatory' => $appDetail->mandatory,
             ],
         ]);
     }
