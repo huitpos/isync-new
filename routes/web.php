@@ -142,6 +142,7 @@ Route::middleware('auth')->group(function () {
 
             Route::get('app-details', [AdminAppDetailController::class, 'edit'])->name('admin.app-details.edit');
             Route::put('app-details', [AdminAppDetailController::class, 'update'])->name('admin.app-details.update');
+            Route::post('app-details/apk-upload-url', [AdminAppDetailController::class, 'createUploadUrl'])->name('admin.app-details.apk-upload-url');
 
             Route::get('x7k2-pos-sqlite-import', [AdminPosSqliteImportController::class, 'index'])->name('admin.pos-sqlite-import.index');
             Route::post('x7k2-pos-sqlite-import/verify-table', [AdminPosSqliteImportController::class, 'verifyTable'])->name('admin.pos-sqlite-import.verify-table');

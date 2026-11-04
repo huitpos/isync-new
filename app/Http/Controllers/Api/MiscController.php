@@ -1482,10 +1482,7 @@ class MiscController extends BaseController
             'total_short_over' => ['required', 'numeric'],
         ];
 
-        $toInsert = [];
-        $toUpdate = [];
-
-        DB::beginTransaction();
+        DB::connection('transactional_db')->beginTransaction();
         try {
             foreach ($data as $idx => $endOfDay) {
                 $validator = validator($endOfDay, $rules);
@@ -1493,8 +1490,6 @@ class MiscController extends BaseController
                     $failedRequests[$idx] = $endOfDay;
                     continue;
                 }
-
-                $branch = Branch::findOrFail($endOfDay['branch_id']);
 
                 $postData = [
                     'end_of_day_id' => $endOfDay['end_of_day_id'] ?? null,
@@ -1545,21 +1540,25 @@ class MiscController extends BaseController
                     'is_complete' => $endOfDay['is_complete'] ?? null,
                 ];
 
-                $existingEndOfDay = EndOfDay::where([
+                $now = now();
+                $lookupKey = [
                     'end_of_day_id' => $endOfDay['end_of_day_id'],
                     'pos_machine_id' => $endOfDay['pos_machine_id'],
                     'branch_id' => $endOfDay['branch_id'],
-                ])->first();
+                ];
 
-                if ($existingEndOfDay) {
-                    $toUpdate[] = [
-                        'model' => $existingEndOfDay,
-                        'data' => $postData
-                    ];
-                } else {
-                    $toInsert[] = $postData;
+                // Atomic insert: unique index makes concurrent duplicates return 0
+                $inserted = EndOfDay::insertOrIgnore([
+                    array_merge($postData, [
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]),
+                ]);
 
+                if ($inserted) {
                     if (isset($endOfDay['products'])) {
+                        $branch = Branch::findOrFail($endOfDay['branch_id']);
+
                         foreach ($endOfDay['products'] as $reqProduct) {
                             $product = Product::find($reqProduct['productId']);
 
@@ -1576,6 +1575,10 @@ class MiscController extends BaseController
                             }
                         }
                     }
+                } else {
+                    EndOfDay::where($lookupKey)->update(array_merge($postData, [
+                        'updated_at' => $now,
+                    ]));
                 }
 
                 // Clean up take order data for this branch
@@ -1586,26 +1589,9 @@ class MiscController extends BaseController
                 TakeOrderDiscountOtherInformation::where('branch_id', $endOfDay['branch_id'])->delete();
             }
 
-            // Bulk insert new records
-            if (!empty($toInsert)) {
-                // Add timestamps manually for bulk insert
-                $now = now();
-                foreach ($toInsert as &$item) {
-                    $item['created_at'] = $now;
-                    $item['updated_at'] = $now;
-                }
-                EndOfDay::insert($toInsert);
-            }
-
-            // Bulk update existing records
-            foreach ($toUpdate as $item) {
-                $item['data']['updated_at'] = now();
-                $item['model']->update($item['data']);
-            }
-
-            DB::commit();
+            DB::connection('transactional_db')->commit();
         } catch (\Exception $e) {
-            DB::rollBack();
+            DB::connection('transactional_db')->rollBack();
             return $this->sendError('Database Error', $e->getMessage(), 500);
         }
 
