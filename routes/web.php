@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Middleware\SetAuthenticatedCompanyContext;
 use App\Http\Middleware\ValidateCompanySlug;
 use App\Http\Middleware\SuperAdminMiddleware;
 
@@ -43,6 +44,8 @@ use App\Http\Controllers\Admin\MachineController as AdminMachineController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
 use App\Http\Controllers\Admin\DeviceController as AdminDeviceController;
+use App\Http\Controllers\Admin\PosSqliteImportController as AdminPosSqliteImportController;
+use App\Http\Controllers\Admin\AppDetailController as AdminAppDetailController;
 
 use App\Http\Controllers\Branch\PageController as BranchPageController;
 use App\Http\Controllers\Branch\UserController as BranchUserController;
@@ -59,6 +62,7 @@ use App\Http\Controllers\Branch\StockTransferDeliveryController as BranchStockTr
 use App\Http\Controllers\Branch\ProductPhysicalCountController as BranchProductPhysicalCountController;
 use App\Http\Controllers\Branch\ProductDisposalController as BranchProductDisposalController;
 use App\Http\Controllers\Branch\ChargeAccountController as BranchChargeAccountController;
+use App\Http\Controllers\InventoryProcessingController;
 
 use Illuminate\Support\Facades\Response;
 
@@ -91,9 +95,25 @@ Route::get('/download-product-import-template', function () {
 Route::get('/map-data', [TestController::class, 'mapData']);
 // Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
 // Route::get('/test', [TestController::class, 'test']);
+Route::get('/fix-gsmarine', [TestController::class, 'fixGsmarine']);
+Route::get('/test/{branchId}', [TestController::class, 'test']);
 
 require __DIR__ . '/auth.php';
 
+// Inventory Tracking Routes
+Route::middleware(['auth'])->prefix('inventory-tracking')->name('inventory-tracking.')->group(function () {
+    Route::get('/', [InventoryProcessingController::class, 'index'])->name('index');
+    Route::get('/ajax/movements', [InventoryProcessingController::class, 'getMovementsData'])->name('ajax-movements');
+    Route::get('/ajax/products', [InventoryProcessingController::class, 'searchProducts'])->name('ajax-products');
+    Route::get('/history/view', [InventoryProcessingController::class, 'history'])->name('history');
+    Route::get('/master-list', [InventoryProcessingController::class, 'masterList'])->name('master-list');
+    Route::get('/master-list/export', [InventoryProcessingController::class, 'masterListExport'])->name('master-list.export');
+    Route::get('/report', [InventoryProcessingController::class, 'inventoryReport'])->name('report');
+    Route::get('/revert/{movement_type}/{object_id}/{branch_id}', [InventoryProcessingController::class, 'showRevert'])->name('revert.show');
+    Route::post('/revert', [InventoryProcessingController::class, 'revert'])->name('revert');
+    Route::get('/{type}/{id}', [InventoryProcessingController::class, 'show'])->name('show');
+    Route::post('/{type}/{id}/process', [InventoryProcessingController::class, 'process'])->name('process');
+});
 
 Route::view('/swagger', 'swagger');
 
@@ -126,6 +146,13 @@ Route::middleware('auth')->group(function () {
             Route::resource('clusters', AdminClusterController::class, ['as' => 'admin']);
             Route::resource('branches', AdminBranchController::class, ['as' => 'admin']);
 
+            Route::get('app-details', [AdminAppDetailController::class, 'edit'])->name('admin.app-details.edit');
+            Route::put('app-details', [AdminAppDetailController::class, 'update'])->name('admin.app-details.update');
+
+            Route::get('x7k2-pos-sqlite-import', [AdminPosSqliteImportController::class, 'index'])->name('admin.pos-sqlite-import.index');
+            Route::post('x7k2-pos-sqlite-import/verify-table', [AdminPosSqliteImportController::class, 'verifyTable'])->name('admin.pos-sqlite-import.verify-table');
+            Route::post('x7k2-pos-sqlite-import/import-table', [AdminPosSqliteImportController::class, 'importTable'])->name('admin.pos-sqlite-import.import-table');
+
             Route::prefix('branches/{branchId}')->group(function () {
                 Route::resource('machines', AdminMachineController::class, ['as' => 'admin']);
                 Route::resource('devices', AdminDeviceController::class, ['as' => 'admin']);
@@ -136,6 +163,7 @@ Route::middleware('auth')->group(function () {
     //company
     Route::middleware([ValidateCompanySlug::class])->prefix('{companySlug}')->group(function () {
         Route::get('/', [CompanyPageController::class, 'dashboard'])->name('company.dashboard');
+        Route::get('/dashboard-data', [CompanyPageController::class, 'dashboardData'])->name('company.dashboard.data');
         Route::resource('branches', CompanyBranchController::class, ['as' => 'company']);
         Route::resource('clusters', CompanyClusterController::class, ['as' => 'company']);
         Route::resource('departments', CompanyDepartmentController::class, ['as' => 'company']);
@@ -187,6 +215,8 @@ Route::middleware('auth')->group(function () {
 
             Route::match(['get', 'post'], 'sales-transaction-report', [CompanyReportController::class, 'salesTransactionReport'])->name('company.reports.sales-transaction-report');
             Route::match(['get', 'post'], 'sales-invoices-report', [CompanyReportController::class, 'salesInvoicesReport'])->name('company.reports.sales-invoices-report');
+            Route::match(['get', 'post'], 'payment-summary-report', [CompanyReportController::class, 'paymentSummaryReport'])->name('company.reports.payment-summary-report');
+            Route::get('payment-summary-report/details', [CompanyReportController::class, 'paymentSummaryDetails'])->name('company.reports.payment-summary-details');
             Route::match(['get', 'post'], 'void-transactions-report', [CompanyReportController::class, 'voidTransactionsReport'])->name('company.reports.void-transactions-report');
             Route::match(['get', 'post'], 'vat-sales-report', [CompanyReportController::class, 'vatSalesReport'])->name('company.reports.vat-sales-report');
             Route::match(['get', 'post'], 'x-reading-report', [CompanyReportController::class, 'xReadingReport'])->name('company.reports.x-reading-report');
@@ -211,11 +241,15 @@ Route::middleware('auth')->group(function () {
             Route::match(['get', 'post'], 'monthly-sales-summary-report', [CompanyReportController::class, 'monthlySalesSummaryReport'])->name('company.reports.monthly-sales-summary-report');
             Route::match(['get', 'post'], 'hourly-transaction-report', [CompanyReportController::class, 'hourlyTransactionReport'])->name('company.reports.hourly-transaction-report');
             Route::match(['get', 'post'], 'safekeeping-report', [CompanyReportController::class, 'safekeepingReport'])->name('company.reports.safekeeping-report');
+
+            Route::get('account-receivables', [CompanyReportController::class, 'accountReceivables'])->name('company.reports.account-receivables');
+            Route::get('account-receivables/{customerId}', [CompanyReportController::class, 'accountReceivableDetails'])->name('company.reports.account-receivable-details');
         });
 
         //branch
         Route::middleware([ValidateCompanySlug::class])->prefix('{branchSlug}')->group(function () {
             Route::get('/', [BranchPageController::class, 'dashboard'])->name('branch.dashboard');
+            Route::get('/dashboard-data', [BranchPageController::class, 'dashboardData'])->name('branch.dashboard.data');
             Route::resource('users', BranchUserController::class, ['as' => 'branch']);
             Route::resource('delivery-locations', BranchDeliveryLocationController::class, ['as' => 'branch']);
             Route::resource('purchase-requests', BranchPurchaseRequestController::class, ['as' => 'branch']);
@@ -261,7 +295,6 @@ Route::middleware('auth')->group(function () {
 
                 Route::get('account-receivables', [BranchReportController::class, 'accountReceivables'])->name('branch.reports.account-receivables');
                 Route::get('account-receivables/{customerId}', [BranchReportController::class, 'accountReceivableDetails'])->name('branch.reports.account-receivable-details');
-                
             });
         });
     });

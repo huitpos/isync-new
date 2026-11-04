@@ -172,6 +172,11 @@ class MiscController extends BaseController
                     DB::raw('IFNULL(NULLIF(branch_product.cost, 0), products.cost) as cost'),
                     DB::raw('IFNULL(NULLIF(branch_product.markup, 0), products.markup) as markup')
                 ])
+                ->where(function ($q) {
+                    $q->whereNull('branch_product.id')
+                        ->orWhere('branch_product.show_to_branch', 1)
+                        ->orWhereNull('branch_product.show_to_branch');
+                })
                 ->with(
                     'itemType',
                     'uom',
@@ -208,6 +213,21 @@ class MiscController extends BaseController
             ->whereHas('itemType', function ($subQuery) {
                 $subQuery->where('show_in_cashier', true);
             })
+            ->leftJoin('branch_product', function ($join) use ($branchId) {
+                    $join->on('branch_product.product_id', '=', 'products.id')
+                         ->where('branch_product.branch_id', '=', $branchId);
+                })
+            ->addSelect([
+                'products.*',
+                DB::raw('IFNULL(NULLIF(branch_product.price, 0), products.srp) as srp'),
+                DB::raw('IFNULL(NULLIF(branch_product.cost, 0), products.cost) as cost'),
+                DB::raw('IFNULL(NULLIF(branch_product.markup, 0), products.markup) as markup')
+            ])
+            ->where(function ($q) {
+                $q->whereNull('branch_product.id')
+                    ->orWhere('branch_product.show_to_branch', 1)
+                    ->orWhereNull('branch_product.show_to_branch');
+            })
             ->with(
                 'itemType',
                 'uom',
@@ -225,7 +245,7 @@ class MiscController extends BaseController
             });
 
         // Paginate the products
-        $perPage = $request->get('per_page', 2); // Default to 15 per page if not specified
+        $perPage = $request->get('per_page', 2);
         $products = $productsQuery->paginate($perPage);
 
         return $this->sendResponse($products, 'Products retrieved successfully.');
@@ -1601,6 +1621,24 @@ class MiscController extends BaseController
                     ];
                 } else {
                     $toInsert[] = $postData;
+
+                    if (isset($endOfDay['products'])) {
+                        foreach ($endOfDay['products'] as $reqProduct) {
+                            $product = Product::find($reqProduct['productId']);
+
+                            if ($product) {
+                                $this->productRepository->updateBranchQuantity($product, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'], null, 'subtract', $product->uom_id);
+
+                                foreach ($product->bundledItems as $bundledItem) {
+                                    $this->productRepository->updateBranchQuantity($bundledItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $bundledItem->bundled_item->quantity, null, 'subtract', $bundledItem->uom_id);
+                                }
+
+                                foreach ($product->rawItems as $rawItem) {
+                                    $this->productRepository->updateBranchQuantity($rawItem, $branch, $reqProduct['endOfDayId'], 'end_of_days', $reqProduct['qty'] * $rawItem->bundled_item->quantity, null, 'subtract', $rawItem->uom_id);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Clean up take order data for this branch
@@ -1633,6 +1671,13 @@ class MiscController extends BaseController
             DB::rollBack();
             return $this->sendError('Database Error', $e->getMessage(), 500);
         }
+
+        $log = new ApiRequestLog();
+        $log->type = 'saveEndOfDays';
+        $log->method = $request->method();
+        $log->request = json_encode($data);
+        $log->response = json_encode($failedRequests);
+        $log->save();
 
         return $this->sendResponse([
             'failed_requests' => array_values($failedRequests)
@@ -4725,7 +4770,7 @@ class MiscController extends BaseController
             'product_id' => 'required',
             'qty' => 'required',
             'is_sent_to_server' => 'required',
-            'treg' => 'required'
+            // 'treg' => 'required'
         ];
 
         $toInsert = [];
@@ -4790,6 +4835,13 @@ class MiscController extends BaseController
             DB::rollBack();
             return $this->sendError('Database Error', $e->getMessage(), 500);
         }
+
+        $log = new ApiRequestLog();
+        $log->type = 'saveEndOfDayProducts';
+        $log->method = $request->method();
+        $log->request = json_encode($data);
+        $log->response = json_encode($failedRequests);
+        $log->save();
 
         return $this->sendResponse([
             'failed_requests' => array_values($failedRequests)

@@ -389,7 +389,7 @@ class ProductController extends Controller
     public function update(Request $request, string $companySlug, string $productId)
     {
         $company = $request->attributes->get('company');
-        
+
         $request->validate([
             'name' => 'required|unique:products,name,' . $productId . ',id,company_id,' . $company->id,
             'description' => 'required',
@@ -436,6 +436,8 @@ class ProductController extends Controller
             'branch_markups.*' => [
                 'nullable', 'numeric', 'regex:/^-?\d+(\.\d{1,4})?$/'
             ],
+            'show_to_branch' => 'nullable|array',
+            'show_to_branch.*' => 'nullable|in:0,1',
         ], [
             'raw_items.*.quantity.required_with' => 'The quantity field is required when a product is selected.',
             'raw_items.*.uom_id.required_with' => 'The unit of measurement field is required when a product is selected.',
@@ -546,6 +548,7 @@ class ProductController extends Controller
             if ($branchSrps = $request->input('branch_srps')) {
                 $branchCosts = $request->input('branch_costs');
                 $branchMarkups = $request->input('branch_markups');
+                $showToBranches = $request->input('show_to_branch', []);
 
                 foreach ($branchSrps as $branchId => $srp) {
                     $product->branches()->syncWithoutDetaching([
@@ -553,6 +556,9 @@ class ProductController extends Controller
                             'price' => $srp,
                             'cost' => $branchCosts[$branchId] ?? null,
                             'markup' => $branchMarkups[$branchId] ?? null,
+                            'show_to_branch' => array_key_exists($branchId, $showToBranches)
+                                ? (int) $showToBranches[$branchId]
+                                : 1,
                         ]
                     ]);
                 }

@@ -46,7 +46,7 @@
     </div>
 
 
-    <div class="row g-1 g-xl-5 mb-1 mb-xl-5">
+    <div id="dashboard-widgets" class="row g-1 g-xl-5 mb-1 mb-xl-5">
         <div class="card">
             <div class="border-0 p-1">
                 <h3 class="card-title align-items-start flex-column">
@@ -57,7 +57,8 @@
                 <div class="row g-1 g-xl-5">
                     <div class="col-3">
                         @include('partials/widgets/small_card', [
-                            'text' => $todayTransactionCount,
+                            'valueId' => 'today-transaction-count',
+                            'text' => '...',
                             'subText' => 'Transaction Count',
                             'class' => 'border-primary border-2',
                             'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-primary-rgb), var(--bs-border-opacity)) !important;'
@@ -66,7 +67,8 @@
 
                     <div class="col-3">
                         @include('partials/widgets/small_card', [
-                            'text' => number_format($todayGrossAmount, 2),
+                            'valueId' => 'today-gross-amount',
+                            'text' => '...',
                             'subText' => 'Gross sales',
                             'class' => 'border-success border-2 shadow',
                             'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;'
@@ -75,7 +77,8 @@
 
                     <div class="col-3">
                         @include('partials/widgets/small_card', [
-                            'text' => number_format($todayNetAmount, 2),
+                            'valueId' => 'today-net-amount',
+                            'text' => '...',
                             'subText' => 'Net Sales',
                             'class' => 'border-info border-2',
                             'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-info-rgb), var(--bs-border-opacity)) !important;'
@@ -84,7 +87,8 @@
 
                     <div class="col-3">
                         @include('partials/widgets/small_card', [
-                            'text' => number_format($todayGrossAmount - $todayCostAmount, 2),
+                            'valueId' => 'today-profit',
+                            'text' => '...',
                             'subText' => 'Profit',
                             'class' => 'border-warning border-2',
                             'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-warning-rgb), var(--bs-border-opacity)) !important;'
@@ -97,14 +101,15 @@
         <div class="card">
             <div class="border-0 p-1">
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bold text-gray-800">{{ $selectedRangeParam }} Sales Summary</span>
+                    <span class="card-label fw-bold text-gray-800" id="range-sales-title">{{ $selectedRangeParam }} Sales Summary</span>
                 </h3>
             </div>
             <div class="card-body p-1">
                 <div class="row g-1 g-xl-5">
                     <div class="col-3">
                         @include('partials/widgets/small_card', [
-                            'text' => $transactionCount,
+                            'valueId' => 'range-transaction-count',
+                            'text' => '...',
                             'subText' => 'Transaction Count',
                             'class' => 'border-primary border-2',
                             'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-primary-rgb), var(--bs-border-opacity)) !important;'
@@ -113,7 +118,8 @@
 
                     <div class="col-3">
                         @include('partials/widgets/small_card', [
-                            'text' => number_format($grossAmount, 2),
+                            'valueId' => 'range-gross-amount',
+                            'text' => '...',
                             'subText' => 'Gross sales',
                             'class' => 'border-success border-2',
                             'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-success-rgb), var(--bs-border-opacity)) !important;'
@@ -122,7 +128,8 @@
 
                     <div class="col-3">
                         @include('partials/widgets/small_card', [
-                            'text' => number_format($netAmount, 2),
+                            'valueId' => 'range-net-amount',
+                            'text' => '...',
                             'subText' => 'Net Sales',
                             'class' => 'border-info border-2',
                             'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-info-rgb), var(--bs-border-opacity)) !important;'
@@ -131,7 +138,8 @@
 
                     <div class="col-3">
                         @include('partials/widgets/small_card', [
-                            'text' => number_format($grossAmount - $costAmount, 2),
+                            'valueId' => 'range-profit',
+                            'text' => '...',
                             'subText' => 'Profit',
                             'class' => 'border-warning border-2',
                             'style' => 'box-shadow: 5px 5px 5px rgba(var(--bs-warning-rgb), var(--bs-border-opacity)) !important;'
@@ -182,25 +190,117 @@
 
     @push('scripts')
     <script type="text/javascript">
+        const dashboardDataUrl = @json(route('company.dashboard.data', ['companySlug' => $company->slug]));
+        const departmentProductsUrl = @json(route('company.dashboard.department-products', ['company' => $company->id]));
+
+        let chartLibReady = false;
+        let dashboardPayload = null;
+        let dashboardRequest = null;
+        let departmentData = null;
+        let departmentChart = null;
+        let salesTable = null;
+
+        const summaryIds = [
+            'today-transaction-count',
+            'today-gross-amount',
+            'today-net-amount',
+            'today-profit',
+            'range-transaction-count',
+            'range-gross-amount',
+            'range-net-amount',
+            'range-profit'
+        ];
+
         google.charts.load('current', {
             packages: ['corechart']
         });
 
         google.charts.setOnLoadCallback(function () {
-            var data = new google.visualization.DataTable();
-            
-            // Add the first column for Month
-            data.addColumn('string', 'Month');
-            
-            // Dynamically add columns for each branch
-            @foreach($branches as $branch)
-                data.addColumn('number', '{{ $branch }}');
-            @endforeach
+            chartLibReady = true;
+            renderCharts();
+        });
 
-            // Insert dynamic data from the controller
-            data.addRows(@json($salesData));
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = value;
+            }
+        }
 
-            var options = {
+        function dashboardParams() {
+            const $date = $('#date_range');
+
+            return {
+                branch_id: $('#branch_id').val(),
+                date_range: $date.val(),
+                selectedRange: $date.attr('data-selected-range'),
+                startDate: $date.attr('data-start-date'),
+                endDate: $date.attr('data-end-date')
+            };
+        }
+
+        function syncUrl(params) {
+            const url = new URL(window.location.href);
+
+            ['date_range', 'branch_id', 'selectedRange', 'startDate', 'endDate'].forEach(function (key) {
+                if (params[key]) {
+                    url.searchParams.set(key, params[key]);
+                } else {
+                    url.searchParams.delete(key);
+                }
+            });
+
+            history.replaceState({}, '', url.toString());
+        }
+
+        function setLoading(isLoading) {
+            $('#search-btn').prop('disabled', isLoading);
+            $('#dashboard-widgets').toggleClass('opacity-50', isLoading);
+
+            if (isLoading) {
+                summaryIds.forEach(function (id) {
+                    setText(id, '...');
+                });
+            }
+        }
+
+        function emptyChart(elementId, message) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.innerHTML = '<div class="d-flex align-items-center justify-content-center h-100 text-muted">' + message + '</div>';
+            }
+        }
+
+        function drawPie(elementId, title, rows) {
+            if (!rows || !rows.length) {
+                emptyChart(elementId, 'No data');
+                return null;
+            }
+
+            const table = new google.visualization.DataTable();
+            table.addColumn('string', 'Item');
+            table.addColumn('number', 'Value');
+            table.addRows(rows);
+
+            const chart = new google.visualization.PieChart(document.getElementById(elementId));
+            chart.draw(table, {
+                title: title,
+                pieHole: 0,
+                pieSliceText: 'percentage',
+                sliceVisibilityThreshold: 0,
+                is3D: true,
+                chartArea: {width: '100%', height: '85%'}
+            });
+
+            return {chart: chart, table: table};
+        }
+
+        function renderCharts() {
+            if (!chartLibReady || !dashboardPayload) {
+                return;
+            }
+
+            const salesOptions = {
                 title: 'Sales Per Branch Per Month',
                 vAxis: {
                     title: 'Sales Amount',
@@ -215,145 +315,134 @@
                 pointSize: 5,
             };
 
-            var chart = new google.visualization.ColumnChart(document.getElementById('kt_docs_google_chart_column'));
-            chart.draw(data, options);
+            if (!dashboardPayload.salesData || !dashboardPayload.salesData.length) {
+                emptyChart('kt_docs_google_chart_column', 'No sales data');
+                emptyChart('kt_docs_google_chart_line', 'No sales data');
+            } else {
+                const salesTableData = new google.visualization.DataTable();
+                salesTableData.addColumn('string', 'Month');
+                (dashboardPayload.branches || []).forEach(function (branch) {
+                    salesTableData.addColumn('number', branch);
+                });
+                salesTableData.addRows(dashboardPayload.salesData);
 
-            var line = new google.visualization.LineChart(document.getElementById('kt_docs_google_chart_line'));
-            line.draw(data, options);
+                new google.visualization.ColumnChart(document.getElementById('kt_docs_google_chart_column')).draw(salesTableData, salesOptions);
+                new google.visualization.LineChart(document.getElementById('kt_docs_google_chart_line')).draw(salesTableData, salesOptions);
+            }
 
-            var departmentData = new google.visualization.DataTable();
-            departmentData.addColumn('string', 'Item');
-            departmentData.addColumn('number', 'Value');
-            departmentData.addRows(@json($departmentSales));
+            const department = drawPie('kt_docs_google_chart_pie', 'Department Sales', dashboardPayload.departmentSales);
+            departmentChart = department ? department.chart : null;
+            departmentData = department ? department.table : null;
 
-            var departmentOptions = {
-                title: 'Department Sales',
-                pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0,
-                is3D : true,
-                chartArea: {width:'100%',height:'85%'},
-            };
+            if (departmentChart) {
+                google.visualization.events.addListener(departmentChart, 'select', function () {
+                    const selection = departmentChart.getSelection();
+                    if (!selection.length || !departmentData) {
+                        return;
+                    }
 
-            var departmentChart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie'));
-            departmentChart.draw(departmentData, departmentOptions);
+                    const item = departmentData.getValue(selection[0].row, 0);
+                    const params = dashboardParams();
 
-            google.visualization.events.addListener(departmentChart, 'select', function () {
-                var selection = departmentChart.getSelection();
-                if (selection.length > 0) {
-                    var row = selection[0].row;
-                    var item = departmentData.getValue(row, 0);
-                    
-                    // Get current filters
-                    const branchValue = document.getElementById('branch_id').value;
-                    const selectedRange = $("#date_range").attr("data-selected-range");
-                    const startDate = $("#date_range").attr("data-start-date");
-                    const endDate = $("#date_range").attr("data-end-date");
-                    
-                    // Show loading indicator
-                    const datatable = $("#kt_datatable_zero_configuration").DataTable();
-                    datatable.clear().draw();
-                    $("#kt_datatable_zero_configuration").addClass("opacity-50");
-                    
-                    // Make AJAX request
+                    salesTable.clear().draw();
+                    $('#kt_datatable_zero_configuration').addClass('opacity-50');
+
                     $.ajax({
-                        url: "{{ route('company.dashboard.department-products', ['company' => $company->id]) }}",
-                        type: "GET",
+                        url: departmentProductsUrl,
+                        type: 'GET',
+                        cache: false,
                         data: {
                             department: item,
-                            branch_id: branchValue,
-                            selectedRange: selectedRange,
-                            startDate: startDate,
-                            endDate: endDate
+                            branch_id: params.branch_id,
+                            selectedRange: params.selectedRange,
+                            startDate: params.startDate,
+                            endDate: params.endDate
                         },
-                        success: function(response) {
-                            datatable.clear();
+                        success: function (response) {
+                            salesTable.clear();
                             if (response.data && response.data.length > 0) {
-                                datatable.rows.add(response.data);
+                                salesTable.rows.add(response.data);
                             }
-                            datatable.draw();
-                            $("#kt_datatable_zero_configuration").removeClass("opacity-50");
-                            $("#sales_breakdown_title").text(`Sales Breakdown for ${item}`);
+                            salesTable.draw();
+                            $('#kt_datatable_zero_configuration').removeClass('opacity-50');
+                            $('#sales_breakdown_title').text('Sales Breakdown for ' + item);
                         },
-                        error: function(xhr) {
-                            console.error("Error loading department products:", xhr);
-                            $("#kt_datatable_zero_configuration").removeClass("opacity-50");
+                        error: function () {
+                            $('#kt_datatable_zero_configuration').removeClass('opacity-50');
+                            if (typeof toastr !== 'undefined') {
+                                toastr.error('Failed to load department products.');
+                            }
                         }
                     });
-                }
-            });
-
-            $("#kt_datatable_zero_configuration").DataTable({
-                order: []  // No default sorting
-            });
-
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Item');
-            data.addColumn('number', 'Value');
-            data.addRows(@json($itemSales));
-
-            var options = {
-                title: 'Top Sold Items',
-                pieHole: 0,
-                pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0,
-                is3D : true,
-                chartArea: {width:'100%',height:'85%'},
-            };
-
-            var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie2'));
-            chart.draw(data, options);
-
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Item');
-            data.addColumn('number', 'Value');
-            data.addRows(@json($paymentTypeSales));
-
-            var options = {
-                title: 'Top Payment Type',
-                pieHole: 0,
-                pieSliceText: 'percentage',
-                sliceVisibilityThreshold : 0,
-                is3D : true,
-                chartArea: {width:'100%',height:'85%'},
-            };
-
-            var chart = new google.visualization.PieChart(document.getElementById('kt_docs_google_chart_pie3'));
-            chart.draw(data, options);
-        });
-
-        const dateRange = document.getElementById('date_range');
-        const branchId = document.getElementById('branch_id');
-
-        function updateURLAndRefresh() {
-            const dateValue = dateRange.value;
-            const branchValue = branchId.value;
-
-            const selectedRange = $("#date_range").attr("data-selected-range");
-            const startDate = $("#date_range").attr("data-start-date");
-            const endDate = $("#date_range").attr("data-end-date");
-
-            const url = new URL(window.location.href);
-            if (dateValue) {
-                url.searchParams.set('date_range', dateValue);
-            } else {
-                url.searchParams.delete('date_range');
-            }
-            if (branchValue) {
-                url.searchParams.set('branch_id', branchValue);
-            } else {
-                url.searchParams.delete('branch_id');
+                });
             }
 
-            //use selectedRange, startDate, endDate in searchParams
-            url.searchParams.set('selectedRange', selectedRange);
-            url.searchParams.set('startDate', startDate);
-            url.searchParams.set('endDate', endDate);   
-
-            window.location.href = url.toString();
+            drawPie('kt_docs_google_chart_pie2', 'Top Sold Items', dashboardPayload.itemSales);
+            drawPie('kt_docs_google_chart_pie3', 'Top Payment Type', dashboardPayload.paymentTypeSales);
         }
 
-        $("#search-btn").on("click", ({date, oldDate}) => {
-            updateURLAndRefresh()
+        function applyDashboard(payload) {
+            setText('today-transaction-count', payload.today.transactionCount);
+            setText('today-gross-amount', payload.today.grossAmount);
+            setText('today-net-amount', payload.today.netAmount);
+            setText('today-profit', payload.today.profit);
+            setText('range-transaction-count', payload.range.transactionCount);
+            setText('range-gross-amount', payload.range.grossAmount);
+            setText('range-net-amount', payload.range.netAmount);
+            setText('range-profit', payload.range.profit);
+            $('#range-sales-title').text((payload.selectedRange || 'Year to Date') + ' Sales Summary');
+
+            dashboardPayload = payload;
+            renderCharts();
+        }
+
+        function loadDashboard() {
+            if (dashboardRequest) {
+                dashboardRequest.abort();
+            }
+
+            const params = dashboardParams();
+            setLoading(true);
+            salesTable.clear().draw();
+            $('#sales_breakdown_title').text('');
+
+            dashboardRequest = $.ajax({
+                url: dashboardDataUrl,
+                type: 'GET',
+                cache: false,
+                data: params,
+                success: function (response) {
+                    applyDashboard(response);
+                    syncUrl(params);
+                    setLoading(false);
+                },
+                error: function (xhr) {
+                    if (xhr.statusText === 'abort') {
+                        return;
+                    }
+
+                    setLoading(false);
+                    summaryIds.forEach(function (id) {
+                        setText(id, '-');
+                    });
+
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Failed to load dashboard data.');
+                    }
+                }
+            });
+        }
+
+        $(function () {
+            salesTable = $('#kt_datatable_zero_configuration').DataTable({
+                order: []
+            });
+
+            $('#search-btn').on('click', function () {
+                loadDashboard();
+            });
+
+            loadDashboard();
         });
     </script>
     @endpush

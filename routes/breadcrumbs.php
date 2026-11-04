@@ -9,6 +9,12 @@ Breadcrumbs::for('admin.dashboard', function (BreadcrumbTrail $trail) {
     $trail->push('Admin', route('admin.dashboard'));
 });
 
+//app details
+Breadcrumbs::for('admin.app-details.edit', function (BreadcrumbTrail $trail) {
+    $trail->parent('admin.dashboard');
+    $trail->push('POS App Details', route('admin.app-details.edit'));
+});
+
 //clients
 Breadcrumbs::for('admin.clients.index', function (BreadcrumbTrail $trail) {
     $trail->parent('admin.dashboard');
@@ -503,6 +509,16 @@ Breadcrumbs::for('branch.productPhysicalCount.create', function (BreadcrumbTrail
     $trail->push('Create');
 });
 
+Breadcrumbs::for('branch.productPhysicalCount.edit', function (BreadcrumbTrail $trail, $company, $branch, $count) {
+    $trail->parent('branch.productPhysicalCount.index', $company, $branch);
+    $trail->push($count->pcount_number, route('branch.product-physical-counts.show', [
+        'companySlug' => $company->slug,
+        'branchSlug' => $branch->slug,
+        'product_physical_count' => $count->id,
+    ]));
+    $trail->push('Edit');
+});
+
 Breadcrumbs::for('branch.productDisposals.index', function (BreadcrumbTrail $trail, $company, $branch) {
     $trail->parent('company.dashboard', $company);
     $trail->push(ucfirst($branch->name), route('branch.dashboard', ['companySlug' => $company->slug, 'branchSlug' => $branch->slug]));
@@ -512,4 +528,35 @@ Breadcrumbs::for('branch.productDisposals.index', function (BreadcrumbTrail $tra
 Breadcrumbs::for('branch.productDisposals.create', function (BreadcrumbTrail $trail, $company, $branch) {
     $trail->parent('branch.productDisposals.index', $company, $branch);
     $trail->push('Create');
+});
+
+// inventory tracking
+Breadcrumbs::for('inventory-tracking.index', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('company.dashboard', $company);
+    $trail->push('Inventory Tracking', route('inventory-tracking.index'));
+});
+
+Breadcrumbs::for('inventory-tracking.history', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('inventory-tracking.index', $company);
+    $trail->push('History', route('inventory-tracking.history'));
+});
+
+Breadcrumbs::for('inventory-tracking.revert', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('inventory-tracking.history', $company);
+    $trail->push('Revert Movement');
+});
+
+Breadcrumbs::for('inventory-tracking.report', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('inventory-tracking.index', $company);
+    $trail->push('Inventory Report', route('inventory-tracking.report'));
+});
+
+Breadcrumbs::for('inventory-tracking.master-list', function (BreadcrumbTrail $trail, $company) {
+    $trail->parent('inventory-tracking.index', $company);
+    $trail->push('Stock Master List', route('inventory-tracking.master-list'));
+});
+
+Breadcrumbs::for('inventory-tracking.show', function (BreadcrumbTrail $trail, $company, $movementLabel) {
+    $trail->parent('inventory-tracking.index', $company);
+    $trail->push($movementLabel);
 });

@@ -25,6 +25,7 @@
 
                 <select id="status" class="form-select form-control-solid w-100 mw-250px">
                     <option value="">Status</option>
+                    <option value="draft">Draft</option>
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>

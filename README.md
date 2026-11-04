@@ -77,6 +77,8 @@ php artisan queue:work
 5. npm install
 6. php artisan migrate
 7. php artisan migrate --database=transactional_db --path=database/migrations/transactional_db
+8. php artisan migrate --database=inventory --path=database/migrations/inventory_db
+
 
 # Basic deployment
 ./deploy.sh

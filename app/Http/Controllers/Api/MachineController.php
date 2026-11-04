@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppDetail;
 use App\Models\PosDevice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 
 use App\Repositories\Interfaces\PosMachineRepositoryInterface;
 
@@ -166,5 +169,31 @@ class MachineController extends BaseController
         $machine = $this->posMachineRepository->getWithActivationData(['product_key' => $validatedData['product_key']])->first();
 
         return $this->sendResponse($machine, 'Device activated successfully');
+    }
+
+    public function posAppVersion(Request $request)
+    {
+        $appDetail = AppDetail::where('app', 'pos')->first();
+
+        if (!$appDetail) {
+            return response()->json([
+                'success' => false,
+                'message' => 'App details not found',
+                'code' => '404',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ok',
+            'code' => '200',
+            'data' => [
+                'version_code' => $appDetail->version_code,
+                'version_name' => $appDetail->version_name,
+                'apk_url' => $appDetail->apk_url,
+                'sha256' => $appDetail->sha256,
+                'mandatory' => $appDetail->mandatory,
+            ],
+        ]);
     }
 }

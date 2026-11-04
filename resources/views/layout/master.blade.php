@@ -40,6 +40,8 @@
 
     @livewireStyles
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/monthSelect/style.css">
+
+    @stack('styles')
 </head>
 <!--end::Head-->
 

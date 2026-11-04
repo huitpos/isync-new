@@ -21,6 +21,7 @@ class PurchaseDelivery extends Model
         'total_qty',
         'total_amount',
         'status',
+        'inventory_processed',
         'action_by',
         'action_by',
     ];
