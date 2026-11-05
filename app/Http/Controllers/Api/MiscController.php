@@ -290,6 +290,7 @@ class MiscController extends BaseController
             $log = new ApiRequestLog();
             $log->type = 'saveTransactions';
             $log->method = $request->method();
+            $log->device_id = $request->device_id;
             $log->request = json_encode($requestData);
             $log->response = json_encode($validator->errors());
             $log->save();
@@ -382,6 +383,7 @@ class MiscController extends BaseController
         $log = new ApiRequestLog();
         $log->type = 'saveTransactionsRequest';
         $log->method = $request->method();
+        $log->device_id = $request->device_id;
         $log->request = json_encode($requestData);
         $log->response = '';
         $log->save();
@@ -616,6 +618,7 @@ class MiscController extends BaseController
         $log = new ApiRequestLog();
         $log->type = 'saveOrdersRequest';
         $log->method = $request->method();
+        $log->device_id = $request->device_id;
         $log->request = json_encode($requestData);
         $log->response = '';
         $log->save();
@@ -1598,6 +1601,7 @@ class MiscController extends BaseController
         $log = new ApiRequestLog();
         $log->type = 'saveEndOfDays';
         $log->method = $request->method();
+        $log->device_id = $request->device_id;
         $log->request = json_encode($data);
         $log->response = json_encode($failedRequests);
         $log->save();
@@ -4760,6 +4764,7 @@ class MiscController extends BaseController
         $log = new ApiRequestLog();
         $log->type = 'saveEndOfDayProducts';
         $log->method = $request->method();
+        $log->device_id = $request->device_id;
         $log->request = json_encode($data);
         $log->response = json_encode($failedRequests);
         $log->save();
