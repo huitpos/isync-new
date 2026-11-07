@@ -163,6 +163,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/branch-product-soh', [MiscController::class, 'getProductSoh']);
         Route::get('/unredeemed-ar-transactions', [MiscController::class, 'getUnredeemedArTransactions']);
+        Route::post('/ar-transactions', [MiscController::class, 'updateArTransaction']);
     });
 
     Route::get('/sb-cutoff', [SbController::class, 'getCutoff']);
