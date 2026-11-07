@@ -13,11 +13,32 @@ security:
 info:
   title: iSync API
 
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: POS Machine
+    description: Machine activation and device registration
+  - name: Cashier
+    description: Endpoints primarily used by Cashier machines
+  - name: Order Station
+    description: Endpoints primarily used by Order Station (take-order) machines
+  - name: Cashier & Order Station
+    description: Shared endpoints used by both Cashier and Order Station
+  - name: Sync From Server
+    description: Download/sync data from server to machine
+  - name: Sync To Server
+    description: Upload/sync data from machine to server
+
+
 paths:
   /api/login:
     post:
       tags:
+        - Cashier & Order Station
         - Auth
+      summary: "Login"
+      description: |
+        Used by: Cashier & Order Station. Authenticate a POS user and return a bearer token for API access.
       requestBody:
         required: true
         content:
@@ -44,7 +65,11 @@ paths:
   /api/activate-machine:
     post:
       tags:
+        - Cashier & Order Station
         - POS Machine
+      summary: "Activate machine"
+      description: |
+        Used by: Cashier & Order Station. Register/activate a POS device using product key and device hardware details.
       requestBody:
         required: true
         content:
@@ -83,7 +108,11 @@ paths:
   /api/companies/{companyId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get company"
+      description: |
+        Used by: Cashier & Order Station. Download company master data for the machine.
       parameters:
         - in: path
           name: companyId
@@ -109,7 +138,11 @@ paths:
   /api/branches/{branchId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get branch"
+      description: |
+        Used by: Cashier & Order Station. Download branch master data for the machine.
       parameters:
         - in: path
           name: branchId
@@ -135,7 +168,11 @@ paths:
   /api/test-connection:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Test connection"
+      description: |
+        Used by: Cashier & Order Station. Health check to verify the machine can reach the server.
       responses:
         '200':
           content:
@@ -148,7 +185,11 @@ paths:
   /api/cash-denominations:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cash denominations"
+      description: |
+        Used by: Cashier. Download cash denomination setup used for cash counts and safekeeping.
       parameters:
         - in: query
           name: device_id
@@ -168,7 +209,11 @@ paths:
   /api/departments/{branchId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get departments"
+      description: |
+        Used by: Cashier & Order Station. Download department master list for the branch.
       parameters:
         - in: path
           name: branchId
@@ -194,7 +239,11 @@ paths:
   /api/categories/{branchId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get categories"
+      description: |
+        Used by: Cashier & Order Station. Download category master list for the branch.
       parameters:
         - in: path
           name: branchId
@@ -220,7 +269,11 @@ paths:
   /api/sub-categories/{branchId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get sub-categories"
+      description: |
+        Used by: Cashier & Order Station. Download sub-category master list for the branch.
       parameters:
         - in: path
           name: branchId
@@ -246,7 +299,11 @@ paths:
   /api/branch-users/{branchId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get branch users"
+      description: |
+        Used by: Cashier & Order Station. Download branch users/cashiers allowed to log in on the machine.
       parameters:
         - in: path
           name: branchId
@@ -272,7 +329,11 @@ paths:
   /api/payment-types/{branchId}:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get payment types"
+      description: |
+        Used by: Cashier. Download available payment types for cashier checkout.
       parameters:
         - in: path
           name: branchId
@@ -298,7 +359,11 @@ paths:
   /api/discount-types/{branchId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get discount types"
+      description: |
+        Used by: Cashier & Order Station. Download discount types that can be applied on transactions/orders.
       parameters:
         - in: path
           name: branchId
@@ -324,7 +389,11 @@ paths:
   /api/charge-accounts/{branchId}:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get charge accounts"
+      description: |
+        Used by: Cashier. Download charge/AR account list used for charge payments.
       parameters:
         - in: path
           name: branchId
@@ -350,7 +419,11 @@ paths:
   /api/price-change-reasons/{branchId}:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get price change reasons"
+      description: |
+        Used by: Cashier. Download reasons allowed when changing product price on cashier.
       parameters:
         - in: path
           name: branchId
@@ -376,7 +449,11 @@ paths:
   /api/branch-products/{branchId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get branch products"
+      description: |
+        Used by: Cashier & Order Station. Download product catalog for the branch.
       parameters:
         - in: path
           name: branchId
@@ -402,7 +479,11 @@ paths:
   /api/branch-take-order-transactions:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get take-order transactions"
+      description: |
+        Used by: Cashier & Order Station. Download take-order (order station) transactions for sync between machines.
       parameters:
         - in: query
           name: branch_id
@@ -426,7 +507,11 @@ paths:
                   type: string
     post:
       tags:
+        - Order Station
         - Sync To Server
+      summary: "Upload take-order transactions"
+      description: |
+        Used by: Order Station. Upload take-order transactions created on the order station.
       requestBody:
         content:
           application/json:
@@ -566,7 +651,11 @@ paths:
   /api/branch-transactions:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cashier transactions"
+      description: |
+        Used by: Cashier. Download cashier sales transactions for multi-machine sync.
       parameters:
         - in: query
           name: branch_id
@@ -596,7 +685,11 @@ paths:
                   type: string
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cashier transactions"
+      description: |
+        Used by: Cashier. Upload cashier sales transactions to the server.
       requestBody:
         content:
           application/json:
@@ -739,7 +832,11 @@ paths:
   /api/branch-orders:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cashier orders"
+      description: |
+        Used by: Cashier. Download cashier order line items for multi-machine sync.
       parameters:
         - in: query
           name: branch_id
@@ -769,7 +866,11 @@ paths:
                   type: string
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cashier orders"
+      description: |
+        Used by: Cashier. Upload cashier order line items to the server.
       requestBody:
         content:
           application/json:
@@ -915,7 +1016,11 @@ paths:
   /api/branch-take-order-orders:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get take-order orders"
+      description: |
+        Used by: Cashier & Order Station. Download take-order line items for sync between machines.
       parameters:
         - in: query
           name: branch_id
@@ -944,7 +1049,11 @@ paths:
                   type: string
     post:
       tags:
+        - Order Station
         - Sync To Server
+      summary: "Upload take-order orders"
+      description: |
+        Used by: Order Station. Upload take-order line items created on the order station.
       requestBody:
         content:
           application/json:
@@ -1085,7 +1194,11 @@ paths:
   /api/branch-payments:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get payments"
+      description: |
+        Used by: Cashier. Download payment records for multi-machine sync.
       parameters:
         - in: query
           name: branch_id
@@ -1115,7 +1228,11 @@ paths:
                   type: string
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload payments"
+      description: |
+        Used by: Cashier. Upload payment records from cashier checkout.
       requestBody:
         content:
           application/json:
@@ -1190,7 +1307,11 @@ paths:
   /api/safekeeping:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get safekeeping"
+      description: |
+        Used by: Cashier. Download safekeeping/cash drop records.
       parameters:
         - in: query
           name: branch_id
@@ -1220,7 +1341,11 @@ paths:
                   type: string
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload safekeeping"
+      description: |
+        Used by: Cashier. Upload safekeeping/cash drop records from cashier.
       requestBody:
         content:
           application/json:
@@ -1282,7 +1407,11 @@ paths:
   /api/safekeeping-denominations:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get safekeeping denominations"
+      description: |
+        Used by: Cashier. Download denomination breakdown of safekeeping records.
       parameters:
         - in: query
           name: branch_id
@@ -1312,7 +1441,11 @@ paths:
                   type: string
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload safekeeping denominations"
+      description: |
+        Used by: Cashier. Upload denomination breakdown for safekeeping records.
       requestBody:
         content:
           application/json:
@@ -1369,7 +1502,11 @@ paths:
   /api/end-of-days:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get end of day"
+      description: |
+        Used by: Cashier. Download Z-reading / end-of-day records.
       parameters:
         - in: query
           name: branch_id
@@ -1399,7 +1536,11 @@ paths:
                   type: string
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload end of day"
+      description: |
+        Used by: Cashier. Upload Z-reading / end-of-day closing records from cashier.
       requestBody:
         content:
           application/json:
@@ -1507,7 +1648,11 @@ paths:
   /api/cut-offs:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cut-offs"
+      description: |
+        Used by: Cashier. Download X-reading / cut-off records.
       parameters:
         - in: query
           name: branch_id
@@ -1537,7 +1682,11 @@ paths:
                   type: string
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cut-offs"
+      description: |
+        Used by: Cashier. Upload X-reading / cut-off records from cashier.
       requestBody:
         content:
           application/json:
@@ -1640,7 +1789,11 @@ paths:
   /api/take-order-discounts:
     post:
       tags:
+        - Order Station
         - Sync To Server
+      summary: "Upload take-order discounts"
+      description: |
+        Used by: Order Station. Upload discounts applied on take-order transactions.
       requestBody:
         content:
           application/json:
@@ -1723,7 +1876,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get take-order discounts"
+      description: |
+        Used by: Cashier & Order Station. Download take-order discount headers for sync.
       parameters:
         - in: query
           name: branch_id
@@ -1754,7 +1911,11 @@ paths:
   /api/discounts:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cashier discounts"
+      description: |
+        Used by: Cashier. Upload discounts applied on cashier transactions.
       requestBody:
         content:
           application/json:
@@ -1840,7 +2001,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cashier discounts"
+      description: |
+        Used by: Cashier. Download cashier discount headers for sync.
       parameters:
         - in: query
           name: branch_id
@@ -1872,7 +2037,11 @@ paths:
   /api/take-order-discount-details:
     post:
       tags:
+        - Order Station
         - Sync To Server
+      summary: "Upload take-order discount details"
+      description: |
+        Used by: Order Station. Upload discount detail lines for take-order discounts.
       requestBody:
         content:
           application/json:
@@ -1947,7 +2116,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get take-order discount details"
+      description: |
+        Used by: Cashier & Order Station. Download take-order discount detail lines for sync.
       parameters:
         - in: query
           name: branch_id
@@ -1978,7 +2151,11 @@ paths:
   /api/discount-details:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cashier discount details"
+      description: |
+        Used by: Cashier. Upload discount detail lines for cashier discounts.
       requestBody:
         content:
           application/json:
@@ -2056,7 +2233,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cashier discount details"
+      description: |
+        Used by: Cashier. Download cashier discount detail lines for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2088,7 +2269,11 @@ paths:
   /api/machines/{machineId}:
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get machine"
+      description: |
+        Used by: Cashier & Order Station. Download POS machine record/settings.
       parameters:
         - in: path
           name: machineId
@@ -2112,7 +2297,11 @@ paths:
                   type: string
     put:
       tags:
+        - Cashier & Order Station
         - Sync To Server
+      summary: "Update machine"
+      description: |
+        Used by: Cashier & Order Station. Update POS machine counters/settings (e.g. OR/shift counters).
       parameters:
         - in: path
           name: machineId
@@ -2155,7 +2344,11 @@ paths:
   /api/payment-other-informations:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload payment other info"
+      description: |
+        Used by: Cashier. Upload extra payment fields (references, card info, etc.).
       requestBody:
         content:
           application/json:
@@ -2200,7 +2393,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get payment other info"
+      description: |
+        Used by: Cashier. Download extra payment field records for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2232,7 +2429,11 @@ paths:
   /api/take-order-discount-other-informations:
     post:
       tags:
+        - Order Station
         - Sync To Server
+      summary: "Upload take-order discount other info"
+      description: |
+        Used by: Order Station. Upload extra discount fields for take-order discounts (SC/PWD details, etc.).
       requestBody:
         content:
           application/json:
@@ -2275,7 +2476,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get take-order discount other info"
+      description: |
+        Used by: Cashier & Order Station. Download take-order discount extra fields for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2306,7 +2511,11 @@ paths:
   /api/discount-other-informations:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cashier discount other info"
+      description: |
+        Used by: Cashier. Upload extra discount fields for cashier discounts (SC/PWD details, etc.).
       requestBody:
         content:
           application/json:
@@ -2351,7 +2560,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cashier discount other info"
+      description: |
+        Used by: Cashier. Download cashier discount extra fields for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2383,7 +2596,11 @@ paths:
   /api/cut-off-departments:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cut-off departments"
+      description: |
+        Used by: Cashier. Upload department sales summary tied to a cut-off.
       requestBody:
         content:
           application/json:
@@ -2428,7 +2645,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cut-off departments"
+      description: |
+        Used by: Cashier. Download cut-off department summaries for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2460,7 +2681,11 @@ paths:
   /api/cut-off-discounts:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cut-off discounts"
+      description: |
+        Used by: Cashier. Upload discount summary tied to a cut-off.
       requestBody:
         content:
           application/json:
@@ -2507,7 +2732,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cut-off discounts"
+      description: |
+        Used by: Cashier. Download cut-off discount summaries for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2539,7 +2768,11 @@ paths:
   /api/cut-off-payments:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cut-off payments"
+      description: |
+        Used by: Cashier. Upload payment summary tied to a cut-off.
       requestBody:
         content:
           application/json:
@@ -2584,7 +2817,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cut-off payments"
+      description: |
+        Used by: Cashier. Download cut-off payment summaries for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2616,7 +2853,11 @@ paths:
   /api/end-of-day-discounts:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload end-of-day discounts"
+      description: |
+        Used by: Cashier. Upload discount summary tied to an end of day.
       requestBody:
         content:
           application/json:
@@ -2661,7 +2902,11 @@ paths:
   /api/end-of-day-payments:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload end-of-day payments"
+      description: |
+        Used by: Cashier. Upload payment summary tied to an end of day.
       requestBody:
         content:
           application/json:
@@ -2704,7 +2949,11 @@ paths:
   /api/end-of-day-departments:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload end-of-day departments"
+      description: |
+        Used by: Cashier. Upload department sales summary tied to an end of day.
       requestBody:
         content:
           application/json:
@@ -2747,7 +2996,11 @@ paths:
   /api/cash-funds:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cash funds"
+      description: |
+        Used by: Cashier. Upload beginning cash fund / drawer fund records.
       requestBody:
         content:
           application/json:
@@ -2799,7 +3052,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cash funds"
+      description: |
+        Used by: Cashier. Download cash fund records for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2831,7 +3088,11 @@ paths:
   /api/cash-fund-denominations:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cash fund denominations"
+      description: |
+        Used by: Cashier. Upload denomination breakdown for cash funds.
       requestBody:
         content:
           application/json:
@@ -2889,7 +3150,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cash fund denominations"
+      description: |
+        Used by: Cashier. Download cash fund denomination records for sync.
       parameters:
         - in: query
           name: branch_id
@@ -2921,7 +3186,11 @@ paths:
   /api/audit-trails:
     post:
       tags:
+        - Cashier & Order Station
         - Sync To Server
+      summary: "Upload audit trails"
+      description: |
+        Used by: Cashier & Order Station. Upload user action/audit trail logs from the machine.
       requestBody:
         content:
           application/json:
@@ -2976,7 +3245,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier & Order Station
         - Sync From Server
+      summary: "Get audit trails"
+      description: |
+        Used by: Cashier & Order Station. Download audit trail logs for sync.
       parameters:
         - in: query
           name: branch_id
@@ -3008,7 +3281,11 @@ paths:
   /api/cut-off-products:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload cut-off products"
+      description: |
+        Used by: Cashier. Upload product sales summary tied to a cut-off.
       requestBody:
         content:
           application/json:
@@ -3056,7 +3333,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get cut-off products"
+      description: |
+        Used by: Cashier. Download cut-off product summaries for sync.
       parameters:
         - in: query
           name: branch_id
@@ -3088,7 +3369,11 @@ paths:
   /api/end-of-day-products:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload end-of-day products"
+      description: |
+        Used by: Cashier. Upload product sales summary tied to an end of day.
       requestBody:
         content:
           application/json:
@@ -3127,7 +3412,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get end-of-day products"
+      description: |
+        Used by: Cashier. Download end-of-day product summaries for sync.
       parameters:
         - in: query
           name: branch_id
@@ -3159,7 +3448,11 @@ paths:
   /api/payouts:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload payouts"
+      description: |
+        Used by: Cashier. Upload cash payout / paid-out records from cashier.
       requestBody:
         content:
           application/json:
@@ -3218,7 +3511,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get payouts"
+      description: |
+        Used by: Cashier. Download payout records for sync.
       parameters:
         - in: query
           name: branch_id
@@ -3250,7 +3547,11 @@ paths:
   /api/official-receipt-informations:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload OR informations"
+      description: |
+        Used by: Cashier. Upload official receipt customer/info records.
       requestBody:
         content:
           application/json:
@@ -3305,7 +3606,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get OR informations"
+      description: |
+        Used by: Cashier. Download official receipt info records for sync.
       parameters:
         - in: query
           name: branch_id
@@ -3337,7 +3642,11 @@ paths:
   /api/spot-audits:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload spot audits"
+      description: |
+        Used by: Cashier. Upload spot audit / cash count records.
       requestBody:
         content:
           application/json:
@@ -3433,7 +3742,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get spot audits"
+      description: |
+        Used by: Cashier. Download spot audit records for sync.
       parameters:
         - in: query
           name: branch_id
@@ -3465,7 +3778,11 @@ paths:
   /api/spot-audit-denominations:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Upload spot audit denominations"
+      description: |
+        Used by: Cashier. Upload denomination breakdown for spot audits.
       requestBody:
         content:
           application/json:
@@ -3519,7 +3836,11 @@ paths:
                   type: string
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get spot audit denominations"
+      description: |
+        Used by: Cashier. Download spot audit denomination records for sync.
       parameters:
         - in: query
           name: branch_id
@@ -3551,7 +3872,11 @@ paths:
   /api/branch-product-soh:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get product stock on hand"
+      description: |
+        Used by: Cashier. Fetch current stock-on-hand for a branch product.
       parameters:
         - in: query
           name: branch_id
@@ -3582,7 +3907,11 @@ paths:
   /api/unredeemed-ar-transactions:
     get:
       tags:
+        - Cashier
         - Sync From Server
+      summary: "Get unredeemed AR transactions"
+      description: |
+        Used by: Cashier. Download unredeemed accounts-receivable / charge transactions.
       parameters:
         - in: query
           name: branch_id
@@ -3609,7 +3938,11 @@ paths:
   /api/ar-transactions:
     post:
       tags:
+        - Cashier
         - Sync To Server
+      summary: "Update AR transaction"
+      description: |
+        Used by: Cashier. Mark/update AR (charge) transaction status such as void/redeem.
       requestBody:
         content:
           application/json:
@@ -3631,102 +3964,6 @@ paths:
                 void_at:
                   type: string
                   default: null
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-
-  /api/sb-cutoff:
-    get:
-      tags:
-        - SB
-      parameters:
-        - in: query
-          name: branch_id
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the branch to get
-        - in: query
-          name: machine_id
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the machine
-        - in: query
-          name: date
-          schema:
-            type: string
-          required: true
-          description: Date of the cutoff (YYYY-MM-DD)
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-
-  /api/sb-endofday:
-
-    get:
-      tags:
-        - SB
-      parameters:
-        - in: query
-          name: branch_id
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the branch to get
-        - in: query
-          name: machine_id
-          schema:
-            type: integer
-          required: true
-          description: Numeric ID of the machine
-        - in: query
-          name: date
-          schema:
-            type: string
-          required: true
-          description: Date of the cutoff (YYYY-MM-DD)
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-  
-  /api/sb-update:
-    post:
-      tags:
-        - SB
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                machine_id:
-                  type: integer
-                  required: true
-                branch_id:
-                  type: integer
-                  required: true
-                percentage:
-                  type: number
-                  required: true
-                date:
-                  type: string
-                  required: true
       responses:
         '200':
           content:
